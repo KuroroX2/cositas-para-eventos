@@ -1,11 +1,35 @@
 /**
  * EVELYN & YIMMY — NUESTRO MATRIMONIO
- * Panel de Administración para los Novios con SUPABASE CLOUD
+ * Panel de Administración para los Novios con SUPABASE CLOUD + Datos Semilla
  * (Clave: "pastox" • Registro de Invitados • Generador de Links • Sorteo & Fotos)
  */
 
 (function() {
   const ADMIN_PIN = 'pastox'; // Clave de acceso
+
+  // 19 Invitaciones oficiales iniciales migradas desde el proyecto original
+  const DEFAULT_SEED_INVITATIONS = [
+    { id: "inv_mt8t3dh4_mdcy", pases: 2, name1: "Roberto", name2: "Acompañante", phone: "+56 9 9411 6173", createdAt: 1787670893560 },
+    { id: "inv_mt7agi0j_r812", pases: 1, name1: "Karen", name2: "", phone: "+56 9 6483 3883", createdAt: 1787579127091 },
+    { id: "inv_mt7agb8r_yhi2", pases: 1, name1: "Sandra", name2: "", phone: "+56 9 9057 6025", createdAt: 1787579118315 },
+    { id: "inv_mt7ag1bu_s3mf", pases: 1, name1: "Jhankhel", name2: "", phone: "+56 9 8142 5746", createdAt: 1787579105466 },
+    { id: "inv_mt7afpe6_kfg4", pases: 1, name1: "Yorka", name2: "", phone: "+1 (514) 570-0368", createdAt: 1787579089998 },
+    { id: "inv_mt7afe11_3wr0", pases: 2, name1: "Pamela", name2: "Marcial", phone: "+56 9 9352 5595", createdAt: 1787579075269 },
+    { id: "inv_mt7af2wd_bc93", pases: 1, name1: "Constanza", name2: "", phone: "+56 9 5003 1547", createdAt: 1787579060845 },
+    { id: "inv_mt7aerri_0o4h", pases: 1, name1: "Cecilia", name2: "", phone: "+56 9 5778 7316", createdAt: 1787579046414 },
+    { id: "inv_mt7aefqb_ewjp", pases: 1, name1: "Barbara", name2: "", phone: "+56 9 8982 8672", createdAt: 1787579030819 },
+    { id: "inv_mt7ae4tr_3c2o", pases: 1, name1: "Claudia", name2: "", phone: "+56 9 7850 6319", createdAt: 1787579016687 },
+    { id: "inv_mt7ado96_pjjz", pases: 2, name1: "Camila", name2: "Tah", phone: "+61 451 471 901", createdAt: 1787578995210 },
+    { id: "inv_mt7ad2wi_m84w", pases: 2, name1: "Daniela", name2: "Hugo", phone: "+56 9 6210 8586", createdAt: 1787578967538 },
+    { id: "inv_mt7acqee_bjth", pases: 2, name1: "Jessica", name2: "Eduardo", phone: "+56 9 5524 3357", createdAt: 1787578951334 },
+    { id: "inv_mt7ac5s2_2ko9", pases: 2, name1: "Cristopher", name2: "Reny", phone: "+56 9 9138 1368", createdAt: 1787578924610 },
+    { id: "inv_mt7abo4o_ixxm", pases: 2, name1: "Carlos", name2: "Carola", phone: "+56 9 2197 6137", createdAt: 1787578901736 },
+    { id: "inv_mt79v1i5_fj7j", pases: 2, name1: "Felipe", name2: "Camila", phone: "+56 9 9588 8834", createdAt: 1787578125917 },
+    { id: "inv_mt79ukht_iqcm", pases: 2, name1: "Guisselle", name2: "Nicolas", phone: "+56 9 3269 8863", createdAt: 1787578103873 },
+    { id: "inv_mt79u2qe_of3f", pases: 2, name1: "Jaqueline", name2: "Luis", phone: "+56 9 8612 9593", createdAt: 1787578080854 },
+    { id: "inv_mt797yfq_46ak", pases: 2, name1: "Isaac", name2: "Denisse", phone: "+56 9 6169 7185", createdAt: 1787577048854 }
+  ];
+
   let adminRsvps = [];
   let adminInvitations = [];
 
@@ -160,6 +184,25 @@
   }
 
   async function loadAdminCloudData() {
+    // 1. Cargar caché local primero para respuesta instantánea (0ms)
+    try {
+      const localInv = localStorage.getItem('wedding_invitations_cloud_v1');
+      if (localInv) {
+        adminInvitations = JSON.parse(localInv);
+      } else {
+        adminInvitations = [...DEFAULT_SEED_INVITATIONS];
+        localStorage.setItem('wedding_invitations_cloud_v1', JSON.stringify(adminInvitations));
+      }
+      const localRsvp = localStorage.getItem('wedding_rsvps_cloud_v1');
+      if (localRsvp) adminRsvps = JSON.parse(localRsvp);
+    } catch (e) {
+      adminInvitations = [...DEFAULT_SEED_INVITATIONS];
+    }
+
+    renderAdminInvitations();
+    renderAdminRsvps();
+
+    // 2. Sincronizar con Supabase Cloud si está disponible
     if (window.dbSupabase) {
       try {
         const [cloudInvs, cloudRsvps] = await Promise.all([
@@ -177,6 +220,7 @@
             createdAt: new Date(i.created_at).getTime()
           }));
           localStorage.setItem('wedding_invitations_cloud_v1', JSON.stringify(adminInvitations));
+          renderAdminInvitations();
         }
 
         if (cloudRsvps && cloudRsvps.length > 0) {
@@ -197,29 +241,12 @@
             timestamp: new Date(r.created_at).getTime()
           }));
           localStorage.setItem('wedding_rsvps_cloud_v1', JSON.stringify(adminRsvps));
+          renderAdminRsvps();
         }
       } catch (e) {
-        console.warn('Error fetching Supabase admin data:', e);
+        console.warn('Notice sync admin Supabase:', e);
       }
     }
-
-    // Fallback if empty
-    if (adminInvitations.length === 0) {
-      try {
-        const localInv = localStorage.getItem('wedding_invitations_cloud_v1');
-        if (localInv) adminInvitations = JSON.parse(localInv);
-      } catch (e) {}
-    }
-
-    if (adminRsvps.length === 0) {
-      try {
-        const localRsvp = localStorage.getItem('wedding_rsvps_cloud_v1');
-        if (localRsvp) adminRsvps = JSON.parse(localRsvp);
-      } catch (e) {}
-    }
-
-    renderAdminInvitations();
-    renderAdminRsvps();
   }
 
   async function handleCreateInvitation(e) {
@@ -257,9 +284,9 @@
       localStorage.setItem('wedding_invitations_cloud_v1', JSON.stringify(adminInvitations));
     } catch (err) {}
 
-    // Save to Supabase Cloud
+    // Save to Supabase Cloud in background
     if (window.dbSupabase) {
-      await window.dbSupabase.createInvitation(newInvitation);
+      window.dbSupabase.createInvitation(newInvitation).catch(() => {});
     }
 
     // Reset form
@@ -397,7 +424,7 @@
     if (adminRsvps.length === 0) {
       tableBody.innerHTML = `
         <tr>
-          <td colspan="8" style="text-align: center; padding: 2rem; color: #888;">
+          <td colspan="9" style="text-align: center; padding: 2rem; color: #888;">
             Aún no hay confirmaciones registradas.
           </td>
         </tr>

@@ -1,13 +1,13 @@
 /**
  * EVELYN & YIMMY — NUESTRO MATRIMONIO
- * Álbum Social Colaborativo en Tiempo Real con SUPABASE CLOUD
- * Subida directa a Storage CDN, Likes y Comentarios en Vivo
+ * Álbum Social Colaborativo en Tiempo Real con SUPABASE CLOUD + Caché Instantáneo
+ * Subida inmediata, Likes y Comentarios en Vivo
  */
 
-const CLOUD_STORAGE_KEY = 'eve_yimmy_wedding_album_cache_v5';
-const LIKED_PHOTOS_KEY = 'eve_yimmy_liked_photos_v5';
+const CLOUD_STORAGE_KEY = 'eve_yimmy_wedding_album_cache_v6';
+const LIKED_PHOTOS_KEY = 'eve_yimmy_liked_photos_v6';
 
-let activeCategoryFilter = 'invitados';
+let activeCategoryFilter = 'all';
 let weddingPhotos = [];
 let activePhotoForLightbox = null;
 
@@ -36,7 +36,7 @@ function loadLocalCache() {
     const raw = localStorage.getItem(CLOUD_STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) {
+      if (Array.isArray(parsed) && parsed.length > 0) {
         weddingPhotos = parsed;
         return;
       }
@@ -201,7 +201,7 @@ window.togglePhotoLike = async function(event, photoId) {
 
   // Supabase update
   if (window.dbSupabase) {
-    window.dbSupabase.likePhoto(photoId, photo.likes);
+    window.dbSupabase.likePhoto(photoId, photo.likes).catch(() => {});
   }
 };
 
@@ -267,7 +267,7 @@ function initLightboxSocial() {
       updateLightboxLikeUI();
 
       if (window.dbSupabase) {
-        window.dbSupabase.addComment(activePhotoForLightbox.id, activePhotoForLightbox.comments, newComment);
+        window.dbSupabase.addComment(activePhotoForLightbox.id, activePhotoForLightbox.comments, newComment).catch(() => {});
       }
     });
   }
@@ -368,7 +368,7 @@ function renderLightboxComments() {
 }
 
 /* ==========================================================================
-   4. PHOTO UPLOAD MODAL & SUPABASE STORAGE UPLOAD
+   4. PHOTO UPLOAD MODAL & INSTANT RENDERING
    ========================================================================== */
 function initUploadModal() {
   const openBtn = document.getElementById('btn-open-upload');
@@ -457,7 +457,7 @@ function initUploadModal() {
         return;
       }
 
-      const author = (document.getElementById('upload-author').value || '').trim();
+      const author = (document.getElementById('upload-author').value || '').trim() || 'Invitado Especial';
       const caption = (document.getElementById('upload-caption').value || '').trim();
       const category = document.getElementById('upload-category').value || 'invitados';
 
@@ -468,34 +468,46 @@ function initUploadModal() {
       if (progressBox) progressBox.style.display = 'flex';
 
       try {
-        // Compresión inteligente para fotos de celular (alta velocidad y compatibilidad)
+        // 1. Comprimir imagen para rendimiento óptimo
         const { blob, dataUrl } = await compressImageFile(selectedFile, 1200, 0.82);
 
-        if (window.dbSupabase) {
-          const record = await window.dbSupabase.uploadPhoto(blob, author, category, caption, dataUrl);
-          if (record) {
-            const formatted = {
-              id: record.id,
-              url: record.photo_url,
-              author: record.author_name,
-              category: record.category,
-              caption: record.caption,
-              likes: record.likes || 0,
-              timestamp: new Date(record.created_at).getTime(),
-              comments: record.comments || []
-            };
-            weddingPhotos.unshift(formatted);
-            saveLocalCache();
-            renderGallery();
-          }
-        }
+        // 2. Crear objeto foto y mostrarlo de INMEDIATO (0ms de espera para el usuario)
+        const tempId = 'photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+        const newPhoto = {
+          id: tempId,
+          url: dataUrl,
+          author: author,
+          category: category,
+          caption: caption,
+          likes: 0,
+          timestamp: Date.now(),
+          comments: []
+        };
+
+        weddingPhotos.unshift(newPhoto);
+        saveLocalCache();
+        renderGallery();
 
         try {
           localStorage.setItem('wedding_guest_name', author);
         } catch (err) {}
 
+        // 3. Sincronizar en la nube en segundo plano
+        if (window.dbSupabase) {
+          window.dbSupabase.uploadPhoto(blob, author, category, caption, dataUrl).then(record => {
+            if (record && record.id) {
+              newPhoto.id = record.id;
+              if (record.photo_url) newPhoto.url = record.photo_url;
+              saveLocalCache();
+              renderGallery();
+            }
+          }).catch(err => {
+            console.warn('Sync notice:', err);
+          });
+        }
+
         closeModal();
-        alert('¡Foto publicada con éxito! Ya está disponible en la nube para todos los invitados.');
+        alert('¡Foto publicada con éxito! Ya está disponible en el álbum para todos.');
 
         const targetSection = category === 'desafios'
           ? document.getElementById('desafios')
@@ -506,7 +518,7 @@ function initUploadModal() {
 
       } catch (error) {
         console.error('Upload error:', error);
-        alert('Ocurrió un detalle al subir la foto. Por favor intenta nuevamente.');
+        alert('Ocurrió un detalle al procesar la foto. Por favor intenta nuevamente.');
       } finally {
         if (submitBtn) submitBtn.style.display = 'inline-flex';
         if (progressBox) progressBox.style.display = 'none';
@@ -575,7 +587,7 @@ async function fetchCloudPhotos() {
 function startCloudPolling() {
   setInterval(() => {
     fetchCloudPhotos();
-  }, 20000); // Polling suave cada 20 segundos
+  }, 15000);
 }
 
 /* ==========================================================================
