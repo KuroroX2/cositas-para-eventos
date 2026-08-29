@@ -126,7 +126,22 @@
     const name2 = urlParams.get('n2');
     const code = urlParams.get('code');
 
-    if (!name1) return; // Standard generic visit
+    const rsvpSection = document.getElementById('rsvp');
+    const navLink = document.getElementById('nav-link-rsvp');
+    const drawerItem = document.getElementById('drawer-item-rsvp');
+
+    if (!name1) {
+      // Visita genérica / pública: Ocultar completamente la sección y enlaces de confirmación
+      if (rsvpSection) rsvpSection.style.display = 'none';
+      if (navLink) navLink.style.display = 'none';
+      if (drawerItem) drawerItem.style.display = 'none';
+      return;
+    }
+
+    // Invitación personalizada con pases: Mostrar la sección y enlaces
+    if (rsvpSection) rsvpSection.style.display = 'block';
+    if (navLink) navLink.style.display = 'inline-flex';
+    if (drawerItem) drawerItem.style.display = 'block';
 
     invitationData = {
       pases: pases,

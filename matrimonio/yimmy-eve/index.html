@@ -53,7 +53,7 @@
         <a href="#regalos" class="nav-item">Lista de Regalos</a>
         <a href="#desafios" class="nav-item">Desafío Fotos</a>
         <a href="#galeria" class="nav-item">Álbum</a>
-        <a href="#rsvp" class="nav-item">Confirmación</a>
+        <a href="#rsvp" class="nav-item" id="nav-link-rsvp" style="display: none;">Confirmación</a>
         <button class="nav-btn-admin" id="btn-navbar-admin" title="Panel exclusivo para los novios">
           <i class="ri-lock-line"></i> Acceso Novios
         </button>
@@ -83,7 +83,7 @@
       <li><a href="#regalos" class="drawer-link">Lista de Regalos 🎁</a></li>
       <li><a href="#desafios" class="drawer-link">Desafío de Fotos 📸</a></li>
       <li><a href="#galeria" class="drawer-link">Álbum de Recuerdos</a></li>
-      <li><a href="#rsvp" class="drawer-link">Confirmar Asistencia (RSVP)</a></li>
+      <li id="drawer-item-rsvp" style="display: none;"><a href="#rsvp" class="drawer-link">Confirmar Asistencia (RSVP)</a></li>
       <li>
         <button class="drawer-admin-btn" id="btn-drawer-admin">
           <i class="ri-lock-line"></i> 💍 Acceso Novios (Administración)
@@ -650,8 +650,8 @@
       </div>
     </section>
 
-    <!-- SECTION: RSVP (CONFIRMACIÓN DE ASISTENCIA) -->
-    <section class="section-editorial section-rsvp reveal" id="rsvp">
+    <!-- SECTION: RSVP (CONFIRMACIÓN DE ASISTENCIA - SOLO CON LINK PERSONALIZADO) -->
+    <section class="section-editorial section-rsvp reveal" id="rsvp" style="display: none;">
       <div class="container">
         <div class="rsvp-editorial-wrapper">
           <div class="rsvp-header-box">
