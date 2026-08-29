@@ -253,7 +253,7 @@ function getCategoryBadgeLabel(cat) {
 function getLikedPhotoIds() {
   try {
     const raw = localStorage.getItem(LIKED_PHOTOS_KEY);
-    return raw ? JSON.parse(raw) : [];
+    return raw ? JSON.parse(raw).map(String) : [];
   } catch (e) {
     return [];
   }
@@ -268,18 +268,19 @@ function saveLikedPhotoIds(ids) {
 window.togglePhotoLike = async function(event, photoId) {
   if (event) event.stopPropagation();
 
-  const photo = weddingPhotos.find(p => p.id === photoId);
+  const idStr = String(photoId);
+  const photo = weddingPhotos.find(p => String(p.id) === idStr);
   if (!photo) return;
 
   let likedIds = getLikedPhotoIds();
-  const isCurrentlyLiked = likedIds.includes(photoId);
+  const isCurrentlyLiked = likedIds.includes(idStr);
 
   if (isCurrentlyLiked) {
     photo.likes = Math.max(0, (photo.likes || 1) - 1);
-    likedIds = likedIds.filter(id => id !== photoId);
+    likedIds = likedIds.filter(id => id !== idStr);
   } else {
     photo.likes = (photo.likes || 0) + 1;
-    likedIds.push(photoId);
+    likedIds.push(idStr);
   }
 
   saveLikedPhotoIds(likedIds);
@@ -289,7 +290,7 @@ window.togglePhotoLike = async function(event, photoId) {
 
   // Supabase update
   if (window.dbSupabase) {
-    window.dbSupabase.likePhoto(photoId, photo.likes).catch(() => {});
+    window.dbSupabase.likePhoto(photo.id, photo.likes).catch(e => console.warn('Supabase like error:', e));
   }
 };
 

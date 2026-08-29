@@ -32,6 +32,7 @@
 
   let adminRsvps = [];
   let adminInvitations = [];
+  let adminPhotos = [];
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initAdminModal);
@@ -203,19 +204,24 @@
       }
       const localRsvp = localStorage.getItem('wedding_rsvps_cloud_v1');
       if (localRsvp) adminRsvps = JSON.parse(localRsvp);
+
+      const localPhotos = localStorage.getItem('eve_yimmy_wedding_album_cache_v9') || localStorage.getItem('wedding_photos_cloud_v1');
+      if (localPhotos) adminPhotos = JSON.parse(localPhotos);
     } catch (e) {
       adminInvitations = [...DEFAULT_SEED_INVITATIONS];
     }
 
     renderAdminInvitations();
     renderAdminRsvps();
+    renderAdminPhotos();
 
     // 2. Sincronizar con Supabase Cloud si está disponible
     if (window.dbSupabase) {
       try {
-        const [cloudInvs, cloudRsvps] = await Promise.all([
+        const [cloudInvs, cloudRsvps, cloudPhotos] = await Promise.all([
           window.dbSupabase.getInvitations(),
-          window.dbSupabase.getRsvps()
+          window.dbSupabase.getRsvps(),
+          window.dbSupabase.getPhotos()
         ]);
 
         if (cloudInvs && cloudInvs.length > 0) {
@@ -250,6 +256,22 @@
           }));
           localStorage.setItem('wedding_rsvps_cloud_v1', JSON.stringify(adminRsvps));
           renderAdminRsvps();
+        }
+
+        if (cloudPhotos && cloudPhotos.length > 0) {
+          adminPhotos = cloudPhotos.map(p => ({
+            id: p.id,
+            url: p.photo_url || p.url,
+            photo_url: p.photo_url || p.url,
+            author: p.guest_name || p.author || 'Invitado',
+            category: p.category || 'album',
+            caption: p.caption || '',
+            likes: p.likes_count || p.likes || 0,
+            comments: p.comments || [],
+            timestamp: p.created_at ? new Date(p.created_at).getTime() : Date.now()
+          }));
+          localStorage.setItem('eve_yimmy_wedding_album_cache_v9', JSON.stringify(adminPhotos));
+          renderAdminPhotos();
         }
       } catch (e) {
         console.warn('Notice sync admin Supabase:', e);
@@ -697,34 +719,81 @@
     printWindow.document.close();
   }
 
+  window.downloadAdminPhoto = async function(url, filename) {
+    if (!url) return;
+    try {
+      if (url.startsWith('data:image')) {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename || 'Foto_Boda_Eve_Yimmy.jpg';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        return;
+      }
+      const resp = await fetch(url);
+      const blob = await resp.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = filename || 'Foto_Boda_Eve_Yimmy.jpg';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
+    } catch (err) {
+      const link = document.createElement('a');
+      link.href = url;
+      link.target = '_blank';
+      link.download = filename || 'Foto_Boda_Eve_Yimmy.jpg';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
   function renderAdminPhotos() {
     const grid = document.getElementById('admin-photos-grid');
     if (!grid) return;
 
-    const photos = window.weddingPhotos || [];
+    const photos = (adminPhotos && adminPhotos.length > 0) ? adminPhotos : (window.weddingPhotos || []);
     if (photos.length === 0) {
-      grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #888; padding: 2rem;">Aún no se han subido fotos al álbum.</p>`;
+      grid.innerHTML = `
+        <div style="grid-column: 1/-1; text-align: center; color: #6C826D; padding: 3rem 1.5rem; background: rgba(82,122,80,0.05); border: 1.5px dashed rgba(82,122,80,0.25); border-radius: 16px;">
+          <i class="ri-image-2-line" style="font-size: 2.5rem; color: #527A50; display: block; margin-bottom: 0.5rem;"></i>
+          <h4 style="font-family: var(--font-serif); font-size: 1.2rem; color: #243525; margin-bottom: 0.3rem;">Aún no se han subido fotos al álbum</h4>
+          <p style="font-size: 0.85rem; margin: 0;">Las fotos que suban los invitados aparecerán aquí y podrán ser descargadas individualmente o todas juntas en ZIP.</p>
+        </div>
+      `;
       return;
     }
 
-    grid.innerHTML = photos.map((p, idx) => `
-      <div class="admin-photo-card">
-        <img src="${escapeHtml(p.url || p.photo_url || '')}" alt="Foto">
-        <div class="admin-photo-info">
-          <span class="admin-photo-author">#${idx + 1} • ${escapeHtml(p.author || p.author_name || 'Invitado')}</span>
-          <span class="admin-photo-likes">❤️ ${p.likes || 0} | 💬 ${(p.comments || []).length}</span>
-          <a href="${escapeHtml(p.url || p.photo_url || '')}" download="Boda_Eve_Yimmy_Foto_${idx + 1}.jpg" target="_blank" class="btn-dl-single">
-            <i class="ri-download-2-line"></i> Descargar
-          </a>
+    grid.innerHTML = photos.map((p, idx) => {
+      const photoUrl = p.url || p.photo_url || '';
+      const author = p.author || p.guest_name || 'Invitado';
+      const category = p.category || 'Álbum';
+      const fileName = `Foto_${String(idx + 1).padStart(2, '0')}_${author.replace(/[^a-zA-Z0-9_-]/g, '_')}.jpg`;
+
+      return `
+        <div class="admin-photo-card">
+          <img src="${escapeHtml(photoUrl)}" alt="Foto por ${escapeHtml(author)}" loading="lazy">
+          <div class="admin-photo-info">
+            <span class="admin-photo-author">#${idx + 1} • ${escapeHtml(author)}</span>
+            <span class="admin-photo-cat">${escapeHtml(category)}</span>
+            <span class="admin-photo-likes">❤️ ${p.likes || 0} Me Gusta | 💬 ${(p.comments || []).length} comentarios</span>
+            <button type="button" class="btn-dl-single" onclick="downloadAdminPhoto('${escapeHtml(photoUrl)}', '${escapeHtml(fileName)}')">
+              <i class="ri-download-2-line"></i> Descargar Foto
+            </button>
+          </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   async function downloadAllPhotosBulk() {
-    const photos = window.weddingPhotos || [];
+    const photos = (adminPhotos && adminPhotos.length > 0) ? adminPhotos : (window.weddingPhotos || []);
     if (photos.length === 0) {
-      alert('No hay fotos para descargar aún.');
+      alert('Aún no hay fotos subidas para descargar.');
       return;
     }
 
@@ -744,11 +813,11 @@
         for (let i = 0; i < photos.length; i++) {
           const p = photos[i];
           const url = p.url || p.photo_url || '';
-          const author = (p.author || p.author_name || 'Invitado').replace(/[^a-zA-Z0-9_-]/g, '_');
+          const author = (p.author || p.guest_name || 'Invitado').replace(/[^a-zA-Z0-9_-]/g, '_');
           const fileName = `${String(i + 1).padStart(2, '0')}_${author}_${p.category || 'album'}.jpg`;
 
           if (btn) {
-            const percent = Math.round(((i + 1) / photos.length) * 80);
+            const percent = Math.round(((i + 1) / photos.length) * 85);
             btn.innerHTML = `<i class="ri-loader-4-line ri-spin"></i> <span>Procesando foto ${i + 1} de ${photos.length} (${percent}%)...</span>`;
           }
 
@@ -761,13 +830,13 @@
               const blob = await resp.blob();
               folder.file(fileName, blob);
             } catch (fetchErr) {
-              console.warn('Direct fetch failed, skipping or fallback:', fetchErr);
+              console.warn('Fetch photo notice:', fetchErr);
             }
           }
         }
 
         if (btn) {
-          btn.innerHTML = `<i class="ri-loader-4-line ri-spin"></i> <span>Generando archivo ZIP...</span>`;
+          btn.innerHTML = `<i class="ri-loader-4-line ri-spin"></i> <span>Comprimiendo archivo ZIP final...</span>`;
         }
 
         const zipBlob = await zip.generateAsync({ type: 'blob' });
@@ -778,8 +847,9 @@
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(zipUrl), 3000);
 
-        alert(`¡Descarga lista! Se ha descargado el archivo ZIP con todas las ${photos.length} fotos juntas.`);
+        alert(`¡Descarga lista! Se ha descargado el archivo ZIP con todas las ${photos.length} fotos del matrimonio.`);
       } else {
         // Fallback secuencial
         photos.forEach((p, idx) => {

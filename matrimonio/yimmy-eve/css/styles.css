@@ -1691,34 +1691,40 @@ body.theme-florido .ch-num {
   flex: 1;
 }
 
-.gallery-card-actions {
+.gallery-card-actions, .photo-social-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding-top: 0.6rem;
-  border-top: 1px solid rgba(28, 27, 26, 0.08);
+  border-top: 1px solid rgba(82, 122, 80, 0.15);
 }
-.btn-card-like {
+.btn-like-social, .btn-card-like {
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  font-size: 0.78rem;
+  gap: 0.4rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  color: var(--text-muted);
-  padding: 0.25rem 0.5rem;
-  border-radius: 20px;
-  background: rgba(0, 0, 0, 0.03);
-  transition: var(--transition-smooth);
+  color: #4B634C;
+  padding: 0.4rem 0.9rem;
+  border-radius: 50px;
+  background: rgba(82, 122, 80, 0.1);
+  border: 1.5px solid rgba(82, 122, 80, 0.25);
+  cursor: pointer;
+  transition: all 0.25s ease;
 }
-.btn-card-like:hover {
+.btn-like-social:hover, .btn-card-like:hover {
   color: #e74c3c;
-  background: rgba(231, 76, 60, 0.08);
+  background: rgba(231, 76, 60, 0.1);
+  border-color: rgba(231, 76, 60, 0.35);
+  transform: translateY(-1px);
 }
-.btn-card-like.liked {
+.btn-like-social.liked, .btn-card-like.liked {
   color: #e74c3c;
-  background: rgba(231, 76, 60, 0.12);
+  background: rgba(231, 76, 60, 0.15);
+  border-color: rgba(231, 76, 60, 0.45);
 }
-.btn-card-like.liked i {
+.btn-like-social.liked i, .btn-card-like.liked i {
+  color: #e74c3c;
   animation: heartPop 0.35s cubic-bezier(0.17, 0.89, 0.32, 1.49);
 }
 @keyframes heartPop {
@@ -1726,17 +1732,24 @@ body.theme-florido .ch-num {
   50% { transform: scale(1.35); }
   100% { transform: scale(1); }
 }
-.btn-card-comments {
+.btn-comment-social, .btn-card-comments {
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  font-size: 0.74rem;
-  color: var(--text-muted);
-  font-weight: 600;
-  transition: color 0.2s ease;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  color: #4B634C;
+  font-weight: 700;
+  padding: 0.4rem 0.8rem;
+  border-radius: 50px;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
-.btn-card-comments:hover {
-  color: var(--text-main);
+.btn-comment-social:hover, .btn-card-comments:hover {
+  color: #243525;
+  background: rgba(82, 122, 80, 0.12);
+  border-color: rgba(82, 122, 80, 0.25);
 }
 
 /* Upload Modal Styles */
@@ -2850,49 +2863,75 @@ body.theme-florido .ch-num {
 
 .admin-photos-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.2rem;
+  margin-top: 1rem;
 }
 .admin-photo-card {
-  border: 1px solid var(--border-gold);
-  border-radius: 8px;
+  border: 1.5px solid rgba(82, 122, 80, 0.25);
+  border-radius: 14px;
   overflow: hidden;
-  background: var(--bg-surface);
+  background: #FFFFFF;
+  box-shadow: 0 4px 15px rgba(82, 122, 80, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+.admin-photo-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 22px rgba(82, 122, 80, 0.15);
 }
 .admin-photo-card img {
   width: 100%;
-  height: 140px;
+  height: 160px;
   object-fit: cover;
+  display: block;
+  background: #eae5d9;
 }
 .admin-photo-info {
-  padding: 0.5rem;
+  padding: 0.8rem;
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
-  font-size: 0.72rem;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  flex: 1;
 }
 .admin-photo-author {
   font-weight: 700;
+  color: #243525;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.admin-photo-cat {
+  font-size: 0.7rem;
+  color: #527A50;
+  font-weight: 600;
+}
+.admin-photo-likes {
+  font-size: 0.74rem;
+  color: #666;
+}
 .btn-dl-single {
-  margin-top: 0.3rem;
+  margin-top: 0.4rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.2rem;
-  padding: 0.25rem 0.5rem;
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 4px;
-  font-size: 0.68rem;
-  color: var(--text-main);
-  font-weight: 600;
+  gap: 0.35rem;
+  padding: 0.45rem 0.85rem;
+  background: #527A50;
+  border-radius: 50px;
+  font-size: 0.74rem;
+  color: #FFFFFF;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
 }
 .btn-dl-single:hover {
-  background: var(--gold-dark);
-  color: #fff;
+  background: #3D5C3B;
+  transform: translateY(-1px);
 }
 
 /* Navbar & Drawer Admin Buttons */
