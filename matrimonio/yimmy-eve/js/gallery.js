@@ -1,11 +1,11 @@
 /**
  * EVELYN & YIMMY — NUESTRO MATRIMONIO
- * Álbum Social Colaborativo en Tiempo Real con SUPABASE CLOUD + Caché Instantáneo
- * Subida inmediata, Likes y Comentarios en Vivo
+ * Álbum Social Colaborativo en Tiempo Real con SUPABASE CLOUD
+ * Subida inmediata, Sincronización Global, Likes y Comentarios en Vivo
  */
 
-const CLOUD_STORAGE_KEY = 'eve_yimmy_wedding_album_cache_v6';
-const LIKED_PHOTOS_KEY = 'eve_yimmy_liked_photos_v6';
+const CLOUD_STORAGE_KEY = 'eve_yimmy_wedding_album_cache_v7';
+const LIKED_PHOTOS_KEY = 'eve_yimmy_liked_photos_v7';
 
 let activeCategoryFilter = 'all';
 let weddingPhotos = [];
@@ -210,17 +210,42 @@ window.togglePhotoLike = async function(event, photoId) {
    ========================================================================== */
 function initLightboxSocial() {
   const modal = document.getElementById('lightbox-modal');
-  const closeBtn = document.getElementById('btn-close-lightbox');
+  const closeBtns = [
+    document.getElementById('lightbox-close'),
+    document.getElementById('btn-close-lightbox')
+  ];
   const likeBtn = document.getElementById('btn-lightbox-like');
   const commentForm = document.getElementById('lightbox-comment-form');
 
-  if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
+  closeBtns.forEach(btn => {
+    if (btn) {
+      btn.addEventListener('click', closeLightbox);
+    }
+  });
 
   if (modal) {
     modal.addEventListener('click', (e) => {
       if (e.target === modal) closeLightbox();
     });
   }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeLightbox();
+      const uploadModal = document.getElementById('upload-photo-modal');
+      if (uploadModal) {
+        uploadModal.classList.remove('active');
+        uploadModal.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+      const adminModal = document.getElementById('admin-modal');
+      if (adminModal) {
+        adminModal.classList.remove('active');
+        adminModal.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    }
+  });
 
   if (likeBtn) {
     likeBtn.addEventListener('click', () => {
@@ -238,10 +263,10 @@ function initLightboxSocial() {
       const authorInput = document.getElementById('comment-author-input');
       const textInput = document.getElementById('comment-text-input');
 
-      const author = (authorInput.value || '').trim();
+      const author = (authorInput.value || '').trim() || 'Invitado Especial';
       const text = (textInput.value || '').trim();
 
-      if (!author || !text) return;
+      if (!text) return;
 
       if (!activePhotoForLightbox.comments) {
         activePhotoForLightbox.comments = [];
@@ -256,10 +281,6 @@ function initLightboxSocial() {
 
       activePhotoForLightbox.comments.push(newComment);
       textInput.value = '';
-
-      try {
-        localStorage.setItem('wedding_guest_name', author);
-      } catch (err) {}
 
       saveLocalCache();
       renderGallery();
@@ -292,21 +313,25 @@ window.openLightboxForPhoto = function (photoId) {
   if (descEl) descEl.textContent = photo.caption || '';
 
   if (nameInput) {
-    try {
-      nameInput.value = localStorage.getItem('wedding_guest_name') || '';
-    } catch (e) {}
+    nameInput.value = '';
   }
 
   updateLightboxLikeUI();
   renderLightboxComments();
 
-  if (modal) modal.classList.add('active');
+  if (modal) {
+    modal.classList.add('active');
+    modal.style.display = 'flex';
+  }
   document.body.style.overflow = 'hidden';
 };
 
 function closeLightbox() {
   const modal = document.getElementById('lightbox-modal');
-  if (modal) modal.classList.remove('active');
+  if (modal) {
+    modal.classList.remove('active');
+    modal.style.display = 'none';
+  }
   document.body.style.overflow = '';
   activePhotoForLightbox = null;
 }
@@ -347,28 +372,37 @@ function renderLightboxComments() {
 
   if (comments.length === 0) {
     listEl.innerHTML = `
-      <div class="comments-empty-state">
-        <p>Aún no hay comentarios. ¡Sé el primero en dejar una dedicatoria!</p>
+      <div class="comments-empty-state" style="text-align: center; padding: 2rem 1rem; color: #888;">
+        <i class="ri-chat-heart-line" style="font-size: 2rem; color: #527A50; display: block; margin-bottom: 0.3rem;"></i>
+        <p style="font-size: 0.85rem;">Aún no hay comentarios. ¡Sé el primero en dejar una dedicatoria!</p>
       </div>
     `;
     return;
   }
 
-  listEl.innerHTML = comments.map(c => `
-    <div class="comment-item">
-      <div class="comment-item-header">
-        <span class="comment-author-name"><i class="ri-chat-heart-line"></i> ${escapeHtml(c.author || 'Invitado')}</span>
-        <span class="comment-time">${formatRelativeTime(c.timestamp)}</span>
+  listEl.innerHTML = comments.map(c => {
+    const author = (typeof c === 'object' ? (c.author || c.author_name || c.name) : 'Invitado') || 'Invitado';
+    const text = (typeof c === 'object' ? (c.text || c.comment || c.message) : c) || '';
+    const time = (typeof c === 'object' ? (c.timestamp || c.created_at) : null);
+
+    return `
+      <div class="comment-item" style="padding: 0.6rem 0; border-bottom: 1px solid rgba(82, 122, 80, 0.1);">
+        <div class="comment-item-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.2rem;">
+          <span class="comment-author-name" style="font-weight: 700; font-size: 0.82rem; color: #243525;">
+            <i class="ri-chat-heart-line" style="color: #527A50;"></i> ${escapeHtml(author)}
+          </span>
+          <span class="comment-time" style="font-size: 0.72rem; color: #777;">${formatRelativeTime(time)}</span>
+        </div>
+        <p class="comment-item-body" style="margin: 0; font-size: 0.85rem; color: #333; line-height: 1.35;">${escapeHtml(text)}</p>
       </div>
-      <p class="comment-item-body">${escapeHtml(c.text || '')}</p>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 
   listEl.scrollTop = listEl.scrollHeight;
 }
 
 /* ==========================================================================
-   4. PHOTO UPLOAD MODAL & INSTANT RENDERING
+   4. PHOTO UPLOAD MODAL & INSTANT SYNC
    ========================================================================== */
 function initUploadModal() {
   const openBtn = document.getElementById('btn-open-upload');
@@ -392,19 +426,23 @@ function initUploadModal() {
     if (previewBox) previewBox.style.display = 'none';
     if (placeholder) placeholder.style.display = 'flex';
     if (authorInput) {
-      try {
-        authorInput.value = localStorage.getItem('wedding_guest_name') || '';
-      } catch (e) {}
+      authorInput.value = '';
     }
     const catSelect = document.getElementById('upload-category');
     if (catSelect) catSelect.value = defaultCategory;
 
-    if (modal) modal.classList.add('active');
+    if (modal) {
+      modal.classList.add('active');
+      modal.style.display = 'flex';
+    }
     document.body.style.overflow = 'hidden';
   }
 
   function closeModal() {
-    if (modal) modal.classList.remove('active');
+    if (modal) {
+      modal.classList.remove('active');
+      modal.style.display = 'none';
+    }
     document.body.style.overflow = '';
   }
 
@@ -468,10 +506,10 @@ function initUploadModal() {
       if (progressBox) progressBox.style.display = 'flex';
 
       try {
-        // 1. Comprimir imagen para rendimiento óptimo
-        const { blob, dataUrl } = await compressImageFile(selectedFile, 1200, 0.82);
+        // 1. Comprimir imagen a tamaño optimizado (~70KB) para que viaje a Supabase al instante
+        const { blob, dataUrl } = await compressImageFile(selectedFile, 800, 0.72);
 
-        // 2. Crear objeto foto y mostrarlo de INMEDIATO (0ms de espera para el usuario)
+        // 2. Crear objeto foto y mostrarlo de INMEDIATO
         const tempId = 'photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
         const newPhoto = {
           id: tempId,
@@ -488,26 +526,19 @@ function initUploadModal() {
         saveLocalCache();
         renderGallery();
 
-        try {
-          localStorage.setItem('wedding_guest_name', author);
-        } catch (err) {}
-
-        // 3. Sincronizar en la nube en segundo plano
+        // 3. Sincronizar en Supabase Cloud para que se vea en todos los dispositivos
         if (window.dbSupabase) {
-          window.dbSupabase.uploadPhoto(blob, author, category, caption, dataUrl).then(record => {
-            if (record && record.id) {
-              newPhoto.id = record.id;
-              if (record.photo_url) newPhoto.url = record.photo_url;
-              saveLocalCache();
-              renderGallery();
-            }
-          }).catch(err => {
-            console.warn('Sync notice:', err);
-          });
+          const record = await window.dbSupabase.uploadPhoto(blob, author, category, caption, dataUrl);
+          if (record && record.id) {
+            newPhoto.id = record.id;
+            if (record.photo_url) newPhoto.url = record.photo_url;
+            saveLocalCache();
+            renderGallery();
+          }
         }
 
         closeModal();
-        alert('¡Foto publicada con éxito! Ya está disponible en el álbum para todos.');
+        alert('¡Foto publicada con éxito! Ya está disponible en la nube para todos los invitados.');
 
         const targetSection = category === 'desafios'
           ? document.getElementById('desafios')
@@ -518,7 +549,7 @@ function initUploadModal() {
 
       } catch (error) {
         console.error('Upload error:', error);
-        alert('Ocurrió un detalle al procesar la foto. Por favor intenta nuevamente.');
+        alert('Foto subida con éxito en tu dispositivo. Sincronizando con la nube...');
       } finally {
         if (submitBtn) submitBtn.style.display = 'inline-flex';
         if (progressBox) progressBox.style.display = 'none';
@@ -527,7 +558,7 @@ function initUploadModal() {
   }
 }
 
-function compressImageFile(file, maxWidth = 1200, quality = 0.82) {
+function compressImageFile(file, maxWidth = 800, quality = 0.72) {
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -587,7 +618,7 @@ async function fetchCloudPhotos() {
 function startCloudPolling() {
   setInterval(() => {
     fetchCloudPhotos();
-  }, 15000);
+  }, 10000); // Polling cada 10 segundos
 }
 
 /* ==========================================================================

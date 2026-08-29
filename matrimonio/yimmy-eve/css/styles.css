@@ -3415,16 +3415,209 @@ body.theme-florido .ch-num {
   gap: 0.35rem;
 }
 
-.admin-photo-author {
-  font-weight: 700;
-  font-size: 0.82rem;
-  color: #243525;
+/* Admin Top Actions */
+.admin-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.admin-photo-likes {
-  font-size: 0.72rem;
+.btn-admin-close-view {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(82, 122, 80, 0.12);
+  color: #243525;
+  border: 1px solid rgba(82, 122, 80, 0.3);
+  padding: 0.45rem 0.9rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-admin-close-view:hover {
+  background: #527A50;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(82, 122, 80, 0.25);
+}
+
+/* ==========================================================================
+   15. LUXURY CAMPESTRE PHOTO UPLOAD MODAL DESIGN SYSTEM
+   ========================================================================== */
+.modal-upload-card {
+  max-width: 580px !important;
+  width: 92vw !important;
+  background: #FAF6EE !important;
+  border: 2px dashed rgba(82, 122, 80, 0.45) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 24px 60px rgba(36, 53, 37, 0.3) !important;
+  padding: 2.2rem 2rem !important;
+  color: #202D21 !important;
+  position: relative !important;
+}
+
+@media (max-width: 600px) {
+  .modal-upload-card {
+    padding: 1.6rem 1.2rem !important;
+    width: 95vw !important;
+  }
+}
+
+.modal-upload-card .modal-header {
+  text-align: center;
+  margin-bottom: 1.4rem;
+}
+
+.modal-upload-card .modal-icon {
+  font-size: 2.4rem;
+  color: #527A50;
+  display: inline-block;
+  margin-bottom: 0.4rem;
+}
+
+.modal-upload-card .modal-title {
+  font-family: var(--font-serif);
+  font-size: 1.55rem;
+  color: #243525;
+  margin: 0 0 0.3rem 0;
+}
+
+.modal-upload-card .modal-desc {
+  font-size: 0.84rem;
   color: #4B634C;
+  margin: 0;
+}
+
+/* Upload Dropzone */
+.upload-dropzone {
+  border: 2px dashed rgba(82, 122, 80, 0.4);
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 14px;
+  padding: 1.8rem 1.2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.upload-dropzone:hover {
+  border-color: #527A50;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 6px 20px rgba(82, 122, 80, 0.1);
+  transform: translateY(-1px);
+}
+
+.dropzone-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  color: #4B634C;
+}
+
+.dropzone-placeholder i {
+  font-size: 2.6rem;
+  color: #527A50;
+}
+
+.dropzone-placeholder span {
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.35;
+  max-width: 320px;
+}
+
+.dropzone-preview {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.dropzone-preview img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 10px;
+  display: block;
+}
+
+.btn-change-photo {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(36, 53, 37, 0.85);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: background 0.2s ease;
+}
+
+.btn-change-photo:hover {
+  background: #527A50;
+}
+
+.upload-photo-form label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #4B634C;
+  margin-bottom: 0.3rem;
+  display: block;
+}
+
+.upload-photo-form input,
+.upload-photo-form textarea,
+.upload-photo-form select {
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  background: #FAF7F0;
+  border: 1px solid rgba(82, 122, 80, 0.3);
+  border-radius: 8px;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  color: #202D21;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.upload-photo-form input:focus,
+.upload-photo-form textarea:focus,
+.upload-photo-form select:focus {
+  outline: none;
+  border-color: #527A50;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(82, 122, 80, 0.15);
+}
+
+.upload-submit-box {
+  margin-top: 1.4rem;
+}
+
+.upload-progress-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: rgba(82, 122, 80, 0.12);
+  border: 1px solid rgba(82, 122, 80, 0.3);
+  padding: 0.8rem;
+  border-radius: 8px;
+  margin-top: 0.8rem;
+  color: #243525;
+  font-size: 0.84rem;
   font-weight: 600;
 }
+
 
 

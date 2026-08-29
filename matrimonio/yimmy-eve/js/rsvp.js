@@ -159,6 +159,16 @@
       if (lblSong2) lblSong2.textContent = name2 ? `Canción que sugiere ${name2}` : 'Canción que sugiere tu acompañante';
       if (lblMessage) lblMessage.textContent = name2 ? `Un mensaje o dedicatoria para nosotros (de parte de ${name1} y ${name2})` : 'Un mensaje o dedicatoria para nosotros (de parte de ustedes)';
     }
+
+    // Scroll suave a la sección RSVP si viene con el ancla o link personalizado
+    if (window.location.hash === '#rsvp') {
+      setTimeout(() => {
+        const rsvpSection = document.getElementById('rsvp');
+        if (rsvpSection) {
+          rsvpSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 400);
+    }
   }
 
   async function checkAlreadyConfirmedStatus() {
