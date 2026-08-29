@@ -3033,3 +3033,398 @@ body.theme-florido .ch-num {
   }
 }
 
+/* ==========================================================================
+   14. LUXURY CAMPESTRE ADMIN MODAL & DASHBOARD DESIGN SYSTEM
+   ========================================================================== */
+.modal-admin-card {
+  max-width: 1020px !important;
+  width: 94vw !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  background: #FAF6EE !important;
+  border: 2px dashed rgba(82, 122, 80, 0.45) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 24px 60px rgba(36, 53, 37, 0.3) !important;
+  padding: 2rem 2.2rem !important;
+  color: #202D21 !important;
+}
+
+@media (max-width: 768px) {
+  .modal-admin-card {
+    padding: 1.4rem 1rem !important;
+    width: 96vw !important;
+  }
+}
+
+/* Admin Top Bar */
+.admin-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid rgba(82, 122, 80, 0.2);
+  margin-bottom: 1.5rem;
+}
+
+.admin-dashboard-title {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  color: #243525;
+  margin: 0 0 0.25rem 0;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.admin-dashboard-sub {
+  font-size: 0.84rem;
+  color: #4B634C;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.btn-admin-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(231, 76, 60, 0.08);
+  color: #c0392b;
+  border: 1px solid rgba(231, 76, 60, 0.25);
+  padding: 0.45rem 0.9rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-admin-logout:hover {
+  background: #c0392b;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(192, 57, 43, 0.25);
+}
+
+/* Metric Cards Grid */
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.8rem;
+}
+
+@media (max-width: 640px) {
+  .admin-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(82, 122, 80, 0.25);
+  border-radius: 14px;
+  padding: 1.1rem 1rem;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(82, 122, 80, 0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(82, 122, 80, 0.12);
+}
+
+.stat-card.stat-total {
+  border-top: 3px solid #527A50;
+}
+
+.stat-card.stat-yes {
+  border-top: 3px solid #27ae60;
+}
+
+.stat-card.stat-no {
+  border-top: 3px solid #e74c3c;
+}
+
+.stat-num {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #243525;
+}
+
+.stat-card.stat-yes .stat-num {
+  color: #27ae60;
+}
+
+.stat-card.stat-no .stat-num {
+  color: #c0392b;
+}
+
+.stat-lbl {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #4B634C;
+  font-weight: 700;
+  margin-top: 0.35rem;
+}
+
+/* Tabs Navigation */
+.admin-tabs {
+  display: flex;
+  gap: 0.5rem;
+  background: rgba(82, 122, 80, 0.08);
+  padding: 0.4rem;
+  border-radius: 30px;
+  margin-bottom: 1.6rem;
+  border: 1px solid rgba(82, 122, 80, 0.15);
+  overflow-x: auto;
+}
+
+.admin-tab-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: none;
+  color: #4B634C;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.65rem 1rem;
+  border-radius: 24px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.25s ease;
+}
+
+.admin-tab-btn:hover {
+  color: #243525;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.admin-tab-btn.active {
+  background: #527A50;
+  color: #FAF7F0;
+  box-shadow: 0 4px 14px rgba(82, 122, 80, 0.3);
+}
+
+.admin-tab-pane {
+  display: none;
+}
+
+.admin-tab-pane.active {
+  display: block;
+  animation: fadeInPane 0.3s ease;
+}
+
+@keyframes fadeInPane {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Create Invitation Box */
+.create-invitation-box {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1.5px dashed rgba(82, 122, 80, 0.45) !important;
+  border-radius: 14px !important;
+  padding: 1.5rem !important;
+  margin-bottom: 1.8rem !important;
+  box-shadow: 0 6px 20px rgba(82, 122, 80, 0.06) !important;
+}
+
+.create-invitation-box h4 {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  color: #243525;
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.create-invitation-box label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #4B634C;
+  margin-bottom: 0.3rem;
+  display: block;
+}
+
+.create-invitation-box input,
+.create-invitation-box select {
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  background: #FAF7F0;
+  border: 1px solid rgba(82, 122, 80, 0.3);
+  border-radius: 8px;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  color: #202D21;
+  transition: all 0.2s ease;
+}
+
+.create-invitation-box input:focus,
+.create-invitation-box select:focus {
+  outline: none;
+  border-color: #527A50;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(82, 122, 80, 0.15);
+}
+
+/* Action Bars */
+.admin-actions-bar {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 1.2rem;
+}
+
+.btn-admin-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: #527A50;
+  color: #FAF7F0;
+  border: 1px solid #527A50;
+  padding: 0.65rem 1.2rem;
+  border-radius: 25px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(82, 122, 80, 0.25);
+  transition: all 0.25s ease;
+}
+
+.btn-admin-action:hover {
+  background: #375436;
+  border-color: #375436;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(82, 122, 80, 0.35);
+}
+
+.btn-admin-action.btn-outline-action {
+  background: rgba(255, 255, 255, 0.85);
+  color: #527A50;
+  border: 1.5px solid #527A50;
+  box-shadow: none;
+}
+
+.btn-admin-action.btn-outline-action:hover {
+  background: #527A50;
+  color: #FAF7F0;
+}
+
+/* Admin Table Wrap & Styles */
+.admin-table-wrap {
+  background: #FFFFFF;
+  border: 1px solid rgba(82, 122, 80, 0.2);
+  border-radius: 12px;
+  overflow-x: auto;
+  box-shadow: 0 4px 18px rgba(82, 122, 80, 0.05);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.84rem;
+}
+
+.admin-table thead th {
+  background: rgba(82, 122, 80, 0.1);
+  color: #243525;
+  font-family: var(--font-display);
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.9rem 1rem;
+  border-bottom: 2px solid rgba(82, 122, 80, 0.25);
+  white-space: nowrap;
+}
+
+.admin-table tbody td {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid rgba(82, 122, 80, 0.08);
+  color: #202D21;
+  vertical-align: middle;
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-table tbody tr:hover {
+  background: rgba(82, 122, 80, 0.04);
+}
+
+.code-tag {
+  font-family: 'Courier New', monospace;
+  background: rgba(82, 122, 80, 0.12);
+  color: #243525;
+  padding: 0.2rem 0.45rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  border: 1px solid rgba(82, 122, 80, 0.2);
+}
+
+/* Admin Photos Grid */
+.admin-photos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.2rem;
+  margin-top: 1.2rem;
+}
+
+.admin-photo-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(82, 122, 80, 0.2);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(82, 122, 80, 0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.admin-photo-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(82, 122, 80, 0.14);
+}
+
+.admin-photo-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+.admin-photo-info {
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.admin-photo-author {
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: #243525;
+}
+
+.admin-photo-likes {
+  font-size: 0.72rem;
+  color: #4B634C;
+  font-weight: 600;
+}
+
+
