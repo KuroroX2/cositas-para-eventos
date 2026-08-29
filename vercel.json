@@ -1,25 +1,25 @@
 {
   "cleanUrls": true,
-  "rewrites": [
+  "redirects": [
     {
       "source": "/yimmy-y-eve",
-      "destination": "/Matrimonios/Yimmy y Eve/index.html"
+      "destination": "/matrimonios/yimmy-y-eve/",
+      "permanent": true
     },
     {
       "source": "/matrimonio",
-      "destination": "/Matrimonios/Yimmy y Eve/index.html"
+      "destination": "/matrimonios/yimmy-y-eve/",
+      "permanent": true
     },
     {
       "source": "/novios",
-      "destination": "/Matrimonios/Yimmy y Eve/index.html"
+      "destination": "/matrimonios/yimmy-y-eve/",
+      "permanent": true
     },
     {
       "source": "/boda",
-      "destination": "/Matrimonios/Yimmy y Eve/index.html"
-    },
-    {
-      "source": "/elegante-rosa",
-      "destination": "/Matrimonios/Yimmy y Eve/elegante-rosa.html"
+      "destination": "/matrimonios/yimmy-y-eve/",
+      "permanent": true
     }
   ]
 }
