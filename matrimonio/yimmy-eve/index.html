@@ -669,108 +669,119 @@
 
       <!-- Vista 1: Login con PIN exclusivo novios -->
       <div class="admin-login-box" id="admin-login-box">
-        <div class="admin-login-header">
-          <i class="ri-shield-keyhole-line"></i>
-          <h3>Panel de Administración</h3>
-          <p>Exclusivo para Evelyn &amp; Yimmy</p>
+        <div class="modal-header">
+          <i class="ri-shield-keyhole-line modal-icon"></i>
+          <h3 class="modal-title">Panel Exclusivo de los Novios 💍</h3>
+          <p class="modal-desc">Ingresa la clave secreta de los novios para registrar invitados, ver confirmaciones y fotos.</p>
         </div>
         <form id="admin-login-form" class="admin-login-form">
           <div class="form-group">
-            <label for="admin-pin-input">Ingresa el PIN de Acceso</label>
-            <input type="password" id="admin-pin-input" placeholder="••••••" maxlength="12" required autofocus>
+            <label for="admin-pin-input">Clave de Acceso Novios</label>
+            <input type="password" id="admin-pin-input" placeholder="Ingresa la clave..." required autofocus autocomplete="off">
           </div>
+          <div class="admin-login-error" id="admin-login-error" style="display: none; color: #e74c3c; font-size: 0.82rem; margin-bottom: 0.8rem; text-align: center; font-weight: 600;"></div>
           <button type="submit" class="btn-vogue-gold" style="width: 100%;">
-            <i class="ri-login-box-line"></i>
-            <span>Ingresar al Panel</span>
+            <i class="ri-login-circle-line"></i>
+            <span>Ingresar al Panel de Novios</span>
           </button>
-          <button type="button" class="btn-vogue-outline" id="btn-close-admin-login" style="width: 100%; margin-top: 0.8rem;">
+          <button type="button" class="btn-admin-close-view" id="btn-close-admin-login" style="width: 100%; margin-top: 0.6rem; justify-content: center;">
             <span>Cerrar</span>
           </button>
         </form>
       </div>
 
-      <!-- Vista 2: Dashboard Administrador Completo -->
-      <div class="admin-dashboard-view" id="admin-dashboard-view" style="display: none;">
-        
-        <div class="admin-topbar">
-          <div class="admin-topbar-info">
-            <h4>💍 Evelyn &amp; Yimmy • Gestión de Matrimonio</h4>
-            <span class="admin-badge-live">Base de Datos en Tiempo Real</span>
+      <!-- Vista 2: Dashboard de Administración -->
+      <div class="admin-dashboard" id="admin-dashboard" style="display: none;">
+        <div class="admin-top-bar">
+          <div>
+            <h3 class="admin-dashboard-title">💍 Panel de Control — Evelyn &amp; Yimmy</h3>
+            <p class="admin-dashboard-sub">Registra a tus invitados (1 o 2 personas), genera links personalizados y gestiona el sorteo.</p>
           </div>
-          <div class="admin-topbar-actions">
-            <button class="btn-admin-logout" id="btn-admin-logout" title="Cerrar sesión de administración">
-              <i class="ri-logout-box-line"></i> Salir
+          <div class="admin-top-actions">
+            <button class="btn-admin-logout" id="btn-admin-logout" title="Cerrar sesión">
+              <i class="ri-logout-box-r-line"></i> <span>Salir</span>
             </button>
-            <button class="btn-admin-exit" id="btn-admin-exit-top" title="Cerrar panel">
-              <i class="ri-close-line"></i> Cerrar
+            <button class="btn-admin-close-view" id="btn-close-admin-view" title="Cerrar panel">
+              <i class="ri-close-line"></i> <span>Cerrar</span>
             </button>
           </div>
         </div>
 
-        <!-- Metric KPI Cards -->
-        <div class="admin-kpi-grid">
-          <div class="kpi-card">
-            <span class="kpi-label">Invitaciones Creadas</span>
-            <strong class="kpi-value" id="admin-kpi-total-invitations">0</strong>
+        <!-- Metric Summary Cards -->
+        <div class="admin-stats-grid">
+          <div class="stat-card stat-total">
+            <span class="stat-num" id="admin-count-invitations">0</span>
+            <span class="stat-lbl">Invitaciones Creadas</span>
           </div>
-          <div class="kpi-card">
-            <span class="kpi-label">Asistentes Confirmados</span>
-            <strong class="kpi-value kpi-highlight" id="admin-kpi-confirmed-guests">0</strong>
+          <div class="stat-card stat-yes">
+            <span class="stat-num" id="admin-count-yes">0</span>
+            <span class="stat-lbl">Confirmados (Sí Asisten)</span>
           </div>
-          <div class="kpi-card">
-            <span class="kpi-label">No Asistirán</span>
-            <strong class="kpi-value" id="admin-kpi-declined-guests" style="color: #c0392b;">0</strong>
-          </div>
-          <div class="kpi-card">
-            <span class="kpi-label">Pendientes por Responder</span>
-            <strong class="kpi-value" id="admin-kpi-pending-invitations">0</strong>
+          <div class="stat-card stat-no">
+            <span class="stat-num" id="admin-count-no">0</span>
+            <span class="stat-lbl">No Podrán Asistir</span>
           </div>
         </div>
 
-        <!-- Admin Navigation Tabs -->
+        <!-- Navigation Tabs -->
         <div class="admin-tabs">
-          <button class="admin-tab-btn active" data-tab="invitations">
-            <i class="ri-mail-send-line"></i> <span>1. Generador de Invitaciones WhatsApp (<span id="admin-count-invitations">0</span>)</span>
+          <button class="admin-tab-btn active" data-tab="admin-tab-invitations">
+            <i class="ri-mail-send-line"></i> 1. Registro de Invitados &amp; Links
           </button>
-          <button class="admin-tab-btn" data-tab="rsvps">
-            <i class="ri-user-follow-line"></i> <span>2. Respuestas de Asistencia (<span id="admin-count-rsvps">0</span>)</span>
+          <button class="admin-tab-btn" data-tab="admin-tab-rsvps">
+            <i class="ri-user-follow-line"></i> 2. Confirmaciones &amp; Sorteo
           </button>
-          <button class="admin-tab-btn" data-tab="photos">
-            <i class="ri-camera-lens-line"></i> <span>3. Álbum en Vivo &amp; QR del Evento</span>
+          <button class="admin-tab-btn" data-tab="admin-tab-photos">
+            <i class="ri-image-line"></i> 3. Álbum &amp; Descargas
           </button>
         </div>
 
-        <!-- Tab 1: Invitations Generator & WhatsApp Links -->
+        <!-- Tab 1: Registro de Invitados & Generador de Links -->
         <div class="admin-tab-pane active" id="admin-tab-invitations">
-          <div class="admin-inv-form-box">
-            <h5>+ Crear Nueva Invitación Personalizada</h5>
-            <form id="admin-create-inv-form" class="admin-inv-grid-form">
+          <!-- Formulario para Crear Invitación -->
+          <div class="create-invitation-box" style="background: rgba(82, 122, 80, 0.08); border: 1px solid var(--border-gold); padding: 1.2rem; border-radius: var(--border-radius-card); margin-bottom: 1.5rem;">
+            <h4 style="font-family: var(--font-serif); font-size: 1.15rem; color: var(--text-main); margin-bottom: 0.8rem;">
+              <i class="ri-user-add-line" style="color: var(--gold-dark);"></i> Registrar Nuevo(s) Invitado(s)
+            </h4>
+            <form id="form-create-invitation" class="form-create-invitation">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="inv-type">Tipo de Invitación *</label>
+                  <select id="inv-type" required>
+                    <option value="1">1 Persona (Individual / Sin Acompañante)</option>
+                    <option value="2" selected>2 Personas (Con Acompañante)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="inv-phone">Teléfono / WhatsApp (Opcional para envío directo)</label>
+                  <input type="tel" id="inv-phone" placeholder="Ej.: +56 9 1234 5678">
+                </div>
+              </div>
+
               <div class="form-group">
-                <label for="inv-type">Tipo de Invitación</label>
-                <select id="inv-type">
-                  <option value="1">1 Pase (Invitado Individual)</option>
-                  <option value="2" selected>2 Pases (Invitado + Acompañante)</option>
-                </select>
+                <label for="inv-name-1">Nombre Invitado 1 *</label>
+                <input type="text" id="inv-name-1" placeholder="Ej.: Cristopher Hormazábal" required>
               </div>
-              <div class="form-group">
-                <label for="inv-name1">Nombre Invitado Principal *</label>
-                <input type="text" id="inv-name1" placeholder="Ej.: Cristopher Hormazábal" required>
+
+              <div class="form-group" id="inv-name-2-group">
+                <label for="inv-name-2">Nombre Invitado 2 (Acompañante) *</label>
+                <input type="text" id="inv-name-2" placeholder="Ej.: Reny Rebolledo">
               </div>
-              <div class="form-group" id="inv-name2-wrap">
-                <label for="inv-name2">Nombre Acompañante *</label>
-                <input type="text" id="inv-name2" placeholder="Ej.: Reny Rebolledo">
-              </div>
-              <div class="form-group">
-                <label for="inv-phone">Teléfono / WhatsApp (Opcional)</label>
-                <input type="tel" id="inv-phone" placeholder="Ej.: +56 9 1234 5678">
-              </div>
-              <div class="form-submit-cell">
-                <button type="submit" class="btn-vogue-gold">
-                  <i class="ri-link"></i>
-                  <span>Generar Link</span>
+
+              <div style="margin-top: 1rem;">
+                <button type="submit" class="btn-vogue-gold" style="width: 100%;">
+                  <i class="ri-check-line"></i>
+                  <span>Registrar Invitación &amp; Generar Link (OK)</span>
                 </button>
               </div>
             </form>
+          </div>
+
+          <!-- Tabla de Invitaciones Creadas -->
+          <div class="admin-actions-bar" style="justify-content: space-between; align-items: center;">
+            <h4 style="font-family: var(--font-serif); font-size: 1.1rem; color: var(--text-main);">
+              <i class="ri-file-list-3-line"></i> Lista de Invitaciones Personalizadas
+            </h4>
           </div>
 
           <div class="admin-table-wrap">
@@ -780,7 +791,7 @@
                   <th>Invitado(s)</th>
                   <th>Pases</th>
                   <th>Estado</th>
-                  <th>Acciones WhatsApp</th>
+                  <th>Acciones / Link WhatsApp</th>
                   <th>Eliminar</th>
                 </tr>
               </thead>
@@ -791,11 +802,11 @@
           </div>
         </div>
 
-        <!-- Tab 2: RSVPs Confirmed List -->
+        <!-- Tab 2: Confirmaciones & Cupones de Sorteo -->
         <div class="admin-tab-pane" id="admin-tab-rsvps">
           <div class="admin-actions-bar">
             <button class="btn-admin-action" id="btn-print-raffle-tickets">
-              <i class="ri-printer-line"></i>
+              <i class="ri-ticket-2-line"></i>
               <span>🎟️ Imprimir Cupones para Sorteo</span>
             </button>
             <button class="btn-admin-action btn-outline-action" id="btn-export-rsvps-csv">
@@ -829,11 +840,11 @@
         <!-- Tab 3: Photos Gallery & Bulk Download -->
         <div class="admin-tab-pane" id="admin-tab-photos">
           <!-- Banner Módulo Fotos & Código QR -->
-          <div style="background: rgba(82, 122, 80, 0.08); border: 1px solid var(--gold-primary); border-radius: 10px; padding: 1.4rem; margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
+          <div style="background: rgba(82, 122, 80, 0.08); border: 1px solid var(--border-gold); border-radius: 10px; padding: 1.4rem; margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
             <div>
-              <h5 style="font-family: var(--font-serif); font-size: 1.15rem; color: var(--text-main); margin-bottom: 0.3rem;">
+              <h4 style="font-family: var(--font-serif); font-size: 1.15rem; color: var(--text-main); margin-bottom: 0.3rem;">
                 📸 Módulo Exclusivo del Evento &amp; Código QR
-              </h5>
+              </h4>
               <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0; line-height: 1.4;">
                 URL para imprimir en carteles y mesas de Casa Pirque: <strong style="color: var(--gold-dark);">https://cositasparaeventos.cl/matrimonio/yimmy-eve/fotos/</strong>
               </p>
@@ -842,7 +853,7 @@
               <a href="fotos/" target="_blank" class="btn-vogue-gold" style="font-size: 0.82rem; padding: 0.6rem 1rem; text-decoration: none;">
                 <i class="ri-external-link-line"></i> <span>Abrir Álbum en Vivo</span>
               </a>
-              <button type="button" class="btn-vogue-outline" style="font-size: 0.82rem; padding: 0.6rem 1rem;" onclick="navigator.clipboard.writeText('https://cositasparaeventos.cl/matrimonio/yimmy-eve/fotos/').then(() => alert('¡Enlace del Código QR copiado al portapapeles!'))">
+              <button type="button" class="btn-admin-close-view" style="font-size: 0.82rem; padding: 0.6rem 1rem;" onclick="navigator.clipboard.writeText('https://cositasparaeventos.cl/matrimonio/yimmy-eve/fotos/').then(() => alert('¡Enlace del Código QR copiado al portapapeles!'))">
                 <i class="ri-file-copy-line"></i> <span>Copiar Link QR</span>
               </button>
             </div>
@@ -869,7 +880,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
   <script src="js/app.js"></script>
-  <script src="js/gallery.js"></script>
   <script src="js/rsvp.js"></script>
   <script src="js/admin.js"></script>
 </body>
