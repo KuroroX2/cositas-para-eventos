@@ -802,9 +802,11 @@ body.theme-florido .hero-theme-crest {
 }
 .hero-photo {
   width: 100%;
-  height: clamp(260px, 45vw, 360px);
+  height: clamp(280px, 48vw, 390px);
   object-fit: cover;
+  object-position: center 20%;
   border-radius: var(--border-radius-card);
+  display: block;
 }
 .frame-tag {
   position: absolute;
