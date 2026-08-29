@@ -468,8 +468,11 @@ function initUploadModal() {
       if (progressBox) progressBox.style.display = 'flex';
 
       try {
+        // Compresión inteligente para fotos de celular (alta velocidad y compatibilidad)
+        const { blob, dataUrl } = await compressImageFile(selectedFile, 1200, 0.82);
+
         if (window.dbSupabase) {
-          const record = await window.dbSupabase.uploadPhoto(selectedFile, author, category, caption);
+          const record = await window.dbSupabase.uploadPhoto(blob, author, category, caption, dataUrl);
           if (record) {
             const formatted = {
               id: record.id,
@@ -503,13 +506,44 @@ function initUploadModal() {
 
       } catch (error) {
         console.error('Upload error:', error);
-        alert('Ocurrió un detalle al subir la foto a Supabase. Verifica que el Storage Bucket esté activo.');
+        alert('Ocurrió un detalle al subir la foto. Por favor intenta nuevamente.');
       } finally {
         if (submitBtn) submitBtn.style.display = 'inline-flex';
         if (progressBox) progressBox.style.display = 'none';
       }
     });
   }
+}
+
+function compressImageFile(file, maxWidth = 1200, quality = 0.82) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+        canvas.toBlob((blob) => {
+          resolve({ blob: blob || file, dataUrl });
+        }, 'image/jpeg', quality);
+      };
+      img.onerror = () => resolve({ blob: file, dataUrl: event.target.result });
+    };
+    reader.onerror = () => resolve({ blob: file, dataUrl: '' });
+  });
 }
 
 /* ==========================================================================

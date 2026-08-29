@@ -114,35 +114,48 @@ window.dbSupabase = {
     }
   },
 
-  async uploadPhoto(file, guestName, category, caption) {
+  async uploadPhoto(fileOrBlob, guestName, category, caption, fallbackDataUrl) {
     if (!supabase) throw new Error('Supabase no inicializado');
     
-    // Subir archivo al bucket 'wedding-photos'
-    const cleanExt = file.name.split('.').pop() || 'jpg';
-    const filePath = `eve-y-yimmy/${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${cleanExt}`;
-    
-    const { data: storageData, error: uploadError } = await supabase.storage
-      .from('wedding-photos')
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false
-      });
+    let finalPhotoUrl = fallbackDataUrl || '';
 
-    if (uploadError) throw uploadError;
+    // Intento 1: Subir al Storage Bucket 'wedding-photos'
+    try {
+      const cleanExt = (fileOrBlob.name ? fileOrBlob.name.split('.').pop() : 'jpg') || 'jpg';
+      const filePath = `eve-y-yimmy/${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${cleanExt}`;
+      
+      const { data: storageData, error: uploadError } = await supabase.storage
+        .from('wedding-photos')
+        .upload(filePath, fileOrBlob, {
+          contentType: fileOrBlob.type || 'image/jpeg',
+          cacheControl: '3600',
+          upsert: true
+        });
 
-    // Obtener URL pública
-    const { data: publicUrlData } = supabase.storage
-      .from('wedding-photos')
-      .getPublicUrl(filePath);
+      if (!uploadError && storageData) {
+        const { data: publicUrlData } = supabase.storage
+          .from('wedding-photos')
+          .getPublicUrl(filePath);
+        if (publicUrlData && publicUrlData.publicUrl) {
+          finalPhotoUrl = publicUrlData.publicUrl;
+        }
+      } else {
+        console.warn('Storage upload notice, using DataURL fallback:', uploadError);
+      }
+    } catch (storageErr) {
+      console.warn('Storage upload error, using fallback:', storageErr);
+    }
 
-    const publicUrl = publicUrlData.publicUrl;
+    if (!finalPhotoUrl && fallbackDataUrl) {
+      finalPhotoUrl = fallbackDataUrl;
+    }
 
     // Registrar en tabla photos
     const { data: photoRecord, error: dbError } = await supabase
       .from('photos')
       .insert([{
         event_slug: 'eve-y-yimmy',
-        photo_url: publicUrl,
+        photo_url: finalPhotoUrl,
         author_name: guestName || 'Invitado Especial',
         category: category || 'invitados',
         caption: caption || '',
