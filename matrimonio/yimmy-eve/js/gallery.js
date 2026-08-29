@@ -499,11 +499,15 @@ function initUploadModal() {
   const modal = document.getElementById('upload-photo-modal');
   const closeBtn = document.getElementById('btn-close-upload-modal');
   const fileInput = document.getElementById('photo-modal-file-input');
+  const cameraInput = document.getElementById('photo-modal-camera-input');
+  const btnCamera = document.getElementById('btn-take-photo-camera');
+  const btnGallery = document.getElementById('btn-choose-photo-gallery');
+  const btnChangeCam = document.getElementById('btn-change-photo-cam');
+  const btnChangeGal = document.getElementById('btn-change-photo-gal');
   const dropzone = document.getElementById('upload-dropzone');
   const placeholder = document.getElementById('dropzone-placeholder');
   const previewBox = document.getElementById('dropzone-preview');
   const previewImg = document.getElementById('preview-image');
-  const changeBtn = document.getElementById('btn-change-photo');
   const form = document.getElementById('upload-photo-form');
   const authorInput = document.getElementById('upload-author');
 
@@ -514,6 +518,19 @@ function initUploadModal() {
   const categorySelect = document.getElementById('upload-category');
 
   let selectedFile = null;
+
+  function handleFileSelected(file) {
+    if (!file) return;
+    selectedFile = file;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (previewImg) previewImg.src = event.target.result;
+      if (placeholder) placeholder.style.display = 'none';
+      if (previewBox) previewBox.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
 
   function openModal(mode = 'album', specificChallenge = null) {
     currentUploadMode = mode;
@@ -565,34 +582,42 @@ function initUploadModal() {
     });
   }
 
-  if (dropzone && fileInput) {
-    dropzone.addEventListener('click', (e) => {
-      if (e.target !== changeBtn && !changeBtn.contains(e.target)) {
-        fileInput.click();
-      }
+  if (btnCamera && cameraInput) {
+    btnCamera.addEventListener('click', () => cameraInput.click());
+  }
+  if (btnGallery && fileInput) {
+    btnGallery.addEventListener('click', () => fileInput.click());
+  }
+  if (btnChangeCam && cameraInput) {
+    btnChangeCam.addEventListener('click', (e) => {
+      e.stopPropagation();
+      cameraInput.click();
     });
   }
-
-  if (changeBtn && fileInput) {
-    changeBtn.addEventListener('click', (e) => {
+  if (btnChangeGal && fileInput) {
+    btnChangeGal.addEventListener('click', (e) => {
       e.stopPropagation();
       fileInput.click();
     });
   }
 
+  if (dropzone && fileInput) {
+    dropzone.addEventListener('click', (e) => {
+      if (!e.target.closest('.btn-change-photo')) {
+        fileInput.click();
+      }
+    });
+  }
+
   if (fileInput) {
     fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      selectedFile = file;
+      handleFileSelected(e.target.files[0]);
+    });
+  }
 
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (previewImg) previewImg.src = event.target.result;
-        if (placeholder) placeholder.style.display = 'none';
-        if (previewBox) previewBox.style.display = 'block';
-      };
-      reader.readAsDataURL(file);
+  if (cameraInput) {
+    cameraInput.addEventListener('change', (e) => {
+      handleFileSelected(e.target.files[0]);
     });
   }
 

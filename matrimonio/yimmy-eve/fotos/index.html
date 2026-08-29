@@ -467,18 +467,38 @@
       </div>
 
       <form id="upload-photo-form" class="upload-photo-form">
-        <!-- Photo Selector / Preview Area -->
-        <div class="upload-dropzone" id="upload-dropzone">
-          <input type="file" id="photo-modal-file-input" accept="image/*" style="display: none;" required>
-          <div class="dropzone-placeholder" id="dropzone-placeholder">
+        <!-- Hidden File & Camera Inputs -->
+        <input type="file" id="photo-modal-file-input" accept="image/*" style="display: none;">
+        <input type="file" id="photo-modal-camera-input" accept="image/*" capture="environment" style="display: none;">
+
+        <!-- Selector de Fuente de Foto (Cámara vs Galería) -->
+        <div class="upload-source-buttons-row">
+          <button type="button" class="btn-source-action btn-source-camera" id="btn-take-photo-camera">
+            <i class="ri-camera-3-line"></i>
+            <span>Tomar Foto (Cámara)</span>
+          </button>
+          <button type="button" class="btn-source-action btn-source-gallery" id="btn-choose-photo-gallery">
             <i class="ri-image-add-line"></i>
-            <span>Toca aquí para seleccionar una foto o tomar una con la cámara</span>
+            <span>Elegir de la Galería</span>
+          </button>
+        </div>
+
+        <!-- Zona de Vista Previa / Drag & Drop -->
+        <div class="upload-dropzone" id="upload-dropzone">
+          <div class="dropzone-placeholder" id="dropzone-placeholder">
+            <i class="ri-upload-2-line"></i>
+            <span>O arrastra tu foto aquí para subirla</span>
           </div>
           <div class="dropzone-preview" id="dropzone-preview" style="display: none;">
             <img id="preview-image" src="" alt="Vista previa">
-            <button type="button" class="btn-change-photo" id="btn-change-photo">
-              <i class="ri-refresh-line"></i> Cambiar Foto
-            </button>
+            <div class="preview-actions-overlay">
+              <button type="button" class="btn-change-photo" id="btn-change-photo-cam" title="Tomar otra con cámara">
+                <i class="ri-camera-3-line"></i> Cámara
+              </button>
+              <button type="button" class="btn-change-photo" id="btn-change-photo-gal" title="Elegir otra de galería">
+                <i class="ri-image-line"></i> Galería
+              </button>
+            </div>
           </div>
         </div>
 
