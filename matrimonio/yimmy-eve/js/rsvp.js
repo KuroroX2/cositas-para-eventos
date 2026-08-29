@@ -595,39 +595,51 @@
         <style>
           @page {
             size: portrait;
-            margin: 0.8cm;
+            margin: 0;
           }
-          * {
+          *, *::before, *::after {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
           }
+          html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #FFFFFF;
+          }
           body {
             font-family: 'Montserrat', sans-serif;
-            background: #FFFFFF;
             color: #243525;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            padding: 1rem;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
+            page-break-inside: avoid;
+            break-inside: avoid;
+            page-break-after: avoid;
+            break-after: avoid;
           }
           .pass-ticket-render {
-            width: 100%;
-            max-width: 440px;
+            width: 90%;
+            max-width: 420px;
             background: #FAF7F0;
             border: 2px solid #527A50;
             border-radius: 18px;
-            padding: 1.8rem 1.4rem;
+            padding: 1.4rem 1.2rem;
             text-align: center;
             page-break-inside: avoid;
             break-inside: avoid;
+            page-break-after: avoid;
+            break-after: avoid;
+            margin: auto;
           }
-          .ticket-top { margin-bottom: 0.8rem; }
+          .ticket-top { margin-bottom: 0.6rem; }
           .ticket-sub {
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             letter-spacing: 0.16em;
             color: #527A50;
             font-weight: 700;
@@ -636,12 +648,12 @@
           }
           .ticket-title {
             font-family: 'Playfair Display', serif;
-            font-size: 1.9rem;
+            font-size: 1.8rem;
             color: #243525;
-            margin: 0.3rem 0;
+            margin: 0.2rem 0;
           }
           .ticket-date {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: #6C826D;
             font-weight: 600;
           }
@@ -649,43 +661,43 @@
             height: 1.5px;
             background: #527A50;
             opacity: 0.3;
-            margin: 1rem 0;
+            margin: 0.8rem 0;
           }
           .ticket-body {
             display: flex;
             flex-direction: column;
-            gap: 0.6rem;
+            gap: 0.5rem;
             text-align: left;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
           }
           .ticket-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.2rem 0;
+            padding: 0.15rem 0;
           }
-          .t-k { font-size: 0.74rem; font-weight: 700; color: #527A50; }
-          .t-v { font-weight: 600; color: #243525; }
+          .t-k { font-size: 0.72rem; font-weight: 700; color: #527A50; }
+          .t-v { font-weight: 600; color: #243525; font-size: 0.82rem; }
           .code-mono {
             font-family: monospace;
             background: rgba(82,122,80,0.15);
-            padding: 3px 8px;
-            border-radius: 6px;
+            padding: 2px 7px;
+            border-radius: 5px;
             color: #243525;
           }
           .ticket-special-notice {
-            margin-top: 1.2rem;
+            margin-top: 0.9rem;
             background: rgba(82, 122, 80, 0.1);
             border: 1px dashed #527A50;
             border-radius: 10px;
-            padding: 0.6rem;
-            font-size: 0.8rem;
+            padding: 0.5rem;
+            font-size: 0.78rem;
             color: #243525;
             text-align: center;
           }
           .ticket-footer-seal {
-            margin-top: 1.2rem;
-            font-size: 0.72rem;
+            margin-top: 0.9rem;
+            font-size: 0.7rem;
             font-weight: 700;
             letter-spacing: 0.12em;
             color: #527A50;

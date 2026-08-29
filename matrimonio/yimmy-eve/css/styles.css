@@ -4003,8 +4003,19 @@ body.theme-florido .ch-num {
   line-height: 1;
 }
 
-/* Print Stylesheet for Digital Pass (Exactly 1 Page) */
+/* Print Stylesheet for Digital Pass (Strictly 1 Page) */
 @media print {
+  @page {
+    size: portrait;
+    margin: 0;
+  }
+  html, body {
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
   body * {
     visibility: hidden;
   }
@@ -4014,24 +4025,29 @@ body.theme-florido .ch-num {
     visibility: visible;
   }
   #guest-pass-modal {
-    position: absolute !important;
+    position: fixed !important;
     left: 0 !important;
     top: 0 !important;
     width: 100% !important;
+    height: 100% !important;
     background: #ffffff !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     padding: 0 !important;
     margin: 0 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
   }
   .modal-pass-card {
     box-shadow: none !important;
     border: none !important;
     background: transparent !important;
     padding: 0 !important;
-    margin: 0 auto !important;
-    max-width: 440px !important;
+    margin: auto !important;
+    max-width: 420px !important;
   }
   .modal-close-btn,
   .pass-actions {
@@ -4040,8 +4056,11 @@ body.theme-florido .ch-num {
   .pass-ticket-render {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
     border: 2px solid #527A50 !important;
     box-shadow: none !important;
+    margin: auto !important;
   }
 }
 
