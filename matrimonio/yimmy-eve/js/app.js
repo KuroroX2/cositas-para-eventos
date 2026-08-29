@@ -354,15 +354,8 @@ function initBankModal() {
   }
 }
 
-/* ==========================================================================
-   6. PHOTO CHALLENGE UPLOAD BUTTON
-   ========================================================================== */
 function initChallengeUpload() {
-  const btn = document.getElementById('btn-challenge-upload');
-  const fileInput = document.getElementById('photo-file-input');
-  if (btn && fileInput) {
-    btn.addEventListener('click', () => fileInput.click());
-  }
+  // Manejado directamente por gallery.js con modal interactivo y compresión
 }
 
 /* ==========================================================================

@@ -299,13 +299,17 @@
   }
 
   function generatePersonalizedUrl(inv) {
-    const baseUrl = window.location.origin + window.location.pathname;
+    const origin = window.location.origin;
+    let path = window.location.pathname;
+    if (!path.endsWith('/')) {
+      path += '/';
+    }
     const params = new URLSearchParams();
     params.set('p', inv.pases);
     params.set('n1', inv.name1);
     if (inv.name2) params.set('n2', inv.name2);
     params.set('code', inv.id);
-    return `${baseUrl}?${params.toString()}`;
+    return `${origin}${path}?${params.toString()}`;
   }
 
   function renderAdminInvitations() {
@@ -370,7 +374,7 @@
               <a href="${escapeHtml(waUrl)}" target="_blank" rel="noopener noreferrer" class="btn-dl-single" style="background: #25D366; color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.5rem 0.8rem; border-radius: var(--border-radius-card); font-size: 0.75rem; font-weight: 700;">
                 <i class="ri-whatsapp-line"></i> <span>Enviar WhatsApp</span>
               </a>
-              <a href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer" class="btn-dl-single" style="background: var(--bg-dark); color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.5rem 0.8rem; border-radius: var(--border-radius-card); font-size: 0.75rem; font-weight: 700;">
+              <a href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer" class="btn-dl-single btn-view-invitation" data-url="${escapeHtml(link)}" style="background: var(--bg-dark); color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.5rem 0.8rem; border-radius: var(--border-radius-card); font-size: 0.75rem; font-weight: 700;">
                 <i class="ri-external-link-line"></i> <span>Ver (OK)</span>
               </a>
             </div>
@@ -383,6 +387,15 @@
         </tr>
       `;
     }).join('');
+
+    tbody.querySelectorAll('.btn-view-invitation').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const url = btn.getAttribute('data-url');
+        if (url) {
+          window.open(url, '_blank');
+        }
+      });
+    });
 
     tbody.querySelectorAll('.btn-del-inv').forEach(btn => {
       btn.addEventListener('click', () => {
