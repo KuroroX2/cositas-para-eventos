@@ -3,7 +3,7 @@
  * Cliente centralizado para Base de Datos y Almacenamiento
  */
 
-const SUPABASE_URL = 'https://igzxrpfghohdzcsyekir.supabase.co';
+const SUPABASE_URL = 'https://igzxrpfghohdzcsqekir.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlnenhycGZnaG9oZHpjc3Fla2lyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwMTM2ODksImV4cCI6MjEwMzU4OTY4OX0.5iCkpu-usMMGeUfrPUpaWuJJmLEXALePauKKE-U2AgI';
 
 // Inicializar cliente Supabase
