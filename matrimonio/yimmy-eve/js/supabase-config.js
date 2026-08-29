@@ -86,6 +86,13 @@ window.dbSupabase = {
     const client = getSupabaseClient();
     if (!client) return false;
     try {
+      // Eliminar registros anteriores para esta misma invitación o código para evitar duplicados
+      if (rsvpData.invCode) {
+        await client.from('rsvps').delete().eq('invitation_id', rsvpData.invCode);
+      } else if (rsvpData.code) {
+        await client.from('rsvps').delete().eq('pass_code', rsvpData.code);
+      }
+
       const { data, error } = await client
         .from('rsvps')
         .insert([{
@@ -93,7 +100,7 @@ window.dbSupabase = {
           invitation_id: rsvpData.invCode || null,
           pass_code: rsvpData.code || 'EY-2026',
           name1: rsvpData.name,
-          attendance1: rsvpData.attendance === 'si',
+          attendance1: rsvpData.attendance === 'si' || rsvpData.attendance1 === 'si',
           dietary1: rsvpData.dietary || 'Ninguna',
           name2: rsvpData.name2 || '',
           attendance2: rsvpData.attendance2 === 'si',
@@ -106,6 +113,53 @@ window.dbSupabase = {
       return true;
     } catch (e) {
       console.error('Error al registrar RSVP:', e);
+      return false;
+    }
+  },
+
+  async updateRsvpAttendanceManual(invitationIdOrCode, isAttendanceYes, name1, name2, pases) {
+    const client = getSupabaseClient();
+    if (!client) return false;
+    try {
+      const { data } = await client.from('rsvps')
+        .select('*')
+        .or(`invitation_id.eq.${invitationIdOrCode},pass_code.eq.${invitationIdOrCode}`);
+
+      if (data && data.length > 0) {
+        const { error } = await client.from('rsvps')
+          .update({
+            attendance1: isAttendanceYes,
+            attendance2: (pases === 2 || name2) ? isAttendanceYes : false
+          })
+          .eq('id', data[0].id);
+        if (error) throw error;
+      } else {
+        const { error } = await client.from('rsvps').insert([{
+          event_slug: 'eve-y-yimmy',
+          invitation_id: invitationIdOrCode,
+          pass_code: 'EY-' + Math.floor(1000 + Math.random() * 9000),
+          name1: name1 || 'Invitado',
+          name2: name2 || '',
+          attendance1: isAttendanceYes,
+          attendance2: (pases === 2 || name2) ? isAttendanceYes : false
+        }]);
+        if (error) throw error;
+      }
+      return true;
+    } catch (e) {
+      console.error('Error actualizando asistencia manual:', e);
+      return false;
+    }
+  },
+
+  async deleteRsvpFromCloud(idOrCode) {
+    const client = getSupabaseClient();
+    if (!client) return false;
+    try {
+      await client.from('rsvps').delete().or(`id.eq.${idOrCode},invitation_id.eq.${idOrCode},pass_code.eq.${idOrCode}`);
+      return true;
+    } catch (e) {
+      console.error('Error al eliminar RSVP en nube:', e);
       return false;
     }
   },

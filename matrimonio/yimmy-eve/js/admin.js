@@ -337,7 +337,12 @@
     }
 
     tbody.innerHTML = adminInvitations.map((inv, idx) => {
-      const isConfirmed = isInvitationConfirmed(inv);
+      const existingRsvp = adminRsvps.find(r => r.invCode === inv.id || (r.name && r.name.toLowerCase().trim() === inv.name1.toLowerCase().trim()));
+      let currentStatus = 'pending';
+      if (existingRsvp) {
+        currentStatus = (existingRsvp.attendance === 'si' || existingRsvp.attendance1 === 'si') ? 'yes' : 'no';
+      }
+
       const link = generatePersonalizedUrl(inv);
       const namesDisplay = inv.name2 ? `${escapeHtml(inv.name1)} &amp; ${escapeHtml(inv.name2)}` : escapeHtml(inv.name1);
 
@@ -366,21 +371,23 @@
             ${inv.phone ? `<br><small style="color: #666; font-weight: normal;"><i class="ri-whatsapp-line"></i> ${escapeHtml(inv.phone)}</small>` : ''}
           </td>
           <td>
-            <span class="badge-status ${inv.pases === 2 ? 'status-yes' : 'status-pending'}">
+            <span class="badge-status ${inv.pases === 2 ? 'status-yes' : 'status-pending'}" style="border-radius: 50px;">
               ${inv.pases} Persona${inv.pases === 2 ? 's (Con Acompañante)' : ' (Individual)'}
             </span>
           </td>
           <td>
-            <span class="badge-status ${isConfirmed ? 'status-yes' : 'status-pending'}">
-              ${isConfirmed ? '✅ Confirmado' : '⏳ Pendiente'}
-            </span>
+            <select class="admin-inv-status-select" data-id="${inv.id}" data-name1="${escapeHtml(inv.name1)}" data-name2="${escapeHtml(inv.name2 || '')}" data-pases="${inv.pases}" style="padding: 0.35rem 0.65rem; border-radius: 50px; font-size: 0.76rem; font-weight: 700; border: 1.5px solid ${currentStatus === 'yes' ? '#27ae60' : currentStatus === 'no' ? '#e74c3c' : '#f39c12'}; color: ${currentStatus === 'yes' ? '#27ae60' : currentStatus === 'no' ? '#c0392b' : '#d35400'}; background: #FFFFFF; cursor: pointer;">
+              <option value="pending" ${currentStatus === 'pending' ? 'selected' : ''}>⏳ Pendiente</option>
+              <option value="yes" ${currentStatus === 'yes' ? 'selected' : ''}>✅ Sí Asiste</option>
+              <option value="no" ${currentStatus === 'no' ? 'selected' : ''}>❌ No Asiste</option>
+            </select>
           </td>
           <td>
             <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
-              <a href="${escapeHtml(waUrl)}" target="_blank" rel="noopener noreferrer" class="btn-dl-single" style="background: #25D366; color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.5rem 0.8rem; border-radius: var(--border-radius-card); font-size: 0.75rem; font-weight: 700;">
-                <i class="ri-whatsapp-line"></i> <span>Enviar WhatsApp</span>
+              <a href="${escapeHtml(waUrl)}" target="_blank" rel="noopener noreferrer" class="btn-dl-single" style="background: #25D366; color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.45rem 0.85rem; border-radius: 50px; font-size: 0.75rem; font-weight: 700;">
+                <i class="ri-whatsapp-line"></i> <span>WhatsApp</span>
               </a>
-              <a href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer" class="btn-dl-single btn-view-invitation" data-url="${escapeHtml(link)}" style="background: var(--bg-dark); color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.5rem 0.8rem; border-radius: var(--border-radius-card); font-size: 0.75rem; font-weight: 700;">
+              <a href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer" class="btn-dl-single btn-view-invitation" data-url="${escapeHtml(link)}" style="background: #527A50; color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.45rem 0.85rem; border-radius: 50px; font-size: 0.75rem; font-weight: 700;">
                 <i class="ri-external-link-line"></i> <span>Ver (OK)</span>
               </a>
             </div>
@@ -393,6 +400,57 @@
         </tr>
       `;
     }).join('');
+
+    tbody.querySelectorAll('.admin-inv-status-select').forEach(sel => {
+      sel.addEventListener('change', async () => {
+        const invId = sel.getAttribute('data-id');
+        const newStatus = sel.value;
+        const name1 = sel.getAttribute('data-name1');
+        const name2 = sel.getAttribute('data-name2');
+        const pases = parseInt(sel.getAttribute('data-pases') || '1', 10);
+
+        if (newStatus === 'pending') {
+          adminRsvps = adminRsvps.filter(r => r.invCode !== invId && r.name !== name1);
+          if (window.dbSupabase) await window.dbSupabase.deleteRsvpFromCloud(invId);
+        } else {
+          const isYes = newStatus === 'yes';
+          const existingR = adminRsvps.find(r => r.invCode === invId || r.name === name1);
+          const code = existingR ? existingR.code : ('EY-' + Math.floor(1000 + Math.random() * 9000));
+          
+          const updatedR = {
+            id: existingR ? existingR.id : ('manual_' + Date.now()),
+            name: name1,
+            name2: name2 || '',
+            pasesCount: isYes ? pases : 0,
+            attendance: isYes ? 'si' : 'no',
+            attendance1: isYes ? 'si' : 'no',
+            attendance2: isYes && name2 ? 'si' : 'no',
+            dietary: existingR ? existingR.dietary : 'ninguna',
+            dietary2: existingR ? existingR.dietary2 : 'ninguna',
+            song: existingR ? existingR.song : '',
+            song2: existingR ? existingR.song2 : '',
+            message: existingR ? existingR.message : '',
+            code: code,
+            invCode: invId,
+            timestamp: Date.now()
+          };
+
+          adminRsvps = adminRsvps.filter(r => r.invCode !== invId && r.name !== name1);
+          adminRsvps.unshift(updatedR);
+
+          if (window.dbSupabase) {
+            await window.dbSupabase.updateRsvpAttendanceManual(invId, isYes, name1, name2, pases);
+          }
+        }
+
+        try {
+          localStorage.setItem('wedding_rsvps_cloud_v1', JSON.stringify(adminRsvps));
+        } catch (e) {}
+
+        renderAdminInvitations();
+        renderAdminRsvps();
+      });
+    });
 
     tbody.querySelectorAll('.btn-view-invitation').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -427,8 +485,8 @@
     const countNoEl = document.getElementById('admin-count-no');
     const tableBody = document.getElementById('admin-rsvps-tbody');
 
-    const confirmedYes = adminRsvps.filter(r => r.attendance === 'si');
-    const confirmedNo = adminRsvps.filter(r => r.attendance === 'no');
+    const confirmedYes = adminRsvps.filter(r => r.attendance === 'si' || r.attendance1 === 'si');
+    const confirmedNo = adminRsvps.filter(r => r.attendance === 'no' && r.attendance1 !== 'si');
 
     let totalPeopleYes = 0;
     confirmedYes.forEach(r => {
@@ -454,13 +512,13 @@
     const sorted = [...adminRsvps].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
     tableBody.innerHTML = sorted.map((r, index) => {
-      const isYes = r.attendance === 'si';
+      const isYes = r.attendance === 'si' || r.attendance1 === 'si';
       const dateStr = r.timestamp ? new Date(r.timestamp).toLocaleDateString('es-CL', {
         day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
       }) : '—';
 
       const namesShow = r.name2 ? `${escapeHtml(r.name)} &amp; ${escapeHtml(r.name2)}` : escapeHtml(r.name);
-      const pasesCount = r.pasesCount || (r.name2 ? 2 : 1);
+      const pasesCount = isYes ? (r.pasesCount || (r.name2 ? 2 : 1)) : 0;
 
       let songsDisplay = '—';
       if (r.song && r.song2) {
@@ -475,9 +533,10 @@
         <tr>
           <td style="font-weight: 700;">${index + 1}. ${namesShow}</td>
           <td>
-            <span class="badge-status ${isYes ? 'status-yes' : 'status-no'}">
-              ${isYes ? '✓ Sí Asiste' : '✗ No Asiste'}
-            </span>
+            <select class="admin-rsvp-status-select" data-id="${r.id || r.code}" data-name1="${escapeHtml(r.name)}" data-name2="${escapeHtml(r.name2 || '')}" data-inv="${r.invCode || ''}" style="padding: 0.35rem 0.65rem; border-radius: 50px; font-size: 0.76rem; font-weight: 700; border: 1.5px solid ${isYes ? '#27ae60' : '#e74c3c'}; color: ${isYes ? '#27ae60' : '#c0392b'}; background: #FFFFFF; cursor: pointer;">
+              <option value="yes" ${isYes ? 'selected' : ''}>✅ Sí Asiste</option>
+              <option value="no" ${!isYes ? 'selected' : ''}>❌ No Asiste</option>
+            </select>
           </td>
           <td><small>${pasesCount} Persona${pasesCount > 1 ? 's' : ''}</small></td>
           <td><strong class="code-tag">${escapeHtml(r.code || 'EY-0000')}</strong></td>
@@ -497,6 +556,33 @@
         </tr>
       `;
     }).join('');
+
+    tableBody.querySelectorAll('.admin-rsvp-status-select').forEach(sel => {
+      sel.addEventListener('change', async () => {
+        const idOrCode = sel.getAttribute('data-id');
+        const isYes = sel.value === 'yes';
+        const invId = sel.getAttribute('data-inv');
+        const name1 = sel.getAttribute('data-name1');
+        const name2 = sel.getAttribute('data-name2');
+
+        const r = adminRsvps.find(x => x.id === idOrCode || x.code === idOrCode || x.name === name1);
+        if (r) {
+          r.attendance = isYes ? 'si' : 'no';
+          r.attendance1 = isYes ? 'si' : 'no';
+          if (r.name2) r.attendance2 = isYes ? 'si' : 'no';
+          r.pasesCount = isYes ? (r.name2 ? 2 : 1) : 0;
+          
+          if (window.dbSupabase) {
+            await window.dbSupabase.updateRsvpAttendanceManual(r.invCode || r.code || invId, isYes, r.name, r.name2, r.name2 ? 2 : 1);
+          }
+          try {
+            localStorage.setItem('wedding_rsvps_cloud_v1', JSON.stringify(adminRsvps));
+          } catch (e) {}
+          renderAdminRsvps();
+          renderAdminInvitations();
+        }
+      });
+    });
 
     tableBody.querySelectorAll('.btn-del-rsvp').forEach(btn => {
       btn.addEventListener('click', () => {

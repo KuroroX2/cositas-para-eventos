@@ -4,11 +4,13 @@
  * - Flujos diferenciados y amigables para "Asiste" y "No Asiste"
  * - Soporte para Invitaciones Personalizadas con bloques individuales por invitado
  * - Pase de Entrada Digital Oficial
+ * - Soporte completo para Modificar Respuesta en cualquier momento
  */
 
 (function() {
   let invitationData = null;
   let existingConfirmation = null;
+  let cachedFormHTML = '';
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initRsvpModule);
@@ -22,8 +24,10 @@
     const closePassBtn = document.getElementById('btn-close-pass-modal');
     const printPassBtn = document.getElementById('btn-print-pass');
     const copyCodeBtn = document.getElementById('btn-copy-pass-code');
-    const attendanceDetails1 = document.getElementById('attendance-details-group');
-    const attendanceDetails2 = document.getElementById('attendance-details-group-2');
+
+    if (form) {
+      cachedFormHTML = form.innerHTML;
+    }
 
     // 1. Check for URL parameters (?p=2&n1=...&n2=...&code=...)
     checkUrlInvitationParams();
@@ -33,45 +37,7 @@
 
     if (!form) return;
 
-    // Toggle details and button text when Yes/No changes
-    function updateAttendanceUI() {
-      const attRadio1 = form.querySelector('input[name="attendance"]:checked');
-      const att1 = attRadio1 ? attRadio1.value : 'si';
-
-      const isTwoPasses = invitationData && invitationData.pases === 2;
-      const attRadio2 = form.querySelector('input[name="attendance_2"]:checked');
-      const att2 = isTwoPasses && attRadio2 ? attRadio2.value : 'no';
-
-      if (attendanceDetails1) {
-        attendanceDetails1.style.display = att1 === 'no' ? 'none' : 'grid';
-      }
-      if (attendanceDetails2) {
-        attendanceDetails2.style.display = att2 === 'no' ? 'none' : 'grid';
-      }
-
-      const submitBtnText = document.getElementById('btn-rsvp-submit-text');
-      const submitBtnIcon = document.getElementById('btn-rsvp-icon');
-
-      const isAnyAttending = (att1 === 'si') || (isTwoPasses && att2 === 'si');
-
-      if (submitBtnText && submitBtnIcon) {
-        if (isAnyAttending) {
-          submitBtnText.textContent = 'Confirmar Asistencia & Ver Mi Pase';
-          submitBtnIcon.className = 'ri-check-double-line';
-        } else {
-          submitBtnText.textContent = 'Enviar Mi Respuesta 💌';
-          submitBtnIcon.className = 'ri-mail-send-line';
-        }
-      }
-    }
-
-    const radios1 = form.querySelectorAll('input[name="attendance"]');
-    radios1.forEach(radio => radio.addEventListener('change', updateAttendanceUI));
-
-    const radios2 = form.querySelectorAll('input[name="attendance_2"]');
-    radios2.forEach(radio => radio.addEventListener('change', updateAttendanceUI));
-
-    updateAttendanceUI();
+    setupFormInteractions();
 
     // Close pass modal
     if (closePassBtn && passModal) {
@@ -114,9 +80,58 @@
         }
       });
     }
+  }
 
-    // Form submit listener
-    form.addEventListener('submit', handleRsvpSubmit);
+  function setupFormInteractions() {
+    const form = document.getElementById('rsvp-form');
+    if (!form) return;
+
+    const attendanceDetails1 = document.getElementById('attendance-details-group');
+    const attendanceDetails2 = document.getElementById('attendance-details-group-2');
+
+    function updateAttendanceUI() {
+      const attRadio1 = form.querySelector('input[name="attendance"]:checked');
+      const att1 = attRadio1 ? attRadio1.value : 'si';
+
+      const isTwoPasses = invitationData && invitationData.pases === 2;
+      const attRadio2 = form.querySelector('input[name="attendance_2"]:checked');
+      const att2 = isTwoPasses && attRadio2 ? attRadio2.value : 'no';
+
+      if (attendanceDetails1) {
+        attendanceDetails1.style.display = att1 === 'no' ? 'none' : 'grid';
+      }
+      if (attendanceDetails2) {
+        attendanceDetails2.style.display = att2 === 'no' ? 'none' : 'grid';
+      }
+
+      const submitBtnText = document.getElementById('btn-rsvp-submit-text');
+      const submitBtnIcon = document.getElementById('btn-rsvp-icon');
+
+      const isAnyAttending = (att1 === 'si') || (isTwoPasses && att2 === 'si');
+
+      if (submitBtnText && submitBtnIcon) {
+        if (existingConfirmation) {
+          submitBtnText.textContent = isAnyAttending ? 'Guardar Cambios & Ver Pase Actualizado' : 'Guardar y Enviar Mi Respuesta 💌';
+          submitBtnIcon.className = 'ri-check-double-line';
+        } else if (isAnyAttending) {
+          submitBtnText.textContent = 'Confirmar Asistencia & Ver Mi Pase';
+          submitBtnIcon.className = 'ri-check-double-line';
+        } else {
+          submitBtnText.textContent = 'Enviar Mi Respuesta 💌';
+          submitBtnIcon.className = 'ri-mail-send-line';
+        }
+      }
+    }
+
+    const radios1 = form.querySelectorAll('input[name="attendance"]');
+    radios1.forEach(radio => radio.addEventListener('change', updateAttendanceUI));
+
+    const radios2 = form.querySelectorAll('input[name="attendance_2"]');
+    radios2.forEach(radio => radio.addEventListener('change', updateAttendanceUI));
+
+    updateAttendanceUI();
+
+    form.onsubmit = handleRsvpSubmit;
   }
 
   function checkUrlInvitationParams() {
@@ -163,20 +178,22 @@
       badge.style.display = 'flex';
     }
 
-    // Pre-fill Name 1
+    applyInvitationFields(name1, name2, pases);
+  }
+
+  function applyInvitationFields(name1, name2, pases) {
     const nameInput1 = document.getElementById('rsvp-name');
     const heading1 = document.getElementById('heading-guest-1');
     const lblName1 = document.getElementById('lbl-rsvp-name');
     const lblAtt1 = document.getElementById('lbl-attendance-1');
     const lblSong1 = document.getElementById('lbl-rsvp-song');
 
-    if (nameInput1) nameInput1.value = name1;
-    if (heading1) heading1.textContent = `Primer Invitado: ${name1}`;
-    if (lblName1) lblName1.textContent = `Nombre y Apellido (Invitado 1: ${name1}) *`;
-    if (lblAtt1) lblAtt1.textContent = `¿Tú (${name1}) nos acompañarás? *`;
-    if (lblSong1) lblSong1.textContent = `Canción que sugiere ${name1}`;
+    if (nameInput1 && name1) nameInput1.value = name1;
+    if (heading1 && name1) heading1.textContent = `Primer Invitado: ${name1}`;
+    if (lblName1 && name1) lblName1.textContent = `Nombre y Apellido (Invitado 1: ${name1}) *`;
+    if (lblAtt1 && name1) lblAtt1.textContent = `¿Tú (${name1}) nos acompañarás? *`;
+    if (lblSong1 && name1) lblSong1.textContent = `Canción que sugiere ${name1}`;
 
-    // If 2 passes, show and pre-fill Guest 2 container
     if (pases === 2) {
       const g2Container = document.getElementById('guest-2-container');
       const nameInput2 = document.getElementById('rsvp-name-2');
@@ -211,12 +228,13 @@
           rsvps = cloudRsvps.map(r => ({
             name: r.name1,
             name2: r.name2,
-            attendance: r.attendance1 ? 'si' : 'no',
+            attendance: (r.attendance1 || r.attendance2) ? 'si' : 'no',
             attendance1: r.attendance1 ? 'si' : 'no',
             attendance2: r.attendance2 ? 'si' : 'no',
             dietary: r.dietary1,
             dietary2: r.dietary2,
             song: r.song_request,
+            song2: '',
             message: r.message,
             code: r.pass_code,
             invCode: r.invitation_id
@@ -236,6 +254,7 @@
     if (invitationData) {
       match = rsvps.find(r => {
         if (invitationData.code && r.invCode === invitationData.code) return true;
+        if (invitationData.name1 && r.name && r.name.toLowerCase().trim() === invitationData.name1.toLowerCase().trim()) return true;
         return false;
       });
     } else {
@@ -257,57 +276,63 @@
 
     const displayName = conf.name2 ? `${conf.name} & ${conf.name2}` : conf.name;
     const isYes = conf.attendance === 'si' || conf.attendance1 === 'si' || conf.attendance2 === 'si';
-    const pasesCount = conf.pasesCount || (conf.name2 ? 2 : 1);
+    const pasesCount = conf.pasesCount || (conf.name2 ? (isYes ? 2 : 0) : (isYes ? 1 : 0));
 
     if (isYes) {
       // Caso 1: Asistencia Confirmada
       form.innerHTML = `
-        <div class="rsvp-already-confirmed-box" style="text-align: center; padding: 2.2rem 1.6rem; background: rgba(82, 122, 80, 0.08); border: 2px solid var(--gold-primary); border-radius: var(--border-radius-card);">
-          <div style="font-size: 3.2rem; color: #27ae60; line-height: 1; margin-bottom: 0.8rem;">
+        <div class="rsvp-already-confirmed-box" style="text-align: center; padding: 2.2rem 1.6rem; background: rgba(82, 122, 80, 0.08); border: 2px solid #527A50; border-radius: 20px;">
+          <div style="font-size: 3.2rem; color: #527A50; line-height: 1; margin-bottom: 0.8rem;">
             <i class="ri-checkbox-circle-fill"></i>
           </div>
-          <h3 style="font-family: var(--font-serif); font-size: 1.55rem; color: var(--text-main); margin-bottom: 0.4rem;">
+          <h3 style="font-family: var(--font-serif); font-size: 1.55rem; color: #243525; margin-bottom: 0.4rem;">
             ¡Asistencia Confirmada con Éxito! 🎉
           </h3>
-          <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.4rem; line-height: 1.5;">
+          <p style="font-size: 0.88rem; color: #4B634C; margin-bottom: 1.4rem; line-height: 1.5;">
             ¡Qué alegría contar contigo! Ya tenemos tu lugar reservado para celebrar juntos en Casa Pirque.
           </p>
 
-          <div style="background: var(--bg-surface); border: 1px dashed var(--border-gold); padding: 1.1rem 1.2rem; border-radius: 10px; margin-bottom: 1.5rem; text-align: left; font-size: 0.84rem; display: flex; flex-direction: column; gap: 0.5rem;">
-            <div style="display: flex; justify-content: space-between;"><strong style="color: var(--text-muted);">Invitado(s):</strong> <span style="font-weight: 700; color: var(--text-main);">${escapeHtml(displayName)}</span></div>
-            <div style="display: flex; justify-content: space-between;"><strong style="color: var(--text-muted);">Estado:</strong> <span style="color: #27ae60; font-weight: 700;">✓ Asistencia Confirmada</span></div>
-            <div style="display: flex; justify-content: space-between;"><strong style="color: var(--text-muted);">Pase(s) Asignado(s):</strong> <span style="font-weight: 700;">${pasesCount} Persona${pasesCount > 1 ? 's' : ''}</span></div>
-            <div style="display: flex; justify-content: space-between; border-top: 1px dashed rgba(28,27,26,0.15); padding-top: 0.4rem;"><strong style="color: var(--gold-dark);">Código de Sorteo:</strong> <span class="code-mono" style="font-weight: 800; font-size: 1.05rem; color: var(--gold-dark);">${escapeHtml(conf.code || 'EY-2026')}</span></div>
+          <div style="background: #FFFFFF; border: 1px dashed rgba(82, 122, 80, 0.35); padding: 1.1rem 1.2rem; border-radius: 12px; margin-bottom: 1.5rem; text-align: left; font-size: 0.84rem; display: flex; flex-direction: column; gap: 0.5rem;">
+            <div style="display: flex; justify-content: space-between;"><strong style="color: #4B634C;">Invitado(s):</strong> <span style="font-weight: 700; color: #243525;">${escapeHtml(displayName)}</span></div>
+            <div style="display: flex; justify-content: space-between;"><strong style="color: #4B634C;">Estado:</strong> <span style="color: #27ae60; font-weight: 700;">✓ Asistencia Confirmada</span></div>
+            <div style="display: flex; justify-content: space-between;"><strong style="color: #4B634C;">Pase(s) Asignado(s):</strong> <span style="font-weight: 700;">${pasesCount > 0 ? pasesCount : (conf.name2 ? 2 : 1)} Persona${(pasesCount > 1 || conf.name2) ? 's' : ''}</span></div>
+            <div style="display: flex; justify-content: space-between; border-top: 1px dashed rgba(82, 122, 80, 0.2); padding-top: 0.4rem;"><strong style="color: #527A50;">Código de Sorteo:</strong> <span class="code-mono" style="font-weight: 800; font-size: 1.05rem; color: #527A50;">${escapeHtml(conf.code || 'EY-2026')}</span></div>
           </div>
 
-          <button type="button" class="btn-vogue-gold" id="btn-reopen-confirmed-pass" style="width: 100%;">
-            <i class="ri-ticket-2-line"></i>
-            <span>Ver / Guardar Mi Pase Digital</span>
-          </button>
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <button type="button" class="btn-vogue-gold" id="btn-reopen-confirmed-pass" style="width: 100%;">
+              <i class="ri-ticket-2-line"></i>
+              <span>Ver / Guardar Mi Pase Digital</span>
+            </button>
+            <button type="button" class="btn-vogue-outline" id="btn-edit-rsvp" style="width: 100%;">
+              <i class="ri-edit-line"></i>
+              <span>Modificar mi respuesta</span>
+            </button>
+          </div>
         </div>
       `;
     } else {
-      // Caso 2: No Asiste (Respuesta Amable y Coherente)
+      // Caso 2: No Asiste
       form.innerHTML = `
-        <div class="rsvp-already-confirmed-box" style="text-align: center; padding: 2.2rem 1.6rem; background: rgba(230, 126, 34, 0.06); border: 1px solid rgba(230, 126, 34, 0.3); border-radius: var(--border-radius-card);">
+        <div class="rsvp-already-confirmed-box" style="text-align: center; padding: 2.2rem 1.6rem; background: rgba(230, 126, 34, 0.06); border: 1.5px solid rgba(230, 126, 34, 0.4); border-radius: 20px;">
           <div style="font-size: 3.2rem; color: #e67e22; line-height: 1; margin-bottom: 0.8rem;">
             <i class="ri-mail-check-line"></i>
           </div>
-          <h3 style="font-family: var(--font-serif); font-size: 1.55rem; color: var(--text-main); margin-bottom: 0.4rem;">
+          <h3 style="font-family: var(--font-serif); font-size: 1.55rem; color: #243525; margin-bottom: 0.4rem;">
             ¡Respuesta Registrada con Éxito! 💌
           </h3>
-          <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.4rem; line-height: 1.5; max-width: 480px; margin-left: auto; margin-right: auto;">
+          <p style="font-size: 0.88rem; color: #4B634C; margin-bottom: 1.4rem; line-height: 1.5; max-width: 480px; margin-left: auto; margin-right: auto;">
             Agradecemos mucho que nos hayas informado. Aunque no puedas acompañarnos físicamente, sabemos que estarás con nosotros en corazón y cariño. ¡Te mandamos un abrazo gigante!
           </p>
 
-          <div style="background: var(--bg-surface); border: 1px dashed rgba(230, 126, 34, 0.3); padding: 1.1rem 1.2rem; border-radius: 10px; margin-bottom: 1.5rem; text-align: left; font-size: 0.84rem; display: flex; flex-direction: column; gap: 0.5rem;">
-            <div style="display: flex; justify-content: space-between;"><strong style="color: var(--text-muted);">Invitado(s):</strong> <span style="font-weight: 700; color: var(--text-main);">${escapeHtml(displayName)}</span></div>
-            <div style="display: flex; justify-content: space-between;"><strong style="color: var(--text-muted);">Respuesta:</strong> <span style="color: #c0392b; font-weight: 700;">No podré asistir</span></div>
+          <div style="background: #FFFFFF; border: 1px dashed rgba(230, 126, 34, 0.35); padding: 1.1rem 1.2rem; border-radius: 12px; margin-bottom: 1.5rem; text-align: left; font-size: 0.84rem; display: flex; flex-direction: column; gap: 0.5rem;">
+            <div style="display: flex; justify-content: space-between;"><strong style="color: #4B634C;">Invitado(s):</strong> <span style="font-weight: 700; color: #243525;">${escapeHtml(displayName)}</span></div>
+            <div style="display: flex; justify-content: space-between;"><strong style="color: #4B634C;">Respuesta:</strong> <span style="color: #c0392b; font-weight: 700;">No podré asistir</span></div>
           </div>
 
           <button type="button" class="btn-vogue-outline" id="btn-edit-rsvp" style="width: 100%;">
             <i class="ri-edit-line"></i>
-            <span>Modificar mi respuesta</span>
+            <span>Modificar mi respuesta (Cambiar a Asistiré)</span>
           </button>
         </div>
       `;
@@ -323,10 +348,66 @@
     const editBtn = document.getElementById('btn-edit-rsvp');
     if (editBtn) {
       editBtn.addEventListener('click', () => {
-        // Clear local storage lock and reload to allow updating
-        localStorage.removeItem('wedding_confirmed_generic_code');
-        window.location.reload();
+        enableEditMode(conf);
       });
+    }
+  }
+
+  function enableEditMode(conf) {
+    const form = document.getElementById('rsvp-form');
+    if (!form || !cachedFormHTML) return;
+
+    form.innerHTML = cachedFormHTML;
+
+    // Apply URL params and names
+    if (invitationData) {
+      applyInvitationFields(invitationData.name1, invitationData.name2, invitationData.pases);
+    } else {
+      applyInvitationFields(conf.name, conf.name2, conf.name2 ? 2 : 1);
+    }
+
+    // Pre-fill fields with conf data
+    const nameInput1 = document.getElementById('rsvp-name');
+    if (nameInput1 && conf.name) nameInput1.value = conf.name;
+
+    const att1 = conf.attendance1 || conf.attendance || 'si';
+    const radioAtt1 = form.querySelector(`input[name="attendance"][value="${att1}"]`);
+    if (radioAtt1) radioAtt1.checked = true;
+
+    const dietary1 = document.getElementById('rsvp-dietary');
+    if (dietary1 && conf.dietary) dietary1.value = conf.dietary;
+
+    const song1 = document.getElementById('rsvp-song');
+    if (song1 && conf.song) song1.value = conf.song;
+
+    // Guest 2
+    if ((invitationData && invitationData.pases === 2) || conf.name2) {
+      const g2Container = document.getElementById('guest-2-container');
+      if (g2Container) g2Container.style.display = 'block';
+
+      const nameInput2 = document.getElementById('rsvp-name-2');
+      if (nameInput2 && conf.name2) nameInput2.value = conf.name2;
+
+      const att2 = conf.attendance2 || (conf.attendance === 'si' ? 'si' : 'no');
+      const radioAtt2 = form.querySelector(`input[name="attendance_2"][value="${att2}"]`);
+      if (radioAtt2) radioAtt2.checked = true;
+
+      const dietary2 = document.getElementById('rsvp-dietary-2');
+      if (dietary2 && conf.dietary2) dietary2.value = conf.dietary2;
+
+      const song2 = document.getElementById('rsvp-song-2');
+      if (song2 && conf.song2) song2.value = conf.song2;
+    }
+
+    const messageInput = document.getElementById('rsvp-message');
+    if (messageInput && conf.message) messageInput.value = conf.message;
+
+    setupFormInteractions();
+
+    // Scroll smoothly to form
+    const rsvpSection = document.getElementById('rsvp');
+    if (rsvpSection) {
+      rsvpSection.scrollIntoView({ behavior: 'smooth' });
     }
   }
 
@@ -349,12 +430,16 @@
 
     // Dieta display
     let dietarySummary = [];
-    if (conf.dietary && conf.dietary !== 'ninguna') dietarySummary.push(`${conf.name}: ${conf.dietary}`);
-    if (conf.name2 && conf.dietary2 && conf.dietary2 !== 'ninguna') dietarySummary.push(`${conf.name2}: ${conf.dietary2}`);
+    if (conf.dietary && conf.dietary !== 'ninguna') {
+      dietarySummary.push(conf.name2 ? `${conf.name}: ${conf.dietary}` : conf.dietary);
+    }
+    if (conf.name2 && conf.dietary2 && conf.dietary2 !== 'ninguna') {
+      dietarySummary.push(`${conf.name2}: ${conf.dietary2}`);
+    }
 
     if (dietarySummary.length > 0 && passDietaryRow && passDietaryVal) {
       passDietaryRow.style.display = 'flex';
-      passDietaryVal.textContent = dietarySummary.join(' | ');
+      passDietaryVal.textContent = dietarySummary.join(' • ');
     } else if (passDietaryRow) {
       passDietaryRow.style.display = 'none';
     }
@@ -384,17 +469,6 @@
   window.handleRsvpSubmit = async function(e) {
     if (e && e.preventDefault) e.preventDefault();
 
-    if (existingConfirmation) {
-      const isYes = existingConfirmation.attendance === 'si' || existingConfirmation.attendance1 === 'si';
-      if (isYes) {
-        alert('Tu asistencia ya se encuentra confirmada. Puedes ver tu pase de entrada directamente.');
-        openDigitalPass(existingConfirmation);
-      } else {
-        alert('Ya tenemos registrada tu respuesta. ¡Muchas gracias por avisarnos!');
-      }
-      return false;
-    }
-
     const form = document.getElementById('rsvp-form');
     if (!form) return false;
 
@@ -409,7 +483,7 @@
     const song1 = (songInput1 ? songInput1.value : '').trim();
 
     // Guest 2 data (if 2 passes)
-    const isTwoPasses = invitationData && invitationData.pases === 2;
+    const isTwoPasses = (invitationData && invitationData.pases === 2) || (existingConfirmation && existingConfirmation.name2);
     const nameInput2 = document.getElementById('rsvp-name-2');
     const name2 = isTwoPasses && nameInput2 ? (nameInput2.value || '').trim() : '';
     const attendanceRadio2 = form.querySelector('input[name="attendance_2"]:checked');
@@ -429,7 +503,7 @@
       return false;
     }
 
-    if (isTwoPasses && !name2) {
+    if (isTwoPasses && !name2 && attendance2 === 'si') {
       alert('Por favor ingresa el nombre de tu acompañante.');
       if (nameInput2) nameInput2.focus();
       return false;
@@ -442,8 +516,11 @@
 
     const isAnyAttending = (attendance1 === 'si') || (isTwoPasses && attendance2 === 'si');
 
-    // Generate unique lucky raffle code
-    const reservationCode = 'EY-' + Math.floor(1000 + Math.random() * 9000);
+    // Preserve or generate unique lucky raffle code
+    const reservationCode = (existingConfirmation && existingConfirmation.code) 
+      ? existingConfirmation.code 
+      : ('EY-' + Math.floor(1000 + Math.random() * 9000));
+      
     const displayName = (isTwoPasses && name2) ? `${name1} & ${name2}` : name1;
 
     const newRsvp = {
@@ -459,14 +536,16 @@
       song2: isTwoPasses ? song2 : '',
       message: message,
       code: reservationCode,
-      invCode: invitationData ? invitationData.code : ''
+      invCode: invitationData ? invitationData.code : (existingConfirmation ? existingConfirmation.invCode : '')
     };
 
     existingConfirmation = newRsvp;
 
     // 1. Save locally
     try {
-      const stored = JSON.parse(localStorage.getItem('wedding_rsvps_cloud_v1') || '[]');
+      let stored = JSON.parse(localStorage.getItem('wedding_rsvps_cloud_v1') || '[]');
+      // Filter out any previous match
+      stored = stored.filter(r => r.code !== reservationCode && r.name !== name1);
       stored.unshift(newRsvp);
       localStorage.setItem('wedding_rsvps_cloud_v1', JSON.stringify(stored));
       localStorage.setItem('wedding_guest_name', displayName);
@@ -485,7 +564,7 @@
     // 3. Save to Supabase Cloud DB
     if (window.dbSupabase) {
       window.dbSupabase.saveRsvp(newRsvp).then(ok => {
-        if (ok) console.log('RSVP guardado exitosamente en Supabase');
+        if (ok) console.log('RSVP actualizado exitosamente en Supabase');
       });
     }
 
