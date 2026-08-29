@@ -127,10 +127,10 @@
     }
 
     // Action buttons
-    const exportBtn = document.getElementById('btn-export-csv');
+    const exportBtn = document.getElementById('btn-export-rsvps-csv') || document.getElementById('btn-export-csv');
     if (exportBtn) exportBtn.addEventListener('click', exportRsvpsToCSV);
 
-    const raffleBtn = document.getElementById('btn-print-raffle');
+    const raffleBtn = document.getElementById('btn-print-raffle-tickets') || document.getElementById('btn-print-raffle');
     if (raffleBtn) raffleBtn.addEventListener('click', printRaffleTickets);
 
     const dlAllPhotosBtn = document.getElementById('btn-download-all-photos');
@@ -138,8 +138,8 @@
   }
 
   function showLoginForm() {
-    const loginView = document.getElementById('admin-login-view');
-    const dashView = document.getElementById('admin-dashboard-view');
+    const loginView = document.getElementById('admin-login-box') || document.getElementById('admin-login-view');
+    const dashView = document.getElementById('admin-dashboard') || document.getElementById('admin-dashboard-view');
     if (loginView) loginView.style.display = 'block';
     if (dashView) dashView.style.display = 'none';
 
@@ -151,10 +151,10 @@
   }
 
   function showDashboard() {
-    const loginView = document.getElementById('admin-login-view');
-    const dashView = document.getElementById('admin-dashboard-view');
+    const loginView = document.getElementById('admin-login-box') || document.getElementById('admin-login-view');
+    const dashView = document.getElementById('admin-dashboard') || document.getElementById('admin-dashboard-view');
     if (loginView) loginView.style.display = 'none';
-    if (dashView) dashView.style.display = 'flex';
+    if (dashView) dashView.style.display = 'block';
 
     loadAdminCloudData();
   }
