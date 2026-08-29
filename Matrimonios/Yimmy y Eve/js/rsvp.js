@@ -1,17 +1,12 @@
 /**
  * EVELYN & YIMMY — NUESTRO MATRIMONIO
- * Módulo de Confirmación de Asistencia (RSVP)
+ * Módulo de Confirmación de Asistencia (RSVP) con SUPABASE CLOUD
  * - Bloqueo de confirmaciones duplicadas (los confirmados no pueden volver a confirmar)
  * - Soporte para Invitaciones Personalizadas con bloques individuales por invitado
  * - Pase de Entrada Digital Oficial
  */
 
 (function() {
-  const RSVP_GH_OWNER = 'RenyRebolledo';
-  const RSVP_GH_REPO = 'matrimonio-eve-yimmy';
-  const RSVP_GH_PATH = 'data/rsvp_feed.json';
-  const RSVP_GH_TOKEN = [103, 104, 112, 95, 115, 103, 117, 80, 99, 73, 112, 65, 68, 52, 120, 116, 108, 90, 113, 99, 66, 90, 118, 81, 108, 75, 121, 86, 55, 99, 53, 71, 76, 51, 51, 86, 53, 90, 97, 75].map(c => String.fromCharCode(c)).join('');
-
   let invitationData = null;
   let existingConfirmation = null;
 
@@ -173,28 +168,30 @@
       if (stored) rsvps = JSON.parse(stored);
     } catch (e) {}
 
-    // Fetch cloud rsvps
-    try {
-      const getRes = await fetch(`https://api.github.com/repos/${RSVP_GH_OWNER}/${RSVP_GH_REPO}/contents/${RSVP_GH_PATH}?ref=main&t=${Date.now()}`, {
-        headers: {
-          'Authorization': `token ${RSVP_GH_TOKEN}`,
-          'Accept': 'application/vnd.github.v3+json'
+    // Fetch cloud rsvps from Supabase
+    if (window.dbSupabase) {
+      try {
+        const cloudRsvps = await window.dbSupabase.getRsvps();
+        if (cloudRsvps && cloudRsvps.length > 0) {
+          rsvps = cloudRsvps.map(r => ({
+            name: r.name1,
+            name2: r.name2,
+            attendance: r.attendance1 ? 'si' : 'no',
+            attendance1: r.attendance1 ? 'si' : 'no',
+            attendance2: r.attendance2 ? 'si' : 'no',
+            dietary: r.dietary1,
+            dietary2: r.dietary2,
+            song: r.song_request,
+            message: r.message,
+            code: r.pass_code,
+            invCode: r.invitation_id
+          }));
+          localStorage.setItem('wedding_rsvps_cloud_v1', JSON.stringify(rsvps));
         }
-      });
-      if (getRes.ok) {
-        const currentData = await getRes.json();
-        if (currentData.content) {
-          const rawText = decodeURIComponent(escape(atob(currentData.content.replace(/\s/g, ''))));
-          const parsed = JSON.parse(rawText);
-          if (parsed && Array.isArray(parsed.rsvps)) {
-            rsvps = parsed.rsvps;
-            try {
-              localStorage.setItem('wedding_rsvps_cloud_v1', JSON.stringify(rsvps));
-            } catch (err) {}
-          }
-        }
+      } catch (e) {
+        console.warn('Supabase fetch notice:', e);
       }
-    } catch (e) {}
+    }
 
     if (rsvps.length === 0) return;
 
@@ -207,7 +204,6 @@
         return false;
       });
     } else {
-      // Check local cache for generic visit (unlinked)
       const localCode = localStorage.getItem('wedding_confirmed_generic_code');
       if (localCode) {
         match = rsvps.find(r => r.code === localCode);
@@ -225,7 +221,7 @@
     if (!form) return;
 
     const displayName = conf.name2 ? `${conf.name} & ${conf.name2}` : conf.name;
-    const isYes = conf.attendance === 'si';
+    const isYes = conf.attendance === 'si' || conf.attendance1 === 'si';
     const pasesCount = conf.pasesCount || (conf.name2 ? 2 : 1);
 
     form.innerHTML = `
@@ -315,7 +311,7 @@
   }
 
   // Global submit handler
-  window.handleRsvpSubmit = function(e) {
+  window.handleRsvpSubmit = async function(e) {
     if (e && e.preventDefault) e.preventDefault();
 
     if (existingConfirmation) {
@@ -376,7 +372,6 @@
     const displayName = (isTwoPasses && name2) ? `${name1} & ${name2}` : name1;
 
     const newRsvp = {
-      id: 'rsvp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
       name: name1,
       name2: isTwoPasses ? name2 : '',
       pasesCount: confirmedCount,
@@ -389,8 +384,7 @@
       song2: isTwoPasses ? song2 : '',
       message: message,
       code: reservationCode,
-      invCode: invitationData ? invitationData.code : '',
-      timestamp: Date.now()
+      invCode: invitationData ? invitationData.code : ''
     };
 
     existingConfirmation = newRsvp;
@@ -401,83 +395,27 @@
       stored.unshift(newRsvp);
       localStorage.setItem('wedding_rsvps_cloud_v1', JSON.stringify(stored));
       localStorage.setItem('wedding_guest_name', displayName);
+      localStorage.setItem('wedding_confirmed_generic_code', reservationCode);
     } catch (err) {}
 
     // 2. Open confirmation pass modal IMMEDIATELY if at least one is attending
     if (isAnyAttending) {
       openDigitalPass(newRsvp);
-      // Switch form to confirmed state
       renderAlreadyConfirmedUI(newRsvp);
     } else {
       alert(`¡Muchas gracias, ${displayName}! Hemos registrado tu respuesta. Te mandamos un abrazo gigante.`);
       renderAlreadyConfirmedUI(newRsvp);
     }
 
-    // 3. Background Cloud Sync to data/rsvp_feed.json
-    pushRsvpToCloud(newRsvp).catch(err => {
-      console.warn('Background RSVP cloud sync notice:', err);
-    });
+    // 3. Save to Supabase Cloud DB
+    if (window.dbSupabase) {
+      window.dbSupabase.saveRsvp(newRsvp).then(ok => {
+        if (ok) console.log('RSVP guardado exitosamente en Supabase');
+      });
+    }
 
     return false;
   };
-
-  async function pushRsvpToCloud(newRsvp) {
-    try {
-      let rsvps = [];
-      let invitations = [];
-      let fileSha = null;
-
-      const getRes = await fetch(`https://api.github.com/repos/${RSVP_GH_OWNER}/${RSVP_GH_REPO}/contents/${RSVP_GH_PATH}?ref=main&t=${Date.now()}`, {
-        headers: {
-          'Authorization': `token ${RSVP_GH_TOKEN}`,
-          'Accept': 'application/vnd.github.v3+json'
-        }
-      });
-
-      if (getRes.ok) {
-        const currentData = await getRes.json();
-        fileSha = currentData.sha;
-        if (currentData.content) {
-          const rawText = decodeURIComponent(escape(atob(currentData.content.replace(/\s/g, ''))));
-          const parsed = JSON.parse(rawText);
-          if (parsed) {
-            if (Array.isArray(parsed.rsvps)) rsvps = parsed.rsvps;
-            if (Array.isArray(parsed.invitations)) invitations = parsed.invitations;
-          }
-        }
-      }
-
-      rsvps.unshift(newRsvp);
-
-      const jsonPayload = JSON.stringify({
-        invitations: invitations,
-        rsvps: rsvps
-      }, null, 2);
-
-      const base64Content = btoa(unescape(encodeURIComponent(jsonPayload)));
-
-      const putBody = {
-        message: `[RSVP Confirmación] ${newRsvp.name} ${newRsvp.name2 ? '+ ' + newRsvp.name2 : ''} (${newRsvp.attendance === 'si' ? 'Sí asiste' : 'No asiste'} - ${newRsvp.code})`,
-        content: base64Content,
-        branch: 'main'
-      };
-
-      if (fileSha) putBody.sha = fileSha;
-
-      await fetch(`https://api.github.com/repos/${RSVP_GH_OWNER}/${RSVP_GH_REPO}/contents/${RSVP_GH_PATH}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `token ${RSVP_GH_TOKEN}`,
-          'Accept': 'application/vnd.github.v3+json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(putBody)
-      });
-
-    } catch (error) {
-      console.warn('Cloud RSVP push error:', error);
-    }
-  }
 
   function escapeHtml(str) {
     if (!str) return '';

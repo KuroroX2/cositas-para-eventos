@@ -1,45 +1,34 @@
 /**
  * EVELYN & YIMMY — NUESTRO MATRIMONIO
- * Álbum Social Colaborativo en Tiempo Real
- * Sincronización Global en la Nube (GitHub Cloud DB • Likes • Comentarios • Subida Inmediata)
+ * Álbum Social Colaborativo en Tiempo Real con SUPABASE CLOUD
+ * Subida directa a Storage CDN, Likes y Comentarios en Vivo
  */
 
-// GitHub API Configuration for Real-time Cloud Sync
-const GH_OWNER = 'RenyRebolledo';
-const GH_REPO = 'matrimonio-eve-yimmy';
-const GH_FILE_PATH = 'data/album_feed.json';
-const GH_AUTH_TOKEN = [103, 104, 112, 95, 115, 103, 117, 80, 99, 73, 112, 65, 68, 52, 120, 116, 108, 90, 113, 99, 66, 90, 118, 81, 108, 75, 121, 86, 55, 99, 53, 71, 76, 51, 51, 86, 53, 90, 97, 75].map(c => String.fromCharCode(c)).join('');
-
-const CLOUD_STORAGE_KEY = 'eve_yimmy_wedding_album_cache_v4';
-const LIKED_PHOTOS_KEY = 'eve_yimmy_liked_photos_v4';
+const CLOUD_STORAGE_KEY = 'eve_yimmy_wedding_album_cache_v5';
+const LIKED_PHOTOS_KEY = 'eve_yimmy_liked_photos_v5';
 
 let activeCategoryFilter = 'invitados';
 let weddingPhotos = [];
 let activePhotoForLightbox = null;
-let currentFileSha = null;
-let isSyncingToCloud = false;
 
 // Expose to window for admin panel
 window.weddingPhotos = weddingPhotos;
-
-// Fallback seed photos (empty so album starts 100% clean)
-const DEFAULT_SEED_PHOTOS = [];
 
 document.addEventListener('DOMContentLoaded', () => {
   initGallery();
   initUploadModal();
   initLightboxSocial();
-  startCloudSync();
+  startCloudPolling();
 });
 
 /* ==========================================================================
-   1. GALLERY INITIALIZATION & CLOUD FETCH
+   1. GALLERY INITIALIZATION & SUPABASE FETCH
    ========================================================================== */
 function initGallery() {
   loadLocalCache();
   renderGallery();
   initFilterButtons();
-  fetchCloudPhotos(); // Fetch latest from cloud on load
+  fetchCloudPhotos();
 }
 
 function loadLocalCache() {
@@ -84,7 +73,6 @@ function renderMainGuestGallery() {
   const grid = document.getElementById('gallery-grid');
   if (!grid) return;
 
-  // Filter for guest memories
   const filtered = activeCategoryFilter === 'all'
     ? weddingPhotos
     : weddingPhotos.filter(p => p.category === activeCategoryFilter);
@@ -101,7 +89,6 @@ function renderMainGuestGallery() {
   }
 
   const likedIds = getLikedPhotoIds();
-
   grid.innerHTML = filtered.map(photo => renderPhotoCardHtml(photo, likedIds)).join('');
 }
 
@@ -128,39 +115,32 @@ function renderChallengeGallery() {
 
 function renderPhotoCardHtml(photo, likedIds) {
   const isLiked = likedIds.includes(photo.id);
-  const likeCount = photo.likes || 0;
+  const likesCount = photo.likes || 0;
   const commentsCount = (photo.comments || []).length;
-  const relativeTime = formatRelativeTime(photo.timestamp);
-  const captionText = photo.caption ? `<p class="gallery-card-caption">${escapeHtml(photo.caption)}</p>` : '';
+  const authorName = photo.author || photo.author_name || 'Invitado';
+  const categoryLabel = getCategoryBadgeLabel(photo.category);
+  const photoUrl = photo.url || photo.photo_url || '';
 
   return `
-    <div class="gallery-social-card" data-photo-id="${photo.id}">
-      <div class="gallery-card-img-wrap" onclick="openLightboxForPhoto('${photo.id}')">
-        <img src="${escapeHtml(photo.url)}" alt="${escapeHtml(photo.caption || 'Foto del Matrimonio')}" loading="lazy">
-        <div class="gallery-card-hover-overlay">
-          <i class="ri-zoom-in-line"></i>
-          <span>Ver foto y comentarios</span>
-        </div>
+    <div class="photo-card" data-photo-id="${photo.id}">
+      <div class="photo-card-media" onclick="openLightboxForPhoto('${photo.id}')">
+        <img src="${escapeHtml(photoUrl)}" alt="Foto por ${escapeHtml(authorName)}" loading="lazy">
+        <span class="photo-badge-cat">${categoryLabel}</span>
       </div>
-
-      <div class="gallery-card-body">
-        <div class="gallery-card-header">
-          <span class="gallery-card-author"><i class="ri-user-smile-line"></i> ${escapeHtml(photo.author || 'Invitado')}</span>
-          <span class="gallery-card-time">${relativeTime}</span>
+      <div class="photo-card-info">
+        <div class="photo-meta">
+          <span class="photo-author"><i class="ri-user-heart-line"></i> ${escapeHtml(authorName)}</span>
+          <span class="photo-time">${formatRelativeTime(photo.timestamp || photo.created_at)}</span>
         </div>
-
-        ${captionText}
-
-        <!-- Social Interaction Bar (Like & Comments) -->
-        <div class="gallery-card-actions">
-          <button class="btn-card-like ${isLiked ? 'liked' : ''}" onclick="toggleLikePhoto('${photo.id}', event)">
+        ${photo.caption ? `<p class="photo-caption" onclick="openLightboxForPhoto('${photo.id}')">${escapeHtml(photo.caption)}</p>` : ''}
+        <div class="photo-social-actions">
+          <button class="btn-like-social ${isLiked ? 'liked' : ''}" onclick="togglePhotoLike(event, '${photo.id}')">
             <i class="${isLiked ? 'ri-heart-fill' : 'ri-heart-line'}"></i>
-            <span class="like-counter">${likeCount}</span>
+            <span class="like-counter">${likesCount}</span>
           </button>
-          
-          <button class="btn-card-comments" onclick="openLightboxForPhoto('${photo.id}')">
+          <button class="btn-comment-social" onclick="openLightboxForPhoto('${photo.id}')">
             <i class="ri-chat-1-line"></i>
-            <span>${commentsCount} ${commentsCount === 1 ? 'comentario' : 'comentarios'}</span>
+            <span>${commentsCount}</span>
           </button>
         </div>
       </div>
@@ -168,8 +148,19 @@ function renderPhotoCardHtml(photo, likedIds) {
   `;
 }
 
+function getCategoryBadgeLabel(cat) {
+  switch (cat) {
+    case 'invitados': return '👥 Invitados';
+    case 'preparativos': return '✨ Preparativos';
+    case 'ceremonia': return '💍 Ceremonia';
+    case 'fiesta': return '🎉 Fiesta & Pasto';
+    case 'desafios': return '🎯 Reto Cumplido';
+    default: return '📸 Momento';
+  }
+}
+
 /* ==========================================================================
-   2. SOCIAL LIKES & COMMENTS
+   2. LIKES SYSTEM
    ========================================================================== */
 function getLikedPhotoIds() {
   try {
@@ -180,22 +171,22 @@ function getLikedPhotoIds() {
   }
 }
 
-function setLikedPhotoIds(ids) {
+function saveLikedPhotoIds(ids) {
   try {
     localStorage.setItem(LIKED_PHOTOS_KEY, JSON.stringify(ids));
   } catch (e) {}
 }
 
-window.toggleLikePhoto = function (photoId, event) {
+window.togglePhotoLike = async function(event, photoId) {
   if (event) event.stopPropagation();
 
   const photo = weddingPhotos.find(p => p.id === photoId);
   if (!photo) return;
 
   let likedIds = getLikedPhotoIds();
-  const alreadyLiked = likedIds.includes(photoId);
+  const isCurrentlyLiked = likedIds.includes(photoId);
 
-  if (alreadyLiked) {
+  if (isCurrentlyLiked) {
     photo.likes = Math.max(0, (photo.likes || 1) - 1);
     likedIds = likedIds.filter(id => id !== photoId);
   } else {
@@ -203,23 +194,23 @@ window.toggleLikePhoto = function (photoId, event) {
     likedIds.push(photoId);
   }
 
-  setLikedPhotoIds(likedIds);
+  saveLikedPhotoIds(likedIds);
   saveLocalCache();
   renderGallery();
+  updateLightboxLikeUI();
 
-  if (activePhotoForLightbox && activePhotoForLightbox.id === photoId) {
-    updateLightboxLikeUI();
+  // Supabase update
+  if (window.dbSupabase) {
+    window.dbSupabase.likePhoto(photoId, photo.likes);
   }
-
-  debouncePushToCloud();
 };
 
 /* ==========================================================================
-   3. LIGHTBOX SOCIAL (FULL MEDIA + COMMENTS THREAD)
+   3. LIGHTBOX & SOCIAL COMMENTS
    ========================================================================== */
 function initLightboxSocial() {
   const modal = document.getElementById('lightbox-modal');
-  const closeBtn = document.getElementById('lightbox-close');
+  const closeBtn = document.getElementById('btn-close-lightbox');
   const likeBtn = document.getElementById('btn-lightbox-like');
   const commentForm = document.getElementById('lightbox-comment-form');
 
@@ -231,22 +222,16 @@ function initLightboxSocial() {
     });
   }
 
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
-      closeLightbox();
-    }
-  });
-
   if (likeBtn) {
     likeBtn.addEventListener('click', () => {
       if (activePhotoForLightbox) {
-        toggleLikePhoto(activePhotoForLightbox.id);
+        window.togglePhotoLike(null, activePhotoForLightbox.id);
       }
     });
   }
 
   if (commentForm) {
-    commentForm.addEventListener('submit', (e) => {
+    commentForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!activePhotoForLightbox) return;
 
@@ -281,7 +266,9 @@ function initLightboxSocial() {
       renderLightboxComments();
       updateLightboxLikeUI();
 
-      debouncePushToCloud();
+      if (window.dbSupabase) {
+        window.dbSupabase.addComment(activePhotoForLightbox.id, activePhotoForLightbox.comments, newComment);
+      }
     });
   }
 }
@@ -299,9 +286,9 @@ window.openLightboxForPhoto = function (photoId) {
   const descEl = document.getElementById('lightbox-desc');
   const nameInput = document.getElementById('comment-author-input');
 
-  if (img) img.src = photo.url;
-  if (authorEl) authorEl.textContent = photo.author || 'Invitado';
-  if (timeEl) timeEl.textContent = formatRelativeTime(photo.timestamp);
+  if (img) img.src = photo.url || photo.photo_url || '';
+  if (authorEl) authorEl.textContent = photo.author || photo.author_name || 'Invitado';
+  if (timeEl) timeEl.textContent = formatRelativeTime(photo.timestamp || photo.created_at);
   if (descEl) descEl.textContent = photo.caption || '';
 
   if (nameInput) {
@@ -381,7 +368,7 @@ function renderLightboxComments() {
 }
 
 /* ==========================================================================
-   4. PHOTO UPLOAD MODAL & IMAGE COMPRESSION + GLOBAL CLOUD DB
+   4. PHOTO UPLOAD MODAL & SUPABASE STORAGE UPLOAD
    ========================================================================== */
 function initUploadModal() {
   const openBtn = document.getElementById('btn-open-upload');
@@ -481,31 +468,28 @@ function initUploadModal() {
       if (progressBox) progressBox.style.display = 'flex';
 
       try {
-        // Compress image to max 900px / JPEG 0.75 for fast transmission and lightweight cloud sync
-        const compressedBase64 = await compressImageFile(selectedFile, 900, 0.75);
-
-        const newPhoto = {
-          id: 'photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
-          url: compressedBase64,
-          author: author,
-          caption: caption,
-          category: category,
-          likes: 1,
-          timestamp: Date.now(),
-          comments: []
-        };
+        if (window.dbSupabase) {
+          const record = await window.dbSupabase.uploadPhoto(selectedFile, author, category, caption);
+          if (record) {
+            const formatted = {
+              id: record.id,
+              url: record.photo_url,
+              author: record.author_name,
+              category: record.category,
+              caption: record.caption,
+              likes: record.likes || 0,
+              timestamp: new Date(record.created_at).getTime(),
+              comments: record.comments || []
+            };
+            weddingPhotos.unshift(formatted);
+            saveLocalCache();
+            renderGallery();
+          }
+        }
 
         try {
           localStorage.setItem('wedding_guest_name', author);
         } catch (err) {}
-
-        // Add to local array immediately
-        weddingPhotos.unshift(newPhoto);
-        saveLocalCache();
-        renderGallery();
-
-        // Push directly to GitHub cloud DB
-        await pushAllPhotosToCloud();
 
         closeModal();
         alert('¡Foto publicada con éxito! Ya está disponible en la nube para todos los invitados.');
@@ -519,7 +503,7 @@ function initUploadModal() {
 
       } catch (error) {
         console.error('Upload error:', error);
-        alert('Ocurrió un detalle al subir la foto. Por favor intenta nuevamente.');
+        alert('Ocurrió un detalle al subir la foto a Supabase. Verifica que el Storage Bucket esté activo.');
       } finally {
         if (submitBtn) submitBtn.style.display = 'inline-flex';
         if (progressBox) progressBox.style.display = 'none';
@@ -528,216 +512,51 @@ function initUploadModal() {
   }
 }
 
-function compressImageFile(file, maxWidth = 900, quality = 0.75) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (event) => {
-      const img = new Image();
-      img.src = event.target.result;
-      img.onload = () => {
-        let width = img.width;
-        let height = img.height;
-
-        if (width > maxWidth) {
-          height = Math.round((height * maxWidth) / width);
-          width = maxWidth;
-        }
-
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-
-        const dataUrl = canvas.toDataURL('image/jpeg', quality);
-        resolve(dataUrl);
-      };
-      img.onerror = (err) => reject(err);
-    };
-    reader.onerror = (err) => reject(err);
-  });
-}
-
 /* ==========================================================================
-   5. REALTIME GITHUB CLOUD DATABASE (Fetch & Push)
+   5. REALTIME SUPABASE SYNC (Fetch & Polling)
    ========================================================================== */
 async function fetchCloudPhotos() {
+  if (!window.dbSupabase) return;
   try {
-    const url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE_PATH}?ref=main&t=${Date.now()}`;
-    const response = await fetch(url, {
-      headers: {
-        'Authorization': `token ${GH_AUTH_TOKEN}`,
-        'Accept': 'application/vnd.github.v3+json'
-      }
-    });
-
-    if (!response.ok) return;
-
-    const data = await response.json();
-    if (data && data.sha) {
-      currentFileSha = data.sha;
-    }
-
-    if (data && data.content) {
-      // Decode Base64 UTF-8
-      const rawText = decodeURIComponent(escape(atob(data.content.replace(/\s/g, ''))));
-      const parsed = JSON.parse(rawText);
-      if (parsed && Array.isArray(parsed.photos)) {
-        mergeCloudPhotos(parsed.photos);
-      }
+    const rawPhotos = await window.dbSupabase.getPhotos();
+    if (rawPhotos && rawPhotos.length > 0) {
+      weddingPhotos = rawPhotos.map(p => ({
+        id: p.id,
+        url: p.photo_url,
+        author: p.author_name,
+        category: p.category,
+        caption: p.caption,
+        likes: p.likes || 0,
+        timestamp: new Date(p.created_at).getTime(),
+        comments: p.comments || []
+      }));
+      saveLocalCache();
+      renderGallery();
     }
   } catch (e) {
-    // Fallback: try raw.githubusercontent.com
-    try {
-      const rawRes = await fetch(`https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/main/${GH_FILE_PATH}?t=${Date.now()}`);
-      if (rawRes.ok) {
-        const rawJson = await rawRes.json();
-        if (rawJson && Array.isArray(rawJson.photos)) {
-          mergeCloudPhotos(rawJson.photos);
-        }
-      }
-    } catch (err) {}
+    console.warn('Supabase photos fetch:', e);
   }
 }
 
-let debounceTimer = null;
-function debouncePushToCloud() {
-  clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(() => {
-    pushAllPhotosToCloud();
-  }, 1200);
-}
-
-async function pushAllPhotosToCloud() {
-  if (isSyncingToCloud) return;
-  isSyncingToCloud = true;
-
-  try {
-    // 1. Get latest file SHA first
-    const getRes = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE_PATH}?ref=main&t=${Date.now()}`, {
-      headers: {
-        'Authorization': `token ${GH_AUTH_TOKEN}`,
-        'Accept': 'application/vnd.github.v3+json'
-      }
-    });
-
-    if (getRes.ok) {
-      const currentData = await getRes.json();
-      currentFileSha = currentData.sha;
-      if (currentData.content) {
-        try {
-          const rawText = decodeURIComponent(escape(atob(currentData.content.replace(/\s/g, ''))));
-          const remoteJson = JSON.parse(rawText);
-          if (remoteJson && Array.isArray(remoteJson.photos)) {
-            // Merge remote into local before writing
-            mergeCloudPhotos(remoteJson.photos);
-          }
-        } catch (e) {}
-      }
-    }
-
-    // 2. Prepare payload
-    const jsonPayload = JSON.stringify({ photos: weddingPhotos }, null, 2);
-    const base64Content = btoa(unescape(encodeURIComponent(jsonPayload)));
-
-    const putBody = {
-      message: `[Live Album Sync] Actualización colaborativa (${weddingPhotos.length} fotos)`,
-      content: base64Content,
-      branch: 'main'
-    };
-
-    if (currentFileSha) {
-      putBody.sha = currentFileSha;
-    }
-
-    const putRes = await fetch(`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE_PATH}`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `token ${GH_AUTH_TOKEN}`,
-        'Accept': 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(putBody)
-    });
-
-    if (putRes.ok) {
-      const putResult = await putRes.json();
-      if (putResult && putResult.content && putResult.content.sha) {
-        currentFileSha = putResult.content.sha;
-      }
-    }
-  } catch (e) {
-    console.warn('Cloud sync push error:', e);
-  } finally {
-    isSyncingToCloud = false;
-  }
-}
-
-function mergeCloudPhotos(cloudPhotos) {
-  if (!Array.isArray(cloudPhotos) || cloudPhotos.length === 0) return;
-
-  let hasChanges = false;
-  const localMap = new Map(weddingPhotos.map(p => [p.id, p]));
-
-  cloudPhotos.forEach(cp => {
-    if (!localMap.has(cp.id)) {
-      weddingPhotos.push(cp);
-      hasChanges = true;
-    } else {
-      const local = localMap.get(cp.id);
-      if ((cp.likes || 0) > (local.likes || 0)) {
-        local.likes = cp.likes;
-        hasChanges = true;
-      }
-      if ((cp.comments || []).length > (local.comments || []).length) {
-        local.comments = cp.comments;
-        hasChanges = true;
-      }
-    }
-  });
-
-  if (hasChanges) {
-    weddingPhotos.sort((a, b) => b.timestamp - a.timestamp);
-    saveLocalCache();
-    renderGallery();
-
-    if (activePhotoForLightbox) {
-      const updated = weddingPhotos.find(p => p.id === activePhotoForLightbox.id);
-      if (updated) {
-        activePhotoForLightbox = updated;
-        renderLightboxComments();
-        updateLightboxLikeUI();
-      }
-    }
-  }
-}
-
-function startCloudSync() {
-  // Poll cloud feed every 6 seconds
+function startCloudPolling() {
   setInterval(() => {
     fetchCloudPhotos();
-  }, 6000);
+  }, 20000); // Polling suave cada 20 segundos
 }
 
 /* ==========================================================================
-   6. UTILITIES
+   6. UTILITY FUNCTIONS
    ========================================================================== */
 function formatRelativeTime(timestamp) {
-  if (!timestamp) return 'Reciente';
-  const diffMs = Date.now() - timestamp;
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
+  if (!timestamp) return 'Hace un momento';
+  const time = typeof timestamp === 'string' ? new Date(timestamp).getTime() : timestamp;
+  const diffSec = Math.floor((Date.now() - time) / 1000);
 
-  if (diffMins < 1) return 'Hace un momento';
-  if (diffMins < 60) return `Hace ${diffMins} min`;
-  if (diffHours < 24) return `Hace ${diffHours} h`;
-  if (diffDays === 1) return 'Ayer';
-  if (diffDays < 7) return `Hace ${diffDays} días`;
-
-  const date = new Date(timestamp);
-  return date.toLocaleDateString('es-CL', { day: 'numeric', month: 'short' });
+  if (diffSec < 60) return 'Hace un momento';
+  if (diffSec < 3600) return `Hace ${Math.floor(diffSec / 60)} min`;
+  if (diffSec < 86400) return `Hace ${Math.floor(diffSec / 3600)} h`;
+  const days = Math.floor(diffSec / 86400);
+  return `Hace ${days} ${days === 1 ? 'día' : 'días'}`;
 }
 
 function escapeHtml(str) {

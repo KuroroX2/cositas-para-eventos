@@ -31,7 +31,7 @@ VALUES (
 
 -- 2. Tabla de Invitaciones Oficiales (Generadas por los Novios / Admin)
 CREATE TABLE IF NOT EXISTS invitations (
-    id TEXT PRIMARY KEY, -- ej: 'inv_mt8t3dh4_mdcy' o código personalizado
+    id TEXT PRIMARY KEY,
     event_slug TEXT NOT NULL DEFAULT 'eve-y-yimmy',
     pases INTEGER NOT NULL DEFAULT 1,
     name1 TEXT NOT NULL,
@@ -39,6 +39,29 @@ CREATE TABLE IF NOT EXISTS invitations (
     phone TEXT DEFAULT '',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+-- Migración de Invitaciones Previas de Evelyn & Yimmy
+INSERT INTO invitations (id, event_slug, pases, name1, name2, phone) VALUES
+('inv_mt8t3dh4_mdcy', 'eve-y-yimmy', 2, 'Roberto', 'Acompañante', '+56 9 9411 6173'),
+('inv_mt7agi0j_r812', 'eve-y-yimmy', 1, 'Karen', '', '+56 9 6483 3883'),
+('inv_mt7agb8r_yhi2', 'eve-y-yimmy', 1, 'Sandra', '', '+56 9 9057 6025'),
+('inv_mt7ag1bu_s3mf', 'eve-y-yimmy', 1, 'Jhankhel', '', '+56 9 8142 5746'),
+('inv_mt7afpe6_kfg4', 'eve-y-yimmy', 1, 'Yorka', '', '+1 (514) 570-0368'),
+('inv_mt7afe11_3wr0', 'eve-y-yimmy', 2, 'Pamela', 'Marcial', '+56 9 9352 5595'),
+('inv_mt7af2wd_bc93', 'eve-y-yimmy', 1, 'Constanza', '', '+56 9 5003 1547'),
+('inv_mt7aerri_0o4h', 'eve-y-yimmy', 1, 'Cecilia', '', '+56 9 5778 7316'),
+('inv_mt7aefqb_ewjp', 'eve-y-yimmy', 1, 'Barbara', '', '+56 9 8982 8672'),
+('inv_mt7ae4tr_3c2o', 'eve-y-yimmy', 1, 'Claudia', '', '+56 9 7850 6319'),
+('inv_mt7ado96_pjjz', 'eve-y-yimmy', 2, 'Camila', 'Tah', '+61 451 471 901'),
+('inv_mt7ad2wi_m84w', 'eve-y-yimmy', 2, 'Daniela', 'Hugo', '+56 9 6210 8586'),
+('inv_mt7acqee_bjth', 'eve-y-yimmy', 2, 'Jessica', 'Eduardo', '+56 9 5524 3357'),
+('inv_mt7ac5s2_2ko9', 'eve-y-yimmy', 2, 'Cristopher', 'Reny', '+56 9 9138 1368'),
+('inv_mt7abo4o_ixxm', 'eve-y-yimmy', 2, 'Carlos', 'Carola', '+56 9 2197 6137'),
+('inv_mt79v1i5_fj7j', 'eve-y-yimmy', 2, 'Felipe', 'Camila', '+56 9 9588 8834'),
+('inv_mt79ukht_iqcm', 'eve-y-yimmy', 2, 'Guisselle', 'Nicolas', '+56 9 3269 8863'),
+('inv_mt79u2qe_of3f', 'eve-y-yimmy', 2, 'Jaqueline', 'Luis', '+56 9 8612 9593'),
+('inv_mt797yfq_46ak', 'eve-y-yimmy', 2, 'Isaac', 'Denisse', '+56 9 6169 7185')
+ON CONFLICT (id) DO NOTHING;
 
 -- 3. Tabla de Confirmaciones de Asistencia (RSVPs)
 CREATE TABLE IF NOT EXISTS rsvps (
@@ -64,7 +87,7 @@ CREATE TABLE IF NOT EXISTS photos (
     event_slug TEXT NOT NULL DEFAULT 'eve-y-yimmy',
     photo_url TEXT NOT NULL,
     author_name TEXT NOT NULL,
-    category TEXT NOT NULL DEFAULT 'invitados', -- 'invitados', 'preparativos', 'ceremonia', 'fiesta', 'retos'
+    category TEXT NOT NULL DEFAULT 'invitados', -- 'invitados', 'preparativos', 'ceremonia', 'fiesta', 'desafios'
     caption TEXT DEFAULT '',
     likes INTEGER NOT NULL DEFAULT 0,
     comments JSONB NOT NULL DEFAULT '[]'::jsonb,

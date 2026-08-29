@@ -1,16 +1,11 @@
 /**
  * EVELYN & YIMMY — NUESTRO MATRIMONIO
- * Panel de Administración para los Novios
+ * Panel de Administración para los Novios con SUPABASE CLOUD
  * (Clave: "pastox" • Registro de Invitados • Generador de Links • Sorteo & Fotos)
  */
 
 (function() {
-  const ADMIN_PIN = 'pastox'; // Clave exclusiva de los novios
-  const ADMIN_GH_OWNER = 'RenyRebolledo';
-  const ADMIN_GH_REPO = 'matrimonio-eve-yimmy';
-  const ADMIN_GH_RSVP_PATH = 'data/rsvp_feed.json';
-  const ADMIN_GH_TOKEN = [103, 104, 112, 95, 115, 103, 117, 80, 99, 73, 112, 65, 68, 52, 120, 116, 108, 90, 113, 99, 66, 90, 118, 81, 108, 75, 121, 86, 55, 99, 53, 71, 76, 51, 51, 86, 53, 90, 97, 75].map(c => String.fromCharCode(c)).join('');
-
+  const ADMIN_PIN = 'pastox'; // Clave de acceso
   let adminRsvps = [];
   let adminInvitations = [];
 
@@ -119,99 +114,105 @@
     // Invitation Type toggle (1 or 2 persons)
     const invTypeSelect = document.getElementById('inv-type');
     const invName2Group = document.getElementById('inv-name-2-group');
-    const invName2Input = document.getElementById('inv-name-2');
-
-    if (invTypeSelect) {
-      invTypeSelect.addEventListener('change', (e) => {
-        if (e.target.value === '2') {
-          if (invName2Group) invName2Group.style.display = 'grid';
-          if (invName2Input) invName2Input.required = true;
-        } else {
-          if (invName2Group) invName2Group.style.display = 'none';
-          if (invName2Input) invName2Input.required = false;
-        }
+    if (invTypeSelect && invName2Group) {
+      invTypeSelect.addEventListener('change', () => {
+        invName2Group.style.display = invTypeSelect.value === '2' ? 'block' : 'none';
       });
     }
 
-    // Create Invitation Form Submit
-    const formCreateInv = document.getElementById('form-create-invitation');
-    if (formCreateInv) {
-      formCreateInv.addEventListener('submit', handleCreateInvitation);
+    // Create invitation form submit
+    const createInvForm = document.getElementById('form-create-invitation');
+    if (createInvForm) {
+      createInvForm.addEventListener('submit', handleCreateInvitation);
     }
 
-    // Action Buttons
-    const btnExportCsv = document.getElementById('btn-export-rsvps-csv');
-    if (btnExportCsv) {
-      btnExportCsv.addEventListener('click', exportRsvpsToCSV);
-    }
+    // Action buttons
+    const exportBtn = document.getElementById('btn-export-csv');
+    if (exportBtn) exportBtn.addEventListener('click', exportRsvpsToCSV);
 
-    const btnPrintTickets = document.getElementById('btn-print-raffle-tickets');
-    if (btnPrintTickets) {
-      btnPrintTickets.addEventListener('click', printRaffleTickets);
-    }
+    const raffleBtn = document.getElementById('btn-print-raffle');
+    if (raffleBtn) raffleBtn.addEventListener('click', printRaffleTickets);
 
-    const btnDownloadAllPhotos = document.getElementById('btn-download-all-photos');
-    if (btnDownloadAllPhotos) {
-      btnDownloadAllPhotos.addEventListener('click', downloadAllPhotosBulk);
-    }
+    const dlAllPhotosBtn = document.getElementById('btn-download-all-photos');
+    if (dlAllPhotosBtn) dlAllPhotosBtn.addEventListener('click', downloadAllPhotosBulk);
   }
 
   function showLoginForm() {
-    const loginBox = document.getElementById('admin-login-box');
-    const dashboard = document.getElementById('admin-dashboard');
+    const loginView = document.getElementById('admin-login-view');
+    const dashView = document.getElementById('admin-dashboard-view');
+    if (loginView) loginView.style.display = 'block';
+    if (dashView) dashView.style.display = 'none';
+
     const pinInput = document.getElementById('admin-pin-input');
-    if (loginBox) loginBox.style.display = 'block';
-    if (dashboard) dashboard.style.display = 'none';
     if (pinInput) {
       pinInput.value = '';
-      pinInput.focus();
+      setTimeout(() => pinInput.focus(), 200);
     }
   }
 
   function showDashboard() {
-    const loginBox = document.getElementById('admin-login-box');
-    const dashboard = document.getElementById('admin-dashboard');
-    if (loginBox) loginBox.style.display = 'none';
-    if (dashboard) dashboard.style.display = 'block';
-    loadAdminData();
+    const loginView = document.getElementById('admin-login-view');
+    const dashView = document.getElementById('admin-dashboard-view');
+    if (loginView) loginView.style.display = 'none';
+    if (dashView) dashView.style.display = 'flex';
+
+    loadAdminCloudData();
   }
 
-  async function loadAdminData() {
-    let cloudLoaded = false;
-    try {
-      const url = `https://api.github.com/repos/${ADMIN_GH_OWNER}/${ADMIN_GH_REPO}/contents/${ADMIN_GH_RSVP_PATH}?ref=main&t=${Date.now()}`;
-      const response = await fetch(url, {
-        headers: {
-          'Authorization': `token ${ADMIN_GH_TOKEN}`,
-          'Accept': 'application/vnd.github.v3+json'
-        }
-      });
+  async function loadAdminCloudData() {
+    if (window.dbSupabase) {
+      try {
+        const [cloudInvs, cloudRsvps] = await Promise.all([
+          window.dbSupabase.getInvitations(),
+          window.dbSupabase.getRsvps()
+        ]);
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data && data.content) {
-          const rawText = decodeURIComponent(escape(atob(data.content.replace(/\s/g, ''))));
-          const parsed = JSON.parse(rawText);
-          if (parsed) {
-            cloudLoaded = true;
-            adminRsvps = Array.isArray(parsed.rsvps) ? parsed.rsvps : [];
-            adminInvitations = Array.isArray(parsed.invitations) ? parsed.invitations : [];
-            try {
-              localStorage.setItem('wedding_invitations_cloud_v1', JSON.stringify(adminInvitations));
-              localStorage.setItem('wedding_rsvps_cloud_v1', JSON.stringify(adminRsvps));
-            } catch (err) {}
-          }
+        if (cloudInvs && cloudInvs.length > 0) {
+          adminInvitations = cloudInvs.map(i => ({
+            id: i.id,
+            pases: i.pases,
+            name1: i.name1,
+            name2: i.name2,
+            phone: i.phone,
+            createdAt: new Date(i.created_at).getTime()
+          }));
+          localStorage.setItem('wedding_invitations_cloud_v1', JSON.stringify(adminInvitations));
         }
+
+        if (cloudRsvps && cloudRsvps.length > 0) {
+          adminRsvps = cloudRsvps.map(r => ({
+            id: r.id,
+            name: r.name1,
+            name2: r.name2,
+            attendance: r.attendance1 ? 'si' : 'no',
+            attendance1: r.attendance1 ? 'si' : 'no',
+            attendance2: r.attendance2 ? 'si' : 'no',
+            pasesCount: (r.attendance1 ? 1 : 0) + (r.attendance2 ? 1 : 0),
+            dietary: r.dietary1,
+            dietary2: r.dietary2,
+            song: r.song_request,
+            message: r.message,
+            code: r.pass_code,
+            invCode: r.invitation_id,
+            timestamp: new Date(r.created_at).getTime()
+          }));
+          localStorage.setItem('wedding_rsvps_cloud_v1', JSON.stringify(adminRsvps));
+        }
+      } catch (e) {
+        console.warn('Error fetching Supabase admin data:', e);
       }
-    } catch (e) {
-      console.warn('Error loading cloud data:', e);
     }
 
-    // Fallback to local storage ONLY if network/cloud request failed
-    if (!cloudLoaded) {
+    // Fallback if empty
+    if (adminInvitations.length === 0) {
       try {
         const localInv = localStorage.getItem('wedding_invitations_cloud_v1');
         if (localInv) adminInvitations = JSON.parse(localInv);
+      } catch (e) {}
+    }
+
+    if (adminRsvps.length === 0) {
+      try {
         const localRsvp = localStorage.getItem('wedding_rsvps_cloud_v1');
         if (localRsvp) adminRsvps = JSON.parse(localRsvp);
       } catch (e) {}
@@ -221,7 +222,7 @@
     renderAdminRsvps();
   }
 
-  function handleCreateInvitation(e) {
+  async function handleCreateInvitation(e) {
     e.preventDefault();
 
     const invType = document.getElementById('inv-type').value;
@@ -252,13 +253,14 @@
 
     adminInvitations.unshift(newInvitation);
 
-    // Save locally
     try {
       localStorage.setItem('wedding_invitations_cloud_v1', JSON.stringify(adminInvitations));
     } catch (err) {}
 
-    // Cloud push
-    pushAdminCloudData(`[Nueva Invitación] ${name1} ${name2 ? '+ ' + name2 : ''} (${invType} Pase/s)`);
+    // Save to Supabase Cloud
+    if (window.dbSupabase) {
+      await window.dbSupabase.createInvitation(newInvitation);
+    }
 
     // Reset form
     document.getElementById('form-create-invitation').reset();
@@ -309,7 +311,6 @@
 
       const waMsg = `${greeting}\nCon muchísima alegría queremos ${verb} a nuestro matrimonio en Casa Pirque el sábado 21 de noviembre de 2026.\n\nAquí tienes tu invitación con todos los detalles para que confirmes tu asistencia:\n${link}\n\n${waitVerb}\n— Evelyn & Yimmy`;
 
-      // Clean phone number for direct wa.me
       let cleanPhone = (inv.phone || '').replace(/\D/g, '');
       if (cleanPhone.length === 9 && cleanPhone.startsWith('9')) {
         cleanPhone = '56' + cleanPhone;
@@ -356,7 +357,6 @@
       `;
     }).join('');
 
-    // Attach delete handlers
     tbody.querySelectorAll('.btn-del-inv').forEach(btn => {
       btn.addEventListener('click', () => {
         const id = btn.getAttribute('data-id');
@@ -365,7 +365,6 @@
           try {
             localStorage.setItem('wedding_invitations_cloud_v1', JSON.stringify(adminInvitations));
           } catch (e) {}
-          pushAdminCloudData(`[Eliminar Invitación] ID ${id}`);
           renderAdminInvitations();
         }
       });
@@ -385,7 +384,6 @@
     const confirmedYes = adminRsvps.filter(r => r.attendance === 'si');
     const confirmedNo = adminRsvps.filter(r => r.attendance === 'no');
 
-    // Total people confirmed (count 2 if pases is 2 and guest 2 attends)
     let totalPeopleYes = 0;
     confirmedYes.forEach(r => {
       totalPeopleYes += (r.pasesCount || (r.name2 ? 2 : 1));
@@ -454,16 +452,14 @@
       `;
     }).join('');
 
-    // Attach delete RSVP handlers
     tableBody.querySelectorAll('.btn-del-rsvp').forEach(btn => {
       btn.addEventListener('click', () => {
         const id = btn.getAttribute('data-id');
-        if (confirm('¿Seguro que deseas eliminar esta confirmación? El invitado podrá volver a confirmar si lo deseas.')) {
+        if (confirm('¿Seguro que deseas eliminar esta confirmación?')) {
           adminRsvps = adminRsvps.filter(r => r.id !== id);
           try {
             localStorage.setItem('wedding_rsvps_cloud_v1', JSON.stringify(adminRsvps));
           } catch (e) {}
-          pushAdminCloudData(`[Eliminar Confirmación] ID ${id}`);
           renderAdminRsvps();
           renderAdminInvitations();
         }
@@ -581,11 +577,11 @@
 
     grid.innerHTML = photos.map((p, idx) => `
       <div class="admin-photo-card">
-        <img src="${escapeHtml(p.url)}" alt="Foto">
+        <img src="${escapeHtml(p.url || p.photo_url || '')}" alt="Foto">
         <div class="admin-photo-info">
-          <span class="admin-photo-author">#${idx + 1} • ${escapeHtml(p.author || 'Invitado')}</span>
+          <span class="admin-photo-author">#${idx + 1} • ${escapeHtml(p.author || p.author_name || 'Invitado')}</span>
           <span class="admin-photo-likes">❤️ ${p.likes || 0} | 💬 ${(p.comments || []).length}</span>
-          <a href="${escapeHtml(p.url)}" download="Boda_Eve_Yimmy_Foto_${idx + 1}.jpg" target="_blank" class="btn-dl-single">
+          <a href="${escapeHtml(p.url || p.photo_url || '')}" download="Boda_Eve_Yimmy_Foto_${idx + 1}.jpg" target="_blank" class="btn-dl-single">
             <i class="ri-download-2-line"></i> Descargar
           </a>
         </div>
@@ -600,62 +596,18 @@
       return;
     }
 
-    alert(`Iniciando descarga de ${photos.length} fotos del álbum. Tu navegador comenzará a descargarlas en alta calidad.`);
+    alert(`Iniciando descarga de ${photos.length} fotos del álbum en alta calidad.`);
 
     photos.forEach((p, idx) => {
       setTimeout(() => {
         const link = document.createElement('a');
-        link.href = p.url;
-        link.download = `Boda_Eve_Yimmy_Foto_${idx + 1}_${(p.author || 'invitado').replace(/\s+/g, '_')}.jpg`;
+        link.href = p.url || p.photo_url || '';
+        link.download = `Boda_Eve_Yimmy_Foto_${idx + 1}_${(p.author || p.author_name || 'invitado').replace(/\s+/g, '_')}.jpg`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
       }, idx * 400);
     });
-  }
-
-  async function pushAdminCloudData(commitMsg) {
-    try {
-      let fileSha = null;
-      const getRes = await fetch(`https://api.github.com/repos/${ADMIN_GH_OWNER}/${ADMIN_GH_REPO}/contents/${ADMIN_GH_RSVP_PATH}?ref=main&t=${Date.now()}`, {
-        headers: {
-          'Authorization': `token ${ADMIN_GH_TOKEN}`,
-          'Accept': 'application/vnd.github.v3+json'
-        }
-      });
-
-      if (getRes.ok) {
-        const currentData = await getRes.json();
-        fileSha = currentData.sha;
-      }
-
-      const jsonPayload = JSON.stringify({
-        invitations: adminInvitations,
-        rsvps: adminRsvps
-      }, null, 2);
-
-      const base64Content = btoa(unescape(encodeURIComponent(jsonPayload)));
-
-      const putBody = {
-        message: commitMsg || '[Admin Update] Evelyn & Yimmy Data',
-        content: base64Content,
-        branch: 'main'
-      };
-
-      if (fileSha) putBody.sha = fileSha;
-
-      await fetch(`https://api.github.com/repos/${ADMIN_GH_OWNER}/${ADMIN_GH_REPO}/contents/${ADMIN_GH_RSVP_PATH}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `token ${ADMIN_GH_TOKEN}`,
-          'Accept': 'application/vnd.github.v3+json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(putBody)
-      });
-    } catch (err) {
-      console.warn('Cloud admin push warning:', err);
-    }
   }
 
   function escapeHtml(str) {
