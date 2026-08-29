@@ -239,20 +239,20 @@ window.dbSupabase = {
     return photoRecord ? photoRecord[0] : null;
   },
 
-  async likePhoto(photoId, currentLikes) {
+  async likePhoto(photoId, exactLikes) {
     const client = getSupabaseClient();
-    if (!client) return (currentLikes || 0) + 1;
+    const targetLikes = Math.max(0, parseInt(exactLikes || 0, 10));
+    if (!client) return targetLikes;
     try {
-      const newLikes = (currentLikes || 0) + 1;
       const { error } = await client
         .from('photos')
-        .update({ likes: newLikes })
+        .update({ likes: targetLikes })
         .eq('id', photoId);
       if (error) throw error;
-      return newLikes;
+      return targetLikes;
     } catch (e) {
-      console.warn('Error al dar like:', e);
-      return (currentLikes || 0) + 1;
+      console.warn('Error al actualizar like en Supabase:', e);
+      return targetLikes;
     }
   },
 

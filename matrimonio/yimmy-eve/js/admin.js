@@ -571,7 +571,7 @@
           </td>
           <td><small style="color: #777;">${dateStr}</small></td>
           <td>
-            <button class="btn-del-rsvp" data-id="${r.id}" title="Eliminar confirmación" style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1.1rem; padding: 0.3rem;">
+            <button class="btn-del-rsvp" data-id="${r.id || ''}" data-inv="${r.invCode || ''}" data-code="${r.code || ''}" data-name1="${escapeHtml(r.name)}" title="Eliminar confirmación" style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1.15rem; padding: 0.35rem; transition: transform 0.2s ease;">
               <i class="ri-delete-bin-line"></i>
             </button>
           </td>
@@ -587,7 +587,7 @@
         const name1 = sel.getAttribute('data-name1');
         const name2 = sel.getAttribute('data-name2');
 
-        const r = adminRsvps.find(x => x.id === idOrCode || x.code === idOrCode || x.name === name1);
+        const r = adminRsvps.find(x => (x.id && x.id === idOrCode) || (x.code && x.code === idOrCode) || (x.name && x.name === name1));
         if (r) {
           r.attendance = isYes ? 'si' : 'no';
           r.attendance1 = isYes ? 'si' : 'no';
@@ -607,13 +607,31 @@
     });
 
     tableBody.querySelectorAll('.btn-del-rsvp').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         const id = btn.getAttribute('data-id');
+        const invId = btn.getAttribute('data-inv');
+        const code = btn.getAttribute('data-code');
+        const name1 = btn.getAttribute('data-name1');
+
         if (confirm('¿Seguro que deseas eliminar esta confirmación?')) {
-          adminRsvps = adminRsvps.filter(r => r.id !== id);
+          adminRsvps = adminRsvps.filter(r => {
+            if (id && r.id === id) return false;
+            if (code && r.code === code) return false;
+            if (invId && r.invCode === invId) return false;
+            if (name1 && r.name === name1) return false;
+            return true;
+          });
+
+          if (window.dbSupabase) {
+            if (id && id !== 'undefined' && id !== '') await window.dbSupabase.deleteRsvpFromCloud(id);
+            if (invId && invId !== 'undefined' && invId !== '') await window.dbSupabase.deleteRsvpFromCloud(invId);
+            if (code && code !== 'undefined' && code !== '') await window.dbSupabase.deleteRsvpFromCloud(code);
+          }
+
           try {
             localStorage.setItem('wedding_rsvps_cloud_v1', JSON.stringify(adminRsvps));
           } catch (e) {}
+
           renderAdminRsvps();
           renderAdminInvitations();
         }
