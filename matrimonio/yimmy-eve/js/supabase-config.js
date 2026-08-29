@@ -117,10 +117,22 @@ window.dbSupabase = {
     }
   },
 
-  async updateRsvpAttendanceManual(invitationIdOrCode, isAttendanceYes, name1, name2, pases) {
+  async updateRsvpAttendanceManual(invitationIdOrCode, attendanceMode, name1, name2, pases) {
     const client = getSupabaseClient();
     if (!client) return false;
     try {
+      const isBoth = (attendanceMode === 'both' || attendanceMode === true || attendanceMode === 'si');
+      const isSingle = (attendanceMode === 'single');
+      const isNone = (attendanceMode === 'none' || attendanceMode === false || attendanceMode === 'no');
+
+      if (attendanceMode === 'pending') {
+        await this.deleteRsvpFromCloud(invitationIdOrCode, invitationIdOrCode, null, name1);
+        return true;
+      }
+
+      const att1 = isBoth || isSingle;
+      const att2 = isBoth && (pases === 2 || !!name2);
+
       let rsvps = [];
       const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
       
@@ -145,8 +157,9 @@ window.dbSupabase = {
         for (const row of rsvps) {
           await client.from('rsvps')
             .update({
-              attendance1: isAttendanceYes,
-              attendance2: (pases === 2 || name2 || row.name2) ? isAttendanceYes : false
+              attendance1: att1,
+              attendance2: att2,
+              name2: name2 || row.name2 || ''
             })
             .eq('id', row.id);
         }
@@ -157,8 +170,8 @@ window.dbSupabase = {
           pass_code: 'EY-' + Math.floor(1000 + Math.random() * 9000),
           name1: name1 || 'Invitado',
           name2: name2 || '',
-          attendance1: isAttendanceYes,
-          attendance2: (pases === 2 || name2) ? isAttendanceYes : false
+          attendance1: att1,
+          attendance2: att2
         }]);
       }
       return true;

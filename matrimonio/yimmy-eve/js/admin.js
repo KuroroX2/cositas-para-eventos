@@ -196,17 +196,17 @@
     // 1. Cargar caché local primero para respuesta instantánea (0ms)
     try {
       const localInv = localStorage.getItem('wedding_invitations_cloud_v1');
-      if (localInv) {
+      if (localInv !== null) {
         adminInvitations = JSON.parse(localInv);
       } else {
         adminInvitations = [...DEFAULT_SEED_INVITATIONS];
         localStorage.setItem('wedding_invitations_cloud_v1', JSON.stringify(adminInvitations));
       }
       const localRsvp = localStorage.getItem('wedding_rsvps_cloud_v1');
-      if (localRsvp) adminRsvps = JSON.parse(localRsvp);
+      if (localRsvp !== null) adminRsvps = JSON.parse(localRsvp);
 
       const localPhotos = localStorage.getItem('eve_yimmy_wedding_album_cache_v9') || localStorage.getItem('wedding_photos_cloud_v1');
-      if (localPhotos) adminPhotos = JSON.parse(localPhotos);
+      if (localPhotos !== null) adminPhotos = JSON.parse(localPhotos);
     } catch (e) {
       adminInvitations = [...DEFAULT_SEED_INVITATIONS];
     }
@@ -224,7 +224,7 @@
           window.dbSupabase.getPhotos()
         ]);
 
-        if (cloudInvs && cloudInvs.length > 0) {
+        if (Array.isArray(cloudInvs)) {
           adminInvitations = cloudInvs.map(i => ({
             id: i.id,
             pases: i.pases,
@@ -237,12 +237,12 @@
           renderAdminInvitations();
         }
 
-        if (cloudRsvps && cloudRsvps.length > 0) {
+        if (Array.isArray(cloudRsvps)) {
           adminRsvps = cloudRsvps.map(r => ({
             id: r.id,
             name: r.name1,
             name2: r.name2,
-            attendance: r.attendance1 ? 'si' : 'no',
+            attendance: (r.attendance1 || r.attendance2) ? 'si' : 'no',
             attendance1: r.attendance1 ? 'si' : 'no',
             attendance2: r.attendance2 ? 'si' : 'no',
             pasesCount: (r.attendance1 ? 1 : 0) + (r.attendance2 ? 1 : 0),
@@ -256,6 +256,7 @@
           }));
           localStorage.setItem('wedding_rsvps_cloud_v1', JSON.stringify(adminRsvps));
           renderAdminRsvps();
+          renderAdminInvitations();
         }
 
         if (cloudPhotos && cloudPhotos.length > 0) {
@@ -340,6 +341,18 @@
     return `${baseOrigin}${basePath}?${params.toString()}`;
   }
 
+  function getAttendanceMode(r) {
+    if (!r) return 'pending';
+    const att1 = (r.attendance1 === true || r.attendance1 === 'si' || r.attendance === 'si');
+    const att2 = (r.attendance2 === true || r.attendance2 === 'si');
+    if (att1 && att2) return 'both';
+    if (att1 && !att2) {
+      if (r.name2 || r.pasesCount === 2 || r.pases === 2) return 'single';
+      return 'both';
+    }
+    return 'none';
+  }
+
   function renderAdminInvitations() {
     const tbody = document.getElementById('admin-invitations-tbody');
     const countInvEl = document.getElementById('admin-count-invitations');
@@ -359,14 +372,46 @@
     }
 
     tbody.innerHTML = adminInvitations.map((inv, idx) => {
-      const existingRsvp = adminRsvps.find(r => r.invCode === inv.id || (r.name && r.name.toLowerCase().trim() === inv.name1.toLowerCase().trim()));
-      let currentStatus = 'pending';
-      if (existingRsvp) {
-        currentStatus = (existingRsvp.attendance === 'si' || existingRsvp.attendance1 === 'si') ? 'yes' : 'no';
-      }
+      const existingRsvp = adminRsvps.find(r => (r.invCode && r.invCode === inv.id) || (r.name && r.name.toLowerCase().trim() === inv.name1.toLowerCase().trim()));
+      const isTwoPasses = (inv.pases === 2 || !!inv.name2);
+      const currentMode = existingRsvp ? getAttendanceMode(existingRsvp) : 'pending';
 
       const link = generatePersonalizedUrl(inv);
       const namesDisplay = inv.name2 ? `${escapeHtml(inv.name1)} &amp; ${escapeHtml(inv.name2)}` : escapeHtml(inv.name1);
+
+      let selectOptions = '';
+      let statusBadge = '';
+
+      if (isTwoPasses) {
+        selectOptions = `
+          <option value="pending" ${currentMode === 'pending' ? 'selected' : ''}>⏳ Pendiente</option>
+          <option value="both" ${currentMode === 'both' ? 'selected' : ''}>✅ Asisten Ambos (2 Pases)</option>
+          <option value="single" ${currentMode === 'single' ? 'selected' : ''}>👤 Asiste Solo 1 (Sin Acompañante)</option>
+          <option value="none" ${currentMode === 'none' ? 'selected' : ''}>❌ No Asiste (0 Pases)</option>
+        `;
+        if (currentMode === 'both') {
+          statusBadge = '<span class="badge-status status-yes" style="border-radius: 50px; font-weight: 700;">🟢 2 Pases (Ambos)</span>';
+        } else if (currentMode === 'single') {
+          statusBadge = '<span class="badge-status" style="background: #fff3cd; color: #856404; border-radius: 50px; font-weight: 700;">🟡 1 Pase (Solo)</span>';
+        } else if (currentMode === 'none') {
+          statusBadge = '<span class="badge-status status-no" style="border-radius: 50px; font-weight: 700;">🔴 0 Pases (No Asiste)</span>';
+        } else {
+          statusBadge = '<span class="badge-status status-pending" style="border-radius: 50px;">⏳ 2 Pases Reservados</span>';
+        }
+      } else {
+        selectOptions = `
+          <option value="pending" ${currentMode === 'pending' ? 'selected' : ''}>⏳ Pendiente</option>
+          <option value="both" ${currentMode === 'both' ? 'selected' : ''}>✅ Sí Asiste (1 Pase)</option>
+          <option value="none" ${currentMode === 'none' ? 'selected' : ''}>❌ No Asiste (0 Pases)</option>
+        `;
+        if (currentMode === 'both') {
+          statusBadge = '<span class="badge-status status-yes" style="border-radius: 50px; font-weight: 700;">🟢 1 Pase (Asiste)</span>';
+        } else if (currentMode === 'none') {
+          statusBadge = '<span class="badge-status status-no" style="border-radius: 50px; font-weight: 700;">🔴 0 Pases (No Asiste)</span>';
+        } else {
+          statusBadge = '<span class="badge-status status-pending" style="border-radius: 50px;">⏳ 1 Pase Reservado</span>';
+        }
+      }
 
       const isPlural = !!inv.name2;
       const greeting = isPlural ? `¡Hola ${inv.name1} y ${inv.name2}!` : `¡Hola ${inv.name1}!`;
@@ -386,22 +431,19 @@
         ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMsg)}` 
         : `https://api.whatsapp.com/send?text=${encodeURIComponent(waMsg)}`;
 
+      const borderColor = currentMode === 'both' ? '#27ae60' : currentMode === 'single' ? '#f39c12' : currentMode === 'none' ? '#e74c3c' : '#bdc3c7';
+      const textColor = currentMode === 'both' ? '#27ae60' : currentMode === 'single' ? '#d35400' : currentMode === 'none' ? '#c0392b' : '#666';
+
       return `
         <tr>
           <td style="font-weight: 700;">
             ${idx + 1}. ${namesDisplay}
             ${inv.phone ? `<br><small style="color: #666; font-weight: normal;"><i class="ri-whatsapp-line"></i> ${escapeHtml(inv.phone)}</small>` : ''}
           </td>
+          <td>${statusBadge}</td>
           <td>
-            <span class="badge-status ${inv.pases === 2 ? 'status-yes' : 'status-pending'}" style="border-radius: 50px;">
-              ${inv.pases} Persona${inv.pases === 2 ? 's (Con Acompañante)' : ' (Individual)'}
-            </span>
-          </td>
-          <td>
-            <select class="admin-inv-status-select" data-id="${inv.id}" data-name1="${escapeHtml(inv.name1)}" data-name2="${escapeHtml(inv.name2 || '')}" data-pases="${inv.pases}" style="padding: 0.35rem 0.65rem; border-radius: 50px; font-size: 0.76rem; font-weight: 700; border: 1.5px solid ${currentStatus === 'yes' ? '#27ae60' : currentStatus === 'no' ? '#e74c3c' : '#f39c12'}; color: ${currentStatus === 'yes' ? '#27ae60' : currentStatus === 'no' ? '#c0392b' : '#d35400'}; background: #FFFFFF; cursor: pointer;">
-              <option value="pending" ${currentStatus === 'pending' ? 'selected' : ''}>⏳ Pendiente</option>
-              <option value="yes" ${currentStatus === 'yes' ? 'selected' : ''}>✅ Sí Asiste</option>
-              <option value="no" ${currentStatus === 'no' ? 'selected' : ''}>❌ No Asiste</option>
+            <select class="admin-inv-status-select" data-id="${inv.id}" data-name1="${escapeHtml(inv.name1)}" data-name2="${escapeHtml(inv.name2 || '')}" data-pases="${inv.pases}" style="padding: 0.35rem 0.65rem; border-radius: 50px; font-size: 0.76rem; font-weight: 700; border: 1.5px solid ${borderColor}; color: ${textColor}; background: #FFFFFF; cursor: pointer;">
+              ${selectOptions}
             </select>
           </td>
           <td>
@@ -415,7 +457,7 @@
             </div>
           </td>
           <td>
-            <button class="btn-del-inv" data-id="${inv.id}" title="Eliminar invitación" style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1.1rem; padding: 0.3rem;">
+            <button class="btn-del-inv" data-id="${inv.id}" title="Eliminar invitación" style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1.15rem; padding: 0.35rem; transition: transform 0.2s ease;">
               <i class="ri-delete-bin-line"></i>
             </button>
           </td>
@@ -426,16 +468,19 @@
     tbody.querySelectorAll('.admin-inv-status-select').forEach(sel => {
       sel.addEventListener('change', async () => {
         const invId = sel.getAttribute('data-id');
-        const newStatus = sel.value;
+        const newMode = sel.value;
         const name1 = sel.getAttribute('data-name1');
         const name2 = sel.getAttribute('data-name2');
         const pases = parseInt(sel.getAttribute('data-pases') || '1', 10);
 
-        if (newStatus === 'pending') {
+        if (newMode === 'pending') {
           adminRsvps = adminRsvps.filter(r => r.invCode !== invId && r.name !== name1);
-          if (window.dbSupabase) await window.dbSupabase.deleteRsvpFromCloud(invId);
+          if (window.dbSupabase) await window.dbSupabase.deleteRsvpFromCloud(invId, invId, null, name1);
         } else {
-          const isYes = newStatus === 'yes';
+          const isBoth = (newMode === 'both');
+          const isSingle = (newMode === 'single');
+          const isNone = (newMode === 'none');
+
           const existingR = adminRsvps.find(r => r.invCode === invId || r.name === name1);
           const code = existingR ? existingR.code : ('EY-' + Math.floor(1000 + Math.random() * 9000));
           
@@ -443,10 +488,10 @@
             id: existingR ? existingR.id : ('manual_' + Date.now()),
             name: name1,
             name2: name2 || '',
-            pasesCount: isYes ? pases : 0,
-            attendance: isYes ? 'si' : 'no',
-            attendance1: isYes ? 'si' : 'no',
-            attendance2: isYes && name2 ? 'si' : 'no',
+            pasesCount: isBoth ? pases : (isSingle ? 1 : 0),
+            attendance: isNone ? 'no' : 'si',
+            attendance1: (isBoth || isSingle) ? 'si' : 'no',
+            attendance2: isBoth && (pases === 2 || !!name2) ? 'si' : 'no',
             dietary: existingR ? existingR.dietary : 'ninguna',
             dietary2: existingR ? existingR.dietary2 : 'ninguna',
             song: existingR ? existingR.song : '',
@@ -461,7 +506,7 @@
           adminRsvps.unshift(updatedR);
 
           if (window.dbSupabase) {
-            await window.dbSupabase.updateRsvpAttendanceManual(invId, isYes, name1, name2, pases);
+            await window.dbSupabase.updateRsvpAttendanceManual(invId, newMode, name1, name2, pases);
           }
         }
 
@@ -522,16 +567,22 @@
     const countNoEl = document.getElementById('admin-count-no');
     const tableBody = document.getElementById('admin-rsvps-tbody');
 
-    const confirmedYes = adminRsvps.filter(r => r.attendance === 'si' || r.attendance1 === 'si');
-    const confirmedNo = adminRsvps.filter(r => r.attendance === 'no' && r.attendance1 !== 'si');
+    const confirmedBoth = adminRsvps.filter(r => getAttendanceMode(r) === 'both');
+    const confirmedSingle = adminRsvps.filter(r => getAttendanceMode(r) === 'single');
+    const notAttending = adminRsvps.filter(r => getAttendanceMode(r) === 'none');
 
     let totalPeopleYes = 0;
-    confirmedYes.forEach(r => {
-      totalPeopleYes += (r.pasesCount || (r.name2 ? 2 : 1));
+    confirmedBoth.forEach(r => {
+      totalPeopleYes += (r.name2 ? 2 : 1);
+    });
+    confirmedSingle.forEach(r => {
+      totalPeopleYes += 1;
     });
 
-    if (countYesEl) countYesEl.textContent = `${confirmedYes.length} reg. (${totalPeopleYes} pers.)`;
-    if (countNoEl) countNoEl.textContent = confirmedNo.length;
+    const totalConfirmations = confirmedBoth.length + confirmedSingle.length;
+
+    if (countYesEl) countYesEl.innerHTML = `<strong>${totalConfirmations}</strong> reg. (<strong>${totalPeopleYes}</strong> pers.)`;
+    if (countNoEl) countNoEl.textContent = notAttending.length;
 
     if (!tableBody) return;
 
@@ -549,13 +600,49 @@
     const sorted = [...adminRsvps].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
     tableBody.innerHTML = sorted.map((r, index) => {
-      const isYes = r.attendance === 'si' || r.attendance1 === 'si';
+      const mode = getAttendanceMode(r);
+      const isTwoPasses = !!(r.name2);
       const dateStr = r.timestamp ? new Date(r.timestamp).toLocaleDateString('es-CL', {
         day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
       }) : '—';
 
-      const namesShow = r.name2 ? `${escapeHtml(r.name)} &amp; ${escapeHtml(r.name2)}` : escapeHtml(r.name);
-      const pasesCount = isYes ? (r.pasesCount || (r.name2 ? 2 : 1)) : 0;
+      let namesShow = escapeHtml(r.name);
+      if (r.name2) {
+        if (mode === 'single') {
+          namesShow = `${escapeHtml(r.name)} <span class="badge-status" style="background: #fff3cd; color: #856404; font-size: 0.68rem; margin-left: 4px; border-radius: 50px; font-weight: 700;">(Solo)</span>`;
+        } else {
+          namesShow = `${escapeHtml(r.name)} &amp; ${escapeHtml(r.name2)}`;
+        }
+      }
+      if (mode === 'none') {
+        namesShow = `<span style="text-decoration: line-through; opacity: 0.65;">${r.name2 ? `${escapeHtml(r.name)} &amp; ${escapeHtml(r.name2)}` : escapeHtml(r.name)}</span>`;
+      }
+
+      let pasesBadge = '';
+      if (mode === 'both') {
+        pasesBadge = `<span class="badge-status status-yes" style="font-weight: 700; border-radius: 50px;">🟢 ${isTwoPasses ? '2 Personas (Ambos)' : '1 Persona'}</span>`;
+      } else if (mode === 'single') {
+        pasesBadge = `<span class="badge-status" style="background: #fff3cd; color: #856404; font-weight: 700; border-radius: 50px;">🟡 1 Persona (Sin Acomp.)</span>`;
+      } else {
+        pasesBadge = `<span class="badge-status status-no" style="font-weight: 700; border-radius: 50px;">🔴 0 Personas (No Asiste)</span>`;
+      }
+
+      let selectOptions = '';
+      if (isTwoPasses) {
+        selectOptions = `
+          <option value="both" ${mode === 'both' ? 'selected' : ''}>✅ Asisten Ambos (2 Pases)</option>
+          <option value="single" ${mode === 'single' ? 'selected' : ''}>👤 Asiste Solo 1 (Sin Acompañante)</option>
+          <option value="none" ${mode === 'none' ? 'selected' : ''}>❌ No Asiste (0 Pases)</option>
+        `;
+      } else {
+        selectOptions = `
+          <option value="both" ${mode === 'both' ? 'selected' : ''}>✅ Sí Asiste (1 Pase)</option>
+          <option value="none" ${mode === 'none' ? 'selected' : ''}>❌ No Asiste (0 Pases)</option>
+        `;
+      }
+
+      const borderColor = mode === 'both' ? '#27ae60' : mode === 'single' ? '#f39c12' : '#e74c3c';
+      const textColor = mode === 'both' ? '#27ae60' : mode === 'single' ? '#d35400' : '#c0392b';
 
       let songsDisplay = '—';
       if (r.song && r.song2) {
@@ -570,12 +657,11 @@
         <tr>
           <td style="font-weight: 700;">${index + 1}. ${namesShow}</td>
           <td>
-            <select class="admin-rsvp-status-select" data-id="${r.id || r.code}" data-name1="${escapeHtml(r.name)}" data-name2="${escapeHtml(r.name2 || '')}" data-inv="${r.invCode || ''}" style="padding: 0.35rem 0.65rem; border-radius: 50px; font-size: 0.76rem; font-weight: 700; border: 1.5px solid ${isYes ? '#27ae60' : '#e74c3c'}; color: ${isYes ? '#27ae60' : '#c0392b'}; background: #FFFFFF; cursor: pointer;">
-              <option value="yes" ${isYes ? 'selected' : ''}>✅ Sí Asiste</option>
-              <option value="no" ${!isYes ? 'selected' : ''}>❌ No Asiste</option>
+            <select class="admin-rsvp-status-select" data-id="${r.id || r.code}" data-name1="${escapeHtml(r.name)}" data-name2="${escapeHtml(r.name2 || '')}" data-inv="${r.invCode || ''}" style="padding: 0.35rem 0.65rem; border-radius: 50px; font-size: 0.76rem; font-weight: 700; border: 1.5px solid ${borderColor}; color: ${textColor}; background: #FFFFFF; cursor: pointer;">
+              ${selectOptions}
             </select>
           </td>
-          <td><small>${pasesCount} Persona${pasesCount > 1 ? 's' : ''}</small></td>
+          <td>${pasesBadge}</td>
           <td><strong class="code-tag">${escapeHtml(r.code || 'EY-0000')}</strong></td>
           <td>
             <small>${escapeHtml(r.dietary && r.dietary !== 'ninguna' ? r.dietary : 'Tradicional')}${r.dietary2 && r.dietary2 !== 'ninguna' ? ' / ' + escapeHtml(r.dietary2) : ''}</small>
@@ -597,20 +683,24 @@
     tableBody.querySelectorAll('.admin-rsvp-status-select').forEach(sel => {
       sel.addEventListener('change', async () => {
         const idOrCode = sel.getAttribute('data-id');
-        const isYes = sel.value === 'yes';
+        const newMode = sel.value;
         const invId = sel.getAttribute('data-inv');
         const name1 = sel.getAttribute('data-name1');
         const name2 = sel.getAttribute('data-name2');
 
         const r = adminRsvps.find(x => (x.id && x.id === idOrCode) || (x.code && x.code === idOrCode) || (x.name && x.name === name1));
         if (r) {
-          r.attendance = isYes ? 'si' : 'no';
-          r.attendance1 = isYes ? 'si' : 'no';
-          if (r.name2) r.attendance2 = isYes ? 'si' : 'no';
-          r.pasesCount = isYes ? (r.name2 ? 2 : 1) : 0;
+          const isBoth = (newMode === 'both');
+          const isSingle = (newMode === 'single');
+          const isNone = (newMode === 'none');
+
+          r.attendance = isNone ? 'no' : 'si';
+          r.attendance1 = (isBoth || isSingle) ? 'si' : 'no';
+          r.attendance2 = (isBoth && (r.name2 || name2)) ? 'si' : 'no';
+          r.pasesCount = isBoth ? (r.name2 ? 2 : 1) : (isSingle ? 1 : 0);
           
           if (window.dbSupabase) {
-            await window.dbSupabase.updateRsvpAttendanceManual(r.invCode || r.code || invId, isYes, r.name, r.name2, r.name2 ? 2 : 1);
+            await window.dbSupabase.updateRsvpAttendanceManual(r.invCode || r.code || invId, newMode, r.name, r.name2, r.name2 ? 2 : 1);
           }
           try {
             localStorage.setItem('wedding_rsvps_cloud_v1', JSON.stringify(adminRsvps));
@@ -662,20 +752,29 @@
       return;
     }
 
-    const headers = ['Nombre_1', 'Nombre_2', 'Asistencia', 'Pases', 'Codigo_Pase', 'Menu_1', 'Menu_2', 'Cancion_1', 'Cancion_2', 'Mensaje_Dedicatoria', 'Fecha_Registro'];
-    const rows = adminRsvps.map(r => [
-      `"${(r.name || '').replace(/"/g, '""')}"`,
-      `"${(r.name2 || '').replace(/"/g, '""')}"`,
-      r.attendance === 'si' ? 'SI ASISTE' : 'NO ASISTE',
-      r.pasesCount || (r.name2 ? 2 : 1),
-      `"${r.code || ''}"`,
-      `"${(r.dietary || '').replace(/"/g, '""')}"`,
-      `"${(r.dietary2 || '').replace(/"/g, '""')}"`,
-      `"${(r.song || '').replace(/"/g, '""')}"`,
-      `"${(r.song2 || '').replace(/"/g, '""')}"`,
-      `"${(r.message || '').replace(/"/g, '""')}"`,
-      r.timestamp ? new Date(r.timestamp).toLocaleString('es-CL') : ''
-    ]);
+    const headers = ['Nombre_1', 'Nombre_2', 'Estado_Asistencia', 'Pases_Confirmados', 'Codigo_Pase', 'Menu_1', 'Menu_2', 'Cancion_1', 'Cancion_2', 'Mensaje_Dedicatoria', 'Fecha_Registro'];
+    const rows = adminRsvps.map(r => {
+      const mode = getAttendanceMode(r);
+      let estadoTxt = 'NO ASISTE';
+      if (mode === 'both') estadoTxt = r.name2 ? 'ASISTEN AMBOS' : 'ASISTE (1 PASE)';
+      if (mode === 'single') estadoTxt = 'ASISTE SOLO 1 (SIN ACOMPAÑANTE)';
+
+      const pases = mode === 'both' ? (r.name2 ? 2 : 1) : (mode === 'single' ? 1 : 0);
+
+      return [
+        `"${(r.name || '').replace(/"/g, '""')}"`,
+        `"${(r.name2 || '').replace(/"/g, '""')}"`,
+        `"${estadoTxt}"`,
+        pases,
+        `"${r.code || ''}"`,
+        `"${(r.dietary || '').replace(/"/g, '""')}"`,
+        `"${(r.dietary2 || '').replace(/"/g, '""')}"`,
+        `"${(r.song || '').replace(/"/g, '""')}"`,
+        `"${(r.song2 || '').replace(/"/g, '""')}"`,
+        `"${(r.message || '').replace(/"/g, '""')}"`,
+        r.timestamp ? new Date(r.timestamp).toLocaleString('es-CL') : ''
+      ];
+    });
 
     const csvContent = '\uFEFF' + [headers.join(';'), ...rows.map(e => e.join(';'))].join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -689,7 +788,7 @@
   }
 
   function printRaffleTickets() {
-    const confirmedYes = adminRsvps.filter(r => r.attendance === 'si');
+    const confirmedYes = adminRsvps.filter(r => getAttendanceMode(r) === 'both' || getAttendanceMode(r) === 'single');
     if (confirmedYes.length === 0) {
       alert('No hay invitados confirmados para generar cupones de sorteo.');
       return;
@@ -702,7 +801,16 @@
     }
 
     const ticketsHtml = confirmedYes.map(r => {
-      const namesText = r.name2 ? `${escapeHtml(r.name)} & ${escapeHtml(r.name2)}` : escapeHtml(r.name);
+      const mode = getAttendanceMode(r);
+      let namesText = escapeHtml(r.name);
+      if (r.name2) {
+        if (mode === 'both') {
+          namesText = `${escapeHtml(r.name)} & ${escapeHtml(r.name2)}`;
+        } else {
+          namesText = `${escapeHtml(r.name)} (Pase Individual)`;
+        }
+      }
+
       return `
         <div class="raffle-ticket">
           <div class="ticket-brand">MATRIMONIO EVELYN & YIMMY • SORTEO</div>
@@ -741,7 +849,7 @@
       </head>
       <body>
         <h2>🎟️ Cupones de Sorteo de Premios — Evelyn & Yimmy</h2>
-        <p class="sub">Total de registros confirmados: ${confirmedYes.length} • Corta por la línea punteada para la tómbola del sorteo.</p>
+        <p class="sub">Total de pases confirmados: ${confirmedYes.length} • Corta por la línea punteada para la tómbola del sorteo.</p>
         <div class="raffle-grid">
           ${ticketsHtml}
         </div>
