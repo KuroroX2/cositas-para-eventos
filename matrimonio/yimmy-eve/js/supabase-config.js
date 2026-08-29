@@ -6,19 +6,29 @@
 const SUPABASE_URL = 'https://igzxrpfghohdzcsqekir.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlnenhycGZnaG9oZHpjc3Fla2lyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwMTM2ODksImV4cCI6MjEwMzU4OTY4OX0.5iCkpu-usMMGeUfrPUpaWuJJmLEXALePauKKE-U2AgI';
 
-// Inicializar cliente Supabase
-const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+// Inicializar cliente Supabase de forma dinámica
+function getSupabaseClient() {
+  if (window._sbClient) return window._sbClient;
+  if (window.supabase && typeof window.supabase.createClient === 'function') {
+    window._sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    return window._sbClient;
+  }
+  return null;
+}
 
 window.dbSupabase = {
-  client: supabase,
+  get client() {
+    return getSupabaseClient();
+  },
 
   // ==========================================
   // 1. INVITACIONES OFICIALES
   // ==========================================
   async getInvitations() {
-    if (!supabase) return [];
+    const client = getSupabaseClient();
+    if (!client) return [];
     try {
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from('invitations')
         .select('*')
         .order('created_at', { ascending: false });
@@ -30,24 +40,26 @@ window.dbSupabase = {
     }
   },
 
-  async createInvitation(inv) {
-    if (!supabase) return false;
+  async createInvitation(invData) {
+    const client = getSupabaseClient();
+    if (!client) return null;
     try {
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from('invitations')
         .insert([{
-          id: inv.id,
+          id: invData.id,
           event_slug: 'eve-y-yimmy',
-          pases: inv.pases || 1,
-          name1: inv.name1,
-          name2: inv.name2 || '',
-          phone: inv.phone || ''
-        }]);
+          pases: invData.pases,
+          name1: invData.name1,
+          name2: invData.name2 || '',
+          phone: invData.phone || ''
+        }])
+        .select();
       if (error) throw error;
-      return true;
+      return data ? data[0] : null;
     } catch (e) {
-      console.error('Error al guardar invitación:', e);
-      return false;
+      console.error('Error al crear invitación en Supabase:', e);
+      return null;
     }
   },
 
@@ -55,9 +67,10 @@ window.dbSupabase = {
   // 2. CONFIRMACIONES RSVP
   // ==========================================
   async getRsvps() {
-    if (!supabase) return [];
+    const client = getSupabaseClient();
+    if (!client) return [];
     try {
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from('rsvps')
         .select('*')
         .order('created_at', { ascending: false });
@@ -70,9 +83,10 @@ window.dbSupabase = {
   },
 
   async saveRsvp(rsvpData) {
-    if (!supabase) return false;
+    const client = getSupabaseClient();
+    if (!client) return false;
     try {
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from('rsvps')
         .insert([{
           event_slug: 'eve-y-yimmy',
@@ -100,9 +114,10 @@ window.dbSupabase = {
   // 3. ÁLBUM SOCIAL Y FOTOS
   // ==========================================
   async getPhotos() {
-    if (!supabase) return [];
+    const client = getSupabaseClient();
+    if (!client) return [];
     try {
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from('photos')
         .select('*')
         .order('created_at', { ascending: false });
@@ -115,16 +130,17 @@ window.dbSupabase = {
   },
 
   async uploadPhoto(fileOrBlob, guestName, category, caption, fallbackDataUrl) {
-    if (!supabase) throw new Error('Supabase no inicializado');
+    const client = getSupabaseClient();
+    if (!client) throw new Error('Supabase no inicializado');
     
     let finalPhotoUrl = fallbackDataUrl || '';
 
-    // Intento 1: Subir al Storage Bucket 'wedding-photos'
+    // Intento 1: Subir al Storage Bucket 'wedding-photos' si está disponible
     try {
       const cleanExt = (fileOrBlob.name ? fileOrBlob.name.split('.').pop() : 'jpg') || 'jpg';
       const filePath = `eve-y-yimmy/${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${cleanExt}`;
       
-      const { data: storageData, error: uploadError } = await supabase.storage
+      const { data: storageData, error: uploadError } = await client.storage
         .from('wedding-photos')
         .upload(filePath, fileOrBlob, {
           contentType: fileOrBlob.type || 'image/jpeg',
@@ -133,17 +149,15 @@ window.dbSupabase = {
         });
 
       if (!uploadError && storageData) {
-        const { data: publicUrlData } = supabase.storage
+        const { data: publicUrlData } = client.storage
           .from('wedding-photos')
           .getPublicUrl(filePath);
         if (publicUrlData && publicUrlData.publicUrl) {
           finalPhotoUrl = publicUrlData.publicUrl;
         }
-      } else {
-        console.warn('Storage upload notice, using DataURL fallback:', uploadError);
       }
     } catch (storageErr) {
-      console.warn('Storage upload error, using fallback:', storageErr);
+      console.warn('Storage fallback to direct insert:', storageErr);
     }
 
     if (!finalPhotoUrl && fallbackDataUrl) {
@@ -151,7 +165,7 @@ window.dbSupabase = {
     }
 
     // Registrar en tabla photos
-    const { data: photoRecord, error: dbError } = await supabase
+    const { data: photoRecord, error: dbError } = await client
       .from('photos')
       .insert([{
         event_slug: 'eve-y-yimmy',
@@ -164,15 +178,19 @@ window.dbSupabase = {
       }])
       .select();
 
-    if (dbError) throw dbError;
+    if (dbError) {
+      console.error('Error insert photo in Supabase:', dbError);
+      throw dbError;
+    }
     return photoRecord ? photoRecord[0] : null;
   },
 
   async likePhoto(photoId, currentLikes) {
-    if (!supabase) return currentLikes + 1;
+    const client = getSupabaseClient();
+    if (!client) return (currentLikes || 0) + 1;
     try {
       const newLikes = (currentLikes || 0) + 1;
-      const { error } = await supabase
+      const { error } = await client
         .from('photos')
         .update({ likes: newLikes })
         .eq('id', photoId);
@@ -180,15 +198,16 @@ window.dbSupabase = {
       return newLikes;
     } catch (e) {
       console.warn('Error al dar like:', e);
-      return currentLikes + 1;
+      return (currentLikes || 0) + 1;
     }
   },
 
   async addComment(photoId, currentComments, newComment) {
-    if (!supabase) return currentComments;
+    const client = getSupabaseClient();
+    if (!client) return currentComments;
     try {
       const updated = [...(currentComments || []), newComment];
-      const { error } = await supabase
+      const { error } = await client
         .from('photos')
         .update({ comments: updated })
         .eq('id', photoId);

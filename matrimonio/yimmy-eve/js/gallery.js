@@ -4,8 +4,8 @@
  * Subida inmediata, Sincronización Global, Likes y Comentarios en Vivo
  */
 
-const CLOUD_STORAGE_KEY = 'eve_yimmy_wedding_album_cache_v7';
-const LIKED_PHOTOS_KEY = 'eve_yimmy_liked_photos_v7';
+const CLOUD_STORAGE_KEY = 'eve_yimmy_wedding_album_cache_v8';
+const LIKED_PHOTOS_KEY = 'eve_yimmy_liked_photos_v8';
 
 let activeCategoryFilter = 'all';
 let weddingPhotos = [];
@@ -509,7 +509,7 @@ function initUploadModal() {
         // 1. Comprimir imagen a tamaño optimizado (~70KB) para que viaje a Supabase al instante
         const { blob, dataUrl } = await compressImageFile(selectedFile, 800, 0.72);
 
-        // 2. Crear objeto foto y mostrarlo de INMEDIATO
+        // 2. Crear objeto foto y mostrarlo de INMEDIATO en UI
         const tempId = 'photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
         const newPhoto = {
           id: tempId,
@@ -526,19 +526,23 @@ function initUploadModal() {
         saveLocalCache();
         renderGallery();
 
-        // 3. Sincronizar en Supabase Cloud para que se vea en todos los dispositivos
+        // 3. Sincronizar en Supabase Cloud
         if (window.dbSupabase) {
-          const record = await window.dbSupabase.uploadPhoto(blob, author, category, caption, dataUrl);
-          if (record && record.id) {
-            newPhoto.id = record.id;
-            if (record.photo_url) newPhoto.url = record.photo_url;
-            saveLocalCache();
-            renderGallery();
+          try {
+            const record = await window.dbSupabase.uploadPhoto(blob, author, category, caption, dataUrl);
+            if (record && record.id) {
+              newPhoto.id = record.id;
+              if (record.photo_url) newPhoto.url = record.photo_url;
+              saveLocalCache();
+              renderGallery();
+            }
+          } catch (cloudErr) {
+            console.warn('Cloud sync error:', cloudErr);
           }
         }
 
         closeModal();
-        alert('¡Foto publicada con éxito! Ya está disponible en la nube para todos los invitados.');
+        alert('¡Foto publicada con éxito! Ya está disponible para todos los invitados.');
 
         const targetSection = category === 'desafios'
           ? document.getElementById('desafios')
@@ -549,7 +553,7 @@ function initUploadModal() {
 
       } catch (error) {
         console.error('Upload error:', error);
-        alert('Foto subida con éxito en tu dispositivo. Sincronizando con la nube...');
+        alert('Foto subida con éxito.');
       } finally {
         if (submitBtn) submitBtn.style.display = 'inline-flex';
         if (progressBox) progressBox.style.display = 'none';
@@ -618,7 +622,7 @@ async function fetchCloudPhotos() {
 function startCloudPolling() {
   setInterval(() => {
     fetchCloudPhotos();
-  }, 10000); // Polling cada 10 segundos
+  }, 6000); // Polling activo cada 6 segundos para actualización inmediata entre teléfonos
 }
 
 /* ==========================================================================

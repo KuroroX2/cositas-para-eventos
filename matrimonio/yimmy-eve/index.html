@@ -35,9 +35,6 @@
     <button id="btn-music-toggle" class="dock-btn music-btn" title="Música ambiental" aria-label="Reproducir música">
       <i class="ri-disc-line spin-icon"></i>
     </button>
-    <a href="#rsvp" class="dock-btn rsvp-quick-btn" title="Confirmar Asistencia" aria-label="RSVP">
-      <i class="ri-mail-heart-line"></i>
-    </a>
   </aside>
 
   <!-- Navigation Bar -->
@@ -154,10 +151,6 @@
 
         <!-- Botones de Acción -->
         <div class="hero-actions">
-          <a href="#rsvp" class="btn-vogue-primary">
-            <span>Confirmar Asistencia</span>
-            <i class="ri-arrow-right-up-line"></i>
-          </a>
           <div class="hero-cal-buttons">
             <button id="btn-google-cal-hero" class="btn-vogue-secondary">
               <i class="ri-google-fill"></i>
@@ -873,9 +866,6 @@
   <!-- MODAL: PANEL DE ADMINISTRACIÓN NOVIOS (EVELYN & YIMMY) -->
   <div class="modal-overlay" id="admin-modal">
     <div class="modal-vogue-card modal-admin-card">
-      <button class="modal-close-btn" id="btn-close-admin" aria-label="Cerrar panel">
-        <i class="ri-close-line"></i>
-      </button>
 
       <!-- Vista 1: Login con PIN exclusivo novios -->
       <div class="admin-login-box" id="admin-login-box">
@@ -893,6 +883,9 @@
           <button type="submit" class="btn-vogue-gold" style="width: 100%;">
             <i class="ri-login-circle-line"></i>
             <span>Ingresar al Panel de Novios</span>
+          </button>
+          <button type="button" class="btn-admin-close-view" id="btn-close-admin-login" style="width: 100%; margin-top: 0.6rem; justify-content: center;">
+            <span>Cerrar</span>
           </button>
         </form>
       </div>

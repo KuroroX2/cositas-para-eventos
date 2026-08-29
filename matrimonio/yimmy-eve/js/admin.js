@@ -73,7 +73,8 @@
 
     const closeBtnsList = [
       document.getElementById('btn-close-admin'),
-      document.getElementById('btn-close-admin-view')
+      document.getElementById('btn-close-admin-view'),
+      document.getElementById('btn-close-admin-login')
     ];
 
     closeBtnsList.forEach(btn => {
@@ -347,8 +348,7 @@
       const verb = isPlural ? 'invitarlos' : 'invitarte';
       const waitVerb = isPlural ? '¡Los esperamos con todo nuestro cariño!' : '¡Te esperamos con todo nuestro cariño!';
 
-      const rsvpDirectLink = `${link}#rsvp`;
-      const waMsg = `${greeting}\nCon muchísima alegría queremos ${verb} a nuestro matrimonio en Casa Pirque el sábado 21 de noviembre de 2026.\n\nAquí tienes tu invitación oficial con tus pases reservados para confirmar tu asistencia:\n${rsvpDirectLink}\n\n${waitVerb}\n— Evelyn & Yimmy`;
+      const waMsg = `${greeting}\nCon muchísima alegría queremos ${verb} a nuestro matrimonio en Casa Pirque el sábado 21 de noviembre de 2026.\n\nAquí tienes tu invitación oficial con tus pases reservados:\n${link}\n\n${waitVerb}\n— Evelyn & Yimmy`;
 
       let cleanPhone = (inv.phone || '').replace(/\D/g, '');
       if (cleanPhone.length === 9 && cleanPhone.startsWith('9')) {
@@ -382,7 +382,7 @@
               <a href="${escapeHtml(waUrl)}" target="_blank" rel="noopener noreferrer" class="btn-dl-single" style="background: #25D366; color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.5rem 0.8rem; border-radius: var(--border-radius-card); font-size: 0.75rem; font-weight: 700;">
                 <i class="ri-whatsapp-line"></i> <span>Enviar WhatsApp</span>
               </a>
-              <a href="${escapeHtml(rsvpDirectLink)}" target="_blank" rel="noopener noreferrer" class="btn-dl-single btn-view-invitation" data-url="${escapeHtml(rsvpDirectLink)}" style="background: var(--bg-dark); color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.5rem 0.8rem; border-radius: var(--border-radius-card); font-size: 0.75rem; font-weight: 700;">
+              <a href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer" class="btn-dl-single btn-view-invitation" data-url="${escapeHtml(link)}" style="background: var(--bg-dark); color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.5rem 0.8rem; border-radius: var(--border-radius-card); font-size: 0.75rem; font-weight: 700;">
                 <i class="ri-external-link-line"></i> <span>Ver (OK)</span>
               </a>
             </div>
