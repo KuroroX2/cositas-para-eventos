@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cositas para Eventos — Invitaciones Virtuales, Dinámicas & Souvenirs Únicos con IA</title>
+  <meta name="description" content="Transforma tu matrimonio, cumpleaños o evento en una experiencia inolvidable. Invitaciones interactivas con juegos y RSVP en vivo, cartas coleccionables y recuerdos personalizados con IA.">
+  <meta property="og:title" content="Cositas para Eventos — Recuerdos & Experiencias Mágicas">
+  <meta property="og:description" content="Invitaciones virtuales personalizadas, dinámicas de caza de fotos y recuerdos únicos como cartas coleccionables y tazos personalizados.">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="#" class="brand-logo" id="brandLogo">
+        <div class="brand-icon">✨</div>
+        <span>Cositas para <span class="brand-highlight">Eventos</span></span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#categorias" class="nav-link">Categorías</a></li>
+        <li><a href="#servicios-digitales" class="nav-link">Servicios Digitales</a></li>
+        <li><a href="#recuerdos-fisicos" class="nav-link">Souvenirs con IA</a></li>
+        <li><a href="#demo-matrimonio" class="nav-link">Demo Boda en Vivo</a></li>
+        <li><a href="#cotizador" class="nav-link">Cotizador</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="#cotizador" class="btn btn-primary" id="navQuoteBtn">Armar Presupuesto</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="container">
+      <div class="badge-tag">
+        <span>🚀 Experiencias y Recuerdos de Próxima Generación</span>
+      </div>
+      <h1 class="hero-title">
+        Hacemos de tu celebración un momento <span class="brand-highlight">mágico e inolvidable</span>
+      </h1>
+      <p class="hero-subtitle">
+        Invitaciones interactivas con confirmación RSVP en vivo, juegos de "Caza de Fotos" para los invitados y souvenirs únicos personalizados con Inteligencia Artificial.
+      </p>
+      
+      <div class="hero-cta">
+        <a href="#demo-matrimonio" class="btn btn-wedding" id="heroDemoBtn">
+          💍 Ver Demo Boda (Yimmy & Eve)
+        </a>
+        <a href="#recuerdos-fisicos" class="btn btn-secondary" id="heroProductsBtn">
+          🃏 Ver Cartas & Souvenirs con IA
+        </a>
+        <a href="#cotizador" class="btn btn-primary" id="heroQuoteBtn">
+          ⚡ Cotizar mi Evento
+        </a>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-icon">💌</div>
+          <div class="stat-text">
+            <strong>RSVP Inteligente</strong>
+            Confirmaciones al instante
+          </div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon">📸</div>
+          <div class="stat-text">
+            <strong>Caza de Fotos</strong>
+            Dinámica y juego en vivo
+          </div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon">🎨</div>
+          <div class="stat-text">
+            <strong>Personalizado con IA</strong>
+            Cartas y recuerdos únicos
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Category Filter Section -->
+  <section class="categories-section" id="categorias">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Tipos de Celebración</span>
+        <h2 class="section-title">¿Qué tipo de evento estás planeando?</h2>
+        <p class="section-subtitle">Diseños y dinámicas exclusivas adaptadas a cada ocasión especial.</p>
+      </div>
+
+      <div class="category-tabs" id="categoryTabs">
+        <button class="tab-btn active" data-category="all">🌟 Todos los Servicios</button>
+        <button class="tab-btn" data-category="matrimonios">💍 Matrimonios & Bodas</button>
+        <button class="tab-btn" data-category="cumpleanos">🎂 Cumpleaños & Fiestas</button>
+        <button class="tab-btn" data-category="babyshower">👶 Baby Shower & Bautizos</button>
+        <button class="tab-btn" data-category="graduaciones">🎓 Graduaciones & Gala</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Digital Services Section -->
+  <section class="services-section" id="servicios-digitales">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Innovación Digital</span>
+        <h2 class="section-title">Servicios Digitales e Interactivos</h2>
+        <p class="section-subtitle">Olvídate de las tarjetas de papel tradicionales. Dale a tus invitados una experiencia web interactiva.</p>
+      </div>
+
+      <div class="services-grid" id="servicesGrid">
+        <!-- Service 1 -->
+        <article class="feature-card" data-cat="matrimonios cumpleanos graduaciones">
+          <div class="card-badge">Más Popular</div>
+          <div class="card-icon-wrapper">💌</div>
+          <h3 class="card-title">Invitación Web Interactiva</h3>
+          <p class="card-desc">Página web personalizada con diseño responsive, música de fondo, cuenta regresiva, Google Maps / Waze y código de vestimenta.</p>
+          <ul class="feature-list">
+            <li><span>✓</span> Confirmación de asistencia (RSVP) en tiempo real</li>
+            <li><span>✓</span> Restricciones alimentarias (vegano, celíaco, etc.)</li>
+            <li><span>✓</span> Integración con calendario Google / Apple</li>
+            <li><span>✓</span> Mesa de regalos / Datos de transferencia</li>
+          </ul>
+          <div class="card-footer">
+            <div class="card-price">
+              Desde
+              <strong>$45.000 CLP</strong>
+            </div>
+            <a href="#cotizador" class="btn btn-secondary btn-sm select-service-btn" data-service="invitacion-web">Agregar</a>
+          </div>
+        </article>
+
+        <!-- Service 2 -->
+        <article class="feature-card" data-cat="matrimonios cumpleanos graduaciones">
+          <div class="card-badge">Super Dinámica</div>
+          <div class="card-icon-wrapper">📸</div>
+          <h3 class="card-title">Caza de Fotos en Vivo (Photo Quest)</h3>
+          <p class="card-desc">Convierte a tus invitados en cazadores de momentos. Cumplen misiones de fotos durante la fiesta y suben sus capturas para ganar puntos.</p>
+          <ul class="feature-list">
+            <li><span>✓</span> Desafíos personalizados para el evento</li>
+            <li><span>✓</span> Muro de fotos en vivo para proyectar en pantallas</li>
+            <li><span>✓</span> Ranking y puntuación en tiempo real</li>
+            <li><span>✓</span> Descarga de álbum completo en alta resolución</li>
+          </ul>
+          <div class="card-footer">
+            <div class="card-price">
+              Desde
+              <strong>$35.000 CLP</strong>
+            </div>
+            <a href="#cotizador" class="btn btn-secondary btn-sm select-service-btn" data-service="caza-fotos">Agregar</a>
+          </div>
+        </article>
+
+        <!-- Service 3 -->
+        <article class="feature-card" data-cat="matrimonios cumpleanos">
+          <div class="card-icon-wrapper">🎵</div>
+          <h3 class="card-title">Pase de Música / Sugerencias DJ</h3>
+          <p class="card-desc">Los invitados sugieren y votan las canciones que no pueden faltar en la fiesta antes y durante la celebración.</p>
+          <ul class="feature-list">
+            <li><span>✓</span> Búsqueda de canciones en Spotify</li>
+            <li><span>✓</span> Lista organizada lista para el DJ del evento</li>
+            <li><span>✓</span> Votación de los temas más prendidos</li>
+          </ul>
+          <div class="card-footer">
+            <div class="card-price">
+              Desde
+              <strong>$15.000 CLP</strong>
+            </div>
+            <a href="#cotizador" class="btn btn-secondary btn-sm select-service-btn" data-service="playlist-dj">Agregar</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Physical Souvenirs Section -->
+  <section class="products-section" id="recuerdos-fisicos">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Recuerdos Físicos & Creativos</span>
+        <h2 class="section-title">Souvenirs Únicos & Dinámicas Físicas</h2>
+        <p class="section-subtitle">Recuerdos fuera de lo común que tus invitados querrán coleccionar y guardar para siempre.</p>
+      </div>
+
+      <div class="products-grid" id="productsGrid">
+        <!-- Product 1: Pokémon TCG IA -->
+        <article class="feature-card" data-cat="cumpleanos matrimonios">
+          <div class="card-badge">Exclusivo</div>
+          <div class="product-preview-box">
+            <div class="card-pokemon-mockup">
+              <div class="card-pokemon-inner">
+                <div class="card-pokemon-img">✨</div>
+                <div class="card-pokemon-name">INVITADO VIP</div>
+                <div class="card-pokemon-hp">HP 150 🔥</div>
+              </div>
+            </div>
+          </div>
+          <h3 class="card-title">Sobres de Cartas Coleccionables con IA</h3>
+          <p class="card-desc">Sobres sellados estilo Pokémon/TCG. Cada sobre contiene cartas del evento y una carta especial holográfica con la foto del invitado transformada en ilustración épica con IA.</p>
+          <ul class="feature-list">
+            <li><span>✓</span> Ilustración personalizada de cada invitado</li>
+            <li><span>✓</span> Ataques y habilidades graciosas del invitado</li>
+            <li><span>✓</span> Acabado foil brillante de alta calidad</li>
+          </ul>
+          <div class="card-footer">
+            <div class="card-price">
+              Pack 30 Sobres
+              <strong>$65.000 CLP</strong>
+            </div>
+            <a href="#cotizador" class="btn btn-secondary btn-sm select-product-btn" data-product="cartas-pokemon">Agregar</a>
+          </div>
+        </article>
+
+        <!-- Product 2: Tazos Retro -->
+        <article class="feature-card" data-cat="cumpleanos matrimonios">
+          <div class="card-badge">Nostalgia 90s</div>
+          <div class="product-preview-box">
+            <div class="tazo-mockup">
+              ⭐<br>TAZO<br>EVENT
+            </div>
+          </div>
+          <h3 class="card-title">Tazos Retro Personalizados</h3>
+          <p class="card-desc">Tazos plásticos de colección conmemorativos del evento, entregados dentro de bolsas de papas fritas o snacks temáticos para los invitados.</p>
+          <ul class="feature-list">
+            <li><span>✓</span> Material plástico grueso y duradero</li>
+            <li><span>✓</span> Diseños de novios, festejado o memes del grupo</li>
+            <li><span>✓</span> Presentación retro en empaque sellado</li>
+          </ul>
+          <div class="card-footer">
+            <div class="card-price">
+              Pack 50 Unidades
+              <strong>$40.000 CLP</strong>
+            </div>
+            <a href="#cotizador" class="btn btn-secondary btn-sm select-product-btn" data-product="tazos-retro">Agregar</a>
+          </div>
+        </article>
+
+        <!-- Product 3: Tarjetas con Burbujeros -->
+        <article class="feature-card" data-cat="matrimonios babyshower">
+          <div class="product-preview-box">
+            <div class="bubble-card-mockup">
+              <span style="font-size: 0.75rem; font-weight: 700;">¡Llena de burbujas!</span>
+              <div class="bubble-wand-stick"></div>
+              <span style="font-size: 0.65rem; color: #64748b;">Nuestra Boda</span>
+            </div>
+          </div>
+          <h3 class="card-title">Tarjetas de Recuerdos con Burbujero</h3>
+          <p class="card-desc">Tarjetas de recuerdo con diseño exclusivo en papel texturado, acompañadas de un tubito de burbujas para la salida de la ceremonia.</p>
+          <ul class="feature-list">
+            <li><span>✓</span> Papel fotográfico premium 300g</li>
+            <li><span>✓</span> Mensaje personalizado de agradecimiento</li>
+            <li><span>✓</span> Tubito de burbujas incluido y listo para usar</li>
+          </ul>
+          <div class="card-footer">
+            <div class="card-price">
+              Pack 50 Unidades
+              <strong>$30.000 CLP</strong>
+            </div>
+            <a href="#cotizador" class="btn btn-secondary btn-sm select-product-btn" data-product="tarjetas-burbujas">Agregar</a>
+          </div>
+        </article>
+
+        <!-- Product 4: Dinámicas y Juegos de Mesa para Invitados -->
+        <article class="feature-card" data-cat="matrimonios cumpleanos">
+          <div class="card-icon-wrapper">🎲</div>
+          <h3 class="card-title">Misiones Secretas & Bingo de Mesa</h3>
+          <p class="card-desc">Tarjetas de dinámicas para romper el hielo en las mesas: misiones secretas divertidas, bingo de bodas y raspaditas con premios.</p>
+          <ul class="feature-list">
+            <li><span>✓</span> Dinámicas personalizadas según el público</li>
+            <li><span>✓</span> Genera interacción y risas entre desconocidos</li>
+            <li><span>✓</span> Incluye tarjetas raspaditas y fichas</li>
+          </ul>
+          <div class="card-footer">
+            <div class="card-price">
+              Kit Completo
+              <strong>$25.000 CLP</strong>
+            </div>
+            <a href="#cotizador" class="btn btn-secondary btn-sm select-product-btn" data-product="juegos-mesa">Agregar</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live Wedding Demo Section (Yimmy & Eve) -->
+  <section class="wedding-demo-section" id="demo-matrimonio">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag" style="color: #34d399;">Demostración en Vivo</span>
+        <h2 class="section-title">Así lucirá la Invitación Virtual de tu Evento</h2>
+        <p class="section-subtitle">Ejemplo real diseñado para la boda en el bosque de <strong>Yimmy & Eve</strong>. ¡Pruébala e interactúa con el RSVP y las misiones!</p>
+      </div>
+
+      <div class="wedding-demo-container">
+        <!-- Mock Browser Top Bar -->
+        <div class="wedding-browser-bar">
+          <div class="browser-dots">
+            <div class="browser-dot red"></div>
+            <div class="browser-dot yellow"></div>
+            <div class="browser-dot green"></div>
+          </div>
+          <div class="browser-url">https://cositasparaeventos.cl/matrimonios/yimmy-y-eve</div>
+          <div style="font-size: 0.8rem; color: #34d399; font-weight: 600;">✨ Invitación Activa</div>
+        </div>
+
+        <div class="wedding-content">
+          <!-- Wedding Hero -->
+          <div class="wedding-hero" style="background-image: url('assets/wedding_lying_grass_1787966826163.jpg');">
+            <div class="wedding-hero-overlay"></div>
+            <div class="wedding-hero-text">
+              <div class="wedding-tag">¡Nos casamos!</div>
+              <h2 class="wedding-names">Yimmy & Eve</h2>
+              <div class="wedding-date-location">
+                <span>📅 Sábado, 28 de Noviembre 2026</span>
+                <span>📍 Casona del Bosque, Santiago</span>
+              </div>
+              
+              <!-- Countdown -->
+              <div class="countdown-box" id="weddingCountdown">
+                <div class="countdown-unit">
+                  <div class="countdown-num" id="countDays">84</div>
+                  <div class="countdown-label">Días</div>
+                </div>
+                <div class="countdown-unit">
+                  <div class="countdown-num" id="countHours">14</div>
+                  <div class="countdown-label">Horas</div>
+                </div>
+                <div class="countdown-unit">
+                  <div class="countdown-num" id="countMins">32</div>
+                  <div class="countdown-label">Min</div>
+                </div>
+                <div class="countdown-unit">
+                  <div class="countdown-num" id="countSecs">45</div>
+                  <div class="countdown-label">Seg</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Wedding Gallery -->
+          <div class="wedding-gallery-grid">
+            <div class="wedding-photo-card" id="demoPhoto1">
+              <img src="assets/wedding_seated_forest_1787966968045.jpg" alt="Yimmy y Eve en el bosque">
+              <span class="photo-overlay-tag">🌿 Retrato en el Bosque</span>
+            </div>
+            <div class="wedding-photo-card" id="demoPhoto2">
+              <img src="assets/wedding_closeup_grass_1787967042912.jpg" alt="Primer plano romántico">
+              <span class="photo-overlay-tag">💖 Amor Eterno</span>
+            </div>
+            <div class="wedding-photo-card" id="demoPhoto3">
+              <img src="assets/wedding_tree_sunset_1787967123603.jpg" alt="Atardecer bajo el gran árbol">
+              <span class="photo-overlay-tag">🌅 Atardecer Dorado</span>
+            </div>
+          </div>
+
+          <!-- Interactive Tabs inside Demo -->
+          <div class="demo-interactive-tabs">
+            <div class="demo-tab-nav">
+              <button class="demo-tab-btn active" data-target="rsvp-tab">💌 Confirmar Asistencia (RSVP)</button>
+              <button class="demo-tab-btn" data-target="quest-tab">📸 Juego: Caza de Fotos (Misiones)</button>
+              <button class="demo-tab-btn" data-target="info-tab">📍 Lugar & Dress Code</button>
+            </div>
+
+            <!-- Tab 1: RSVP Form -->
+            <div class="demo-tab-content active" id="rsvp-tab">
+              <form id="demoRsvpForm" class="rsvp-form-grid">
+                <div class="form-group">
+                  <label class="form-label" for="guestName">Nombre y Apellido</label>
+                  <input type="text" id="guestName" class="form-control" placeholder="Ej: Camilo Henríquez" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="guestPhone">Teléfono / WhatsApp</label>
+                  <input type="tel" id="guestPhone" class="form-control" placeholder="+56 9 1234 5678" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="guestDiet">Preferencia de Menú</label>
+                  <select id="guestDiet" class="form-control">
+                    <option value="estandar">Menú Estándar</option>
+                    <option value="vegetariano">Vegetariano</option>
+                    <option value="vegano">Vegano</option>
+                    <option value="celiaco">Sin Gluten / Celíaco</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="guestSong">Canción que te hará bailar</label>
+                  <input type="text" id="guestSong" class="form-control" placeholder="Artista - Canción">
+                </div>
+                <div class="form-group full-width">
+                  <label class="form-label" for="guestMessage">Mensaje para los novios</label>
+                  <textarea id="guestMessage" class="form-control" rows="2" placeholder="¡Felicidades Yimmy y Eve!"></textarea>
+                </div>
+                <div class="form-group full-width">
+                  <button type="submit" class="btn btn-wedding" style="width: 100%;">
+                    ✅ Confirmar mi Asistencia
+                  </button>
+                </div>
+              </form>
+              <div id="rsvpSuccessMsg" style="display: none; padding: 20px; background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; border-radius: 8px; text-align: center; margin-top: 15px;">
+                🎉 <strong>¡Asistencia confirmada con éxito!</strong> Nos vemos en el bosque con Yimmy & Eve.
+              </div>
+            </div>
+
+            <!-- Tab 2: Photo Quest -->
+            <div class="demo-tab-content" id="quest-tab">
+              <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">
+                Durante la fiesta, los invitados cumplen estas misiones fotografiando momentos clave. ¡Gana puntos y sé el campeón del álbum colectivo!
+              </p>
+              <div class="quest-list">
+                <div class="quest-item">
+                  <div class="quest-info">
+                    <div class="quest-icon">👰</div>
+                    <div>
+                      <div class="quest-title">Foto de la novia riendo</div>
+                      <div class="quest-points">+100 Puntos</div>
+                    </div>
+                  </div>
+                  <button class="quest-upload-btn simulate-upload" data-quest="Novia Riendo">📸 Subir Foto</button>
+                </div>
+
+                <div class="quest-item">
+                  <div class="quest-info">
+                    <div class="quest-icon">🕺</div>
+                    <div>
+                      <div class="quest-title">El mejor paso en la pista</div>
+                      <div class="quest-points">+80 Puntos</div>
+                    </div>
+                  </div>
+                  <button class="quest-upload-btn simulate-upload" data-quest="Mejor Baile">📸 Subir Foto</button>
+                </div>
+
+                <div class="quest-item">
+                  <div class="quest-info">
+                    <div class="quest-icon">🥂</div>
+                    <div>
+                      <div class="quest-title">Brindis grupal en la mesa</div>
+                      <div class="quest-points">+50 Puntos</div>
+                    </div>
+                  </div>
+                  <button class="quest-upload-btn simulate-upload" data-quest="Brindis">📸 Subir Foto</button>
+                </div>
+              </div>
+              <div id="questUploadSuccess" style="display: none; padding: 15px; background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; border-radius: 8px; margin-top: 16px; font-size: 0.9rem;">
+                ✨ <strong>¡Foto cazada con éxito!</strong> Has ganado puntos para el álbum de Yimmy & Eve.
+              </div>
+            </div>
+
+            <!-- Tab 3: Location & Info -->
+            <div class="demo-tab-content" id="info-tab">
+              <div style="background: rgba(30, 41, 59, 0.4); padding: 24px; border-radius: 12px; border: 1px solid var(--border-light);">
+                <h4 style="font-size: 1.1rem; margin-bottom: 12px; color: #34d399;">🌿 Casona del Bosque Mágico</h4>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 16px;">
+                  Av. Los Helechos 1234, Pirque, Región Metropolitana.<br>
+                  <strong>Código de vestimenta:</strong> Elegante Campestre / Formal Cómodo.
+                </p>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                  <a href="https://maps.google.com" target="_blank" class="btn btn-secondary btn-sm">🗺️ Abrir en Google Maps</a>
+                  <a href="https://waze.com" target="_blank" class="btn btn-secondary btn-sm">🚗 Abrir en Waze</a>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Budget Calculator Section -->
+  <section class="calculator-section" id="cotizador">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Transparente & Personalizado</span>
+        <h2 class="section-title">Calcula y Arma el Pack para tu Evento</h2>
+        <p class="section-subtitle">Selecciona los servicios que deseas y calcula el presupuesto estimado en tiempo real.</p>
+      </div>
+
+      <div class="calculator-wrapper">
+        <!-- Controls -->
+        <div class="calc-controls">
+          <div class="slider-container">
+            <div class="slider-header">
+              <span style="font-weight: 600;">Número estimado de invitados:</span>
+              <span class="slider-value" id="guestsDisplay">80 invitados</span>
+            </div>
+            <input type="range" id="guestsRange" class="custom-range" min="20" max="300" step="10" value="80">
+          </div>
+
+          <div class="calc-options-title">
+            <span>💻</span> Servicios Digitales
+          </div>
+          <div class="checkbox-cards-grid">
+            <label class="service-check-card checked">
+              <input type="checkbox" id="checkWeb" checked data-price="45000" data-name="Invitación Web Interactiva">
+              <div class="custom-checkbox-mark">✓</div>
+              <div class="check-card-info">
+                <h4>Invitación Web con RSVP</h4>
+                <span class="check-card-price">$45.000 CLP</span>
+              </div>
+            </label>
+
+            <label class="service-check-card checked">
+              <input type="checkbox" id="checkQuest" checked data-price="35000" data-name="Juego Caza de Fotos">
+              <div class="custom-checkbox-mark">✓</div>
+              <div class="check-card-info">
+                <h4>Caza de Fotos en Vivo</h4>
+                <span class="check-card-price">$35.000 CLP</span>
+              </div>
+            </label>
+
+            <label class="service-check-card">
+              <input type="checkbox" id="checkMusic" data-price="15000" data-name="Pase de Música DJ">
+              <div class="custom-checkbox-mark">✓</div>
+              <div class="check-card-info">
+                <h4>Pase de Música para DJ</h4>
+                <span class="check-card-price">$15.000 CLP</span>
+              </div>
+            </label>
+          </div>
+
+          <div class="calc-options-title">
+            <span>🎁</span> Recuerdos & Souvenirs Físicos
+          </div>
+          <div class="checkbox-cards-grid">
+            <label class="service-check-card">
+              <input type="checkbox" id="checkCards" data-price-per-guest="1500" data-name="Sobres Cartas Pokémon IA">
+              <div class="custom-checkbox-mark">✓</div>
+              <div class="check-card-info">
+                <h4>Cartas Coleccionables IA</h4>
+                <span class="check-card-price">$1.500 c/u</span>
+              </div>
+            </label>
+
+            <label class="service-check-card">
+              <input type="checkbox" id="checkTazos" data-price-per-guest="800" data-name="Tazos Retro en Snacks">
+              <div class="custom-checkbox-mark">✓</div>
+              <div class="check-card-info">
+                <h4>Tazos Retro en Snacks</h4>
+                <span class="check-card-price">$800 c/u</span>
+              </div>
+            </label>
+
+            <label class="service-check-card">
+              <input type="checkbox" id="checkBubbles" data-price-per-guest="600" data-name="Tarjetas de Recuerdos con Burbujas">
+              <div class="custom-checkbox-mark">✓</div>
+              <div class="check-card-info">
+                <h4>Tarjetas + Burbujeros</h4>
+                <span class="check-card-price">$600 c/u</span>
+              </div>
+            </label>
+
+            <label class="service-check-card">
+              <input type="checkbox" id="checkGames" data-price="25000" data-name="Juegos y Retos de Mesa">
+              <div class="custom-checkbox-mark">✓</div>
+              <div class="check-card-info">
+                <h4>Retos y Juegos de Mesa</h4>
+                <span class="check-card-price">$25.000 CLP</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Summary & WhatsApp Order -->
+        <div class="calc-summary-box">
+          <div>
+            <h3 class="summary-title">Resumen de tu Pack</h3>
+            <ul class="summary-items-list" id="calcItemsList">
+              <li><span>Invitación Web con RSVP</span> <span>$45.000</span></li>
+              <li><span>Caza de Fotos en Vivo</span> <span>$35.000</span></li>
+            </ul>
+          </div>
+
+          <div>
+            <div class="summary-total-row">
+              <div>
+                <span style="font-size: 0.85rem; color: var(--text-dim); display: block;">Total Estimado</span>
+                <span style="font-size: 0.85rem; color: var(--text-muted);">(Para <span id="summaryGuests">80</span> personas)</span>
+              </div>
+              <div class="total-amount" id="totalPriceDisplay">$80.000 CLP</div>
+            </div>
+
+            <button class="btn btn-primary" id="btnWhatsappQuote" style="width: 100%; font-size: 1.05rem;">
+              💬 Pedir Cotización por WhatsApp
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Technical Deployment & Integration Guide -->
+  <section class="deploy-guide-section" id="guia-tecnica">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Infraestructura & Despliegue</span>
+        <h2 class="section-title">Cómo Conectar NIC.cl, Vercel y Supabase</h2>
+        <p class="section-subtitle">Pasos claros para que tu proyecto esté 100% en línea con dominio propio y base de datos.</p>
+      </div>
+
+      <div class="guide-accordion">
+        <div class="guide-step">
+          <h3><span class="step-num-badge">1</span> Comprar Dominio en NIC Chile (nic.cl)</h3>
+          <p>
+            Entra a <strong>nic.cl</strong> y registra tu dominio (ej. <code>cositasparaeventos.cl</code>). 
+            No necesitas tener el servidor listo de inmediato: al comprarlo, déjalo con la opción por defecto. 
+            Más adelante, en la sección de Servidores DNS de NIC.cl, solo tendrás que ingresar los nombres de servidor que te dé Vercel (ej: <code>ns1.vercel-dns.com</code> y <code>ns2.vercel-dns.com</code>).
+          </p>
+        </div>
+
+        <div class="guide-step">
+          <h3><span class="step-num-badge">2</span> Conectar Repositorio de GitHub en Vercel</h3>
+          <p>
+            Crea una cuenta en <strong>vercel.com</strong> (puedes iniciar sesión con tu cuenta de GitHub). 
+            Haz clic en <em>"Add New... Project"</em>, selecciona el repositorio donde están colaborando y presiona <em>"Deploy"</em>. 
+            ¡Vercel compilará la web y te dará una URL inmediata con HTTPS gratuito!
+          </p>
+          <div class="code-snippet">
+            # Comandos para subir cambios a GitHub:
+            git add .
+            git commit -m "Web Cositas para Eventos lista para Vercel"
+            git push origin main
+          </div>
+        </div>
+
+        <div class="guide-step">
+          <h3><span class="step-num-badge">3</span> Configurar Base de Datos en Supabase</h3>
+          <p>
+            Crea un proyecto gratuito en <strong>supabase.com</strong>. Ve a la pestaña <em>"SQL Editor"</em> y pega el contenido del archivo <code>supabase_schema.sql</code> que preparamos en tu proyecto. 
+            Esto creará automáticamente las tablas para guardar las confirmaciones de asistencia (RSVP) y las fotos que suban los invitados en la Caza de Fotos.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-logo">✨ Cositas para Eventos</div>
+      <p style="margin-bottom: 20px;">Haciendo que cada evento sea único, inolvidable y mágico con tecnología y cariño.</p>
+      <p>© 2026 Cositas para Eventos. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
