@@ -3,22 +3,22 @@
   "redirects": [
     {
       "source": "/yimmy-y-eve",
-      "destination": "/matrimonios/yimmy-y-eve/",
+      "destination": "/boda-eve-yimmy/",
       "permanent": true
     },
     {
       "source": "/matrimonio",
-      "destination": "/matrimonios/yimmy-y-eve/",
+      "destination": "/boda-eve-yimmy/",
       "permanent": true
     },
     {
       "source": "/novios",
-      "destination": "/matrimonios/yimmy-y-eve/",
+      "destination": "/boda-eve-yimmy/",
       "permanent": true
     },
     {
       "source": "/boda",
-      "destination": "/matrimonios/yimmy-y-eve/",
+      "destination": "/boda-eve-yimmy/",
       "permanent": true
     }
   ]
