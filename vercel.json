@@ -1,0 +1,25 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/yimmy-y-eve",
+      "destination": "/Matrimonios/Yimmy y Eve/index.html"
+    },
+    {
+      "source": "/matrimonio",
+      "destination": "/Matrimonios/Yimmy y Eve/index.html"
+    },
+    {
+      "source": "/novios",
+      "destination": "/Matrimonios/Yimmy y Eve/index.html"
+    },
+    {
+      "source": "/boda",
+      "destination": "/Matrimonios/Yimmy y Eve/index.html"
+    },
+    {
+      "source": "/elegante-rosa",
+      "destination": "/Matrimonios/Yimmy y Eve/elegante-rosa.html"
+    }
+  ]
+}
