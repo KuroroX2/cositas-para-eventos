@@ -342,13 +342,28 @@ window.dbSupabase = {
     const client = getSupabaseClient();
     if (!client) return currentComments;
     try {
-      const updated = [...(currentComments || []), newComment];
+      let updated = Array.isArray(currentComments) ? [...currentComments] : [];
+      if (newComment && !updated.some(c => (c.id && c.id === newComment.id))) {
+        updated.push(newComment);
+      }
+
+      // Deduplicar por ID
+      const seen = new Set();
+      const finalComments = [];
+      for (const c of updated) {
+        const id = c.id || (c.author + '_' + c.text + '_' + c.timestamp);
+        if (!seen.has(id)) {
+          seen.add(id);
+          finalComments.push(c);
+        }
+      }
+
       const { error } = await client
         .from('photos')
-        .update({ comments: updated })
+        .update({ comments: finalComments })
         .eq('id', photoId);
       if (error) throw error;
-      return updated;
+      return finalComments;
     } catch (e) {
       console.warn('Error al agregar comentario:', e);
       return currentComments;

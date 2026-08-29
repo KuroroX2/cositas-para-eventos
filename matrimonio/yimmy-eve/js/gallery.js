@@ -377,14 +377,14 @@ function initLightboxSocial() {
       updateLightboxLikeUI();
 
       if (window.dbSupabase) {
-        window.dbSupabase.addComment(activePhotoForLightbox.id, activePhotoForLightbox.comments, newComment).catch(() => {});
+        window.dbSupabase.addComment(activePhotoForLightbox.id, activePhotoForLightbox.comments).catch(() => {});
       }
     });
   }
 }
 
 window.openLightboxForPhoto = function (photoId) {
-  const photo = weddingPhotos.find(p => p.id === photoId);
+  const photo = weddingPhotos.find(p => String(p.id) === String(photoId));
   if (!photo) return;
 
   activePhotoForLightbox = photo;
@@ -433,7 +433,7 @@ function updateLightboxLikeUI() {
   const commentsTotalEl = document.getElementById('lightbox-comments-total');
 
   const likedIds = getLikedPhotoIds();
-  const isLiked = likedIds.includes(activePhotoForLightbox.id);
+  const isLiked = likedIds.includes(String(activePhotoForLightbox.id));
   const likesCount = activePhotoForLightbox.likes || 0;
   const commentsCount = (activePhotoForLightbox.comments || []).length;
 
@@ -445,10 +445,10 @@ function updateLightboxLikeUI() {
   if (likeBtn && icon) {
     if (isLiked) {
       likeBtn.classList.add('liked');
-      icon.className = 'ri-heart-fill';
+      icon.className = 'ri-heart-3-fill';
     } else {
       likeBtn.classList.remove('liked');
-      icon.className = 'ri-heart-line';
+      icon.className = 'ri-heart-3-line';
     }
   }
 }
