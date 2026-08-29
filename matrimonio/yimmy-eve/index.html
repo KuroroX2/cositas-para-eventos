@@ -51,8 +51,6 @@
         <a href="#pasto" class="nav-item">Momento Pasto</a>
         <a href="#dresscode" class="nav-item">Dress Code</a>
         <a href="#regalos" class="nav-item">Lista de Regalos</a>
-        <a href="#desafios" class="nav-item">Desafío Fotos</a>
-        <a href="#galeria" class="nav-item">Álbum</a>
         <a href="#rsvp" class="nav-item" id="nav-link-rsvp" style="display: none;">Confirmación</a>
         <button class="nav-btn-admin" id="btn-navbar-admin" title="Panel exclusivo para los novios">
           <i class="ri-lock-line"></i> Acceso Novios
@@ -81,8 +79,6 @@
       <li><a href="#pasto" class="drawer-link">Momento Pasto 🧺</a></li>
       <li><a href="#dresscode" class="drawer-link">Código de Vestimenta</a></li>
       <li><a href="#regalos" class="drawer-link">Lista de Regalos 🎁</a></li>
-      <li><a href="#desafios" class="drawer-link">Desafío de Fotos 📸</a></li>
-      <li><a href="#galeria" class="drawer-link">Álbum de Recuerdos</a></li>
       <li id="drawer-item-rsvp" style="display: none;"><a href="#rsvp" class="drawer-link">Confirmar Asistencia (RSVP)</a></li>
       <li>
         <button class="drawer-admin-btn" id="btn-drawer-admin">
@@ -394,261 +390,7 @@
       </div>
     </section>
 
-    <!-- SECTION: DESAFÍO DE FOTOS -->
-    <section class="section-editorial section-challenge reveal" id="desafios">
-      <div class="container">
-        <div class="section-header">
-          <h2 class="section-title">Desafío de Fotos 📸</h2>
-          <p class="section-subtitle">¡Queremos recopilar los mejores momentos de nuestra boda! Durante el día, intenta completar estos 12 desafíos fotográficos y súbelos aquí mismo:</p>
-          <div class="title-divider"></div>
-        </div>
 
-        <div class="challenge-box">
-          <!-- Banner Concurso Sorpresa -->
-          <div class="challenge-contest-banner">
-            <i class="ri-trophy-line trophy-icon"></i>
-            <div class="contest-text">
-              <h4>🏆 ¡Gran Concurso de Fotos!</h4>
-              <p>La foto que tenga <strong>más "Me Gusta" (❤️)</strong> antes de las <strong>20:00 hrs</strong> ganará una gran sorpresa de parte de los novios. ¡A participar y dar Me Gusta!</p>
-            </div>
-          </div>
-
-          <div class="challenge-grid">
-            <div class="challenge-card" data-challenge-id="desafio_01">
-              <div class="challenge-card-top">
-                <span class="ch-num">01</span>
-                <p class="ch-text">Foto con los lentes de la novia 🕶️</p>
-              </div>
-              <div class="challenge-card-thumbnails" id="thumbs-desafio_01">
-                <!-- Miniaturas renderizadas por gallery.js -->
-              </div>
-              <div class="challenge-card-actions">
-                <button class="btn-upload-challenge-item" onclick="openChallengeModalFor('desafio_01')">
-                  <i class="ri-camera-fill"></i> <span>+ Subir a este reto</span>
-                </button>
-              </div>
-            </div>
-
-            <div class="challenge-card" data-challenge-id="desafio_02">
-              <div class="challenge-card-top">
-                <span class="ch-num">02</span>
-                <p class="ch-text">Foto tomándote un shot 🥃</p>
-              </div>
-              <div class="challenge-card-thumbnails" id="thumbs-desafio_02">
-                <!-- Miniaturas renderizadas por gallery.js -->
-              </div>
-              <div class="challenge-card-actions">
-                <button class="btn-upload-challenge-item" onclick="openChallengeModalFor('desafio_02')">
-                  <i class="ri-camera-fill"></i> <span>+ Subir a este reto</span>
-                </button>
-              </div>
-            </div>
-
-            <div class="challenge-card" data-challenge-id="desafio_03">
-              <div class="challenge-card-top">
-                <span class="ch-num">03</span>
-                <p class="ch-text">Foto instagrameable en los spots decorados 📸✨</p>
-              </div>
-              <div class="challenge-card-thumbnails" id="thumbs-desafio_03">
-                <!-- Miniaturas renderizadas por gallery.js -->
-              </div>
-              <div class="challenge-card-actions">
-                <button class="btn-upload-challenge-item" onclick="openChallengeModalFor('desafio_03')">
-                  <i class="ri-camera-fill"></i> <span>+ Subir a este reto</span>
-                </button>
-              </div>
-            </div>
-
-            <div class="challenge-card" data-challenge-id="desafio_04">
-              <div class="challenge-card-top">
-                <span class="ch-num">04</span>
-                <p class="ch-text">Foto abrazando un árbol de Casa Pirque 🌳</p>
-              </div>
-              <div class="challenge-card-thumbnails" id="thumbs-desafio_04">
-                <!-- Miniaturas renderizadas por gallery.js -->
-              </div>
-              <div class="challenge-card-actions">
-                <button class="btn-upload-challenge-item" onclick="openChallengeModalFor('desafio_04')">
-                  <i class="ri-camera-fill"></i> <span>+ Subir a este reto</span>
-                </button>
-              </div>
-            </div>
-
-            <div class="challenge-card" data-challenge-id="desafio_05">
-              <div class="challenge-card-top">
-                <span class="ch-num">05</span>
-                <p class="ch-text">Foto con los recién casados (Evelyn &amp; Yimmy) 💍</p>
-              </div>
-              <div class="challenge-card-thumbnails" id="thumbs-desafio_05">
-                <!-- Miniaturas renderizadas por gallery.js -->
-              </div>
-              <div class="challenge-card-actions">
-                <button class="btn-upload-challenge-item" onclick="openChallengeModalFor('desafio_05')">
-                  <i class="ri-camera-fill"></i> <span>+ Subir a este reto</span>
-                </button>
-              </div>
-            </div>
-
-            <div class="challenge-card" data-challenge-id="desafio_06">
-              <div class="challenge-card-top">
-                <span class="ch-num">06</span>
-                <p class="ch-text">Foto con los padres de los novios 👨‍👩‍👧‍👦</p>
-              </div>
-              <div class="challenge-card-thumbnails" id="thumbs-desafio_06">
-                <!-- Miniaturas renderizadas por gallery.js -->
-              </div>
-              <div class="challenge-card-actions">
-                <button class="btn-upload-challenge-item" onclick="openChallengeModalFor('desafio_06')">
-                  <i class="ri-camera-fill"></i> <span>+ Subir a este reto</span>
-                </button>
-              </div>
-            </div>
-
-            <div class="challenge-card" data-challenge-id="desafio_07">
-              <div class="challenge-card-top">
-                <span class="ch-num">07</span>
-                <p class="ch-text">Foto de tu grupo relajándose en la manta de pasto 🧺</p>
-              </div>
-              <div class="challenge-card-thumbnails" id="thumbs-desafio_07">
-                <!-- Miniaturas renderizadas por gallery.js -->
-              </div>
-              <div class="challenge-card-actions">
-                <button class="btn-upload-challenge-item" onclick="openChallengeModalFor('desafio_07')">
-                  <i class="ri-camera-fill"></i> <span>+ Subir a este reto</span>
-                </button>
-              </div>
-            </div>
-
-            <div class="challenge-card" data-challenge-id="desafio_08">
-              <div class="challenge-card-top">
-                <span class="ch-num">08</span>
-                <p class="ch-text">Foto brindando por el amor con tu trago favorito 🥂</p>
-              </div>
-              <div class="challenge-card-thumbnails" id="thumbs-desafio_08">
-                <!-- Miniaturas renderizadas por gallery.js -->
-              </div>
-              <div class="challenge-card-actions">
-                <button class="btn-upload-challenge-item" onclick="openChallengeModalFor('desafio_08')">
-                  <i class="ri-camera-fill"></i> <span>+ Subir a este reto</span>
-                </button>
-              </div>
-            </div>
-
-            <div class="challenge-card" data-challenge-id="desafio_09">
-              <div class="challenge-card-top">
-                <span class="ch-num">09</span>
-                <p class="ch-text">Foto divertida dándolo todo en la pista de baile 🕺💃</p>
-              </div>
-              <div class="challenge-card-thumbnails" id="thumbs-desafio_09">
-                <!-- Miniaturas renderizadas por gallery.js -->
-              </div>
-              <div class="challenge-card-actions">
-                <button class="btn-upload-challenge-item" onclick="openChallengeModalFor('desafio_09')">
-                  <i class="ri-camera-fill"></i> <span>+ Subir a este reto</span>
-                </button>
-              </div>
-            </div>
-
-            <div class="challenge-card" data-challenge-id="desafio_10">
-              <div class="challenge-card-top">
-                <span class="ch-num">10</span>
-                <p class="ch-text">La foto más espontánea y divertida del día ✨</p>
-              </div>
-              <div class="challenge-card-thumbnails" id="thumbs-desafio_10">
-                <!-- Miniaturas renderizadas por gallery.js -->
-              </div>
-              <div class="challenge-card-actions">
-                <button class="btn-upload-challenge-item" onclick="openChallengeModalFor('desafio_10')">
-                  <i class="ri-camera-fill"></i> <span>+ Subir a este reto</span>
-                </button>
-              </div>
-            </div>
-
-            <div class="challenge-card" data-challenge-id="desafio_11">
-              <div class="challenge-card-top">
-                <span class="ch-num">11</span>
-                <p class="ch-text">Foto emotiva durante la ceremonia 🥹💍</p>
-              </div>
-              <div class="challenge-card-thumbnails" id="thumbs-desafio_11">
-                <!-- Miniaturas renderizadas por gallery.js -->
-              </div>
-              <div class="challenge-card-actions">
-                <button class="btn-upload-challenge-item" onclick="openChallengeModalFor('desafio_11')">
-                  <i class="ri-camera-fill"></i> <span>+ Subir a este reto</span>
-                </button>
-              </div>
-            </div>
-
-            <div class="challenge-card" data-challenge-id="desafio_12">
-              <div class="challenge-card-top">
-                <span class="ch-num">12</span>
-                <p class="ch-text">Foto grupal con tu familia o amigos 👨‍👩‍👧‍👦🎉</p>
-              </div>
-              <div class="challenge-card-thumbnails" id="thumbs-desafio_12">
-                <!-- Miniaturas renderizadas por gallery.js -->
-              </div>
-              <div class="challenge-card-actions">
-                <button class="btn-upload-challenge-item" onclick="openChallengeModalFor('desafio_12')">
-                  <i class="ri-camera-fill"></i> <span>+ Subir a este reto</span>
-                </button>
-              </div>
-            </div>
-          </div>
-          
-          <div class="challenge-cta">
-            <button class="btn-vogue-gold" id="btn-challenge-upload">
-              <i class="ri-trophy-line"></i>
-              <span>¡Subir una Foto para los Desafíos!</span>
-            </button>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION: ÁLBUM DE FOTOS (FOTOS DE INVITADOS) -->
-    <section class="section-editorial reveal" id="galeria">
-      <div class="container">
-        <div class="section-header">
-          <h2 class="section-title">Álbum de Recuerdos 📸</h2>
-          <p class="section-subtitle">Explora todos los momentos de la boda en tiempo real:</p>
-          <div class="title-divider"></div>
-        </div>
-
-        <div class="gallery-controls-wrapper">
-          <div class="gallery-filters" id="gallery-filters">
-            <button class="filter-btn active" data-filter="all">
-              <i class="ri-apps-2-line"></i> <span>Ver Todas</span>
-            </button>
-            <button class="filter-btn" data-filter="album">
-              <i class="ri-camera-lens-line"></i> <span>Álbum de Recuerdos</span>
-            </button>
-            <button class="filter-btn" data-filter="desafios">
-              <i class="ri-trophy-line"></i> <span>Desafíos de Fotos</span>
-            </button>
-          </div>
-
-          <div class="gallery-sort-controls">
-            <span class="sort-label">Ordenar:</span>
-            <button class="sort-btn active" id="btn-sort-recent" data-sort="recent" title="Ver las fotos más recientes primero">
-              <i class="ri-time-line"></i> <span>Más Recientes</span>
-            </button>
-            <button class="sort-btn" id="btn-sort-popular" data-sort="popular" title="Ver las fotos más votadas con Me Gusta">
-              <i class="ri-heart-3-line"></i> <span>Más Populares</span>
-            </button>
-          </div>
-
-          <button class="btn-upload-photo" id="btn-open-upload">
-            <i class="ri-upload-cloud-2-line"></i>
-            <span>Subir Foto al Álbum</span>
-          </button>
-        </div>
-
-        <div class="gallery-masonry" id="gallery-grid">
-          <!-- Rendered by gallery.js -->
-        </div>
-      </div>
-    </section>
 
     <!-- SECTION: RSVP (CONFIRMACIÓN DE ASISTENCIA - SOLO CON LINK PERSONALIZADO) -->
     <section class="section-editorial section-rsvp reveal" id="rsvp" style="display: none;">
@@ -921,254 +663,114 @@
     </div>
   </div>
 
-  <!-- MODAL: SUBIR FOTO AL ÁLBUM COMPARTIDO -->
-  <div class="modal-overlay" id="upload-photo-modal">
-    <div class="modal-vogue-card modal-upload-card">
-      <button class="modal-close-btn" id="btn-close-upload-modal" aria-label="Cerrar modal">
-        <i class="ri-close-line"></i>
-      </button>
-
-      <div class="modal-header">
-        <i class="ri-camera-lens-line modal-icon" id="upload-modal-icon"></i>
-        <h3 class="modal-title" id="upload-modal-title">Subir Foto al Álbum de Recuerdos</h3>
-        <p class="modal-desc" id="upload-modal-desc">Comparte tu foto para que todos los invitados y los novios puedan verla en tiempo real.</p>
-      </div>
-
-      <form id="upload-photo-form" class="upload-photo-form">
-        <!-- Photo Selector / Preview Area -->
-        <div class="upload-dropzone" id="upload-dropzone">
-          <input type="file" id="photo-modal-file-input" accept="image/*" style="display: none;" required>
-          <div class="dropzone-placeholder" id="dropzone-placeholder">
-            <i class="ri-image-add-line"></i>
-            <span>Toca aquí para seleccionar una foto o tomar una con la cámara</span>
-          </div>
-          <div class="dropzone-preview" id="dropzone-preview" style="display: none;">
-            <img id="preview-image" src="" alt="Vista previa">
-            <button type="button" class="btn-change-photo" id="btn-change-photo">
-              <i class="ri-refresh-line"></i> Cambiar Foto
-            </button>
-          </div>
-        </div>
-
-        <div class="form-group" style="margin-top: 1rem;">
-          <label for="upload-author">¿Quién sube la foto? (Tu Nombre o Familia) *</label>
-          <input type="text" id="upload-author" placeholder="Ej.: Cristopher / Familia Soto" required>
-        </div>
-
-        <!-- Grupo de Selección de Desafío (Solo visible cuando se sube para un Desafío) -->
-        <div class="form-group" id="upload-category-group" style="display: none;">
-          <label for="upload-category">¿A cuál de los 12 desafíos corresponde? *</label>
-          <select id="upload-category">
-            <option value="desafio_01">01. Foto con los lentes de la novia 🕶️</option>
-            <option value="desafio_02">02. Foto tomándote un shot 🥃</option>
-            <option value="desafio_03">03. Foto instagrameable en los spots decorados 📸✨</option>
-            <option value="desafio_04">04. Foto abrazando un árbol de Casa Pirque 🌳</option>
-            <option value="desafio_05">05. Foto con los recién casados (Evelyn &amp; Yimmy) 💍</option>
-            <option value="desafio_06">06. Foto con los padres de los novios 👨‍👩‍👧‍👦</option>
-            <option value="desafio_07">07. Foto relajándose en la manta de pasto 🧺</option>
-            <option value="desafio_08">08. Foto brindando por el amor con tu trago favorito 🥂</option>
-            <option value="desafio_09">09. Foto divertida dándolo todo en la pista de baile 🕺💃</option>
-            <option value="desafio_10">10. La foto más espontánea y divertida del día ✨</option>
-            <option value="desafio_11">11. Foto emotiva durante la ceremonia 🥹💍</option>
-            <option value="desafio_12">12. Foto grupal con tu familia o amigos 👨‍👩‍👧‍👦🎉</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="upload-caption">Dedicatoria o Descripción (Opcional)</label>
-          <textarea id="upload-caption" rows="2" placeholder="Ej.: ¡Celebrando con todo el cariño del mundo! 🎉 (Opcional)"></textarea>
-        </div>
-
-        <div class="upload-submit-box">
-          <button type="submit" class="btn-vogue-gold" id="btn-submit-photo" style="width: 100%;">
-            <i class="ri-upload-cloud-2-line"></i>
-            <span>Publicar Foto para Todos</span>
-          </button>
-          <div class="upload-progress-box" id="upload-progress-box" style="display: none;">
-            <div class="upload-spinner"><i class="ri-loader-4-line ri-spin"></i></div>
-            <span class="upload-progress-text">Subiendo y sincronizando foto...</span>
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- MODAL: LIGHTBOX SOCIAL (FOTO GRANDE + LIKES + COMENTARIOS) -->
-  <div class="lightbox-overlay" id="lightbox-modal">
-    <button class="lightbox-close" id="lightbox-close" aria-label="Cerrar foto"><i class="ri-close-line"></i></button>
-    <div class="lightbox-card-container">
-      
-      <!-- Left / Top: Photo Media -->
-      <div class="lightbox-photo-panel">
-        <img src="" alt="" id="lightbox-img" class="lightbox-img">
-      </div>
-
-      <!-- Right / Bottom: Details, Likes & Comments Thread -->
-      <div class="lightbox-social-panel">
-        <div class="lightbox-header-info">
-          <div class="lightbox-author-badge">
-            <i class="ri-user-heart-line"></i>
-            <span id="lightbox-author">Autor</span>
-          </div>
-          <span class="lightbox-time" id="lightbox-time">Hace un momento</span>
-        </div>
-
-        <p class="lightbox-caption-text" id="lightbox-desc">Descripción</p>
-
-        <!-- Social Action Bar (Like count & Like Button) -->
-        <div class="lightbox-actions-bar">
-          <button class="btn-lightbox-like" id="btn-lightbox-like">
-            <i class="ri-heart-line" id="lightbox-like-icon"></i>
-            <span id="lightbox-like-label">Me gusta</span>
-            (<span id="lightbox-like-count">0</span>)
-          </button>
-          <span class="lightbox-comments-total" id="lightbox-comments-total">0 comentarios</span>
-        </div>
-
-        <!-- Comments List -->
-        <div class="lightbox-comments-section">
-          <h5 class="comments-heading"><i class="ri-chat-1-line"></i> Comentarios</h5>
-          <div class="comments-list" id="comments-list">
-            <!-- Rendered dynamically -->
-          </div>
-        </div>
-
-        <!-- Add Comment Form -->
-        <form class="lightbox-comment-form" id="lightbox-comment-form">
-          <div class="comment-inputs-row">
-            <input type="text" id="comment-author-input" placeholder="Tu nombre..." required>
-            <div class="comment-submit-wrap">
-              <input type="text" id="comment-text-input" placeholder="Escribe un comentario..." required>
-              <button type="submit" class="btn-send-comment" title="Enviar comentario">
-                <i class="ri-send-plane-fill"></i>
-              </button>
-            </div>
-          </div>
-        </form>
-
-      </div>
-    </div>
-  </div>
-
   <!-- MODAL: PANEL DE ADMINISTRACIÓN NOVIOS (EVELYN & YIMMY) -->
   <div class="modal-overlay" id="admin-modal">
     <div class="modal-vogue-card modal-admin-card">
 
       <!-- Vista 1: Login con PIN exclusivo novios -->
       <div class="admin-login-box" id="admin-login-box">
-        <div class="modal-header">
-          <i class="ri-shield-keyhole-line modal-icon"></i>
-          <h3 class="modal-title">Panel Exclusivo de los Novios 💍</h3>
-          <p class="modal-desc">Ingresa la clave secreta de los novios para registrar invitados, ver confirmaciones y fotos.</p>
+        <div class="admin-login-header">
+          <i class="ri-shield-keyhole-line"></i>
+          <h3>Panel de Administración</h3>
+          <p>Exclusivo para Evelyn &amp; Yimmy</p>
         </div>
         <form id="admin-login-form" class="admin-login-form">
           <div class="form-group">
-            <label for="admin-pin-input">Clave de Acceso Novios</label>
-            <input type="password" id="admin-pin-input" placeholder="Ingresa la clave..." required autofocus autocomplete="off">
+            <label for="admin-pin-input">Ingresa el PIN de Acceso</label>
+            <input type="password" id="admin-pin-input" placeholder="••••••" maxlength="12" required autofocus>
           </div>
-          <div class="admin-login-error" id="admin-login-error" style="display: none; color: #e74c3c; font-size: 0.82rem; margin-bottom: 0.8rem; text-align: center; font-weight: 600;"></div>
           <button type="submit" class="btn-vogue-gold" style="width: 100%;">
-            <i class="ri-login-circle-line"></i>
-            <span>Ingresar al Panel de Novios</span>
+            <i class="ri-login-box-line"></i>
+            <span>Ingresar al Panel</span>
           </button>
-          <button type="button" class="btn-admin-close-view" id="btn-close-admin-login" style="width: 100%; margin-top: 0.6rem; justify-content: center;">
+          <button type="button" class="btn-vogue-outline" id="btn-close-admin-login" style="width: 100%; margin-top: 0.8rem;">
             <span>Cerrar</span>
           </button>
         </form>
       </div>
 
-      <!-- Vista 2: Dashboard de Administración -->
-      <div class="admin-dashboard" id="admin-dashboard" style="display: none;">
-        <div class="admin-top-bar">
-          <div>
-            <h3 class="admin-dashboard-title">💍 Panel de Control — Evelyn &amp; Yimmy</h3>
-            <p class="admin-dashboard-sub">Registra a tus invitados (1 o 2 personas), genera links personalizados y gestiona el sorteo.</p>
+      <!-- Vista 2: Dashboard Administrador Completo -->
+      <div class="admin-dashboard-view" id="admin-dashboard-view" style="display: none;">
+        
+        <div class="admin-topbar">
+          <div class="admin-topbar-info">
+            <h4>💍 Evelyn &amp; Yimmy • Gestión de Matrimonio</h4>
+            <span class="admin-badge-live">Base de Datos en Tiempo Real</span>
           </div>
-          <div class="admin-top-actions">
-            <button class="btn-admin-logout" id="btn-admin-logout" title="Cerrar sesión">
-              <i class="ri-logout-box-r-line"></i> <span>Salir</span>
+          <div class="admin-topbar-actions">
+            <button class="btn-admin-logout" id="btn-admin-logout" title="Cerrar sesión de administración">
+              <i class="ri-logout-box-line"></i> Salir
             </button>
-            <button class="btn-admin-close-view" id="btn-close-admin-view" title="Cerrar panel">
-              <i class="ri-close-line"></i> <span>Cerrar</span>
+            <button class="btn-admin-exit" id="btn-admin-exit-top" title="Cerrar panel">
+              <i class="ri-close-line"></i> Cerrar
             </button>
           </div>
         </div>
 
-        <!-- Metric Summary Cards -->
-        <div class="admin-stats-grid">
-          <div class="stat-card stat-total">
-            <span class="stat-num" id="admin-count-invitations">0</span>
-            <span class="stat-lbl">Invitaciones Creadas</span>
+        <!-- Metric KPI Cards -->
+        <div class="admin-kpi-grid">
+          <div class="kpi-card">
+            <span class="kpi-label">Invitaciones Creadas</span>
+            <strong class="kpi-value" id="admin-kpi-total-invitations">0</strong>
           </div>
-          <div class="stat-card stat-yes">
-            <span class="stat-num" id="admin-count-yes">0</span>
-            <span class="stat-lbl">Confirmados (Sí Asisten)</span>
+          <div class="kpi-card">
+            <span class="kpi-label">Asistentes Confirmados</span>
+            <strong class="kpi-value kpi-highlight" id="admin-kpi-confirmed-guests">0</strong>
           </div>
-          <div class="stat-card stat-no">
-            <span class="stat-num" id="admin-count-no">0</span>
-            <span class="stat-lbl">No Podrán Asistir</span>
+          <div class="kpi-card">
+            <span class="kpi-label">No Asistirán</span>
+            <strong class="kpi-value" id="admin-kpi-declined-guests" style="color: #c0392b;">0</strong>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Pendientes por Responder</span>
+            <strong class="kpi-value" id="admin-kpi-pending-invitations">0</strong>
           </div>
         </div>
 
-        <!-- Navigation Tabs -->
+        <!-- Admin Navigation Tabs -->
         <div class="admin-tabs">
-          <button class="admin-tab-btn active" data-tab="admin-tab-invitations">
-            <i class="ri-mail-send-line"></i> 1. Registro de Invitados &amp; Links
+          <button class="admin-tab-btn active" data-tab="invitations">
+            <i class="ri-mail-send-line"></i> <span>1. Generador de Invitaciones WhatsApp (<span id="admin-count-invitations">0</span>)</span>
           </button>
-          <button class="admin-tab-btn" data-tab="admin-tab-rsvps">
-            <i class="ri-user-follow-line"></i> 2. Confirmaciones &amp; Sorteo
+          <button class="admin-tab-btn" data-tab="rsvps">
+            <i class="ri-user-follow-line"></i> <span>2. Respuestas de Asistencia (<span id="admin-count-rsvps">0</span>)</span>
           </button>
-          <button class="admin-tab-btn" data-tab="admin-tab-photos">
-            <i class="ri-image-line"></i> 3. Álbum &amp; Descargas
+          <button class="admin-tab-btn" data-tab="photos">
+            <i class="ri-camera-lens-line"></i> <span>3. Álbum en Vivo &amp; QR del Evento</span>
           </button>
         </div>
 
-        <!-- Tab 1: Registro de Invitados & Generador de Links -->
+        <!-- Tab 1: Invitations Generator & WhatsApp Links -->
         <div class="admin-tab-pane active" id="admin-tab-invitations">
-          <!-- Formulario para Crear Invitación -->
-          <div class="create-invitation-box" style="background: rgba(82, 122, 80, 0.08); border: 1px solid var(--border-gold); padding: 1.2rem; border-radius: var(--border-radius-card); margin-bottom: 1.5rem;">
-            <h4 style="font-family: var(--font-serif); font-size: 1.15rem; color: var(--text-main); margin-bottom: 0.8rem;">
-              <i class="ri-user-add-line" style="color: var(--gold-dark);"></i> Registrar Nuevo(s) Invitado(s)
-            </h4>
-            <form id="form-create-invitation" class="form-create-invitation">
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="inv-type">Tipo de Invitación *</label>
-                  <select id="inv-type" required>
-                    <option value="1">1 Persona (Individual / Sin Acompañante)</option>
-                    <option value="2">2 Personas (Con Acompañante)</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="inv-phone">Teléfono / WhatsApp (Opcional para envío directo)</label>
-                  <input type="tel" id="inv-phone" placeholder="Ej.: +56 9 1234 5678">
-                </div>
-              </div>
-
+          <div class="admin-inv-form-box">
+            <h5>+ Crear Nueva Invitación Personalizada</h5>
+            <form id="admin-create-inv-form" class="admin-inv-grid-form">
               <div class="form-group">
-                <label for="inv-name-1">Nombre Invitado 1 *</label>
-                <input type="text" id="inv-name-1" placeholder="Ej.: Cristopher Hormazábal" required>
+                <label for="inv-type">Tipo de Invitación</label>
+                <select id="inv-type">
+                  <option value="1">1 Pase (Invitado Individual)</option>
+                  <option value="2" selected>2 Pases (Invitado + Acompañante)</option>
+                </select>
               </div>
-
-              <div class="form-group" id="inv-name-2-group" style="display: none;">
-                <label for="inv-name-2">Nombre Invitado 2 (Acompañante) *</label>
-                <input type="text" id="inv-name-2" placeholder="Ej.: Reny Rebolledo">
+              <div class="form-group">
+                <label for="inv-name1">Nombre Invitado Principal *</label>
+                <input type="text" id="inv-name1" placeholder="Ej.: Cristopher Hormazábal" required>
               </div>
-
-              <div style="margin-top: 1rem;">
-                <button type="submit" class="btn-vogue-gold" style="width: 100%;">
-                  <i class="ri-check-line"></i>
-                  <span>Registrar Invitación &amp; Generar Link (OK)</span>
+              <div class="form-group" id="inv-name2-wrap">
+                <label for="inv-name2">Nombre Acompañante *</label>
+                <input type="text" id="inv-name2" placeholder="Ej.: Reny Rebolledo">
+              </div>
+              <div class="form-group">
+                <label for="inv-phone">Teléfono / WhatsApp (Opcional)</label>
+                <input type="tel" id="inv-phone" placeholder="Ej.: +56 9 1234 5678">
+              </div>
+              <div class="form-submit-cell">
+                <button type="submit" class="btn-vogue-gold">
+                  <i class="ri-link"></i>
+                  <span>Generar Link</span>
                 </button>
               </div>
             </form>
-          </div>
-
-          <!-- Tabla de Invitaciones Creadas -->
-          <div class="admin-actions-bar" style="justify-content: space-between; align-items: center;">
-            <h4 style="font-family: var(--font-serif); font-size: 1.1rem; color: var(--text-main);">
-              <i class="ri-file-list-3-line"></i> Lista de Invitaciones Personalizadas
-            </h4>
           </div>
 
           <div class="admin-table-wrap">
@@ -1178,7 +780,7 @@
                   <th>Invitado(s)</th>
                   <th>Pases</th>
                   <th>Estado</th>
-                  <th>Acciones / Link WhatsApp</th>
+                  <th>Acciones WhatsApp</th>
                   <th>Eliminar</th>
                 </tr>
               </thead>
@@ -1189,11 +791,11 @@
           </div>
         </div>
 
-        <!-- Tab 2: Confirmaciones & Cupones de Sorteo -->
+        <!-- Tab 2: RSVPs Confirmed List -->
         <div class="admin-tab-pane" id="admin-tab-rsvps">
           <div class="admin-actions-bar">
             <button class="btn-admin-action" id="btn-print-raffle-tickets">
-              <i class="ri-ticket-2-line"></i>
+              <i class="ri-printer-line"></i>
               <span>🎟️ Imprimir Cupones para Sorteo</span>
             </button>
             <button class="btn-admin-action btn-outline-action" id="btn-export-rsvps-csv">
@@ -1226,10 +828,30 @@
 
         <!-- Tab 3: Photos Gallery & Bulk Download -->
         <div class="admin-tab-pane" id="admin-tab-photos">
+          <!-- Banner Módulo Fotos & Código QR -->
+          <div style="background: rgba(82, 122, 80, 0.08); border: 1px solid var(--gold-primary); border-radius: 10px; padding: 1.4rem; margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
+            <div>
+              <h5 style="font-family: var(--font-serif); font-size: 1.15rem; color: var(--text-main); margin-bottom: 0.3rem;">
+                📸 Módulo Exclusivo del Evento &amp; Código QR
+              </h5>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0; line-height: 1.4;">
+                URL para imprimir en carteles y mesas de Casa Pirque: <strong style="color: var(--gold-dark);">https://cositasparaeventos.cl/matrimonio/yimmy-eve/fotos/</strong>
+              </p>
+            </div>
+            <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+              <a href="fotos/" target="_blank" class="btn-vogue-gold" style="font-size: 0.82rem; padding: 0.6rem 1rem; text-decoration: none;">
+                <i class="ri-external-link-line"></i> <span>Abrir Álbum en Vivo</span>
+              </a>
+              <button type="button" class="btn-vogue-outline" style="font-size: 0.82rem; padding: 0.6rem 1rem;" onclick="navigator.clipboard.writeText('https://cositasparaeventos.cl/matrimonio/yimmy-eve/fotos/').then(() => alert('¡Enlace del Código QR copiado al portapapeles!'))">
+                <i class="ri-file-copy-line"></i> <span>Copiar Link QR</span>
+              </button>
+            </div>
+          </div>
+
           <div class="admin-actions-bar">
             <button class="btn-admin-action" id="btn-download-all-photos">
               <i class="ri-download-cloud-2-line"></i>
-              <span>📥 Descargar Todas las Fotos del Matrimonio</span>
+              <span>📥 Descargar Todas las Fotos del Matrimonio en ZIP</span>
             </button>
           </div>
 

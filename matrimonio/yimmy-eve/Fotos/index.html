@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Álbum en Vivo & Desafíos de Fotos — Evelyn & Yimmy</title>
+  <meta name="description" content="Sube tus fotos, completa los 12 desafíos fotográficos y vota con Me Gusta en tiempo real en el matrimonio de Evelyn & Yimmy.">
+
+  <!-- Google Fonts: Editorial Serif & Clean Modern Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Pinyon+Script&display=swap" rel="stylesheet">
+
+  <!-- Remix Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="../css/styles.css?v=2026_fotos_v1">
+
+  <style>
+    /* Custom Styling for the Dedicated Live Photos App */
+    .fotos-hero-header {
+      text-align: center;
+      padding: 4.5rem 1.5rem 2.5rem;
+      background: radial-gradient(circle at center, rgba(82, 122, 80, 0.12) 0%, rgba(250, 246, 238, 0) 70%);
+    }
+
+    .fotos-live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: #527A50;
+      color: #FFFFFF;
+      padding: 0.35rem 0.9rem;
+      border-radius: 20px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.8rem;
+      box-shadow: 0 4px 15px rgba(82, 122, 80, 0.25);
+    }
+
+    .fotos-live-badge .live-dot {
+      width: 8px;
+      height: 8px;
+      background: #2ecc71;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #2ecc71;
+      animation: pulseLive 1.5s infinite;
+    }
+
+    @keyframes pulseLive {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.3); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .fotos-title {
+      font-family: var(--font-serif);
+      font-size: 2.3rem;
+      color: #243525;
+      margin: 0.2rem 0;
+    }
+
+    .fotos-subtitle {
+      font-family: 'Pinyon Script', cursive;
+      font-size: 2.2rem;
+      color: #527A50;
+      margin: 0;
+      line-height: 1.1;
+    }
+
+    .fotos-lead {
+      max-width: 580px;
+      margin: 0.8rem auto 0;
+      font-size: 0.9rem;
+      color: #4B634C;
+      line-height: 1.45;
+    }
+
+    .fotos-top-nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      background: rgba(250, 246, 238, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(82, 122, 80, 0.15);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .btn-return-invitation {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: #243525;
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      background: rgba(82, 122, 80, 0.1);
+      transition: all 0.2s ease;
+    }
+
+    .btn-return-invitation:hover {
+      background: #527A50;
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Glow Effects -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+
+  <!-- Top Sticky Bar -->
+  <header class="fotos-top-nav-bar">
+    <a href="../" class="btn-return-invitation" title="Volver a la Invitación Oficial">
+      <i class="ri-arrow-left-line"></i>
+      <span>Ver Invitación</span>
+    </a>
+    <div style="font-weight: 700; font-size: 0.9rem; color: #243525; font-family: var(--font-serif);">
+      Evelyn & Yimmy
+    </div>
+    <button class="btn-upload-photo" id="btn-quick-upload-top" style="padding: 0.45rem 0.9rem; font-size: 0.78rem;" onclick="document.getElementById('btn-open-upload').click()">
+      <i class="ri-camera-lens-line"></i>
+      <span>Subir Foto</span>
+    </button>
+  </header>
+
+  <main>
+    <!-- HERO HEADER -->
+    <header class="fotos-hero-header">
+      <div class="fotos-live-badge">
+        <span class="live-dot"></span>
+        <span>Álbum en Vivo del Evento</span>
+      </div>
+      <h1 class="fotos-title">Momentos Inolvidables</h1>
+      <p class="fotos-subtitle">Evelyn & Yimmy</p>
+      <p class="fotos-lead">
+        ¡Captura los momentos de nuestro matrimonio en Casa Pirque! Completa los 12 desafíos, comparte tus fotos favoritas y vota con ❤️ por las mejores.
+      </p>
+    </header>
+
+    <!-- SECTION: DESAFÍOS FOTOGRÁFICOS -->
+    <section class="section-editorial section-challenge reveal" id="desafios" style="padding-top: 1rem;">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Desafíos Fotográficos 🎯</h2>
+          <p class="section-subtitle">Completa los 12 retos del día y compite por el premio especial:</p>
+          <div class="title-divider"></div>
+        </div>
+
+        <div class="challenge-box">
+          <!-- Banner Concurso Sorpresa -->
+          <div class="challenge-contest-banner">
+            <i class="ri-trophy-line trophy-icon"></i>
+            <div class="contest-text">
+              <h4>🏆 ¡Gran Concurso de Fotos de las 20:00 hrs!</h4>
+              <p>La foto que tenga <strong>más "Me Gusta" (❤️)</strong> antes de las <strong>20:00 hrs</strong> ganará una gran sorpresa de parte de los novios. ¡Participa y vota por tus favoritas!</p>
+            </div>
+          </div>
+
+          <!-- Grid de los 12 Desafíos con Miniaturas Dinámicas -->
+          <div class="challenge-grid">
+            <div class="challenge-card" data-challenge-id="desafio_01">
+              <div class="challenge-card-top">
+                <span class="ch-num">01</span>
+                <p class="ch-text">Foto con los lentes de la novia 🕶️</p>
+              </div>
+              <div class="challenge-card-thumbnails" id="thumbs-desafio_01">
+                <!-- Rendered dynamically by gallery.js -->
+              </div>
+              <div class="challenge-card-actions">
+                <button class="btn-upload-challenge-item" onclick="openChallengeModalFor('desafio_01')">
+                  <i class="ri-camera-fill"></i> <span>+ Subir a este reto</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="challenge-card" data-challenge-id="desafio_02">
+              <div class="challenge-card-top">
+                <span class="ch-num">02</span>
+                <p class="ch-text">Foto tomándote un shot 🥃</p>
+              </div>
+              <div class="challenge-card-thumbnails" id="thumbs-desafio_02">
+                <!-- Rendered dynamically by gallery.js -->
+              </div>
+              <div class="challenge-card-actions">
+                <button class="btn-upload-challenge-item" onclick="openChallengeModalFor('desafio_02')">
+                  <i class="ri-camera-fill"></i> <span>+ Subir a este reto</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="challenge-card" data-challenge-id="desafio_03">
+              <div class="challenge-card-top">
+                <span class="ch-num">03</span>
+                <p class="ch-text">Foto instagrameable en los spots decorados 📸✨</p>
+              </div>
+              <div class="challenge-card-thumbnails" id="thumbs-desafio_03">
+                <!-- Rendered dynamically by gallery.js -->
+              </div>
+              <div class="challenge-card-actions">
+                <button class="btn-upload-challenge-item" onclick="openChallengeModalFor('desafio_03')">
+                  <i class="ri-camera-fill"></i> <span>+ Subir a este reto</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="challenge-card" data-challenge-id="desafio_04">
+              <div class="challenge-card-top">
+                <span class="ch-num">04</span>
+                <p class="ch-text">Foto abrazando un árbol de Casa Pirque 🌳</p>
+              </div>
+              <div class="challenge-card-thumbnails" id="thumbs-desafio_04">
+                <!-- Rendered dynamically by gallery.js -->
+              </div>
+              <div class="challenge-card-actions">
+                <button class="btn-upload-challenge-item" onclick="openChallengeModalFor('desafio_04')">
+                  <i class="ri-camera-fill"></i> <span>+ Subir a este reto</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="challenge-card" data-challenge-id="desafio_05">
+              <div class="challenge-card-top">
+                <span class="ch-num">05</span>
+                <p class="ch-text">Foto con los recién casados (Evelyn &amp; Yimmy) 💍</p>
+              </div>
+              <div class="challenge-card-thumbnails" id="thumbs-desafio_05">
+                <!-- Rendered dynamically by gallery.js -->
+              </div>
+              <div class="challenge-card-actions">
+                <button class="btn-upload-challenge-item" onclick="openChallengeModalFor('desafio_05')">
+                  <i class="ri-camera-fill"></i> <span>+ Subir a este reto</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="challenge-card" data-challenge-id="desafio_06">
+              <div class="challenge-card-top">
+                <span class="ch-num">06</span>
+                <p class="ch-text">Foto con los padres de los novios 👨‍👩‍👧‍👦</p>
+              </div>
+              <div class="challenge-card-thumbnails" id="thumbs-desafio_06">
+                <!-- Rendered dynamically by gallery.js -->
+              </div>
+              <div class="challenge-card-actions">
+                <button class="btn-upload-challenge-item" onclick="openChallengeModalFor('desafio_06')">
+                  <i class="ri-camera-fill"></i> <span>+ Subir a este reto</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="challenge-card" data-challenge-id="desafio_07">
+              <div class="challenge-card-top">
+                <span class="ch-num">07</span>
+                <p class="ch-text">Foto de tu grupo relajándose en la manta de pasto 🧺</p>
+              </div>
+              <div class="challenge-card-thumbnails" id="thumbs-desafio_07">
+                <!-- Rendered dynamically by gallery.js -->
+              </div>
+              <div class="challenge-card-actions">
+                <button class="btn-upload-challenge-item" onclick="openChallengeModalFor('desafio_07')">
+                  <i class="ri-camera-fill"></i> <span>+ Subir a este reto</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="challenge-card" data-challenge-id="desafio_08">
+              <div class="challenge-card-top">
+                <span class="ch-num">08</span>
+                <p class="ch-text">Foto brindando por el amor con tu trago favorito 🥂</p>
+              </div>
+              <div class="challenge-card-thumbnails" id="thumbs-desafio_08">
+                <!-- Rendered dynamically by gallery.js -->
+              </div>
+              <div class="challenge-card-actions">
+                <button class="btn-upload-challenge-item" onclick="openChallengeModalFor('desafio_08')">
+                  <i class="ri-camera-fill"></i> <span>+ Subir a este reto</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="challenge-card" data-challenge-id="desafio_09">
+              <div class="challenge-card-top">
+                <span class="ch-num">09</span>
+                <p class="ch-text">Foto divertida dándolo todo en la pista de baile 🕺💃</p>
+              </div>
+              <div class="challenge-card-thumbnails" id="thumbs-desafio_09">
+                <!-- Rendered dynamically by gallery.js -->
+              </div>
+              <div class="challenge-card-actions">
+                <button class="btn-upload-challenge-item" onclick="openChallengeModalFor('desafio_09')">
+                  <i class="ri-camera-fill"></i> <span>+ Subir a este reto</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="challenge-card" data-challenge-id="desafio_10">
+              <div class="challenge-card-top">
+                <span class="ch-num">10</span>
+                <p class="ch-text">La foto más espontánea y divertida del día ✨</p>
+              </div>
+              <div class="challenge-card-thumbnails" id="thumbs-desafio_10">
+                <!-- Rendered dynamically by gallery.js -->
+              </div>
+              <div class="challenge-card-actions">
+                <button class="btn-upload-challenge-item" onclick="openChallengeModalFor('desafio_10')">
+                  <i class="ri-camera-fill"></i> <span>+ Subir a este reto</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="challenge-card" data-challenge-id="desafio_11">
+              <div class="challenge-card-top">
+                <span class="ch-num">11</span>
+                <p class="ch-text">Foto emotiva durante la ceremonia 🥹💍</p>
+              </div>
+              <div class="challenge-card-thumbnails" id="thumbs-desafio_11">
+                <!-- Rendered dynamically by gallery.js -->
+              </div>
+              <div class="challenge-card-actions">
+                <button class="btn-upload-challenge-item" onclick="openChallengeModalFor('desafio_11')">
+                  <i class="ri-camera-fill"></i> <span>+ Subir a este reto</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="challenge-card" data-challenge-id="desafio_12">
+              <div class="challenge-card-top">
+                <span class="ch-num">12</span>
+                <p class="ch-text">Foto grupal con tu familia o amigos 👨‍👩‍👧‍👦🎉</p>
+              </div>
+              <div class="challenge-card-thumbnails" id="thumbs-desafio_12">
+                <!-- Rendered dynamically by gallery.js -->
+              </div>
+              <div class="challenge-card-actions">
+                <button class="btn-upload-challenge-item" onclick="openChallengeModalFor('desafio_12')">
+                  <i class="ri-camera-fill"></i> <span>+ Subir a este reto</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="challenge-cta">
+            <button class="btn-vogue-gold" id="btn-challenge-upload">
+              <i class="ri-trophy-line"></i>
+              <span>¡Subir una Foto para los Desafíos!</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: ÁLBUM DE FOTOS EN VIVO -->
+    <section class="section-editorial reveal" id="galeria">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Álbum de Recuerdos 📸</h2>
+          <p class="section-subtitle">Fotos libres y momentos compartidos por todos los invitados:</p>
+          <div class="title-divider"></div>
+        </div>
+
+        <div class="gallery-controls-wrapper">
+          <div class="gallery-filters" id="gallery-filters">
+            <button class="filter-btn active" data-filter="all">
+              <i class="ri-apps-2-line"></i> <span>Ver Todas</span>
+            </button>
+            <button class="filter-btn" data-filter="album">
+              <i class="ri-camera-lens-line"></i> <span>Álbum de Recuerdos</span>
+            </button>
+            <button class="filter-btn" data-filter="desafios">
+              <i class="ri-trophy-line"></i> <span>Desafíos de Fotos</span>
+            </button>
+          </div>
+
+          <div class="gallery-sort-controls">
+            <span class="sort-label">Ordenar:</span>
+            <button class="sort-btn active" id="btn-sort-recent" data-sort="recent" title="Ver las fotos más recientes primero">
+              <i class="ri-time-line"></i> <span>Más Recientes</span>
+            </button>
+            <button class="sort-btn" id="btn-sort-popular" data-sort="popular" title="Ver las fotos más votadas con Me Gusta">
+              <i class="ri-heart-3-line"></i> <span>Más Populares</span>
+            </button>
+          </div>
+
+          <button class="btn-upload-photo" id="btn-open-upload">
+            <i class="ri-upload-cloud-2-line"></i>
+            <span>Subir Foto al Álbum</span>
+          </button>
+        </div>
+
+        <div class="gallery-masonry" id="gallery-grid">
+          <!-- Rendered dynamically by gallery.js -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="vogue-footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <h3 class="footer-title">Evelyn &amp; Yimmy</h3>
+        <p class="footer-subtitle">SÁBADO 21 DE NOVIEMBRE DE 2026 • CASA PIRQUE</p>
+      </div>
+      <p class="footer-copy">© 2026 Evelyn &amp; Yimmy. Álbum Social en Tiempo Real impulsado por Cositas Para Eventos.</p>
+    </div>
+  </footer>
+
+  <!-- MODAL: SUBIR FOTO AL ÁLBUM COMPARTIDO -->
+  <div class="modal-overlay" id="upload-photo-modal">
+    <div class="modal-vogue-card modal-upload-card">
+      <button class="modal-close-btn" id="btn-close-upload-modal" aria-label="Cerrar modal">
+        <i class="ri-close-line"></i>
+      </button>
+
+      <div class="modal-header">
+        <i class="ri-camera-lens-line modal-icon" id="upload-modal-icon"></i>
+        <h3 class="modal-title" id="upload-modal-title">Subir Foto al Álbum de Recuerdos</h3>
+        <p class="modal-desc" id="upload-modal-desc">Comparte tu foto para que todos los invitados y los novios puedan verla en tiempo real.</p>
+      </div>
+
+      <form id="upload-photo-form" class="upload-photo-form">
+        <!-- Photo Selector / Preview Area -->
+        <div class="upload-dropzone" id="upload-dropzone">
+          <input type="file" id="photo-modal-file-input" accept="image/*" style="display: none;" required>
+          <div class="dropzone-placeholder" id="dropzone-placeholder">
+            <i class="ri-image-add-line"></i>
+            <span>Toca aquí para seleccionar una foto o tomar una con la cámara</span>
+          </div>
+          <div class="dropzone-preview" id="dropzone-preview" style="display: none;">
+            <img id="preview-image" src="" alt="Vista previa">
+            <button type="button" class="btn-change-photo" id="btn-change-photo">
+              <i class="ri-refresh-line"></i> Cambiar Foto
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 1rem;">
+          <label for="upload-author">¿Quién sube la foto? (Tu Nombre o Familia) *</label>
+          <input type="text" id="upload-author" placeholder="Ej.: Cristopher / Familia Soto" required>
+        </div>
+
+        <!-- Grupo de Selección de Desafío (Solo visible cuando se sube para un Desafío) -->
+        <div class="form-group" id="upload-category-group" style="display: none;">
+          <label for="upload-category">¿A cuál de los 12 desafíos corresponde? *</label>
+          <select id="upload-category">
+            <option value="desafio_01">01. Foto con los lentes de la novia 🕶️</option>
+            <option value="desafio_02">02. Foto tomándote un shot 🥃</option>
+            <option value="desafio_03">03. Foto instagrameable en los spots decorados 📸✨</option>
+            <option value="desafio_04">04. Foto abrazando un árbol de Casa Pirque 🌳</option>
+            <option value="desafio_05">05. Foto con los recién casados (Evelyn &amp; Yimmy) 💍</option>
+            <option value="desafio_06">06. Foto con los padres de los novios 👨‍👩‍👧‍👦</option>
+            <option value="desafio_07">07. Foto relajándose en la manta de pasto 🧺</option>
+            <option value="desafio_08">08. Foto brindando por el amor con tu trago favorito 🥂</option>
+            <option value="desafio_09">09. Foto divertida dándolo todo en la pista de baile 🕺💃</option>
+            <option value="desafio_10">10. La foto más espontánea y divertida del día ✨</option>
+            <option value="desafio_11">11. Foto emotiva durante la ceremonia 🥹💍</option>
+            <option value="desafio_12">12. Foto grupal con tu familia o amigos 👨‍👩‍👧‍👦🎉</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="upload-caption">Dedicatoria o Descripción (Opcional)</label>
+          <textarea id="upload-caption" rows="2" placeholder="Ej.: ¡Celebrando con todo el cariño del mundo! 🎉 (Opcional)"></textarea>
+        </div>
+
+        <div class="upload-submit-box">
+          <button type="submit" class="btn-vogue-gold" id="btn-submit-photo" style="width: 100%;">
+            <i class="ri-upload-cloud-2-line"></i>
+            <span>Publicar Foto para Todos</span>
+          </button>
+          <div class="upload-progress-box" id="upload-progress-box" style="display: none;">
+            <div class="upload-spinner"><i class="ri-loader-4-line ri-spin"></i></div>
+            <span class="upload-progress-text">Subiendo y sincronizando foto...</span>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: LIGHTBOX SOCIAL (FOTO GRANDE + LIKES + COMENTARIOS) -->
+  <div class="lightbox-overlay" id="lightbox-modal">
+    <button class="lightbox-close" id="lightbox-close" aria-label="Cerrar foto"><i class="ri-close-line"></i></button>
+    <div class="lightbox-card-container">
+      
+      <!-- Left / Top: Photo Media -->
+      <div class="lightbox-photo-panel">
+        <img src="" alt="" id="lightbox-img" class="lightbox-img">
+      </div>
+
+      <!-- Right / Bottom: Details, Likes & Comments Thread -->
+      <div class="lightbox-social-panel">
+        <div class="lightbox-header-info">
+          <div class="lightbox-author-badge">
+            <i class="ri-user-heart-line"></i>
+            <span id="lightbox-author">Autor</span>
+          </div>
+          <span class="lightbox-time" id="lightbox-time">Hace un momento</span>
+        </div>
+
+        <p class="lightbox-caption-text" id="lightbox-desc">Descripción</p>
+
+        <!-- Social Action Bar (Like count & Like Button) -->
+        <div class="lightbox-actions-bar">
+          <button class="btn-lightbox-like" id="btn-lightbox-like">
+            <i class="ri-heart-line" id="lightbox-like-icon"></i>
+            <span id="lightbox-like-label">Me gusta</span>
+            (<span id="lightbox-like-count">0</span>)
+          </button>
+          <span class="lightbox-comments-total" id="lightbox-comments-total">0 comentarios</span>
+        </div>
+
+        <!-- Comments List -->
+        <div class="lightbox-comments-section">
+          <h5 class="comments-heading"><i class="ri-chat-1-line"></i> Comentarios</h5>
+          <div class="comments-list" id="comments-list">
+            <!-- Rendered dynamically by gallery.js -->
+          </div>
+        </div>
+
+        <!-- Add Comment Form -->
+        <form class="lightbox-comment-form" id="lightbox-comment-form">
+          <div class="comment-inputs-row">
+            <input type="text" id="comment-author-input" placeholder="Tu nombre..." required>
+            <div class="comment-submit-wrap">
+              <input type="text" id="comment-text-input" placeholder="Escribe un comentario..." required>
+              <button type="submit" class="btn-send-comment" title="Enviar comentario">
+                <i class="ri-send-plane-fill"></i>
+              </button>
+            </div>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/gallery.js"></script>
+</body>
+</html>
