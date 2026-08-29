@@ -31,9 +31,21 @@ window.dbSupabase = {
       const { data, error } = await client
         .from('invitations')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: true });
       if (error) throw error;
-      return data || [];
+
+      // Obtener lápidas de invitaciones eliminadas
+      const { data: allRsvps } = await client.from('rsvps').select('*').order('created_at', { ascending: false });
+      const deletedInvIds = new Set();
+      if (allRsvps) {
+        allRsvps.forEach(r => {
+          if (r.name1 === '__DELETED__' && r.invitation_id) {
+            deletedInvIds.add(r.invitation_id);
+          }
+        });
+      }
+
+      return (data || []).filter(i => !deletedInvIds.has(i.id));
     } catch (e) {
       console.warn('Error al obtener invitaciones:', e);
       return [];
@@ -75,7 +87,47 @@ window.dbSupabase = {
         .select('*')
         .order('created_at', { ascending: false });
       if (error) throw error;
-      return data || [];
+
+      if (!data || data.length === 0) return [];
+
+      const result = [];
+      const deletedKeys = new Set();
+      const seenKeys = new Set();
+
+      for (const row of data) {
+        const invId = row.invitation_id;
+        const passCode = row.pass_code;
+        const name1 = (row.name1 || '').trim().toLowerCase();
+
+        const invKey = invId ? `inv:${invId}` : null;
+        const codeKey = passCode ? `code:${passCode}` : null;
+        const nameKey = name1 ? `name:${name1}` : null;
+
+        const isDeleted = (row.name1 === '__DELETED__' || row.dietary1 === '__DELETED__' || row.message === '__DELETED__');
+
+        if (isDeleted) {
+          if (invKey) deletedKeys.add(invKey);
+          if (codeKey) deletedKeys.add(codeKey);
+          continue;
+        }
+
+        if ((invKey && deletedKeys.has(invKey)) || (codeKey && deletedKeys.has(codeKey))) {
+          continue;
+        }
+
+        const primary = invKey || codeKey || nameKey;
+        if (primary && seenKeys.has(primary)) {
+          continue;
+        }
+
+        if (primary) seenKeys.add(primary);
+        if (invKey) seenKeys.add(invKey);
+        if (codeKey) seenKeys.add(codeKey);
+
+        result.push(row);
+      }
+
+      return result;
     } catch (e) {
       console.warn('Error al obtener RSVPs:', e);
       return [];
@@ -86,13 +138,6 @@ window.dbSupabase = {
     const client = getSupabaseClient();
     if (!client) return false;
     try {
-      // Eliminar registros anteriores para esta misma invitación o código para evitar duplicados
-      if (rsvpData.invCode) {
-        await client.from('rsvps').delete().eq('invitation_id', rsvpData.invCode);
-      } else if (rsvpData.code) {
-        await client.from('rsvps').delete().eq('pass_code', rsvpData.code);
-      }
-
       const { data, error } = await client
         .from('rsvps')
         .insert([{
@@ -123,7 +168,6 @@ window.dbSupabase = {
     try {
       const isBoth = (attendanceMode === 'both' || attendanceMode === true || attendanceMode === 'si');
       const isSingle = (attendanceMode === 'single');
-      const isNone = (attendanceMode === 'none' || attendanceMode === false || attendanceMode === 'no');
 
       if (attendanceMode === 'pending') {
         await this.deleteRsvpFromCloud(invitationIdOrCode, invitationIdOrCode, null, name1);
@@ -133,47 +177,20 @@ window.dbSupabase = {
       const att1 = isBoth || isSingle;
       const att2 = isBoth && (pases === 2 || !!name2);
 
-      let rsvps = [];
-      const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
-      
-      if (invitationIdOrCode && uuidRegex.test(invitationIdOrCode)) {
-        const res = await client.from('rsvps').select('*').eq('id', invitationIdOrCode);
-        if (res.data && res.data.length > 0) rsvps = res.data;
-      }
-      if (rsvps.length === 0 && invitationIdOrCode) {
-        const res = await client.from('rsvps').select('*').eq('invitation_id', invitationIdOrCode);
-        if (res.data && res.data.length > 0) rsvps = res.data;
-      }
-      if (rsvps.length === 0 && invitationIdOrCode) {
-        const res = await client.from('rsvps').select('*').eq('pass_code', invitationIdOrCode);
-        if (res.data && res.data.length > 0) rsvps = res.data;
-      }
-      if (rsvps.length === 0 && name1) {
-        const res = await client.from('rsvps').select('*').ilike('name1', name1.trim());
-        if (res.data && res.data.length > 0) rsvps = res.data;
-      }
+      const passCode = 'EY-' + Math.floor(1000 + Math.random() * 9000);
 
-      if (rsvps.length > 0) {
-        for (const row of rsvps) {
-          await client.from('rsvps')
-            .update({
-              attendance1: att1,
-              attendance2: att2,
-              name2: name2 || row.name2 || ''
-            })
-            .eq('id', row.id);
-        }
-      } else {
-        await client.from('rsvps').insert([{
-          event_slug: 'eve-y-yimmy',
-          invitation_id: invitationIdOrCode || null,
-          pass_code: 'EY-' + Math.floor(1000 + Math.random() * 9000),
-          name1: name1 || 'Invitado',
-          name2: name2 || '',
-          attendance1: att1,
-          attendance2: att2
-        }]);
-      }
+      const { error } = await client.from('rsvps').insert([{
+        event_slug: 'eve-y-yimmy',
+        invitation_id: invitationIdOrCode || null,
+        pass_code: passCode,
+        name1: name1 || 'Invitado',
+        name2: name2 || '',
+        attendance1: att1,
+        attendance2: att2,
+        dietary1: 'Ninguna',
+        dietary2: 'Ninguna'
+      }]);
+      if (error) throw error;
       return true;
     } catch (e) {
       console.error('Error actualizando asistencia manual:', e);
@@ -185,39 +202,40 @@ window.dbSupabase = {
     const client = getSupabaseClient();
     if (!client) return false;
     try {
-      const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
-
-      if (idOrCode && uuidRegex.test(idOrCode)) {
-        await client.from('rsvps').delete().eq('id', idOrCode);
-      }
-      if (invId) {
-        await client.from('rsvps').delete().eq('invitation_id', invId);
-      } else if (idOrCode && String(idOrCode).startsWith('inv_')) {
-        await client.from('rsvps').delete().eq('invitation_id', idOrCode);
-      }
-      if (passCode) {
-        await client.from('rsvps').delete().eq('pass_code', passCode);
-      } else if (idOrCode && String(idOrCode).startsWith('EY-')) {
-        await client.from('rsvps').delete().eq('pass_code', idOrCode);
-      }
-      if (name1) {
-        await client.from('rsvps').delete().ilike('name1', name1.trim());
-      }
+      await client.from('rsvps').insert([{
+        event_slug: 'eve-y-yimmy',
+        invitation_id: invId || (idOrCode && String(idOrCode).startsWith('inv_') ? idOrCode : null),
+        pass_code: passCode || (idOrCode && String(idOrCode).startsWith('EY-') ? idOrCode : 'EY-DEL'),
+        name1: '__DELETED__',
+        dietary1: '__DELETED__',
+        message: '__DELETED__',
+        attendance1: false,
+        attendance2: false
+      }]);
       return true;
     } catch (e) {
-      console.error('Error al eliminar RSVP en nube:', e);
+      console.warn('Error eliminando RSVP de Supabase:', e);
       return false;
     }
   },
 
-  async deleteInvitationFromCloud(invId) {
+  async deleteInvitationFromCloud(id) {
     const client = getSupabaseClient();
-    if (!client || !invId) return false;
+    if (!client) return false;
     try {
-      await client.from('invitations').delete().eq('id', invId);
+      await client.from('rsvps').insert([{
+        event_slug: 'eve-y-yimmy',
+        invitation_id: id,
+        pass_code: 'EY-DEL',
+        name1: '__DELETED__',
+        dietary1: '__DELETED__',
+        message: '__DELETED__',
+        attendance1: false,
+        attendance2: false
+      }]);
       return true;
     } catch (e) {
-      console.error('Error al eliminar invitación en nube:', e);
+      console.warn('Error eliminando invitación en Supabase:', e);
       return false;
     }
   },

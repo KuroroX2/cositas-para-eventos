@@ -614,9 +614,6 @@
           namesShow = `${escapeHtml(r.name)} &amp; ${escapeHtml(r.name2)}`;
         }
       }
-      if (mode === 'none') {
-        namesShow = `<span style="text-decoration: line-through; opacity: 0.65;">${r.name2 ? `${escapeHtml(r.name)} &amp; ${escapeHtml(r.name2)}` : escapeHtml(r.name)}</span>`;
-      }
 
       let pasesBadge = '';
       if (mode === 'both') {
