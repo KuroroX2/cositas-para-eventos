@@ -3925,6 +3925,84 @@ body.theme-florido .ch-num {
   box-shadow: 0 4px 12px rgba(82, 122, 80, 0.25);
 }
 
+/* SECTION: NUESTRA HISTORIA / MENSAJE DE LOS NOVIOS */
+.section-love-story {
+  padding: 4.5rem 0 3.5rem;
+  position: relative;
+}
+.love-story-card {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: center;
+  background: #FFFFFF;
+  border: 1.5px solid rgba(82, 122, 80, 0.25);
+  border-radius: 24px;
+  padding: 2.2rem 1.6rem;
+  box-shadow: 0 16px 45px rgba(82, 122, 80, 0.1);
+  position: relative;
+}
+@media (min-width: 820px) {
+  .love-story-card {
+    grid-template-columns: 1fr 1.25fr;
+    padding: 3rem 2.8rem;
+    gap: 3.5rem;
+  }
+}
+.love-story-img {
+  width: 100%;
+  height: clamp(300px, 45vw, 420px);
+  object-fit: cover;
+  border-radius: var(--border-radius-card);
+  display: block;
+}
+.love-story-kicker {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #527A50;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+.love-story-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.8rem, 4.5vw, 2.4rem);
+  color: #243525;
+  margin: 0;
+  line-height: 1.2;
+}
+.love-story-text {
+  font-size: 0.95rem;
+  color: var(--text-main);
+  line-height: 1.75;
+  margin-bottom: 1.2rem;
+}
+.love-story-verse {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.98rem;
+  color: #3D5C3B;
+  border-left: 3.5px solid #527A50;
+  padding-left: 1.1rem;
+  margin: 1.2rem 0 1.5rem;
+  line-height: 1.65;
+  background: rgba(82, 122, 80, 0.05);
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-radius: 0 12px 12px 0;
+}
+.love-story-signature {
+  margin-top: 1rem;
+}
+.sig-script {
+  font-family: 'Pinyon Script', cursive, var(--font-serif);
+  font-size: 2.6rem;
+  color: #527A50;
+  display: inline-block;
+  line-height: 1;
+}
+
 
 
 
