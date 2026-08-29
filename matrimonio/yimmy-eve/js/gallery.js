@@ -266,7 +266,10 @@ function saveLikedPhotoIds(ids) {
 }
 
 window.togglePhotoLike = async function(event, photoId) {
-  if (event) event.stopPropagation();
+  if (event) {
+    event.stopPropagation();
+    if (event.currentTarget && event.currentTarget.blur) event.currentTarget.blur();
+  }
 
   const idStr = String(photoId);
   const photo = weddingPhotos.find(p => String(p.id) === idStr);
@@ -337,7 +340,8 @@ function initLightboxSocial() {
   });
 
   if (likeBtn) {
-    likeBtn.addEventListener('click', () => {
+    likeBtn.addEventListener('click', (e) => {
+      likeBtn.blur();
       if (activePhotoForLightbox) {
         window.togglePhotoLike(null, activePhotoForLightbox.id);
       }

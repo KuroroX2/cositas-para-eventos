@@ -1712,21 +1712,27 @@ body.theme-florido .ch-num {
   background: rgba(82, 122, 80, 0.1);
   border: 1.5px solid rgba(82, 122, 80, 0.25);
   cursor: pointer;
+  outline: none;
   transition: all 0.25s ease;
 }
-.btn-like-social:hover, .btn-card-like:hover {
-  color: #e74c3c;
-  background: rgba(231, 76, 60, 0.1);
-  border-color: rgba(231, 76, 60, 0.35);
-  transform: translateY(-1px);
+@media (hover: hover) {
+  .btn-like-social:hover, .btn-card-like:hover {
+    background: rgba(82, 122, 80, 0.18);
+    border-color: #527A50;
+    color: #243525;
+    transform: translateY(-1px);
+  }
+}
+.btn-like-social:focus, .btn-like-social:active {
+  outline: none;
 }
 .btn-like-social.liked, .btn-card-like.liked {
-  color: #e74c3c;
-  background: rgba(231, 76, 60, 0.15);
-  border-color: rgba(231, 76, 60, 0.45);
+  color: #e74c3c !important;
+  background: rgba(231, 76, 60, 0.15) !important;
+  border-color: rgba(231, 76, 60, 0.45) !important;
 }
 .btn-like-social.liked i, .btn-card-like.liked i {
-  color: #e74c3c;
+  color: #e74c3c !important;
   animation: heartPop 0.35s cubic-bezier(0.17, 0.89, 0.32, 1.49);
 }
 @keyframes heartPop {
