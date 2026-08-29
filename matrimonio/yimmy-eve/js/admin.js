@@ -452,7 +452,7 @@
                 <i class="ri-whatsapp-line"></i> <span>WhatsApp</span>
               </a>
               <a href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer" class="btn-dl-single btn-view-invitation" data-url="${escapeHtml(link)}" style="background: #527A50; color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.45rem 0.85rem; border-radius: 50px; font-size: 0.75rem; font-weight: 700;">
-                <i class="ri-external-link-line"></i> <span>Ver (OK)</span>
+                <i class="ri-external-link-line"></i> <span>Ver Invitación</span>
               </a>
             </div>
           </td>
