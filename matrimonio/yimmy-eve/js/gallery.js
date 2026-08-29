@@ -429,30 +429,56 @@ function closeLightbox() {
   activePhotoForLightbox = null;
 }
 
+function getActiveLightboxPhoto() {
+  if (!activePhotoForLightbox) return null;
+  const current = weddingPhotos.find(p => String(p.id) === String(activePhotoForLightbox.id));
+  if (current) activePhotoForLightbox = current;
+  return activePhotoForLightbox;
+}
+
 function updateLightboxLikeUI() {
-  if (!activePhotoForLightbox) return;
+  const photo = getActiveLightboxPhoto();
+  if (!photo) return;
+
   const countEl = document.getElementById('lightbox-like-count');
   const icon = document.getElementById('lightbox-like-icon');
   const likeBtn = document.getElementById('btn-lightbox-like');
   const commentsTotalEl = document.getElementById('lightbox-comments-total');
 
   const likedIds = getLikedPhotoIds();
-  const isLiked = likedIds.includes(String(activePhotoForLightbox.id));
-  const likesCount = activePhotoForLightbox.likes || 0;
-  const commentsCount = (activePhotoForLightbox.comments || []).length;
+  const isLiked = likedIds.includes(String(photo.id));
+  const likesCount = Number(photo.likes) || 0;
+  const commentsCount = (photo.comments || []).length;
 
   if (countEl) countEl.textContent = likesCount;
   if (commentsTotalEl) {
     commentsTotalEl.textContent = `${commentsCount} ${commentsCount === 1 ? 'comentario' : 'comentarios'}`;
   }
 
-  if (likeBtn && icon) {
+  if (likeBtn) {
     if (isLiked) {
       likeBtn.classList.add('liked');
-      icon.className = 'ri-heart-3-fill';
+      likeBtn.style.setProperty('color', '#e74c3c', 'important');
+      likeBtn.style.setProperty('background', 'rgba(231, 76, 60, 0.15)', 'important');
+      likeBtn.style.setProperty('border-color', 'rgba(231, 76, 60, 0.45)', 'important');
     } else {
       likeBtn.classList.remove('liked');
-      icon.className = 'ri-heart-3-line';
+      likeBtn.style.removeProperty('color');
+      likeBtn.style.removeProperty('background');
+      likeBtn.style.removeProperty('border-color');
+      likeBtn.style.color = '#4B634C';
+      likeBtn.style.background = 'rgba(82, 122, 80, 0.1)';
+      likeBtn.style.borderColor = 'rgba(82, 122, 80, 0.25)';
+    }
+  }
+
+  if (icon) {
+    icon.className = isLiked ? 'ri-heart-3-fill' : 'ri-heart-3-line';
+    if (isLiked) {
+      icon.style.setProperty('color', '#e74c3c', 'important');
+    } else {
+      icon.style.removeProperty('color');
+      icon.style.color = '#4B634C';
     }
   }
 }
@@ -784,6 +810,9 @@ async function fetchCloudPhotos() {
       }));
       saveLocalCache();
       renderGallery();
+      if (activePhotoForLightbox) {
+        updateLightboxLikeUI();
+      }
     }
   } catch (e) {
     console.warn('Supabase photos fetch:', e);
