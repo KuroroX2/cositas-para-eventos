@@ -307,17 +307,15 @@
   }
 
   function generatePersonalizedUrl(inv) {
-    const origin = window.location.origin;
-    let path = window.location.pathname;
-    if (!path.endsWith('/')) {
-      path += '/';
-    }
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const baseOrigin = isLocal ? window.location.origin : 'https://cositasparaeventos.cl';
+    const basePath = '/matrimonio/yimmy-eve/';
     const params = new URLSearchParams();
     params.set('p', inv.pases);
     params.set('n1', inv.name1);
     if (inv.name2) params.set('n2', inv.name2);
     params.set('code', inv.id);
-    return `${origin}${path}?${params.toString()}`;
+    return `${baseOrigin}${basePath}?${params.toString()}`;
   }
 
   function renderAdminInvitations() {
@@ -637,25 +635,87 @@
     `).join('');
   }
 
-  function downloadAllPhotosBulk() {
+  async function downloadAllPhotosBulk() {
     const photos = window.weddingPhotos || [];
     if (photos.length === 0) {
       alert('No hay fotos para descargar aún.');
       return;
     }
 
-    alert(`Iniciando descarga de ${photos.length} fotos del álbum en alta calidad.`);
+    const btn = document.getElementById('btn-download-all-photos');
+    const originalText = btn ? btn.innerHTML : '';
 
-    photos.forEach((p, idx) => {
-      setTimeout(() => {
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<i class="ri-loader-4-line ri-spin"></i> <span>Empaquetando ${photos.length} fotos en ZIP (0%)...</span>`;
+    }
+
+    try {
+      if (typeof window.JSZip === 'function') {
+        const zip = new window.JSZip();
+        const folder = zip.folder('Fotos_Matrimonio_Evelyn_Yimmy_2026');
+
+        for (let i = 0; i < photos.length; i++) {
+          const p = photos[i];
+          const url = p.url || p.photo_url || '';
+          const author = (p.author || p.author_name || 'Invitado').replace(/[^a-zA-Z0-9_-]/g, '_');
+          const fileName = `${String(i + 1).padStart(2, '0')}_${author}_${p.category || 'album'}.jpg`;
+
+          if (btn) {
+            const percent = Math.round(((i + 1) / photos.length) * 80);
+            btn.innerHTML = `<i class="ri-loader-4-line ri-spin"></i> <span>Procesando foto ${i + 1} de ${photos.length} (${percent}%)...</span>`;
+          }
+
+          if (url.startsWith('data:image')) {
+            const base64Data = url.split(',')[1];
+            if (base64Data) folder.file(fileName, base64Data, { base64: true });
+          } else if (url.startsWith('http')) {
+            try {
+              const resp = await fetch(url);
+              const blob = await resp.blob();
+              folder.file(fileName, blob);
+            } catch (fetchErr) {
+              console.warn('Direct fetch failed, skipping or fallback:', fetchErr);
+            }
+          }
+        }
+
+        if (btn) {
+          btn.innerHTML = `<i class="ri-loader-4-line ri-spin"></i> <span>Generando archivo ZIP...</span>`;
+        }
+
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
+        const zipUrl = URL.createObjectURL(zipBlob);
         const link = document.createElement('a');
-        link.href = p.url || p.photo_url || '';
-        link.download = `Boda_Eve_Yimmy_Foto_${idx + 1}_${(p.author || p.author_name || 'invitado').replace(/\s+/g, '_')}.jpg`;
+        link.href = zipUrl;
+        link.download = `Fotos_Matrimonio_Evelyn_Yimmy_${new Date().toISOString().slice(0, 10)}.zip`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-      }, idx * 400);
-    });
+
+        alert(`¡Descarga lista! Se ha descargado el archivo ZIP con todas las ${photos.length} fotos juntas.`);
+      } else {
+        // Fallback secuencial
+        photos.forEach((p, idx) => {
+          setTimeout(() => {
+            const link = document.createElement('a');
+            link.href = p.url || p.photo_url || '';
+            link.download = `Boda_Eve_Yimmy_${idx + 1}.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }, idx * 300);
+        });
+      }
+    } catch (err) {
+      console.error('Error generando ZIP:', err);
+      alert('Ocurrió un detalle al generar el ZIP. Por favor intenta nuevamente.');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    }
   }
 
   function escapeHtml(str) {
