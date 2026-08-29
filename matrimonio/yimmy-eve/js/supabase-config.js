@@ -34,12 +34,12 @@ window.dbSupabase = {
         .order('created_at', { ascending: true });
       if (error) throw error;
 
-      // Obtener lápidas de invitaciones eliminadas
+      // Filtrar únicamente si la invitación fue explícitamente borrada con lápida de invitación
       const { data: allRsvps } = await client.from('rsvps').select('*').order('created_at', { ascending: false });
       const deletedInvIds = new Set();
       if (allRsvps) {
         allRsvps.forEach(r => {
-          if (r.name1 === '__DELETED__' && r.invitation_id) {
+          if (r.name1 === '__DELETED_INVITATION__' && r.invitation_id) {
             deletedInvIds.add(r.invitation_id);
           }
         });
@@ -103,9 +103,15 @@ window.dbSupabase = {
         const codeKey = passCode ? `code:${passCode}` : null;
         const nameKey = name1 ? `name:${name1}` : null;
 
-        const isDeleted = (row.name1 === '__DELETED__' || row.dietary1 === '__DELETED__' || row.message === '__DELETED__');
+        const isTombstone = (
+          row.name1 === '__DELETED__' || 
+          row.name1 === '__RESET_PENDING__' || 
+          row.name1 === '__DELETED_INVITATION__' || 
+          row.dietary1 === '__DELETED__' || 
+          row.message === '__DELETED__'
+        );
 
-        if (isDeleted) {
+        if (isTombstone) {
           if (invKey) deletedKeys.add(invKey);
           if (codeKey) deletedKeys.add(codeKey);
           continue;
@@ -206,15 +212,15 @@ window.dbSupabase = {
         event_slug: 'eve-y-yimmy',
         invitation_id: invId || (idOrCode && String(idOrCode).startsWith('inv_') ? idOrCode : null),
         pass_code: passCode || (idOrCode && String(idOrCode).startsWith('EY-') ? idOrCode : 'EY-DEL'),
-        name1: '__DELETED__',
-        dietary1: '__DELETED__',
-        message: '__DELETED__',
+        name1: '__RESET_PENDING__',
+        dietary1: '__RESET_PENDING__',
+        message: '__RESET_PENDING__',
         attendance1: false,
         attendance2: false
       }]);
       return true;
     } catch (e) {
-      console.warn('Error eliminando RSVP de Supabase:', e);
+      console.warn('Error reseteando RSVP en Supabase:', e);
       return false;
     }
   },
@@ -227,9 +233,9 @@ window.dbSupabase = {
         event_slug: 'eve-y-yimmy',
         invitation_id: id,
         pass_code: 'EY-DEL',
-        name1: '__DELETED__',
-        dietary1: '__DELETED__',
-        message: '__DELETED__',
+        name1: '__DELETED_INVITATION__',
+        dietary1: '__DELETED_INVITATION__',
+        message: '__DELETED_INVITATION__',
         attendance1: false,
         attendance2: false
       }]);
