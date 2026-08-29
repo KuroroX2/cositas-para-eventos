@@ -1,17 +1,34 @@
 /**
  * EVELYN & YIMMY — NUESTRO MATRIMONIO
  * Álbum Social Colaborativo en Tiempo Real con SUPABASE CLOUD
- * Subida inmediata, Sincronización Global, Likes y Comentarios en Vivo
+ * Desafíos con miniaturas ordenadas por Likes, Álbum con orden Cronológico/Popular y Sincronización Global
  */
 
-const CLOUD_STORAGE_KEY = 'eve_yimmy_wedding_album_cache_v8';
-const LIKED_PHOTOS_KEY = 'eve_yimmy_liked_photos_v8';
+const CLOUD_STORAGE_KEY = 'eve_yimmy_wedding_album_cache_v9';
+const LIKED_PHOTOS_KEY = 'eve_yimmy_liked_photos_v9';
 
-let activeCategoryFilter = 'all';
+const CHALLENGES_LIST = [
+  { id: 'desafio_01', num: '01', title: 'Foto con los lentes de la novia 🕶️' },
+  { id: 'desafio_02', num: '02', title: 'Foto tomándote un shot 🥃' },
+  { id: 'desafio_03', num: '03', title: 'Foto instagrameable en los spots decorados 📸✨' },
+  { id: 'desafio_04', num: '04', title: 'Foto abrazando un árbol de Casa Pirque 🌳' },
+  { id: 'desafio_05', num: '05', title: 'Foto con los recién casados (Evelyn & Yimmy) 💍' },
+  { id: 'desafio_06', num: '06', title: 'Foto con los padres de los novios 👨‍👩‍👧‍👦' },
+  { id: 'desafio_07', num: '07', title: 'Foto de tu grupo relajándose en la manta de pasto 🧺' },
+  { id: 'desafio_08', num: '08', title: 'Foto brindando por el amor con tu trago favorito 🥂' },
+  { id: 'desafio_09', num: '09', title: 'Foto divertida dándolo todo en la pista de baile 🕺💃' },
+  { id: 'desafio_10', num: '10', title: 'La foto más espontánea y divertida del día ✨' },
+  { id: 'desafio_11', num: '11', title: 'Foto emotiva durante la ceremonia 🥹💍' },
+  { id: 'desafio_12', num: '12', title: 'Foto grupal con tu familia o amigos 👨‍👩‍👧‍👦🎉' }
+];
+
+let activeCategoryFilter = 'all'; // 'all', 'album', 'desafios'
+let activeSortOrder = 'recent';   // 'recent' (cronológico), 'popular' (más me gusta)
+let currentUploadMode = 'album';   // 'album', 'desafios'
 let weddingPhotos = [];
 let activePhotoForLightbox = null;
 
-// Expose to window for admin panel
+// Expose to window
 window.weddingPhotos = weddingPhotos;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -27,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function initGallery() {
   loadLocalCache();
   renderGallery();
-  initFilterButtons();
+  initFilterAndSortButtons();
   fetchCloudPhotos();
 }
 
@@ -51,37 +68,130 @@ function saveLocalCache() {
   } catch (e) {}
 }
 
-function initFilterButtons() {
+function initFilterAndSortButtons() {
+  // Category Filter Buttons
   const filterBtns = document.querySelectorAll('#gallery-filters .filter-btn');
   filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       filterBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       activeCategoryFilter = btn.getAttribute('data-filter') || 'all';
-      renderGallery();
+      renderMainGuestGallery();
     });
   });
+
+  // Sort Order Buttons
+  const sortRecentBtn = document.getElementById('btn-sort-recent');
+  const sortPopularBtn = document.getElementById('btn-sort-popular');
+
+  if (sortRecentBtn) {
+    sortRecentBtn.addEventListener('click', () => {
+      if (sortPopularBtn) sortPopularBtn.classList.remove('active');
+      sortRecentBtn.classList.add('active');
+      activeSortOrder = 'recent';
+      renderMainGuestGallery();
+    });
+  }
+
+  if (sortPopularBtn) {
+    sortPopularBtn.addEventListener('click', () => {
+      if (sortRecentBtn) sortRecentBtn.classList.remove('active');
+      sortPopularBtn.classList.add('active');
+      activeSortOrder = 'popular';
+      renderMainGuestGallery();
+    });
+  }
 }
 
 function renderGallery() {
   window.weddingPhotos = weddingPhotos;
+  renderChallengeGridThumbnails();
   renderMainGuestGallery();
-  renderChallengeGallery();
 }
 
+/* ==========================================================================
+   2. DYNAMIC THUMBNAILS FOR THE 12 CHALLENGE CARDS (Sorted by Likes)
+   ========================================================================== */
+function renderChallengeGridThumbnails() {
+  CHALLENGES_LIST.forEach(ch => {
+    const container = document.getElementById(`thumbs-${ch.id}`);
+    if (!container) return;
+
+    // Photos belonging to this challenge
+    const matchingPhotos = weddingPhotos.filter(p => {
+      const cat = p.category || '';
+      return cat === ch.id || cat.toLowerCase().includes(ch.num);
+    });
+
+    // Sort by Most Likes (❤️)
+    matchingPhotos.sort((a, b) => (b.likes || 0) - (a.likes || 0) || (b.timestamp - a.timestamp));
+
+    if (matchingPhotos.length === 0) {
+      container.innerHTML = `
+        <span class="ch-empty-badge">
+          <i class="ri-sparkling-line" style="color: #527A50;"></i>
+          <span>Sé el primero en cumplir este reto</span>
+        </span>
+      `;
+      return;
+    }
+
+    const topPhotos = matchingPhotos.slice(0, 3);
+    const extraCount = matchingPhotos.length - 3;
+
+    let thumbsHtml = topPhotos.map(photo => `
+      <div class="ch-thumb-item" onclick="openLightboxForPhoto('${photo.id}')" title="Foto por ${escapeHtml(photo.author || 'Invitado')} (${photo.likes || 0} ❤️)">
+        <img src="${escapeHtml(photo.url || photo.photo_url || '')}" alt="Reto ${ch.num}" loading="lazy">
+        <span class="ch-thumb-likes">❤️ ${photo.likes || 0}</span>
+      </div>
+    `).join('');
+
+    if (extraCount > 0) {
+      const fourthPhoto = matchingPhotos[3];
+      thumbsHtml += `
+        <div class="ch-thumb-more" onclick="openLightboxForPhoto('${fourthPhoto.id}')" title="Ver ${extraCount} foto(s) más de este reto">
+          +${extraCount}
+        </div>
+      `;
+    }
+
+    container.innerHTML = thumbsHtml;
+  });
+}
+
+/* ==========================================================================
+   3. MAIN GUEST GALLERY (Chronological by Default, with Sort Toggle)
+   ========================================================================== */
 function renderMainGuestGallery() {
   const grid = document.getElementById('gallery-grid');
   if (!grid) return;
 
-  const filtered = activeCategoryFilter === 'all'
-    ? weddingPhotos
-    : weddingPhotos.filter(p => p.category === activeCategoryFilter);
+  // Filter photos
+  let filtered = weddingPhotos.filter(photo => {
+    const cat = photo.category || 'album';
+    if (activeCategoryFilter === 'all') return true;
+    if (activeCategoryFilter === 'album') {
+      return cat === 'album' || cat === 'invitados' || cat === 'lugar' || !cat.startsWith('desafio');
+    }
+    if (activeCategoryFilter === 'desafios') {
+      return cat.startsWith('desafio') || cat === 'desafios';
+    }
+    return true;
+  });
+
+  // Sort photos
+  if (activeSortOrder === 'recent') {
+    filtered.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+  } else {
+    // Popular: Most Likes first, then timestamp
+    filtered.sort((a, b) => (b.likes || 0) - (a.likes || 0) || (b.timestamp || 0) - (a.timestamp || 0));
+  }
 
   if (filtered.length === 0) {
     grid.innerHTML = `
       <div class="gallery-empty-state" style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
         <i class="ri-camera-lens-line" style="font-size: 2.5rem; color: var(--gold-primary); display: block; margin-bottom: 0.5rem;"></i>
-        <p style="font-size: 0.95rem; font-weight: 600;">Aún no hay fotos en esta categoría.</p>
+        <p style="font-size: 0.95rem; font-weight: 600;">Aún no hay fotos en esta sección.</p>
         <p style="font-size: 0.8rem; margin-top: 0.3rem;">¡Sé el primero en subir una foto y compartirla con todos!</p>
       </div>
     `;
@@ -90,27 +200,6 @@ function renderMainGuestGallery() {
 
   const likedIds = getLikedPhotoIds();
   grid.innerHTML = filtered.map(photo => renderPhotoCardHtml(photo, likedIds)).join('');
-}
-
-function renderChallengeGallery() {
-  const challengeGrid = document.getElementById('challenge-gallery-grid');
-  if (!challengeGrid) return;
-
-  const challengePhotos = weddingPhotos.filter(p => p.category === 'desafios');
-
-  if (challengePhotos.length === 0) {
-    challengeGrid.innerHTML = `
-      <div class="gallery-empty-state" style="grid-column: 1 / -1; text-align: center; padding: 2rem 1rem; color: var(--text-muted); background: rgba(0,0,0,0.02); border: 1px dashed var(--border-gold); border-radius: var(--border-radius-card);">
-        <i class="ri-camera-lens-line" style="font-size: 2.2rem; color: var(--gold-primary); display: block; margin-bottom: 0.5rem;"></i>
-        <p style="font-size: 0.9rem; font-weight: 700; color: var(--text-main);">Aún no se han subido fotos para los desafíos fotográficos.</p>
-        <p style="font-size: 0.78rem; margin-top: 0.3rem;">¡Cumple uno de los 12 desafíos de arriba, sube tu foto y compite por el premio de las 20:00 hrs! 🏆✨</p>
-      </div>
-    `;
-    return;
-  }
-
-  const likedIds = getLikedPhotoIds();
-  challengeGrid.innerHTML = challengePhotos.map(photo => renderPhotoCardHtml(photo, likedIds)).join('');
 }
 
 function renderPhotoCardHtml(photo, likedIds) {
@@ -149,18 +238,17 @@ function renderPhotoCardHtml(photo, likedIds) {
 }
 
 function getCategoryBadgeLabel(cat) {
-  switch (cat) {
-    case 'invitados': return '👥 Invitados';
-    case 'preparativos': return '✨ Preparativos';
-    case 'ceremonia': return '💍 Ceremonia';
-    case 'fiesta': return '🎉 Fiesta & Pasto';
-    case 'desafios': return '🎯 Reto Cumplido';
-    default: return '📸 Momento';
+  if (!cat || cat === 'album' || cat === 'invitados') return '📸 Álbum de Recuerdos';
+  if (cat.startsWith('desafio_')) {
+    const ch = CHALLENGES_LIST.find(c => c.id === cat);
+    return ch ? `🎯 Reto ${ch.num}` : '🎯 Desafío';
   }
+  if (cat === 'desafios') return '🎯 Desafío';
+  return '📸 Momento';
 }
 
 /* ==========================================================================
-   2. LIKES SYSTEM
+   4. LIKES SYSTEM
    ========================================================================== */
 function getLikedPhotoIds() {
   try {
@@ -206,7 +294,7 @@ window.togglePhotoLike = async function(event, photoId) {
 };
 
 /* ==========================================================================
-   3. LIGHTBOX & SOCIAL COMMENTS
+   5. LIGHTBOX & SOCIAL COMMENTS
    ========================================================================== */
 function initLightboxSocial() {
   const modal = document.getElementById('lightbox-modal');
@@ -402,7 +490,7 @@ function renderLightboxComments() {
 }
 
 /* ==========================================================================
-   4. PHOTO UPLOAD MODAL & INSTANT SYNC
+   6. PHOTO UPLOAD MODAL & CATEGORY INTELLIGENCE
    ========================================================================== */
 function initUploadModal() {
   const openBtn = document.getElementById('btn-open-upload');
@@ -418,18 +506,34 @@ function initUploadModal() {
   const form = document.getElementById('upload-photo-form');
   const authorInput = document.getElementById('upload-author');
 
+  const modalTitle = document.getElementById('upload-modal-title');
+  const modalDesc = document.getElementById('upload-modal-desc');
+  const modalIcon = document.getElementById('upload-modal-icon');
+  const categoryGroup = document.getElementById('upload-category-group');
+  const categorySelect = document.getElementById('upload-category');
+
   let selectedFile = null;
 
-  function openModal(defaultCategory = 'invitados') {
+  function openModal(mode = 'album', specificChallenge = null) {
+    currentUploadMode = mode;
     selectedFile = null;
     if (form) form.reset();
     if (previewBox) previewBox.style.display = 'none';
     if (placeholder) placeholder.style.display = 'flex';
-    if (authorInput) {
-      authorInput.value = '';
+    if (authorInput) authorInput.value = '';
+
+    if (mode === 'desafios') {
+      if (modalTitle) modalTitle.textContent = '🏆 Subir Foto para un Desafío';
+      if (modalDesc) modalDesc.textContent = 'Participa en el concurso de las 20:00 hrs. La foto con más ❤️ gana.';
+      if (modalIcon) modalIcon.className = 'ri-trophy-line modal-icon';
+      if (categoryGroup) categoryGroup.style.display = 'block';
+      if (categorySelect) categorySelect.value = specificChallenge || 'desafio_01';
+    } else {
+      if (modalTitle) modalTitle.textContent = '📸 Subir Foto al Álbum de Recuerdos';
+      if (modalDesc) modalDesc.textContent = 'Comparte tus fotos y momentos para que todos los invitados puedan verlas en vivo.';
+      if (modalIcon) modalIcon.className = 'ri-camera-lens-line modal-icon';
+      if (categoryGroup) categoryGroup.style.display = 'none';
     }
-    const catSelect = document.getElementById('upload-category');
-    if (catSelect) catSelect.value = defaultCategory;
 
     if (modal) {
       modal.classList.add('active');
@@ -437,6 +541,10 @@ function initUploadModal() {
     }
     document.body.style.overflow = 'hidden';
   }
+
+  window.openChallengeModalFor = function(challengeId) {
+    openModal('desafios', challengeId);
+  };
 
   function closeModal() {
     if (modal) {
@@ -446,8 +554,8 @@ function initUploadModal() {
     document.body.style.overflow = '';
   }
 
-  if (openBtn) openBtn.addEventListener('click', () => openModal('invitados'));
-  if (challengeBtn) challengeBtn.addEventListener('click', () => openModal('desafios'));
+  if (openBtn) openBtn.addEventListener('click', () => openModal('album'));
+  if (challengeBtn) challengeBtn.addEventListener('click', () => openModal('desafios', 'desafio_01'));
   if (closeBtn) closeBtn.addEventListener('click', closeModal);
 
   if (modal) {
@@ -497,7 +605,12 @@ function initUploadModal() {
 
       const author = (document.getElementById('upload-author').value || '').trim() || 'Invitado Especial';
       const caption = (document.getElementById('upload-caption').value || '').trim();
-      const category = document.getElementById('upload-category').value || 'invitados';
+      
+      // Determine category based on mode
+      let category = 'album';
+      if (currentUploadMode === 'desafios' && categorySelect) {
+        category = categorySelect.value || 'desafio_01';
+      }
 
       const submitBtn = document.getElementById('btn-submit-photo');
       const progressBox = document.getElementById('upload-progress-box');
@@ -506,10 +619,10 @@ function initUploadModal() {
       if (progressBox) progressBox.style.display = 'flex';
 
       try {
-        // 1. Comprimir imagen a tamaño optimizado (~70KB) para que viaje a Supabase al instante
+        // 1. Comprimir imagen a tamaño ligero (~70KB)
         const { blob, dataUrl } = await compressImageFile(selectedFile, 800, 0.72);
 
-        // 2. Crear objeto foto y mostrarlo de INMEDIATO en UI
+        // 2. Crear objeto foto y agregarlo de INMEDIATO
         const tempId = 'photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
         const newPhoto = {
           id: tempId,
@@ -537,14 +650,14 @@ function initUploadModal() {
               renderGallery();
             }
           } catch (cloudErr) {
-            console.warn('Cloud sync error:', cloudErr);
+            console.warn('Cloud sync note:', cloudErr);
           }
         }
 
         closeModal();
-        alert('¡Foto publicada con éxito! Ya está disponible para todos los invitados.');
+        alert('¡Foto publicada con éxito! Ya está disponible para todos en vivo.');
 
-        const targetSection = category === 'desafios'
+        const targetSection = category.startsWith('desafio')
           ? document.getElementById('desafios')
           : document.getElementById('galeria');
         if (targetSection) {
@@ -594,7 +707,7 @@ function compressImageFile(file, maxWidth = 800, quality = 0.72) {
 }
 
 /* ==========================================================================
-   5. REALTIME SUPABASE SYNC (Fetch & Polling)
+   7. REALTIME SUPABASE SYNC (Fetch & Polling)
    ========================================================================== */
 async function fetchCloudPhotos() {
   if (!window.dbSupabase) return;
@@ -605,7 +718,7 @@ async function fetchCloudPhotos() {
         id: p.id,
         url: p.photo_url,
         author: p.author_name,
-        category: p.category,
+        category: p.category || 'album',
         caption: p.caption,
         likes: p.likes || 0,
         timestamp: new Date(p.created_at).getTime(),
@@ -622,11 +735,11 @@ async function fetchCloudPhotos() {
 function startCloudPolling() {
   setInterval(() => {
     fetchCloudPhotos();
-  }, 6000); // Polling activo cada 6 segundos para actualización inmediata entre teléfonos
+  }, 6000); // Polling cada 6 segundos
 }
 
 /* ==========================================================================
-   6. UTILITY FUNCTIONS
+   8. UTILITY FUNCTIONS
    ========================================================================== */
 function formatRelativeTime(timestamp) {
   if (!timestamp) return 'Hace un momento';

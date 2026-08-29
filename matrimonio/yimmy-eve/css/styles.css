@@ -3619,5 +3619,231 @@ body.theme-florido .ch-num {
   font-weight: 600;
 }
 
+/* ==========================================================================
+   16. ENHANCED CHALLENGE CARDS & DYNAMIC THUMBNAILS
+   ========================================================================== */
+.challenge-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(82, 122, 80, 0.22);
+  border-radius: 14px;
+  padding: 1.2rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 4px 15px rgba(82, 122, 80, 0.05);
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+.challenge-card:hover {
+  transform: translateY(-2px);
+  border-color: #527A50;
+  box-shadow: 0 8px 25px rgba(82, 122, 80, 0.12);
+}
+
+.challenge-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.challenge-card .ch-num {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #527A50;
+  background: rgba(82, 122, 80, 0.1);
+  padding: 0.2rem 0.6rem;
+  border-radius: 8px;
+  line-height: 1;
+}
+
+.challenge-card .ch-text {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #243525;
+  margin: 0;
+  line-height: 1.35;
+  flex: 1;
+}
+
+.challenge-card-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.8rem;
+  padding-top: 0.7rem;
+  border-top: 1px dashed rgba(82, 122, 80, 0.15);
+}
+
+.btn-upload-challenge-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(82, 122, 80, 0.12);
+  color: #243525;
+  border: 1px solid rgba(82, 122, 80, 0.3);
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-upload-challenge-item:hover {
+  background: #527A50;
+  color: #ffffff;
+  border-color: #527A50;
+}
+
+/* Challenge Thumbnails Row */
+.challenge-card-thumbnails {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+  min-height: 54px;
+}
+
+.ch-empty-badge {
+  font-size: 0.75rem;
+  color: #6C826D;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.ch-thumb-item {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  border: 2px solid #527A50;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.ch-thumb-item:hover {
+  transform: scale(1.08);
+}
+
+.ch-thumb-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ch-thumb-likes {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  background: rgba(0, 0, 0, 0.65);
+  color: #ffffff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  line-height: 1;
+}
+
+.ch-thumb-more {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  background: #243525;
+  color: #FAF6EE;
+  font-size: 0.88rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 2px dashed #D4AF37;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.ch-thumb-more:hover {
+  background: #527A50;
+  transform: scale(1.08);
+}
+
+/* ==========================================================================
+   17. GALLERY CONTROLS & SORTING BUTTONS
+   ========================================================================== */
+.gallery-controls-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(82, 122, 80, 0.2);
+  padding: 0.9rem 1.2rem;
+  border-radius: 16px;
+}
+
+.gallery-filters {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.gallery-sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.sort-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #4B634C;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-right: 0.3rem;
+}
+
+.sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #FAF7F0;
+  border: 1px solid rgba(82, 122, 80, 0.25);
+  color: #243525;
+  padding: 0.45rem 0.85rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.sort-btn:hover {
+  border-color: #527A50;
+  background: #FFFFFF;
+}
+
+.sort-btn.active {
+  background: #243525;
+  color: #FAF6EE;
+  border-color: #243525;
+  box-shadow: 0 4px 12px rgba(36, 53, 37, 0.2);
+}
+
+
 
 
