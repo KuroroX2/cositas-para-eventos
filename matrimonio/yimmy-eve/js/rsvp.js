@@ -58,11 +58,9 @@
       });
     }
 
-    // Print Pass
+    // Print Pass (Exactamente 1 sola página)
     if (printPassBtn) {
-      printPassBtn.addEventListener('click', () => {
-        window.print();
-      });
+      printPassBtn.addEventListener('click', printGuestPass);
     }
 
     // Copy Code
@@ -570,6 +568,145 @@
 
     return false;
   };
+
+  function printGuestPass() {
+    const passCard = document.getElementById('pass-ticket-render');
+    if (!passCard) {
+      window.print();
+      return;
+    }
+
+    const printWindow = window.open('', '_blank', 'width=520,height=750');
+    if (!printWindow) {
+      window.print();
+      return;
+    }
+
+    const passHtml = passCard.outerHTML;
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html lang="es">
+      <head>
+        <meta charset="UTF-8">
+        <title>Pase de Entrada — Evelyn & Yimmy</title>
+        <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Montserrat:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+        <style>
+          @page {
+            size: portrait;
+            margin: 0.8cm;
+          }
+          * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+          }
+          body {
+            font-family: 'Montserrat', sans-serif;
+            background: #FFFFFF;
+            color: #243525;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+          .pass-ticket-render {
+            width: 100%;
+            max-width: 440px;
+            background: #FAF7F0;
+            border: 2px solid #527A50;
+            border-radius: 18px;
+            padding: 1.8rem 1.4rem;
+            text-align: center;
+            page-break-inside: avoid;
+            break-inside: avoid;
+          }
+          .ticket-top { margin-bottom: 0.8rem; }
+          .ticket-sub {
+            font-size: 0.72rem;
+            letter-spacing: 0.16em;
+            color: #527A50;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: block;
+          }
+          .ticket-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.9rem;
+            color: #243525;
+            margin: 0.3rem 0;
+          }
+          .ticket-date {
+            font-size: 0.75rem;
+            color: #6C826D;
+            font-weight: 600;
+          }
+          .ticket-divider-line {
+            height: 1.5px;
+            background: #527A50;
+            opacity: 0.3;
+            margin: 1rem 0;
+          }
+          .ticket-body {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            text-align: left;
+            font-size: 0.85rem;
+          }
+          .ticket-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.2rem 0;
+          }
+          .t-k { font-size: 0.74rem; font-weight: 700; color: #527A50; }
+          .t-v { font-weight: 600; color: #243525; }
+          .code-mono {
+            font-family: monospace;
+            background: rgba(82,122,80,0.15);
+            padding: 3px 8px;
+            border-radius: 6px;
+            color: #243525;
+          }
+          .ticket-special-notice {
+            margin-top: 1.2rem;
+            background: rgba(82, 122, 80, 0.1);
+            border: 1px dashed #527A50;
+            border-radius: 10px;
+            padding: 0.6rem;
+            font-size: 0.8rem;
+            color: #243525;
+            text-align: center;
+          }
+          .ticket-footer-seal {
+            margin-top: 1.2rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            color: #527A50;
+            text-align: center;
+          }
+        </style>
+      </head>
+      <body>
+        ${passHtml}
+        <script>
+          window.onload = function() {
+            setTimeout(function() {
+              window.print();
+            }, 300);
+          }
+        </script>
+      </body>
+      </html>
+    `);
+    printWindow.document.close();
+  }
 
   function escapeHtml(str) {
     if (!str) return '';

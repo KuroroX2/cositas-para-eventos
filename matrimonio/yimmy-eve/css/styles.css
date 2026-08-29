@@ -4003,6 +4003,48 @@ body.theme-florido .ch-num {
   line-height: 1;
 }
 
+/* Print Stylesheet for Digital Pass (Exactly 1 Page) */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #guest-pass-modal,
+  #guest-pass-modal .pass-ticket-render,
+  #guest-pass-modal .pass-ticket-render * {
+    visibility: visible;
+  }
+  #guest-pass-modal {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    background: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .modal-pass-card {
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    max-width: 440px !important;
+  }
+  .modal-close-btn,
+  .pass-actions {
+    display: none !important;
+  }
+  .pass-ticket-render {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    border: 2px solid #527A50 !important;
+    box-shadow: none !important;
+  }
+}
+
 
 
 

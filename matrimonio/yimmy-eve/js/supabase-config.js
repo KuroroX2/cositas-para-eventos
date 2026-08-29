@@ -121,29 +121,45 @@ window.dbSupabase = {
     const client = getSupabaseClient();
     if (!client) return false;
     try {
-      const { data } = await client.from('rsvps')
-        .select('*')
-        .or(`invitation_id.eq.${invitationIdOrCode},pass_code.eq.${invitationIdOrCode}`);
+      let rsvps = [];
+      const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+      
+      if (invitationIdOrCode && uuidRegex.test(invitationIdOrCode)) {
+        const res = await client.from('rsvps').select('*').eq('id', invitationIdOrCode);
+        if (res.data && res.data.length > 0) rsvps = res.data;
+      }
+      if (rsvps.length === 0 && invitationIdOrCode) {
+        const res = await client.from('rsvps').select('*').eq('invitation_id', invitationIdOrCode);
+        if (res.data && res.data.length > 0) rsvps = res.data;
+      }
+      if (rsvps.length === 0 && invitationIdOrCode) {
+        const res = await client.from('rsvps').select('*').eq('pass_code', invitationIdOrCode);
+        if (res.data && res.data.length > 0) rsvps = res.data;
+      }
+      if (rsvps.length === 0 && name1) {
+        const res = await client.from('rsvps').select('*').ilike('name1', name1.trim());
+        if (res.data && res.data.length > 0) rsvps = res.data;
+      }
 
-      if (data && data.length > 0) {
-        const { error } = await client.from('rsvps')
-          .update({
-            attendance1: isAttendanceYes,
-            attendance2: (pases === 2 || name2) ? isAttendanceYes : false
-          })
-          .eq('id', data[0].id);
-        if (error) throw error;
+      if (rsvps.length > 0) {
+        for (const row of rsvps) {
+          await client.from('rsvps')
+            .update({
+              attendance1: isAttendanceYes,
+              attendance2: (pases === 2 || name2 || row.name2) ? isAttendanceYes : false
+            })
+            .eq('id', row.id);
+        }
       } else {
-        const { error } = await client.from('rsvps').insert([{
+        await client.from('rsvps').insert([{
           event_slug: 'eve-y-yimmy',
-          invitation_id: invitationIdOrCode,
+          invitation_id: invitationIdOrCode || null,
           pass_code: 'EY-' + Math.floor(1000 + Math.random() * 9000),
           name1: name1 || 'Invitado',
           name2: name2 || '',
           attendance1: isAttendanceYes,
           attendance2: (pases === 2 || name2) ? isAttendanceYes : false
         }]);
-        if (error) throw error;
       }
       return true;
     } catch (e) {
@@ -152,14 +168,43 @@ window.dbSupabase = {
     }
   },
 
-  async deleteRsvpFromCloud(idOrCode) {
+  async deleteRsvpFromCloud(idOrCode, invId, passCode, name1) {
     const client = getSupabaseClient();
     if (!client) return false;
     try {
-      await client.from('rsvps').delete().or(`id.eq.${idOrCode},invitation_id.eq.${idOrCode},pass_code.eq.${idOrCode}`);
+      const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+
+      if (idOrCode && uuidRegex.test(idOrCode)) {
+        await client.from('rsvps').delete().eq('id', idOrCode);
+      }
+      if (invId) {
+        await client.from('rsvps').delete().eq('invitation_id', invId);
+      } else if (idOrCode && String(idOrCode).startsWith('inv_')) {
+        await client.from('rsvps').delete().eq('invitation_id', idOrCode);
+      }
+      if (passCode) {
+        await client.from('rsvps').delete().eq('pass_code', passCode);
+      } else if (idOrCode && String(idOrCode).startsWith('EY-')) {
+        await client.from('rsvps').delete().eq('pass_code', idOrCode);
+      }
+      if (name1) {
+        await client.from('rsvps').delete().ilike('name1', name1.trim());
+      }
       return true;
     } catch (e) {
       console.error('Error al eliminar RSVP en nube:', e);
+      return false;
+    }
+  },
+
+  async deleteInvitationFromCloud(invId) {
+    const client = getSupabaseClient();
+    if (!client || !invId) return false;
+    try {
+      await client.from('invitations').delete().eq('id', invId);
+      return true;
+    } catch (e) {
+      console.error('Error al eliminar invitación en nube:', e);
       return false;
     }
   },

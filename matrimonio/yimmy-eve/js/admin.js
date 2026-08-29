@@ -484,14 +484,29 @@
     });
 
     tbody.querySelectorAll('.btn-del-inv').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         const id = btn.getAttribute('data-id');
         if (confirm('¿Seguro que deseas eliminar esta invitación?')) {
           adminInvitations = adminInvitations.filter(i => i.id !== id);
+          adminRsvps = adminRsvps.filter(r => r.invCode !== id);
+
+          if (window.dbSupabase) {
+            try {
+              await Promise.all([
+                window.dbSupabase.deleteInvitationFromCloud(id),
+                window.dbSupabase.deleteRsvpFromCloud(null, id)
+              ]);
+            } catch (e) {
+              console.warn('Error borrando en Supabase:', e);
+            }
+          }
+
           try {
             localStorage.setItem('wedding_invitations_cloud_v1', JSON.stringify(adminInvitations));
+            localStorage.setItem('wedding_rsvps_cloud_v1', JSON.stringify(adminRsvps));
           } catch (e) {}
           renderAdminInvitations();
+          renderAdminRsvps();
         }
       });
     });
@@ -623,9 +638,11 @@
           });
 
           if (window.dbSupabase) {
-            if (id && id !== 'undefined' && id !== '') await window.dbSupabase.deleteRsvpFromCloud(id);
-            if (invId && invId !== 'undefined' && invId !== '') await window.dbSupabase.deleteRsvpFromCloud(invId);
-            if (code && code !== 'undefined' && code !== '') await window.dbSupabase.deleteRsvpFromCloud(code);
+            try {
+              await window.dbSupabase.deleteRsvpFromCloud(id, invId, code, name1);
+            } catch (e) {
+              console.warn('Error eliminando RSVP de Supabase:', e);
+            }
           }
 
           try {
