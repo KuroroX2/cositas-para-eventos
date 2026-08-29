@@ -1,25 +1,3 @@
 {
-  "cleanUrls": true,
-  "redirects": [
-    {
-      "source": "/yimmy-y-eve",
-      "destination": "/boda-eve-yimmy/",
-      "permanent": true
-    },
-    {
-      "source": "/matrimonio",
-      "destination": "/boda-eve-yimmy/",
-      "permanent": true
-    },
-    {
-      "source": "/novios",
-      "destination": "/boda-eve-yimmy/",
-      "permanent": true
-    },
-    {
-      "source": "/boda",
-      "destination": "/boda-eve-yimmy/",
-      "permanent": true
-    }
-  ]
+  "cleanUrls": true
 }
