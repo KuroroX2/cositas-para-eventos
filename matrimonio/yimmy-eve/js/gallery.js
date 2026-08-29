@@ -241,9 +241,9 @@ function getCategoryBadgeLabel(cat) {
   if (!cat || cat === 'album' || cat === 'invitados') return '📸 Álbum de Recuerdos';
   if (cat.startsWith('desafio_')) {
     const ch = CHALLENGES_LIST.find(c => c.id === cat);
-    return ch ? `🎯 Reto ${ch.num}` : '🎯 Desafío';
+    return ch ? `🏆 Reto ${ch.num}` : '🏆 Desafío';
   }
-  if (cat === 'desafios') return '🎯 Desafío';
+  if (cat === 'desafios') return '🏆 Desafío';
   return '📸 Momento';
 }
 
@@ -523,13 +523,21 @@ function initUploadModal() {
     if (!file) return;
     selectedFile = file;
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (previewImg) previewImg.src = event.target.result;
+    // Instant Preview using ObjectURL (0 ms latency)
+    try {
+      const objUrl = URL.createObjectURL(file);
+      if (previewImg) previewImg.src = objUrl;
       if (placeholder) placeholder.style.display = 'none';
       if (previewBox) previewBox.style.display = 'block';
-    };
-    reader.readAsDataURL(file);
+    } catch (e) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (previewImg) previewImg.src = event.target.result;
+        if (placeholder) placeholder.style.display = 'none';
+        if (previewBox) previewBox.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   function openModal(mode = 'album', specificChallenge = null) {
@@ -541,11 +549,18 @@ function initUploadModal() {
     if (authorInput) authorInput.value = '';
 
     if (mode === 'desafios') {
+      const challengeId = specificChallenge || 'desafio_01';
+      const ch = CHALLENGES_LIST.find(c => c.id === challengeId) || CHALLENGES_LIST[0];
+      const challengeText = document.getElementById('upload-challenge-locked-text');
+      const categoryInput = document.getElementById('upload-category');
+
+      if (challengeText) challengeText.textContent = `${ch.num}. ${ch.title}`;
+      if (categoryInput) categoryInput.value = ch.id;
+
       if (modalTitle) modalTitle.textContent = '🏆 Subir Foto para un Desafío';
       if (modalDesc) modalDesc.textContent = 'Participa en el concurso de las 20:00 hrs. La foto con más ❤️ gana.';
       if (modalIcon) modalIcon.className = 'ri-trophy-line modal-icon';
       if (categoryGroup) categoryGroup.style.display = 'block';
-      if (categorySelect) categorySelect.value = specificChallenge || 'desafio_01';
     } else {
       if (modalTitle) modalTitle.textContent = '📸 Subir Foto al Álbum de Recuerdos';
       if (modalDesc) modalDesc.textContent = 'Comparte tus fotos y momentos para que todos los invitados puedan verlas en vivo.';
@@ -703,32 +718,45 @@ function initUploadModal() {
 
 function compressImageFile(file, maxWidth = 800, quality = 0.72) {
   return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (event) => {
-      const img = new Image();
-      img.src = event.target.result;
-      img.onload = () => {
-        let width = img.width;
-        let height = img.height;
-        if (width > maxWidth) {
-          height = Math.round((height * maxWidth) / width);
-          width = maxWidth;
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
+    let objectUrl = '';
+    try {
+      objectUrl = URL.createObjectURL(file);
+    } catch (e) {}
 
-        const dataUrl = canvas.toDataURL('image/jpeg', quality);
-        canvas.toBlob((blob) => {
-          resolve({ blob: blob || file, dataUrl });
-        }, 'image/jpeg', quality);
-      };
-      img.onerror = () => resolve({ blob: file, dataUrl: event.target.result });
+    const img = new Image();
+    img.onload = () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      let width = img.width;
+      let height = img.height;
+      if (width > maxWidth) {
+        height = Math.round((height * maxWidth) / width);
+        width = maxWidth;
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+
+      const dataUrl = canvas.toDataURL('image/jpeg', quality);
+      canvas.toBlob((blob) => {
+        resolve({ blob: blob || file, dataUrl });
+      }, 'image/jpeg', quality);
     };
-    reader.onerror = () => resolve({ blob: file, dataUrl: '' });
+
+    img.onerror = () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      resolve({ blob: file, dataUrl: '' });
+    };
+
+    if (objectUrl) {
+      img.src = objectUrl;
+    } else {
+      const reader = new FileReader();
+      reader.onload = (e) => { img.src = e.target.result; };
+      reader.onerror = () => resolve({ blob: file, dataUrl: '' });
+      reader.readAsDataURL(file);
+    }
   });
 }
 

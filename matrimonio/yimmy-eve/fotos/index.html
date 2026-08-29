@@ -156,10 +156,10 @@
       <i class="ri-arrow-left-line"></i>
       <span>Volver a la Invitación</span>
     </a>
-    <div style="font-weight: 700; font-size: 0.95rem; color: #243525; font-family: var(--font-serif); display: flex; align-items: center; gap: 0.35rem;">
+    <div class="fotos-brand-center">
       <span>🌿 Evelyn &amp; Yimmy 🌿</span>
     </div>
-    <button class="btn-upload-photo" id="btn-quick-upload-top" style="padding: 0.45rem 1rem; font-size: 0.78rem;" onclick="document.getElementById('btn-open-upload').click()">
+    <button class="btn-upload-photo" id="btn-quick-upload-top" style="padding: 0.45rem 0.9rem; font-size: 0.78rem; white-space: nowrap; flex-shrink: 0;" onclick="document.getElementById('btn-open-upload').click()">
       <i class="ri-camera-lens-line"></i>
       <span>Subir Foto</span>
     </button>
@@ -188,7 +188,7 @@
     <section class="section-editorial section-challenge reveal" id="desafios" style="padding-top: 1rem;">
       <div class="container">
         <div class="section-header">
-          <h2 class="section-title">Desafíos Fotográficos 🎯</h2>
+          <h2 class="section-title">Desafíos Fotográficos 🏆</h2>
           <p class="section-subtitle">Completa los 12 retos del día y compite por el premio especial:</p>
           <div class="title-divider"></div>
         </div>
@@ -507,23 +507,14 @@
           <input type="text" id="upload-author" placeholder="Ej.: Cristopher / Familia Soto" required>
         </div>
 
-        <!-- Grupo de Selección de Desafío (Solo visible cuando se sube para un Desafío) -->
+        <!-- Desafío Seleccionado (Fijo / Bloqueado al Reto Clickeado) -->
         <div class="form-group" id="upload-category-group" style="display: none;">
-          <label for="upload-category">¿A cuál de los 12 desafíos corresponde? *</label>
-          <select id="upload-category">
-            <option value="desafio_01">01. Foto con los lentes de la novia 🕶️</option>
-            <option value="desafio_02">02. Foto tomándote un shot 🥃</option>
-            <option value="desafio_03">03. Foto instagrameable en los spots decorados 📸✨</option>
-            <option value="desafio_04">04. Foto abrazando un árbol de Casa Pirque 🌳</option>
-            <option value="desafio_05">05. Foto con los recién casados (Evelyn &amp; Yimmy) 💍</option>
-            <option value="desafio_06">06. Foto con los padres de los novios 👨‍👩‍👧‍👦</option>
-            <option value="desafio_07">07. Foto relajándose en la manta de pasto 🧺</option>
-            <option value="desafio_08">08. Foto brindando por el amor con tu trago favorito 🥂</option>
-            <option value="desafio_09">09. Foto divertida dándolo todo en la pista de baile 🕺💃</option>
-            <option value="desafio_10">10. La foto más espontánea y divertida del día ✨</option>
-            <option value="desafio_11">11. Foto emotiva durante la ceremonia 🥹💍</option>
-            <option value="desafio_12">12. Foto grupal con tu familia o amigos 👨‍👩‍👧‍👦🎉</option>
-          </select>
+          <label>Desafío Asignado</label>
+          <div class="upload-challenge-locked-badge" id="upload-challenge-locked-badge">
+            <i class="ri-trophy-line"></i>
+            <span id="upload-challenge-locked-text">01. Foto con los lentes de la novia 🕶️</span>
+          </div>
+          <input type="hidden" id="upload-category" value="desafio_01">
         </div>
 
         <div class="form-group">

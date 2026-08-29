@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initAtmosphereParticles();
   initCountdown();
   initCalendarActions();
-  initAudioPlayer();
   initNavigation();
   initBankModal();
   initScrollReveals();
@@ -236,72 +235,7 @@ function downloadAppleIcsCalendar() {
 }
 
 /* ==========================================================================
-   3. ROMANTIC AMBIENT AUDIO SYNTHESIZER
-   ========================================================================== */
-function initAudioPlayer() {
-  const musicToggle = document.getElementById('btn-music-toggle');
-  if (!musicToggle) return;
-
-  let audioCtx = null;
-  let isPlaying = false;
-  let synthInterval = null;
-
-  const notes = [
-    261.63, 329.63, 392.00, 523.25, 493.88, 392.00, 329.63,
-    293.66, 369.99, 440.00, 587.33, 440.00, 369.99, 329.63
-  ];
-  let noteIndex = 0;
-
-  function playAmbientNote() {
-    if (!audioCtx || !isPlaying) return;
-
-    try {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(notes[noteIndex % notes.length], audioCtx.currentTime);
-      noteIndex++;
-
-      gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.08, audioCtx.currentTime + 0.4);
-      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 2.5);
-
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-
-      osc.start();
-      osc.stop(audioCtx.currentTime + 2.6);
-    } catch (err) {
-      console.warn('Audio note error:', err);
-    }
-  }
-
-  musicToggle.addEventListener('click', () => {
-    if (!audioCtx) {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      audioCtx = new AudioContext();
-    }
-
-    if (audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
-
-    if (isPlaying) {
-      isPlaying = false;
-      musicToggle.classList.remove('playing');
-      clearInterval(synthInterval);
-    } else {
-      isPlaying = true;
-      musicToggle.classList.add('playing');
-      playAmbientNote();
-      synthInterval = setInterval(playAmbientNote, 2200);
-    }
-  });
-}
-
-/* ==========================================================================
-   4. NAVIGATION & MOBILE DRAWER
+   3. NAVIGATION & MOBILE DRAWER
    ========================================================================== */
 function initNavigation() {
   const toggleBtn = document.getElementById('btn-mobile-toggle');
