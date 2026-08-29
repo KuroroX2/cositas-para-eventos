@@ -1,4 +1,18 @@
 {
   "trailingSlash": true,
-  "cleanUrls": true
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/fotos",
+      "destination": "/matrimonio/yimmy-eve/fotos/index.html"
+    },
+    {
+      "source": "/fotos/",
+      "destination": "/matrimonio/yimmy-eve/fotos/index.html"
+    },
+    {
+      "source": "/fotos/:path*",
+      "destination": "/matrimonio/yimmy-eve/fotos/:path*"
+    }
+  ]
 }
