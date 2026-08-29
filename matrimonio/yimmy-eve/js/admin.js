@@ -119,6 +119,18 @@
       });
     }
 
+    // Toggle Password Visibility
+    const togglePinBtn = document.getElementById('btn-toggle-pin-visibility');
+    const pinInputEl = document.getElementById('admin-pin-input');
+    const iconToggle = document.getElementById('icon-toggle-pin');
+    if (togglePinBtn && pinInputEl && iconToggle) {
+      togglePinBtn.addEventListener('click', () => {
+        const isPassword = pinInputEl.type === 'password';
+        pinInputEl.type = isPassword ? 'text' : 'password';
+        iconToggle.className = isPassword ? 'ri-eye-off-line' : 'ri-eye-line';
+      });
+    }
+
     if (logoutBtn) {
       logoutBtn.addEventListener('click', () => {
         sessionStorage.removeItem('novios_logged_in');
