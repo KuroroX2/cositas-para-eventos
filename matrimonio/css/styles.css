@@ -4886,3 +4886,195 @@ body.theme-tradicional .wedding-hero-cinematic .btn-hero-cal:hover {
   font-size: 0.88rem;
   font-weight: 700;
 }
+
+
+/* ==========================================================================
+   FIXES DE MÁRGENES, RESPONSIVIDAD Y PREVENCIÓN DE DESBORDES EN PANEL NOVIOS
+   ========================================================================== */
+.modal-overlay {
+  align-items: flex-start !important;
+  padding: 2.5rem 1rem !important;
+  overflow-y: auto !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 600px) {
+  .modal-overlay {
+    padding: 1rem 0.5rem !important;
+  }
+}
+
+.modal-admin-card {
+  width: 100% !important;
+  max-width: 1040px !important;
+  max-height: 88vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  box-sizing: border-box !important;
+  margin: auto !important;
+  padding: 2.2rem 2.2rem !important;
+}
+
+@media (max-width: 768px) {
+  .modal-admin-card {
+    padding: 1.4rem 1rem !important;
+    border-radius: 16px !important;
+  }
+}
+
+/* Evitar desbordes en texto y títulos del Hub */
+.admin-hub-card {
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  word-break: break-word !important;
+}
+
+.admin-hub-card .hub-card-title,
+.admin-hub-card .hub-card-desc {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  word-break: break-word !important;
+}
+
+/* Banner Hero del Organizador (Tab 3) */
+.org-hub-banner {
+  background: linear-gradient(135deg, rgba(10, 24, 40, 0.04) 0%, rgba(212, 175, 55, 0.09) 100%);
+  border: 1.5px solid rgba(212, 175, 55, 0.4);
+  border-radius: 16px;
+  padding: 1.8rem 1.6rem;
+  margin-bottom: 1.6rem;
+  text-align: center;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.org-hub-icon {
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.org-hub-title {
+  font-family: 'Cormorant Garamond', serif !important;
+  font-size: 1.75rem !important;
+  color: #0A1828 !important;
+  margin: 0 0 0.4rem 0 !important;
+  font-weight: 700 !important;
+}
+
+.org-hub-subtitle {
+  font-size: 0.92rem;
+  color: #4A5568;
+  max-width: 650px;
+  margin: 0 auto 1.4rem;
+  line-height: 1.5;
+}
+
+.btn-org-hero-cta {
+  font-size: 0.95rem !important;
+  padding: 0.8rem 2rem !important;
+  text-decoration: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35) !important;
+}
+
+.org-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.1rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 860px) {
+  .org-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.org-card-item {
+  background: #FFFFFF;
+  border: 1.5px solid rgba(212, 175, 55, 0.3);
+  border-radius: 14px;
+  padding: 1.6rem 1.2rem;
+  text-align: center;
+  box-sizing: border-box;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+  transition: all 0.25s ease;
+}
+
+.org-card-item:hover {
+  border-color: #D4AF37;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(212, 175, 55, 0.18);
+}
+
+.org-card-icon {
+  font-size: 2.2rem;
+  color: #99742a;
+}
+
+.org-card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #0A1828;
+  margin: 0 0 0.4rem 0;
+}
+
+.org-card-desc {
+  font-size: 0.82rem;
+  color: #64748B;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.btn-org-card-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #0A1828;
+  color: #D4AF37 !important;
+  border: 1px solid #D4AF37;
+  padding: 0.55rem 1.2rem;
+  border-radius: 30px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.btn-org-card-action:hover {
+  background: #D4AF37;
+  color: #0A1828 !important;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.org-hub-note {
+  background: rgba(10, 24, 40, 0.04);
+  border: 1px dashed rgba(212, 175, 55, 0.4);
+  border-radius: 12px;
+  padding: 0.85rem 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.84rem;
+  color: #4A5568;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.org-hub-note i {
+  color: #99742a;
+  font-size: 1.1rem;
+}

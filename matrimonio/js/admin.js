@@ -208,20 +208,7 @@
       });
     }
 
-    // Toggle Organizador Inline Preview
-    const toggleOrgBtn = document.getElementById('btn-toggle-organizador-inline');
-    const orgWrapper = document.getElementById('organizador-inline-wrapper');
-    const toggleOrgText = document.getElementById('btn-toggle-org-text');
 
-    if (toggleOrgBtn && orgWrapper) {
-      toggleOrgBtn.addEventListener('click', () => {
-        const isHidden = orgWrapper.style.display === 'none';
-        orgWrapper.style.display = isHidden ? 'block' : 'none';
-        if (toggleOrgText) {
-          toggleOrgText.textContent = isHidden ? 'Ocultar Vista Miniatura ▲' : 'Ver Aquí Mismo en Miniatura';
-        }
-      });
-    }
 
     // Real-time Search Filter for Invitations
     const searchInput = document.getElementById('admin-search-invitations');
