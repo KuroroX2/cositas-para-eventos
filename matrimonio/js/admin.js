@@ -178,8 +178,59 @@
     const raffleBtn = document.getElementById('btn-print-raffle-tickets') || document.getElementById('btn-print-raffle');
     if (raffleBtn) raffleBtn.addEventListener('click', printRaffleTickets);
 
-    const dlAllPhotosBtn = document.getElementById('btn-download-all-photos');
+        const dlAllPhotosBtn = document.getElementById('btn-download-all-photos');
     if (dlAllPhotosBtn) dlAllPhotosBtn.addEventListener('click', downloadAllPhotosBulk);
+
+    // Toggle Formulario Crear Invitación
+    const toggleCreateBtn = document.getElementById('btn-toggle-create-form');
+    const closeCreateBtn = document.getElementById('btn-close-create-form');
+    const createBox = document.getElementById('create-invitation-box');
+    const toggleCreateText = document.getElementById('btn-toggle-create-text');
+
+    if (toggleCreateBtn && createBox) {
+      toggleCreateBtn.addEventListener('click', () => {
+        const isHidden = createBox.style.display === 'none' || !createBox.style.display;
+        createBox.style.display = isHidden ? 'block' : 'none';
+        if (toggleCreateText) {
+          toggleCreateText.textContent = isHidden ? '▲ Ocultar Formulario' : '+ Registrar Nuevo Invitado';
+        }
+        if (isHidden) {
+          const n1 = document.getElementById('inv-name-1');
+          if (n1) n1.focus();
+        }
+      });
+    }
+
+    if (closeCreateBtn && createBox) {
+      closeCreateBtn.addEventListener('click', () => {
+        createBox.style.display = 'none';
+        if (toggleCreateText) toggleCreateText.textContent = '+ Registrar Nuevo Invitado';
+      });
+    }
+
+    // Toggle Organizador Inline Preview
+    const toggleOrgBtn = document.getElementById('btn-toggle-organizador-inline');
+    const orgWrapper = document.getElementById('organizador-inline-wrapper');
+    const toggleOrgText = document.getElementById('btn-toggle-org-text');
+
+    if (toggleOrgBtn && orgWrapper) {
+      toggleOrgBtn.addEventListener('click', () => {
+        const isHidden = orgWrapper.style.display === 'none';
+        orgWrapper.style.display = isHidden ? 'block' : 'none';
+        if (toggleOrgText) {
+          toggleOrgText.textContent = isHidden ? 'Ocultar Vista Miniatura ▲' : 'Ver Aquí Mismo en Miniatura';
+        }
+      });
+    }
+
+    // Real-time Search Filter for Invitations
+    const searchInput = document.getElementById('admin-search-invitations');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        filterAdminInvitations(query);
+      });
+    }
   }
 
   function showLoginForm() {
@@ -344,7 +395,7 @@
   function generatePersonalizedUrl(inv) {
     const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     const baseOrigin = isLocal ? window.location.origin : 'https://cositasparaeventos.cl';
-    const basePath = '/matrimonio/yimmy-eve/';
+    const basePath = window.location.pathname.includes('/yimmy-eve/') ? '/matrimonio/yimmy-eve/' : '/matrimonio/';
     const params = new URLSearchParams();
     params.set('p', inv.pases);
     params.set('n1', inv.name1);
@@ -363,6 +414,33 @@
       return 'both';
     }
     return 'none';
+  }
+
+  
+  function filterAdminInvitations(query) {
+    const tbody = document.getElementById('admin-invitations-tbody');
+    if (!tbody) return;
+    const rows = tbody.querySelectorAll('tr');
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+      const text = row.textContent.toLowerCase();
+      if (!query || text.includes(query)) {
+        row.style.display = '';
+        visibleCount++;
+      } else {
+        row.style.display = 'none';
+      }
+    });
+
+    const filteredCountEl = document.getElementById('admin-filtered-count');
+    if (filteredCountEl) {
+      if (query) {
+        filteredCountEl.textContent = `Mostrando ${visibleCount} de ${adminInvitations.length}`;
+      } else {
+        filteredCountEl.textContent = '';
+      }
+    }
   }
 
   function renderAdminInvitations() {

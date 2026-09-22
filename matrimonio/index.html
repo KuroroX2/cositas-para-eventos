@@ -696,16 +696,17 @@
 
       <!-- Vista 2: Dashboard de Administración -->
       <div class="admin-dashboard" id="admin-dashboard" style="display: none;">
+        <!-- Header del Panel -->
         <div class="admin-top-bar">
           <div>
-            <h3 class="admin-dashboard-title">💍 Panel de Control — Cristopher &amp; Reny</h3>
-            <p class="admin-dashboard-sub">Registra a tus invitados (1 o 2 personas), genera links personalizados y gestiona el sorteo.</p>
+            <span class="admin-badge-royal">👑 Panel Exclusivo de Novios</span>
+            <h3 class="admin-dashboard-title">Cristopher &amp; Reny — Centro de Control</h3>
+            <p class="admin-dashboard-sub">Gestiona tus invitados, revisa quién asistirá, organiza mesas y descarga las fotos del gran día.</p>
           </div>
           <div class="admin-top-actions">
-            <a href="organizador.html" target="_blank" class="btn-vogue-gold" style="padding: 0.5rem 1rem; font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 4px 12px rgba(197, 160, 89, 0.35);" title="Abrir Organizador de Mesas, Cronograma y Compras">
+            <a href="organizador.html" target="_blank" class="btn-admin-organizador-quick" title="Abrir Organizador de Mesas, Cronograma y Compras en pantalla completa">
               <i class="ri-layout-grid-fill"></i>
-              <span>📋 Mesas, Cronograma &amp; Compras</span>
-              <i class="ri-external-link-line"></i>
+              <span>Organizador Completo ↗</span>
             </a>
             <button class="btn-admin-logout" id="btn-admin-logout" title="Cerrar sesión">
               <i class="ri-logout-box-r-line"></i> <span>Salir</span>
@@ -719,42 +720,90 @@
         <!-- Metric Summary Cards -->
         <div class="admin-stats-grid">
           <div class="stat-card stat-total">
-            <span class="stat-num" id="admin-count-invitations">0</span>
-            <span class="stat-lbl">Invitaciones Creadas</span>
+            <div class="stat-icon-wrap"><i class="ri-mail-send-line"></i></div>
+            <div class="stat-info">
+              <span class="stat-num" id="admin-count-invitations">0</span>
+              <span class="stat-lbl">Invitaciones Creadas</span>
+            </div>
           </div>
           <div class="stat-card stat-yes">
-            <span class="stat-num" id="admin-count-yes">0</span>
-            <span class="stat-lbl">Confirmados (Sí Asisten)</span>
+            <div class="stat-icon-wrap"><i class="ri-checkbox-circle-line"></i></div>
+            <div class="stat-info">
+              <span class="stat-num" id="admin-count-yes">0</span>
+              <span class="stat-lbl">Confirmados (Sí Asisten)</span>
+            </div>
           </div>
           <div class="stat-card stat-no">
-            <span class="stat-num" id="admin-count-no">0</span>
-            <span class="stat-lbl">No Podrán Asistir</span>
+            <div class="stat-icon-wrap"><i class="ri-close-circle-line"></i></div>
+            <div class="stat-info">
+              <span class="stat-num" id="admin-count-no">0</span>
+              <span class="stat-lbl">No Podrán Asistir</span>
+            </div>
           </div>
         </div>
 
-        <!-- Navigation Tabs -->
-        <div class="admin-tabs">
-          <button class="admin-tab-btn active" data-tab="admin-tab-invitations">
-            <i class="ri-mail-send-line"></i> 1. Registro de Invitados &amp; Links
+        <!-- NAVEGACIÓN INTUITIVA: HUB MODULAR EN 4 TARJETAS -->
+        <div class="admin-nav-hub" role="tablist">
+          <button class="admin-tab-btn admin-hub-card active" data-tab="admin-tab-invitations" role="tab" aria-selected="true">
+            <div class="hub-card-icon"><i class="ri-user-add-line"></i></div>
+            <div class="hub-card-text">
+              <span class="hub-card-step">Paso 1</span>
+              <strong class="hub-card-title">Invitados &amp; Links</strong>
+              <small class="hub-card-desc">Crear pases y WhatsApp</small>
+            </div>
           </button>
-          <button class="admin-tab-btn" data-tab="admin-tab-rsvps">
-            <i class="ri-user-follow-line"></i> 2. Confirmaciones &amp; Sorteo
+          <button class="admin-tab-btn admin-hub-card" data-tab="admin-tab-rsvps" role="tab" aria-selected="false">
+            <div class="hub-card-icon"><i class="ri-user-follow-line"></i></div>
+            <div class="hub-card-text">
+              <span class="hub-card-step">Paso 2</span>
+              <strong class="hub-card-title">Confirmaciones (RSVP)</strong>
+              <small class="hub-card-desc">Menú, canciones y sorteo</small>
+            </div>
           </button>
-          <button class="admin-tab-btn" data-tab="admin-tab-organizador">
-            <i class="ri-calendar-todo-line"></i> 4. Mesas, Cronograma &amp; Compras
+          <button class="admin-tab-btn admin-hub-card" data-tab="admin-tab-organizador" role="tab" aria-selected="false">
+            <div class="hub-card-icon"><i class="ri-calendar-check-line"></i></div>
+            <div class="hub-card-text">
+              <span class="hub-card-step">Paso 3</span>
+              <strong class="hub-card-title">Mesas &amp; Cronograma</strong>
+              <small class="hub-card-desc">Distribución y checklist</small>
+            </div>
           </button>
-          <button class="admin-tab-btn" data-tab="admin-tab-photos">
-            <i class="ri-image-line"></i> 3. Álbum &amp; Descargas
+          <button class="admin-tab-btn admin-hub-card" data-tab="admin-tab-photos" role="tab" aria-selected="false">
+            <div class="hub-card-icon"><i class="ri-camera-3-line"></i></div>
+            <div class="hub-card-text">
+              <span class="hub-card-step">Paso 4</span>
+              <strong class="hub-card-title">Álbum de Recuerdos</strong>
+              <small class="hub-card-desc">Fotos en vivo y descarga ZIP</small>
+            </div>
           </button>
         </div>
 
         <!-- Tab 1: Registro de Invitados & Generador de Links -->
         <div class="admin-tab-pane active" id="admin-tab-invitations">
-          <!-- Formulario para Crear Invitación -->
-          <div class="create-invitation-box" style="background: rgba(82, 122, 80, 0.08); border: 1px solid var(--border-gold); padding: 1.2rem; border-radius: var(--border-radius-card); margin-bottom: 1.5rem;">
-            <h4 style="font-family: var(--font-serif); font-size: 1.15rem; color: var(--text-main); margin-bottom: 0.8rem;">
-              <i class="ri-user-add-line" style="color: var(--gold-dark);"></i> Registrar Nuevo(s) Invitado(s)
-            </h4>
+          
+          <!-- Toolbar: Barra de Búsqueda Rápida y Botón para Agregar -->
+          <div class="admin-toolbar">
+            <div class="admin-search-wrap">
+              <i class="ri-search-line"></i>
+              <input type="text" id="admin-search-invitations" placeholder="🔍 Buscar invitado por nombre o teléfono..." autocomplete="off">
+            </div>
+            <button type="button" class="btn-toggle-create-form" id="btn-toggle-create-form">
+              <i class="ri-user-add-line"></i>
+              <span id="btn-toggle-create-text">+ Registrar Nuevo Invitado</span>
+            </button>
+          </div>
+
+          <!-- Formulario para Crear Invitación (Desplegable) -->
+          <div class="create-invitation-box" id="create-invitation-box" style="display: none; background: #ffffff; border: 1.5px solid rgba(212, 175, 55, 0.4); padding: 1.4rem; border-radius: 16px; margin-bottom: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.04);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <h4 style="font-family: var(--font-serif); font-size: 1.2rem; color: #0A1828; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="ri-user-add-line" style="color: #D4AF37;"></i>
+                <span>Registrar Nuevo(s) Invitado(s)</span>
+              </h4>
+              <button type="button" id="btn-close-create-form" style="background: none; border: none; font-size: 1.2rem; color: #888; cursor: pointer;">
+                <i class="ri-close-line"></i>
+              </button>
+            </div>
             <form id="form-create-invitation" class="form-create-invitation">
               <div class="form-row">
                 <div class="form-group">
@@ -783,17 +832,19 @@
               <div style="margin-top: 1rem;">
                 <button type="submit" class="btn-vogue-gold" style="width: 100%;">
                   <i class="ri-check-line"></i>
-                  <span>Registrar Invitación &amp; Generar Link</span>
+                  <span>Guardar Invitación &amp; Generar Link</span>
                 </button>
               </div>
             </form>
           </div>
 
           <!-- Tabla de Invitaciones Creadas -->
-          <div class="admin-actions-bar" style="justify-content: space-between; align-items: center;">
-            <h4 style="font-family: var(--font-serif); font-size: 1.1rem; color: var(--text-main);">
-              <i class="ri-file-list-3-line"></i> Lista de Invitaciones Personalizadas
+          <div class="admin-actions-bar" style="justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+            <h4 style="font-family: var(--font-serif); font-size: 1.15rem; color: #0A1828; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+              <i class="ri-file-list-3-line" style="color: #D4AF37;"></i> 
+              <span>Lista de Invitaciones &amp; Enlaces de WhatsApp</span>
             </h4>
+            <span style="font-size: 0.82rem; color: #666;" id="admin-filtered-count"></span>
           </div>
 
           <div class="admin-table-wrap">
@@ -849,66 +900,79 @@
           </div>
         </div>
 
-        <!-- Tab 3: Photos Gallery & Bulk Download -->
-        
-        <!-- Tab 4: Organizador de Mesas, Cronograma & Compras -->
+        <!-- Tab 3: Mesas, Cronograma & Compras -->
         <div class="admin-tab-pane" id="admin-tab-organizador">
-          <div style="background: rgba(82, 122, 80, 0.08); border: 1.5px solid var(--border-gold); border-radius: 12px; padding: 1.8rem; margin-bottom: 1.5rem; text-align: center;">
-            <div style="font-size: 2.5rem; margin-bottom: 0.8rem;">📋</div>
-            <h3 style="font-family: var(--font-serif); font-size: 1.6rem; color: #234233; margin-bottom: 0.5rem;">
-              Organizador Nupcial Completo
+          <div style="background: linear-gradient(135deg, rgba(10, 24, 40, 0.03) 0%, rgba(212, 175, 55, 0.08) 100%); border: 1.5px solid rgba(212, 175, 55, 0.4); border-radius: 16px; padding: 1.8rem; margin-bottom: 1.6rem; text-align: center;">
+            <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">📋</div>
+            <h3 style="font-family: var(--font-serif); font-size: 1.7rem; color: #0A1828; margin-bottom: 0.4rem;">
+              Organizador Nupcial Integral
             </h3>
-            <p style="font-size: 0.95rem; color: #5e6b63; max-width: 650px; margin: 0 auto 1.5rem; line-height: 1.5;">
-              Aquí puedes organizar la distribución de mesas de los invitados, planificar el cronograma minuto a minuto de todo el día de la boda (indicando responsables y si está OK o Pendiente) y llevar el control de todas las cosas que necesitan comprar o preparar.
+            <p style="font-size: 0.92rem; color: #4A5568; max-width: 680px; margin: 0 auto 1.4rem; line-height: 1.5;">
+              Planifica la distribución de mesas para tus invitados, controla el cronograma minuto a minuto del gran día (con checks de OK / Pendiente) y gestiona todas las compras e insumos necesarios.
             </p>
-            <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
-              <a href="organizador.html" target="_blank" class="btn-vogue-gold" style="font-size: 1rem; padding: 0.8rem 1.8rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.6rem; box-shadow: 0 6px 20px rgba(197, 160, 89, 0.4);">
+            <div style="display: flex; justify-content: center; gap: 0.9rem; flex-wrap: wrap;">
+              <a href="organizador.html" target="_blank" class="btn-vogue-gold" style="font-size: 0.95rem; padding: 0.75rem 1.8rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35);">
                 <i class="ri-external-link-line"></i>
                 <span>Abrir Organizador en Pantalla Completa</span>
               </a>
+              <button type="button" id="btn-toggle-organizador-inline" class="btn-admin-organizador-quick" style="padding: 0.75rem 1.4rem; font-size: 0.9rem; cursor: pointer;">
+                <i class="ri-eye-line"></i>
+                <span id="btn-toggle-org-text">Ver Aquí Mismo en Miniatura</span>
+              </button>
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
-            <div style="background: #ffffff; border: 1px solid var(--border-gold); border-radius: 10px; padding: 1.2rem; text-align: center;">
-              <div style="font-size: 1.8rem; color: #99742a; margin-bottom: 0.4rem;">🪑</div>
-              <h4 style="font-family: var(--font-serif); font-size: 1.15rem; color: #1c1b1a;">Mesas de Invitados</h4>
-              <p style="font-size: 0.8rem; color: #5e6b63; margin: 0.4rem 0 1rem;">Crea mesas, define capacidades y ubica a cada invitado.</p>
-              <a href="organizador.html" target="_blank" class="btn-vogue-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem; text-decoration: none;">Gestionar Mesas ↗</a>
+          <!-- 3 Tarjetas Visuales con Atajos Directos -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.1rem; margin-bottom: 1.5rem;">
+            <div style="background: #ffffff; border: 1.5px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 1.4rem 1.2rem; text-align: center; box-shadow: 0 4px 14px rgba(0,0,0,0.03); transition: all 0.25s ease;">
+              <div style="font-size: 2rem; color: #99742a; margin-bottom: 0.4rem;">🪑</div>
+              <h4 style="font-family: var(--font-serif); font-size: 1.2rem; color: #0A1828; margin: 0 0 0.4rem 0;">Mesas de Invitados</h4>
+              <p style="font-size: 0.82rem; color: #64748B; margin: 0 0 1rem 0; line-height: 1.4;">Crea mesas, define capacidades y ubica a cada invitado cómodamente.</p>
+              <a href="organizador.html#mesas" target="_blank" class="btn-vogue-secondary" style="font-size: 0.8rem; padding: 0.45rem 1rem; text-decoration: none; border-radius: 20px;">Gestionar Mesas ↗</a>
             </div>
 
-            <div style="background: #ffffff; border: 1px solid var(--border-gold); border-radius: 10px; padding: 1.2rem; text-align: center;">
-              <div style="font-size: 1.8rem; color: #99742a; margin-bottom: 0.4rem;">⏱️</div>
-              <h4 style="font-family: var(--font-serif); font-size: 1.15rem; color: #1c1b1a;">Cronograma Minuto a Minuto</h4>
-              <p style="font-size: 0.8rem; color: #5e6b63; margin: 0.4rem 0 1rem;">Horarios, actividades, responsables y estado Pendiente/OK.</p>
-              <a href="organizador.html" target="_blank" class="btn-vogue-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem; text-decoration: none;">Ver Cronograma ↗</a>
+            <div style="background: #ffffff; border: 1.5px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 1.4rem 1.2rem; text-align: center; box-shadow: 0 4px 14px rgba(0,0,0,0.03); transition: all 0.25s ease;">
+              <div style="font-size: 2rem; color: #99742a; margin-bottom: 0.4rem;">⏱️</div>
+              <h4 style="font-family: var(--font-serif); font-size: 1.2rem; color: #0A1828; margin: 0 0 0.4rem 0;">Cronograma del Día</h4>
+              <p style="font-size: 0.82rem; color: #64748B; margin: 0 0 1rem 0; line-height: 1.4;">Horarios, actividades, personas a cargo y marcado rápido de OK o Pendiente.</p>
+              <a href="organizador.html#cronograma" target="_blank" class="btn-vogue-secondary" style="font-size: 0.8rem; padding: 0.45rem 1rem; text-decoration: none; border-radius: 20px;">Ver Cronograma ↗</a>
             </div>
 
-            <div style="background: #ffffff; border: 1px solid var(--border-gold); border-radius: 10px; padding: 1.2rem; text-align: center;">
-              <div style="font-size: 1.8rem; color: #99742a; margin-bottom: 0.4rem;">🛍️</div>
-              <h4 style="font-family: var(--font-serif); font-size: 1.15rem; color: #1c1b1a;">Compras &amp; Pendientes</h4>
-              <p style="font-size: 0.8rem; color: #5e6b63; margin: 0.4rem 0 1rem;">Detalle de ítems por comprar con estado de compra.</p>
-              <a href="organizador.html" target="_blank" class="btn-vogue-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem; text-decoration: none;">Ver Compras ↗</a>
+            <div style="background: #ffffff; border: 1.5px solid rgba(212, 175, 55, 0.3); border-radius: 14px; padding: 1.4rem 1.2rem; text-align: center; box-shadow: 0 4px 14px rgba(0,0,0,0.03); transition: all 0.25s ease;">
+              <div style="font-size: 2rem; color: #99742a; margin-bottom: 0.4rem;">🛍️</div>
+              <h4 style="font-family: var(--font-serif); font-size: 1.2rem; color: #0A1828; margin: 0 0 0.4rem 0;">Compras &amp; Pendientes</h4>
+              <p style="font-size: 0.82rem; color: #64748B; margin: 0 0 1rem 0; line-height: 1.4;">Artículos por comprar, presupuestos y control de avance de compras.</p>
+              <a href="organizador.html#compras" target="_blank" class="btn-vogue-secondary" style="font-size: 0.8rem; padding: 0.45rem 1rem; text-decoration: none; border-radius: 20px;">Ver Compras ↗</a>
             </div>
+          </div>
+
+          <!-- Iframe Incrustado Opcional -->
+          <div id="organizador-inline-wrapper" style="display: none; border: 2px solid #D4AF37; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-top: 1.5rem;">
+            <div style="background: #0A1828; color: #D4AF37; padding: 0.6rem 1rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; font-weight: 700;">
+              <span>📋 Vista Rápida del Organizador</span>
+              <a href="organizador.html" target="_blank" style="color: #F5E6B3; text-decoration: underline;">Abrir en pestaña nueva ↗</a>
+            </div>
+            <iframe src="organizador.html" style="width: 100%; height: 550px; border: none;" title="Organizador Nupcial"></iframe>
           </div>
         </div>
 
+        <!-- Tab 4: Fotos & Galería -->
         <div class="admin-tab-pane" id="admin-tab-photos">
           <!-- Banner Módulo Fotos & Código QR -->
-          <div style="background: rgba(82, 122, 80, 0.08); border: 1px solid var(--border-gold); border-radius: 10px; padding: 1.4rem; margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
+          <div style="background: linear-gradient(135deg, rgba(10, 24, 40, 0.03) 0%, rgba(212, 175, 55, 0.08) 100%); border: 1.5px solid rgba(212, 175, 55, 0.4); border-radius: 14px; padding: 1.5rem; margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
             <div>
-              <h4 style="font-family: var(--font-serif); font-size: 1.15rem; color: var(--text-main); margin-bottom: 0.3rem;">
+              <h4 style="font-family: var(--font-serif); font-size: 1.25rem; color: #0A1828; margin-bottom: 0.3rem;">
                 📸 Módulo Exclusivo del Evento &amp; Código QR
               </h4>
-              <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0; line-height: 1.4;">
-                URL para imprimir en carteles y mesas de Casona Los Olivos, Pirque: <strong style="color: var(--gold-dark);">https://cositasparaeventos.cl/matrimonio/yimmy-eve/fotos/</strong>
+              <p style="font-size: 0.88rem; color: #4A5568; margin: 0; line-height: 1.4;">
+                Enlace para carteles y mesas de los novios: <strong style="color: #99742a;">https://cositasparaeventos.cl/matrimonio/fotos/</strong>
               </p>
             </div>
             <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
-              <a href="fotos/" target="_blank" class="btn-vogue-gold" style="font-size: 0.82rem; padding: 0.6rem 1rem; text-decoration: none;">
+              <a href="fotos/" target="_blank" class="btn-vogue-gold" style="font-size: 0.85rem; padding: 0.65rem 1.1rem; text-decoration: none;">
                 <i class="ri-external-link-line"></i> <span>Abrir Álbum en Vivo</span>
               </a>
-              <button type="button" class="btn-admin-close-view" style="font-size: 0.82rem; padding: 0.6rem 1rem;" onclick="navigator.clipboard.writeText('https://cositasparaeventos.cl/matrimonio/yimmy-eve/fotos/').then(() => alert('¡Enlace del Código QR copiado al portapapeles!'))">
+              <button type="button" class="btn-admin-close-view" style="font-size: 0.85rem; padding: 0.65rem 1.1rem;" onclick="navigator.clipboard.writeText('https://cositasparaeventos.cl/matrimonio/fotos/').then(() => alert('¡Enlace del Código QR copiado al portapapeles!'))">
                 <i class="ri-file-copy-line"></i> <span>Copiar Link QR</span>
               </button>
             </div>
