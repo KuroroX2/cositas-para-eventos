@@ -122,9 +122,15 @@
             <h3 class="side-card-title"><i class="ri-layout-masonry-line" style="color: var(--gold-dark);"></i> Crear Nueva Mesa</h3>
             <p class="side-card-desc">Define el nombre y la cantidad de comensales:</p>
             <form id="formAddTable">
-              <div class="form-group-org">
-                <label for="newTableName">Nombre o Número de Mesa *</label>
-                <input type="text" id="newTableName" class="input-org" placeholder="Ej.: Mesa 7: Primos" required>
+              <div style="display: flex; gap: 10px; margin-bottom: 14px;">
+                <div class="form-group-org" style="width: 95px; margin-bottom: 0;">
+                  <label for="newTableNumber">Nº Mesa *</label>
+                  <input type="number" id="newTableNumber" class="input-org" min="1" max="999" required style="font-weight: 800; text-align: center; color: var(--navy-royal); font-size: 1rem;">
+                </div>
+                <div class="form-group-org" style="flex: 1; margin-bottom: 0;">
+                  <label for="newTableName">Nombre de la Mesa *</label>
+                  <input type="text" id="newTableName" class="input-org" placeholder="Ej.: Familia Novia / Primos" required>
+                </div>
               </div>
               <div class="form-group-org">
                 <label for="newTableCapacity">Capacidad Máxima *</label>
@@ -346,9 +352,15 @@
       <h3 class="org-modal-title"><i class="ri-edit-line" style="color: var(--gold-dark); font-size: 1.3rem;"></i> Editar Mesa</h3>
       <form id="formEditTable">
         <input type="hidden" id="editTableId">
-        <div class="form-group-org">
-          <label for="editTableName">Nombre o Número de Mesa *</label>
-          <input type="text" id="editTableName" class="input-org" required>
+        <div style="display: flex; gap: 10px; margin-bottom: 14px;">
+          <div class="form-group-org" style="width: 100px; margin-bottom: 0;">
+            <label for="editTableNumber">Nº Mesa *</label>
+            <input type="number" id="editTableNumber" class="input-org" min="1" max="999" required style="font-weight: 800; text-align: center; color: var(--navy-royal); font-size: 1rem;">
+          </div>
+          <div class="form-group-org" style="flex: 1; margin-bottom: 0;">
+            <label for="editTableName">Nombre de la Mesa *</label>
+            <input type="text" id="editTableName" class="input-org" required>
+          </div>
         </div>
         <div class="form-group-org">
           <label for="editTableCapacity">Capacidad Máxima de Asientos *</label>

@@ -49,44 +49,87 @@ let timeline = [];
 let shopping = [];
 let unassignedGuests = [];
 
+
+function extractTableNumber(table, idx) {
+  if (table.number !== undefined && !isNaN(parseInt(table.number, 10))) {
+    return parseInt(table.number, 10);
+  }
+  const match = (table.name || '').match(/Mesa\s*(\d+)/i);
+  if (match) return parseInt(match[1], 10);
+  return idx + 1;
+}
+
+function getNextTableNumber() {
+  if (tables.length === 0) return 1;
+  const numbers = tables.map((t, idx) => extractTableNumber(t, idx));
+  return Math.max(...numbers, 0) + 1;
+}
+
+function sortTablesAscending() {
+  // Ensure every table has a valid .number property
+  tables.forEach((t, idx) => {
+    t.number = extractTableNumber(t, idx);
+  });
+  tables.sort((a, b) => {
+    const numA = parseInt(a.number, 10) || 0;
+    const numB = parseInt(b.number, 10) || 0;
+    if (numA !== numB) return numA - numB;
+    return (a.name || '').localeCompare(b.name || '');
+  });
+}
+
+function updateNextTableNumberInput() {
+  const numInput = document.getElementById('newTableNumber');
+  if (numInput) {
+    numInput.value = getNextTableNumber();
+  }
+}
+
 function loadData() {
   const savedTables = localStorage.getItem(STORAGE_KEY_TABLES);
   if (savedTables) {
     tables = JSON.parse(savedTables);
+    sortTablesAscending();
   } else {
     tables = [
       {
         id: 't_1',
+        number: 1,
         name: 'Mesa 1: Mesa de los Novios',
         capacity: 2,
         guests: ['Cristopher', 'Reny']
       },
       {
         id: 't_2',
+        number: 2,
         name: 'Mesa 2: Familia de la Novia',
         capacity: 8,
         guests: ['Pamela', 'Marcial', 'Constanza', 'Cecilia', 'Barbara']
       },
       {
         id: 't_3',
+        number: 3,
         name: 'Mesa 3: Familia del Novio',
         capacity: 8,
         guests: ['Carlos', 'Carola', 'Felipe', 'Camila']
       },
       {
         id: 't_4',
+        number: 4,
         name: 'Mesa 4: Amigos del Colegio',
         capacity: 8,
         guests: ['Jessica', 'Eduardo', 'Guisselle', 'Nicolas']
       },
       {
         id: 't_5',
+        number: 5,
         name: 'Mesa 5: Amigos de la Universidad',
         capacity: 8,
         guests: ['Jaqueline', 'Luis', 'Isaac', 'Denisse']
       },
       {
         id: 't_6',
+        number: 6,
         name: 'Mesa 6: Mesa Infantil / Niños',
         capacity: 6,
         guests: ['Jhankhel', 'Daniela', 'Hugo']
@@ -278,6 +321,8 @@ function saveData() {
 }
 
 function renderAll() {
+  sortTablesAscending();
+  updateNextTableNumberInput();
   renderMetrics();
   renderTables();
   renderUnassignedList();
@@ -658,6 +703,7 @@ window.openEditTableModal = function(tableId) {
 
   const modal = document.getElementById('editTableModal');
   const idInput = document.getElementById('editTableId');
+  const numInput = document.getElementById('editTableNumber');
   const nameInput = document.getElementById('editTableName');
   const capInput = document.getElementById('editTableCapacity');
   const seatsHint = document.getElementById('editTableCurrentSeats');
@@ -665,7 +711,16 @@ window.openEditTableModal = function(tableId) {
   if (!modal || !idInput || !nameInput || !capInput) return;
 
   idInput.value = table.id;
-  nameInput.value = table.name;
+  if (numInput) numInput.value = table.number || extractTableNumber(table, 0);
+
+  // Clean name to display just the description if it starts with "Mesa X: "
+  let cleanName = table.name;
+  const match = cleanName.match(/^Mesa\s*\d+\s*:\s*(.*)$/i);
+  if (match) {
+    cleanName = match[1];
+  }
+  nameInput.value = cleanName;
+
   capInput.value = table.capacity;
   capInput.min = Math.max(1, table.guests.length);
 
@@ -844,25 +899,35 @@ function setupEventListeners() {
   if (formAddTable) {
     formAddTable.addEventListener('submit', (e) => {
       e.preventDefault();
+      const numInput = document.getElementById('newTableNumber');
       const nameInput = document.getElementById('newTableName');
       const capSelect = document.getElementById('newTableCapacity');
 
-      const name = nameInput.value.trim();
+      const num = parseInt(numInput.value, 10) || getNextTableNumber();
+      let rawName = nameInput.value.trim();
       const capacity = parseInt(capSelect.value, 10);
 
-      if (!name) return;
+      if (!rawName) return;
+
+      // Ensure formatted name e.g. "Mesa 7: Primos" if user just typed "Primos"
+      let fullName = rawName;
+      if (!rawName.toLowerCase().startsWith('mesa ')) {
+        fullName = `Mesa ${num}: ${rawName}`;
+      }
 
       tables.push({
         id: 't_' + Date.now(),
-        name: name,
+        number: num,
+        name: fullName,
         capacity: capacity,
         guests: []
       });
 
       nameInput.value = '';
+      sortTablesAscending();
       saveData();
       renderAll();
-      showToast(`¡Mesa "${name}" agregada con éxito!`);
+      showToast(`¡"${fullName}" agregada con éxito!`);
     });
   }
 
@@ -872,7 +937,9 @@ function setupEventListeners() {
     formEditTable.addEventListener('submit', (e) => {
       e.preventDefault();
       const id = document.getElementById('editTableId').value;
-      const newName = document.getElementById('editTableName').value.trim();
+      const numInput = document.getElementById('editTableNumber');
+      const newNum = numInput ? parseInt(numInput.value, 10) : 1;
+      const rawName = document.getElementById('editTableName').value.trim();
       const newCap = parseInt(document.getElementById('editTableCapacity').value, 10);
 
       const table = tables.find(t => t.id === id);
@@ -883,16 +950,23 @@ function setupEventListeners() {
         return;
       }
 
-      table.name = newName;
+      let fullName = rawName;
+      if (!rawName.toLowerCase().startsWith('mesa ')) {
+        fullName = `Mesa ${newNum}: ${rawName}`;
+      }
+
+      table.number = newNum;
+      table.name = fullName;
       table.capacity = newCap;
 
+      sortTablesAscending();
       saveData();
       renderAll();
 
       const modal = document.getElementById('editTableModal');
       if (modal) modal.classList.remove('active');
 
-      showToast(`¡Mesa actualizada: "${newName}" (${newCap} asientos)!`);
+      showToast(`¡Mesa actualizada: "${fullName}" (${newCap} asientos)!`);
     });
   }
 
