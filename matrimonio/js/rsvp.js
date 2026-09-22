@@ -287,14 +287,14 @@
             ¡Asistencia Confirmada con Éxito! 🎉
           </h3>
           <p style="font-size: 0.88rem; color: #4B634C; margin-bottom: 1.4rem; line-height: 1.5;">
-            ¡Qué alegría contar contigo! Ya tenemos tu lugar reservado para celebrar juntos en Casa Pirque.
+            ¡Qué alegría contar contigo! Ya tenemos tu lugar reservado para celebrar juntos en Casona Los Olivos, Pirque.
           </p>
 
           <div style="background: #FFFFFF; border: 1px dashed rgba(82, 122, 80, 0.35); padding: 1.1rem 1.2rem; border-radius: 12px; margin-bottom: 1.5rem; text-align: left; font-size: 0.84rem; display: flex; flex-direction: column; gap: 0.5rem;">
             <div style="display: flex; justify-content: space-between;"><strong style="color: #4B634C;">Invitado(s):</strong> <span style="font-weight: 700; color: #243525;">${escapeHtml(displayName)}</span></div>
             <div style="display: flex; justify-content: space-between;"><strong style="color: #4B634C;">Estado:</strong> <span style="color: #27ae60; font-weight: 700;">✓ Asistencia Confirmada</span></div>
             <div style="display: flex; justify-content: space-between;"><strong style="color: #4B634C;">Pase(s) Asignado(s):</strong> <span style="font-weight: 700;">${pasesCount > 0 ? pasesCount : (conf.name2 ? 2 : 1)} Persona${(pasesCount > 1 || conf.name2) ? 's' : ''}</span></div>
-            <div style="display: flex; justify-content: space-between; border-top: 1px dashed rgba(82, 122, 80, 0.2); padding-top: 0.4rem;"><strong style="color: #527A50;">Código de Sorteo:</strong> <span class="code-mono" style="font-weight: 800; font-size: 1.05rem; color: #527A50;">${escapeHtml(conf.code || 'EY-2026')}</span></div>
+            <div style="display: flex; justify-content: space-between; border-top: 1px dashed rgba(82, 122, 80, 0.2); padding-top: 0.4rem;"><strong style="color: #527A50;">Código de Sorteo:</strong> <span class="code-mono" style="font-weight: 800; font-size: 1.05rem; color: #527A50;">${escapeHtml(conf.code || 'CR-2026')}</span></div>
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 0.75rem;">
@@ -424,7 +424,7 @@
 
     if (guestNameEl) guestNameEl.textContent = displayName;
     if (passCountEl) passCountEl.textContent = `${pasesCount} Persona${pasesCount > 1 ? 's' : ''}`;
-    if (passCodeEl) passCodeEl.textContent = conf.code || 'EY-2026';
+    if (passCodeEl) passCodeEl.textContent = conf.code || 'CR-2026';
 
     // Dieta display
     let dietarySummary = [];
@@ -517,7 +517,7 @@
     // Preserve or generate unique lucky raffle code
     const reservationCode = (existingConfirmation && existingConfirmation.code) 
       ? existingConfirmation.code 
-      : ('EY-' + Math.floor(1000 + Math.random() * 9000));
+      : ('CR-' + Math.floor(1000 + Math.random() * 9000));
       
     const displayName = (isTwoPasses && name2) ? `${name1} & ${name2}` : name1;
 
@@ -589,7 +589,7 @@
       <html lang="es">
       <head>
         <meta charset="UTF-8">
-        <title>Pase de Entrada — Evelyn & Yimmy</title>
+        <title>Pase de Entrada — Cristopher & Reny</title>
         <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Montserrat:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
         <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
         <style>
