@@ -470,12 +470,12 @@
       if (isTwoPasses) {
         selectOptions = `
           <option value="pending" ${currentMode === 'pending' ? 'selected' : ''}>⏳ Pendiente</option>
-          <option value="both" ${currentMode === 'both' ? 'selected' : ''}>✅ Asisten Ambos (2 Pases)</option>
+          <option value="both" ${currentMode === 'both' ? 'selected' : ''}>✅ Asisten (2 Pases)</option>
           <option value="single" ${currentMode === 'single' ? 'selected' : ''}>👤 Asiste Solo 1 (Sin Acompañante)</option>
           <option value="none" ${currentMode === 'none' ? 'selected' : ''}>❌ No Asiste (0 Pases)</option>
         `;
         if (currentMode === 'both') {
-          statusBadge = '<span class="badge-status status-yes">🟢 2 Pases (Ambos)</span>';
+          statusBadge = '<span class="badge-status status-yes">🟢 2 Pases</span>';
         } else if (currentMode === 'single') {
           statusBadge = '<span class="badge-status" style="background: #fff3cd; color: #856404; font-weight: 700;">🟡 1 Pase (Solo)</span>';
         } else if (currentMode === 'none') {
@@ -527,7 +527,7 @@
           </td>
           <td class="col-pases">${statusBadge}</td>
           <td class="col-status">
-            <select class="admin-inv-status-select" data-id="${inv.id}" data-name1="${escapeHtml(inv.name1)}" data-name2="${escapeHtml(inv.name2 || '')}" data-pases="${inv.pases}" style="padding: 0.35rem 0.65rem; border-radius: 50px; font-size: 0.76rem; font-weight: 700; border: 1.5px solid ${borderColor}; color: ${textColor}; background: #FFFFFF; cursor: pointer;">
+            <select class="admin-inv-status-select" data-id="${inv.id}" data-name1="${escapeHtml(inv.name1)}" data-name2="${escapeHtml(inv.name2 || '')}" data-pases="${inv.pases}" style="padding: 0.2rem 0.65rem; border-radius: 50px; font-size: 0.78rem; font-weight: 700; border: 1.5px solid ${borderColor}; color: ${textColor}; background: #FFFFFF; cursor: pointer; height: 34px; line-height: 1.4; vertical-align: middle;">
               ${selectOptions}
             </select>
           </td>
@@ -702,7 +702,7 @@
 
       let pasesBadge = '';
       if (mode === 'both') {
-        pasesBadge = `<span class="badge-status status-yes">🟢 ${isTwoPasses ? '2 Personas (Ambos)' : '1 Persona'}</span>`;
+        pasesBadge = `<span class="badge-status status-yes">🟢 ${isTwoPasses ? '2 Personas' : '1 Persona'}</span>`;
       } else if (mode === 'single') {
         pasesBadge = `<span class="badge-status" style="background: #fff3cd; color: #856404; font-weight: 700;">🟡 1 Persona (Sin Acomp.)</span>`;
       } else {
@@ -712,7 +712,7 @@
       let selectOptions = '';
       if (isTwoPasses) {
         selectOptions = `
-          <option value="both" ${mode === 'both' ? 'selected' : ''}>✅ Asisten Ambos (2 Pases)</option>
+          <option value="both" ${mode === 'both' ? 'selected' : ''}>✅ Asisten (2 Pases)</option>
           <option value="single" ${mode === 'single' ? 'selected' : ''}>👤 Asiste Solo 1 (Sin Acompañante)</option>
           <option value="none" ${mode === 'none' ? 'selected' : ''}>❌ No Asiste (0 Pases)</option>
         `;
@@ -739,7 +739,7 @@
         <tr>
           <td style="font-weight: 700;">${index + 1}. ${namesShow}</td>
           <td class="col-status">
-            <select class="admin-rsvp-status-select" data-id="${r.id || r.code}" data-name1="${escapeHtml(r.name)}" data-name2="${escapeHtml(r.name2 || '')}" data-inv="${r.invCode || ''}" style="padding: 0.35rem 0.65rem; border-radius: 50px; font-size: 0.76rem; font-weight: 700; border: 1.5px solid ${borderColor}; color: ${textColor}; background: #FFFFFF; cursor: pointer;">
+            <select class="admin-rsvp-status-select" data-id="${r.id || r.code}" data-name1="${escapeHtml(r.name)}" data-name2="${escapeHtml(r.name2 || '')}" data-inv="${r.invCode || ''}" style="padding: 0.2rem 0.65rem; border-radius: 50px; font-size: 0.78rem; font-weight: 700; border: 1.5px solid ${borderColor}; color: ${textColor}; background: #FFFFFF; cursor: pointer; height: 34px; line-height: 1.4; vertical-align: middle;">
               ${selectOptions}
             </select>
           </td>
@@ -838,7 +838,7 @@
     const rows = adminRsvps.map(r => {
       const mode = getAttendanceMode(r);
       let estadoTxt = 'NO ASISTE';
-      if (mode === 'both') estadoTxt = r.name2 ? 'ASISTEN AMBOS' : 'ASISTE (1 PASE)';
+      if (mode === 'both') estadoTxt = r.name2 ? 'ASISTEN (2 PASES)' : 'ASISTE (1 PASE)';
       if (mode === 'single') estadoTxt = 'ASISTE SOLO 1 (SIN ACOMPAÑANTE)';
 
       const pases = mode === 'both' ? (r.name2 ? 2 : 1) : (mode === 'single' ? 1 : 0);

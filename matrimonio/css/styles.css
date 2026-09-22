@@ -2867,6 +2867,7 @@ body.theme-florido .ch-num {
 }
 .admin-table {
   width: 100%;
+  min-width: 1050px;
   border-collapse: collapse;
   font-size: 0.78rem;
   text-align: left;
@@ -2892,12 +2893,14 @@ body.theme-florido .ch-num {
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: 5px;
+  gap: 6px;
   padding: 0.32rem 0.75rem;
   border-radius: 50px;
   font-size: 0.74rem;
   font-weight: 700;
   white-space: nowrap;
+  flex-shrink: 0;
+  line-height: 1.35;
 }
 .status-yes {
   background: #d4edda;
@@ -2931,18 +2934,26 @@ body.theme-florido .ch-num {
 .admin-table td.col-pases {
   text-align: center !important;
   vertical-align: middle !important;
-  white-space: nowrap;
+  white-space: nowrap !important;
+  width: 130px !important;
+  min-width: 125px !important;
 }
 .admin-table th.col-status,
 .admin-table td.col-status {
-  width: 175px !important;
-  max-width: 185px !important;
+  width: 165px !important;
+  min-width: 160px !important;
+  max-width: 180px !important;
+  vertical-align: middle !important;
 }
 .admin-inv-status-select,
 .admin-rsvp-status-select {
   width: 100% !important;
+  min-width: 155px !important;
   max-width: 175px !important;
-  box-sizing: border-box;
+  height: 34px !important;
+  line-height: 1.4 !important;
+  box-sizing: border-box !important;
+  vertical-align: middle !important;
 }
 
 .admin-photos-grid {
@@ -3497,6 +3508,7 @@ body.theme-florido .ch-num {
 
 .admin-table {
   width: 100%;
+  min-width: 1050px;
   border-collapse: collapse;
   text-align: left;
   font-size: 0.84rem;
