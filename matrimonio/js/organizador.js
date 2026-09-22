@@ -495,17 +495,17 @@ function renderTables() {
 
     card.innerHTML = `
       <div class="table-card-header">
-        <div>
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
-            <h3 class="table-card-title">${escapeHtml(table.name)}</h3>
-            <button class="btn-table-edit" onclick="openEditTableModal('${table.id}')" title="Editar nombre y capacidad de asientos">
-              <i class="ri-edit-line"></i> <span>Editar</span>
-            </button>
-          </div>
+        <div class="table-card-title-wrap">
+          <h3 class="table-card-title">${escapeHtml(table.name)}</h3>
         </div>
-        <span class="table-badge-capacity ${isFull ? 'full' : ''}">
-          ${table.guests.length} / ${table.capacity}
-        </span>
+        <div class="table-card-header-actions">
+          <button class="btn-table-edit" onclick="openEditTableModal('${table.id}')" title="Editar nombre y capacidad de asientos">
+            <i class="ri-edit-line"></i> <span>Editar</span>
+          </button>
+          <span class="table-badge-capacity ${isFull ? 'full' : ''}" title="Asientos asignados / Capacidad total">
+            ${table.guests.length} / ${table.capacity}
+          </span>
+        </div>
       </div>
       <ul class="table-guests-list">
         ${guestsHtml}
