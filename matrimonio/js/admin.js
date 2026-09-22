@@ -475,13 +475,13 @@
           <option value="none" ${currentMode === 'none' ? 'selected' : ''}>❌ No Asiste (0 Pases)</option>
         `;
         if (currentMode === 'both') {
-          statusBadge = '<span class="badge-status status-yes" style="border-radius: 50px; font-weight: 700;">🟢 2 Pases (Ambos)</span>';
+          statusBadge = '<span class="badge-status status-yes">🟢 2 Pases (Ambos)</span>';
         } else if (currentMode === 'single') {
-          statusBadge = '<span class="badge-status" style="background: #fff3cd; color: #856404; border-radius: 50px; font-weight: 700;">🟡 1 Pase (Solo)</span>';
+          statusBadge = '<span class="badge-status" style="background: #fff3cd; color: #856404; font-weight: 700;">🟡 1 Pase (Solo)</span>';
         } else if (currentMode === 'none') {
-          statusBadge = '<span class="badge-status status-no" style="border-radius: 50px; font-weight: 700;">🔴 0 Pases (No Asiste)</span>';
+          statusBadge = '<span class="badge-status status-no">🔴 0 Pases (No Asiste)</span>';
         } else {
-          statusBadge = '<span class="badge-status status-pending" style="border-radius: 50px;">⏳ 2 Pases Reservados</span>';
+          statusBadge = '<span class="badge-status status-pending">⏳ 2 Pases Reservados</span>';
         }
       } else {
         selectOptions = `
@@ -490,11 +490,11 @@
           <option value="none" ${currentMode === 'none' ? 'selected' : ''}>❌ No Asiste (0 Pases)</option>
         `;
         if (currentMode === 'both') {
-          statusBadge = '<span class="badge-status status-yes" style="border-radius: 50px; font-weight: 700;">🟢 1 Pase (Asiste)</span>';
+          statusBadge = '<span class="badge-status status-yes">🟢 1 Pase (Asiste)</span>';
         } else if (currentMode === 'none') {
-          statusBadge = '<span class="badge-status status-no" style="border-radius: 50px; font-weight: 700;">🔴 0 Pases (No Asiste)</span>';
+          statusBadge = '<span class="badge-status status-no">🔴 0 Pases (No Asiste)</span>';
         } else {
-          statusBadge = '<span class="badge-status status-pending" style="border-radius: 50px;">⏳ 1 Pase Reservado</span>';
+          statusBadge = '<span class="badge-status status-pending">⏳ 1 Pase Reservado</span>';
         }
       }
 
@@ -525,8 +525,8 @@
             ${idx + 1}. ${namesDisplay}
             ${inv.phone ? `<br><small style="color: #666; font-weight: normal;"><i class="ri-whatsapp-line"></i> ${escapeHtml(inv.phone)}</small>` : ''}
           </td>
-          <td>${statusBadge}</td>
-          <td>
+          <td class="col-pases">${statusBadge}</td>
+          <td class="col-status">
             <select class="admin-inv-status-select" data-id="${inv.id}" data-name1="${escapeHtml(inv.name1)}" data-name2="${escapeHtml(inv.name2 || '')}" data-pases="${inv.pases}" style="padding: 0.35rem 0.65rem; border-radius: 50px; font-size: 0.76rem; font-weight: 700; border: 1.5px solid ${borderColor}; color: ${textColor}; background: #FFFFFF; cursor: pointer;">
               ${selectOptions}
             </select>
@@ -541,7 +541,7 @@
               </a>
             </div>
           </td>
-          <td>
+          <td style="text-align: center;">
             <button class="btn-del-inv" data-id="${inv.id}" title="Eliminar invitación" style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1.15rem; padding: 0.35rem; transition: transform 0.2s ease;">
               <i class="ri-delete-bin-line"></i>
             </button>
@@ -702,11 +702,11 @@
 
       let pasesBadge = '';
       if (mode === 'both') {
-        pasesBadge = `<span class="badge-status status-yes" style="font-weight: 700; border-radius: 50px;">🟢 ${isTwoPasses ? '2 Personas (Ambos)' : '1 Persona'}</span>`;
+        pasesBadge = `<span class="badge-status status-yes">🟢 ${isTwoPasses ? '2 Personas (Ambos)' : '1 Persona'}</span>`;
       } else if (mode === 'single') {
-        pasesBadge = `<span class="badge-status" style="background: #fff3cd; color: #856404; font-weight: 700; border-radius: 50px;">🟡 1 Persona (Sin Acomp.)</span>`;
+        pasesBadge = `<span class="badge-status" style="background: #fff3cd; color: #856404; font-weight: 700;">🟡 1 Persona (Sin Acomp.)</span>`;
       } else {
-        pasesBadge = `<span class="badge-status status-no" style="font-weight: 700; border-radius: 50px;">🔴 0 Personas (No Asiste)</span>`;
+        pasesBadge = `<span class="badge-status status-no">🔴 0 Personas (No Asiste)</span>`;
       }
 
       let selectOptions = '';
@@ -738,13 +738,13 @@
       return `
         <tr>
           <td style="font-weight: 700;">${index + 1}. ${namesShow}</td>
-          <td>
+          <td class="col-status">
             <select class="admin-rsvp-status-select" data-id="${r.id || r.code}" data-name1="${escapeHtml(r.name)}" data-name2="${escapeHtml(r.name2 || '')}" data-inv="${r.invCode || ''}" style="padding: 0.35rem 0.65rem; border-radius: 50px; font-size: 0.76rem; font-weight: 700; border: 1.5px solid ${borderColor}; color: ${textColor}; background: #FFFFFF; cursor: pointer;">
               ${selectOptions}
             </select>
           </td>
-          <td>${pasesBadge}</td>
-          <td><strong class="code-tag">${escapeHtml(r.code || 'CR-0000')}</strong></td>
+          <td class="col-pases">${pasesBadge}</td>
+          <td style="text-align: center;"><strong class="code-tag">${escapeHtml(r.code || 'CR-0000')}</strong></td>
           <td>
             <small>${escapeHtml(r.dietary && r.dietary !== 'ninguna' ? r.dietary : 'Tradicional')}${r.dietary2 && r.dietary2 !== 'ninguna' ? ' / ' + escapeHtml(r.dietary2) : ''}</small>
           </td>
@@ -752,8 +752,8 @@
           <td class="cell-message" title="${escapeHtml(r.message || '')}">
             <small>${escapeHtml(r.message || '—')}</small>
           </td>
-          <td><small style="color: #777;">${dateStr}</small></td>
-          <td>
+          <td style="text-align: center;"><small style="color: #777;">${dateStr}</small></td>
+          <td style="text-align: center;">
             <button class="btn-del-rsvp" data-id="${r.id || ''}" data-inv="${r.invCode || ''}" data-code="${r.code || ''}" data-name1="${escapeHtml(r.name)}" title="Eliminar confirmación" style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1.15rem; padding: 0.35rem; transition: transform 0.2s ease;">
               <i class="ri-delete-bin-line"></i>
             </button>

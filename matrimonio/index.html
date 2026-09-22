@@ -698,16 +698,12 @@
       <div class="admin-dashboard" id="admin-dashboard" style="display: none;">
         <!-- Header del Panel -->
         <div class="admin-top-bar">
-          <div>
+          <div class="admin-title-area">
             <span class="admin-badge-royal">👑 Panel Exclusivo de Novios</span>
             <h3 class="admin-dashboard-title">Cristopher &amp; Reny — Centro de Control</h3>
             <p class="admin-dashboard-sub">Gestiona tus invitados, revisa quién asistirá, organiza mesas y descarga las fotos del gran día.</p>
           </div>
           <div class="admin-top-actions">
-            <a href="organizador.html" target="_blank" class="btn-admin-organizador-quick" title="Abrir Organizador de Mesas, Cronograma y Compras en pantalla completa">
-              <i class="ri-layout-grid-fill"></i>
-              <span>Organizador Completo ↗</span>
-            </a>
             <button class="btn-admin-logout" id="btn-admin-logout" title="Cerrar sesión">
               <i class="ri-logout-box-r-line"></i> <span>Salir</span>
             </button>
@@ -852,10 +848,10 @@
               <thead>
                 <tr>
                   <th>Invitado(s)</th>
-                  <th>Pases</th>
-                  <th>Estado</th>
+                  <th class="col-pases" style="text-align: center; width: 140px;">Pases</th>
+                  <th class="col-status" style="width: 175px;">Estado</th>
                   <th>Acciones / Link WhatsApp</th>
-                  <th>Eliminar</th>
+                  <th style="width: 70px; text-align: center;">Eliminar</th>
                 </tr>
               </thead>
               <tbody id="admin-invitations-tbody">
@@ -883,14 +879,14 @@
               <thead>
                 <tr>
                   <th>Invitado(a)</th>
-                  <th>Estado</th>
-                  <th>Pases</th>
-                  <th>Código Pase</th>
+                  <th class="col-status" style="width: 175px;">Estado</th>
+                  <th class="col-pases" style="text-align: center; width: 140px;">Pases</th>
+                  <th style="width: 105px; text-align: center;">Código Pase</th>
                   <th>Menú / Dieta</th>
                   <th>Canción</th>
-                  <th>Dedicatoria</th>
-                  <th>Fecha</th>
-                  <th>Eliminar</th>
+                  <th class="col-message" style="min-width: 220px;">Dedicatoria</th>
+                  <th style="width: 105px; text-align: center;">Fecha</th>
+                  <th style="width: 60px; text-align: center;">Eliminar</th>
                 </tr>
               </thead>
               <tbody id="admin-rsvps-tbody">
@@ -911,7 +907,7 @@
               Planifica la distribución de mesas, controla el cronograma minuto a minuto del evento con estado de cada actividad (OK / Pendiente) y gestiona las compras e insumos necesarios en una interfaz amplia y cómoda.
             </p>
             <div class="org-hub-cta">
-              <a href="organizador.html" target="_blank" class="btn-vogue-gold btn-org-hero-cta">
+              <a href="organizador.html?tab=mesas#pane-tables" target="_blank" class="btn-vogue-gold btn-org-hero-cta">
                 <i class="ri-external-link-line"></i>
                 <span>Abrir Organizador en Pantalla Completa</span>
               </a>
@@ -926,7 +922,7 @@
                 <h4 class="org-card-title">Distribución de Mesas</h4>
                 <p class="org-card-desc">Crea y nombra mesas, define número de comensales y asigna a cada invitado con facilidad.</p>
               </div>
-              <a href="organizador.html#mesas" target="_blank" class="btn-org-card-action">
+              <a href="organizador.html?tab=mesas#pane-tables" target="_blank" class="btn-org-card-action">
                 <span>Gestionar Mesas</span> <i class="ri-arrow-right-line"></i>
               </a>
             </div>
@@ -937,7 +933,7 @@
                 <h4 class="org-card-title">Cronograma del Día</h4>
                 <p class="org-card-desc">Itinerario minuto a minuto con horas, responsables y botones de marcado (Pendiente / OK).</p>
               </div>
-              <a href="organizador.html#cronograma" target="_blank" class="btn-org-card-action">
+              <a href="organizador.html?tab=cronograma#pane-timeline" target="_blank" class="btn-org-card-action">
                 <span>Ver Cronograma</span> <i class="ri-arrow-right-line"></i>
               </a>
             </div>
@@ -948,7 +944,7 @@
                 <h4 class="org-card-title">Compras &amp; Pendientes</h4>
                 <p class="org-card-desc">Lista detallada de compras requeridas, presupuestos estimados y control de avance de compras.</p>
               </div>
-              <a href="organizador.html#compras" target="_blank" class="btn-org-card-action">
+              <a href="organizador.html?tab=compras#pane-shopping" target="_blank" class="btn-org-card-action">
                 <span>Ver Compras</span> <i class="ri-arrow-right-line"></i>
               </a>
             </div>

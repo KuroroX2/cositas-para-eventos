@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initTabs();
   loadData();
   renderAll();
+  handleTabFromUrl();
   setupEventListeners();
   initDragAndDrop();
 });
@@ -1196,19 +1197,49 @@ function setupEventListeners() {
 /* ==========================================================================
    11. Pestañas y Helpers
    ========================================================================== */
+function switchTab(targetId) {
+  const tabs = document.querySelectorAll('.org-nav-tabs .tab-btn');
+  const targetPane = document.getElementById(targetId);
+  const targetTabBtn = document.querySelector(`.org-nav-tabs .tab-btn[data-target="${targetId}"]`);
+
+  if (targetPane && targetTabBtn) {
+    tabs.forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.org-pane').forEach(p => p.classList.remove('active'));
+
+    targetTabBtn.classList.add('active');
+    targetPane.classList.add('active');
+  }
+}
+
+function handleTabFromUrl() {
+  const hash = (window.location.hash || '').toLowerCase().replace('#', '').trim();
+  const urlParams = new URLSearchParams(window.location.search);
+  const tabParam = (urlParams.get('tab') || '').toLowerCase().trim();
+  const key = tabParam || hash;
+
+  if (key === 'cronograma' || key === 'timeline' || key === 'pane-timeline') {
+    switchTab('pane-timeline');
+  } else if (key === 'compras' || key === 'shopping' || key === 'pane-shopping') {
+    switchTab('pane-shopping');
+  } else if (key === 'mesas' || key === 'tables' || key === 'pane-tables') {
+    switchTab('pane-tables');
+  }
+}
+
 function initTabs() {
   const tabs = document.querySelectorAll('.org-nav-tabs .tab-btn');
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.org-pane').forEach(p => p.classList.remove('active'));
-
-      tab.classList.add('active');
       const targetId = tab.dataset.target;
-      const targetPane = document.getElementById(targetId);
-      if (targetPane) targetPane.classList.add('active');
+      switchTab(targetId);
+      if (targetId === 'pane-timeline') window.location.hash = 'cronograma';
+      else if (targetId === 'pane-shopping') window.location.hash = 'compras';
+      else if (targetId === 'pane-tables') window.location.hash = 'mesas';
     });
   });
+
+  handleTabFromUrl();
+  window.addEventListener('hashchange', handleTabFromUrl);
 }
 
 function showToast(msg) {
