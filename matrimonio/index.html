@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cristopher & Reny — Nuestro Matrimonio | Invitación Oficial</title>
+  <meta name="description" content="Te invitamos a celebrar nuestro matrimonio. Cristopher y Reny. Sábado 14 de Noviembre de 2026 en Casona Los Olivos, Pirque.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Italiana&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Remix Icon CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💍</text></svg>">
+</head>
+<body>
+
+  <!-- Interactive Atmosphere Background Canvas -->
+  <canvas id="particleCanvas" class="particle-canvas" aria-hidden="true"></canvas>
+
+  <!-- Ambient Glow Effects -->
+  <div class="ambient-glow glow-1" aria-hidden="true"></div>
+  <div class="ambient-glow glow-2" aria-hidden="true"></div>
+
+  <!-- Floating Navigation Bar -->
+  <header class="vogue-nav" id="navbar">
+    <div class="nav-container">
+      <a href="#" class="brand-monogram">
+        <span class="brand-initials">C & R</span>
+        <span class="brand-date">14 • 11 • 2026</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#fecha-lugar" class="nav-link">Fecha & Lugar</a></li>
+        <li><a href="#itinerario" class="nav-link">Itinerario</a></li>
+        <li><a href="#galeria" class="nav-link">Momentos</a></li>
+        <li><a href="#dinamicas" class="nav-link">Caza de Fotos</a></li>
+        <li><a href="#dresscode" class="nav-link">Dress Code</a></li>
+        <li><a href="#regalos" class="nav-link">Regalos</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="../index.html" class="btn-back-home" title="Volver a Cositas Para Eventos">
+          <i class="ri-arrow-left-line"></i>
+          <span>Cositas Para Eventos</span>
+        </a>
+        <a href="#rsvp" class="btn-rsvp-nav">
+          Confirmar
+        </a>
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menú de navegación">
+          <i class="ri-menu-3-line"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Overlay -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <aside class="mobile-nav-drawer" id="mobileDrawer">
+    <button class="drawer-close" id="drawerClose" aria-label="Cerrar menú">
+      <i class="ri-close-line"></i>
+    </button>
+    <div style="margin-bottom: 24px;">
+      <span style="font-family: var(--font-cinzel); font-size: 1.5rem; color: var(--primary-forest); font-weight: 700;">C & R</span>
+      <p style="font-size: 0.8rem; color: var(--gold-dark); text-transform: uppercase; letter-spacing: 2px;">14 Noviembre 2026</p>
+    </div>
+    <ul class="drawer-links">
+      <li><a href="#fecha-lugar">Fecha & Lugar</a></li>
+      <li><a href="#itinerario">Itinerario del Día</a></li>
+      <li><a href="#galeria">Nuestros Recuerdos</a></li>
+      <li><a href="#dinamicas">Caza de Fotos 📸</a></li>
+      <li><a href="#dresscode">Código de Vestimenta</a></li>
+      <li><a href="#regalos">Lista de Regalos 🎁</a></li>
+      <li><a href="#rsvp" style="color: var(--gold-warm); font-weight: 700;">Confirmar Asistencia (RSVP)</a></li>
+    </ul>
+    <div style="margin-top: auto; padding-top: 20px;">
+      <a href="../index.html" class="btn-back-home" style="justify-content: center; width: 100%;">
+        <i class="ri-arrow-left-line"></i>
+        <span>Volver a Cositas Para Eventos</span>
+      </a>
+    </div>
+  </aside>
+
+  <main>
+    <!-- HERO SECTION / PORTADA -->
+    <section class="hero-section" id="hero">
+      <div class="container">
+        <div class="hero-editorial-frame">
+          <!-- Ornamental Corners -->
+          <div class="ornament-corner ornament-tl" aria-hidden="true"></div>
+          <div class="ornament-corner ornament-tr" aria-hidden="true"></div>
+          <div class="ornament-corner ornament-bl" aria-hidden="true"></div>
+          <div class="ornament-corner ornament-br" aria-hidden="true"></div>
+
+          <p class="hero-tagline">¡Queremos compartir este día tan especial contigo!</p>
+
+          <h1 class="hero-title">
+            <span class="hero-name">Cristopher</span>
+            <span class="hero-amp">&amp;</span>
+            <span class="hero-name">Reny</span>
+          </h1>
+
+          <p class="hero-verse">
+            “El amor no consiste en mirarse el uno al otro, sino en mirar juntos hacia la misma dirección. Hoy comenzamos nuestra aventura para siempre.”
+          </p>
+
+          <!-- Showcase Image -->
+          <div class="hero-showcase">
+            <div class="hero-img-wrapper">
+              <img src="assets/images/demo_hero_couple.jpg" alt="Cristopher & Reny - Foto Oficial de Boda" loading="eager">
+              <div class="hero-badge-overlay">
+                💍 14 DE NOVIEMBRE DE 2026 • CASONA LOS OLIVOS, PIRQUE
+              </div>
+            </div>
+          </div>
+
+          <!-- Countdown Grid -->
+          <div class="countdown-container">
+            <p class="countdown-label">Faltan para nuestro matrimonio</p>
+            <div class="countdown-grid">
+              <div class="countdown-box">
+                <div class="countdown-num" id="countDays">00</div>
+                <div class="countdown-unit">Días</div>
+              </div>
+              <div class="countdown-box">
+                <div class="countdown-num" id="countHours">00</div>
+                <div class="countdown-unit">Horas</div>
+              </div>
+              <div class="countdown-box">
+                <div class="countdown-num" id="countMins">00</div>
+                <div class="countdown-unit">Min</div>
+              </div>
+              <div class="countdown-box">
+                <div class="countdown-num" id="countSecs">00</div>
+                <div class="countdown-unit">Seg</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="hero-cta-buttons">
+            <button class="btn-outline" id="btnGoogleCal">
+              <i class="ri-google-fill"></i>
+              <span>Google Calendar</span>
+            </button>
+            <button class="btn-outline" id="btnIcsCal">
+              <i class="ri-calendar-event-fill"></i>
+              <span>Apple / Outlook (.ics)</span>
+            </button>
+            <a href="#rsvp" class="btn-primary">
+              <i class="ri-mail-check-fill"></i>
+              <span>Confirmar Asistencia</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GALERÍA DE RECUERDOS -->
+    <section class="content-section" id="galeria">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Nuestra Historia</span>
+          <h2 class="section-title">Momentos que Guardamos en el Corazón</h2>
+          <p class="section-subtitle">Un vistazo a nuestras risas, aventuras y el camino que nos trajo hasta este gran paso.</p>
+        </div>
+
+        <div class="gallery-grid">
+          <article class="gallery-card">
+            <img src="assets/images/demo_forest_walk.jpg" alt="Paseo por el bosque">
+            <div class="gallery-overlay">
+              <h3 class="gallery-title">Paseo en el Bosque</h3>
+              <p class="gallery-desc">Caminatas al atardecer</p>
+            </div>
+          </article>
+
+          <article class="gallery-card">
+            <img src="assets/images/demo_closeup_smile.jpg" alt="Risas y complicidad">
+            <div class="gallery-overlay">
+              <h3 class="gallery-title">Risas & Complicidad</h3>
+              <p class="gallery-desc">La magia de cada día</p>
+            </div>
+          </article>
+
+          <article class="gallery-card">
+            <img src="assets/images/demo_sunset_tree.jpg" alt="Atardecer Dorado">
+            <div class="gallery-overlay">
+              <h3 class="gallery-title">Atardecer Dorado</h3>
+              <p class="gallery-desc">Donde todo comenzó</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- FECHA, HORARIO & UBICACIÓN -->
+    <section class="content-section section-bg-alt" id="fecha-lugar">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Dónde & Cuándo</span>
+          <h2 class="section-title">El Lugar de Nuestro Gran Día</h2>
+          <p class="section-subtitle">Hemos elegido un rincón mágico rodeado de naturaleza y viñedos en Pirque.</p>
+        </div>
+
+        <div class="venue-grid">
+          <!-- Tarjeta Fecha & Hora -->
+          <div class="venue-card">
+            <div>
+              <div class="venue-icon-box">
+                <i class="ri-calendar-2-line"></i>
+              </div>
+              <h3 class="venue-title">Fecha & Horarios</h3>
+              <p class="venue-address">
+                <strong>Sábado, 14 de Noviembre de 2026</strong><br>
+                Recepción: 16:30 hrs.<br>
+                Ceremonia Civil & Votos: 17:00 hrs. en punto.
+              </p>
+              <div class="venue-badges">
+                <span class="venue-badge">🌤️ Clima Primavera Campestre</span>
+                <span class="venue-badge">🌿 Jardines al aire libre</span>
+              </div>
+            </div>
+            <div class="venue-actions">
+              <a href="#itinerario" class="btn-outline" style="width: 100%; justify-content: center;">
+                <i class="ri-time-line"></i> Ver Itinerario Detallado
+              </a>
+            </div>
+          </div>
+
+          <!-- Tarjeta Casona Los Olivos -->
+          <div class="venue-card">
+            <div>
+              <div class="venue-icon-box">
+                <i class="ri-map-pin-2-line"></i>
+              </div>
+              <h3 class="venue-title">Casona Los Olivos</h3>
+              <p class="venue-address">
+                Camino El Principal #4520, Comuna de Pirque, Región Metropolitana, Chile.
+              </p>
+              <div class="venue-badges">
+                <span class="venue-badge">🚗 Estacionamiento Privado</span>
+                <span class="venue-badge">🔒 Seguridad en el recinto</span>
+              </div>
+            </div>
+            <div class="venue-actions">
+              <a href="https://maps.google.com/?q=Pirque+Chile" target="_blank" rel="noopener noreferrer" class="btn-map-action btn-gmaps">
+                <i class="ri-google-fill"></i> Google Maps
+              </a>
+              <a href="https://waze.com/ul?q=Pirque" target="_blank" rel="noopener noreferrer" class="btn-map-action btn-waze">
+                <i class="ri-navigation-line"></i> Waze
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ITINERARIO DEL DÍA -->
+    <section class="content-section" id="itinerario">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Cronograma</span>
+          <h2 class="section-title">Itinerario del Matrimonio</h2>
+          <p class="section-subtitle">Queremos que disfrutes cada momento desde la llegada hasta la última canción.</p>
+        </div>
+
+        <div class="timeline">
+          <div class="timeline-item left">
+            <div class="timeline-dot"></div>
+            <div class="timeline-card">
+              <span class="timeline-time">16:30 HRS</span>
+              <h3 class="timeline-title">🥂 Llegada & Bienvenida</h3>
+              <p class="timeline-desc">Recepción de los invitados en los jardines con aguas frescas aromáticas y música acústica.</p>
+            </div>
+          </div>
+
+          <div class="timeline-item right">
+            <div class="timeline-dot"></div>
+            <div class="timeline-card">
+              <span class="timeline-time">17:00 HRS</span>
+              <h3 class="timeline-title">💍 Ceremonia & Votos</h3>
+              <p class="timeline-desc">Nuestra unión civil y bendición simbólica bajo la sombra de los olivos centenarios.</p>
+            </div>
+          </div>
+
+          <div class="timeline-item left">
+            <div class="timeline-dot"></div>
+            <div class="timeline-card">
+              <span class="timeline-time">18:00 HRS</span>
+              <h3 class="timeline-title">🧺 Cóctel & "Momento Pasto"</h3>
+              <p class="timeline-desc">Degustación de aperitivos campestres, sesión de fotos y juego de Caza de Fotos.</p>
+            </div>
+          </div>
+
+          <div class="timeline-item right">
+            <div class="timeline-dot"></div>
+            <div class="timeline-card">
+              <span class="timeline-time">19:30 HRS</span>
+              <h3 class="timeline-title">🍽️ Cena & Brindis de Honor</h3>
+              <p class="timeline-desc">Banquete al atardecer, palabras de nuestros seres queridos y el esperado brindis.</p>
+            </div>
+          </div>
+
+          <div class="timeline-item left">
+            <div class="timeline-dot"></div>
+            <div class="timeline-card">
+              <span class="timeline-time">21:00 HRS</span>
+              <h3 class="timeline-title">💃 Baile de Novios & Fiesta</h3>
+              <p class="timeline-desc">Apertura oficial de la pista de baile, barra abierta, cotillón y mucha diversión.</p>
+            </div>
+          </div>
+
+          <div class="timeline-item right">
+            <div class="timeline-dot"></div>
+            <div class="timeline-card">
+              <span class="timeline-time">02:00 HRS</span>
+              <h3 class="timeline-title">🎆 Cierre con Chispitas</h3>
+              <p class="timeline-desc">Despedida mágica iluminada con luces de bengala y un abrazo fraterno.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DINÁMICA / JUEGO CAZA DE FOTOS -->
+    <section class="content-section section-bg-alt" id="dinamicas">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Juego Interactivo</span>
+          <h2 class="section-title">Caza de Fotos: Misiones de los Invitados</h2>
+          <p class="section-subtitle">¡Sé nuestro fotógrafo secreto! Cumple estas misiones divertidas durante la celebración.</p>
+        </div>
+
+        <div class="quest-grid">
+          <div class="quest-card">
+            <span class="quest-number">MISIÓN 01</span>
+            <div class="quest-icon">📸</div>
+            <h3 class="quest-title">Selfie con los Novios</h3>
+            <p class="quest-desc">Captura una sonrisa espontánea junto a Cristopher y Reny durante la fiesta.</p>
+            <button class="quest-status-btn"><span>Completar Misión</span></button>
+          </div>
+
+          <div class="quest-card">
+            <span class="quest-number">MISIÓN 02</span>
+            <div class="quest-icon">🥂</div>
+            <h3 class="quest-title">El Brindis Efusivo</h3>
+            <p class="quest-desc">Fotografía a tu mesa chocando las copas con la mayor alegría posible.</p>
+            <button class="quest-status-btn"><span>Completar Misión</span></button>
+          </div>
+
+          <div class="quest-card">
+            <span class="quest-number">MISIÓN 03</span>
+            <div class="quest-icon">🕺</div>
+            <h3 class="quest-title">El Mejor Paso de Baile</h3>
+            <p class="quest-desc">Captura al rey o reina de la pista dándolo todo con la mejor coreografía.</p>
+            <button class="quest-status-btn"><span>Completar Misión</span></button>
+          </div>
+
+          <div class="quest-card">
+            <span class="quest-number">MISIÓN 04</span>
+            <div class="quest-icon">🥺</div>
+            <h3 class="quest-title">Lágrima de Emoción</h3>
+            <p class="quest-desc">Inmortaliza el rostro emocionado de un familiar o amigo durante los votos.</p>
+            <button class="quest-status-btn"><span>Completar Misión</span></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DRESS CODE -->
+    <section class="content-section" id="dresscode">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Cómo Vestir</span>
+          <h2 class="section-title">Código de Vestimenta</h2>
+          <p class="section-subtitle">Estilo: <strong>Elegante Campestre / Formal de Tarde</strong>. Queremos que luzcas increíble y te sientas muy cómodo.</p>
+        </div>
+
+        <div class="dresscode-grid">
+          <!-- Damas -->
+          <article class="dresscode-card">
+            <div class="dresscode-img-wrapper">
+              <img src="assets/images/dresscode_women.jpg" alt="Sugerencia de vestuario para mujeres">
+            </div>
+            <div class="dresscode-content">
+              <span class="dresscode-role">Para Ellas</span>
+              <h3 class="dresscode-title">Vestidos Fluidos & Frescura</h3>
+              <ul class="dresscode-list">
+                <li><i class="ri-check-line"></i> Vestidos largos o midi en telas livianas y frescas.</li>
+                <li><i class="ri-check-line"></i> Se recomienda tacón ancho, cuñas o flats para caminar cómodamente en el pasto.</li>
+                <li><i class="ri-close-line" style="color: #ef4444;"></i> Reservar el color blanco y marfil exclusivamente para la novia.</li>
+              </ul>
+            </div>
+          </article>
+
+          <!-- Caballeros -->
+          <article class="dresscode-card">
+            <div class="dresscode-img-wrapper">
+              <img src="assets/images/dresscode_men.jpg" alt="Sugerencia de vestuario para hombres">
+            </div>
+            <div class="dresscode-content">
+              <span class="dresscode-role">Para Ellos</span>
+              <h3 class="dresscode-title">Traje Formal de Tarde</h3>
+              <ul class="dresscode-list">
+                <li><i class="ri-check-line"></i> Traje de dos piezas en tonos azul, gris, beige o tierra.</li>
+                <li><i class="ri-check-line"></i> Camisa formal; corbata o corbatín opcional para mayor frescura.</li>
+                <li><i class="ri-check-line"></i> Zapatos de cuero o calzado formal cómodo para exteriores.</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+
+        <!-- Paleta de Colores Sugerida -->
+        <div class="color-palette-showcase">
+          <h4 style="font-family: var(--font-serif); font-size: 1.4rem; color: var(--primary-forest);">Gama de Colores Inspirada en el Entorno</h4>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 4px;">Tonos botánicos y tierra que complementan el paisaje campestre:</p>
+          <div class="palette-swatches">
+            <div class="swatch">
+              <div class="swatch-circle" style="background: #7c9d8b;"></div>
+              <span class="swatch-name">Verde Salvia</span>
+            </div>
+            <div class="swatch">
+              <div class="swatch-circle" style="background: #c46851;"></div>
+              <span class="swatch-name">Terracota</span>
+            </div>
+            <div class="swatch">
+              <div class="swatch-circle" style="background: #e6d3a3;"></div>
+              <span class="swatch-name">Champagne</span>
+            </div>
+            <div class="swatch">
+              <div class="swatch-circle" style="background: #2c5945;"></div>
+              <span class="swatch-name">Eucalipto</span>
+            </div>
+            <div class="swatch">
+              <div class="swatch-circle" style="background: #4a5568;"></div>
+              <span class="swatch-name">Azul Noche</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LISTA DE REGALOS -->
+    <section class="content-section section-bg-alt" id="regalos">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Muestras de Cariño</span>
+          <h2 class="section-title">Lista de Regalos & Buenos Deseos</h2>
+          <p class="section-subtitle">Tu presencia es nuestro mejor obsequio. Si deseas hacernos un regalo para nuestro nuevo hogar y luna de miel, ponemos a tu disposición estos datos:</p>
+        </div>
+
+        <div class="gifts-wrapper">
+          <div style="font-size: 2.8rem; margin-bottom: 12px;">🎁</div>
+          <h3 style="font-family: var(--font-serif); font-size: 1.8rem; color: var(--primary-forest); margin-bottom: 8px;">Transferencia Bancaria</h3>
+          <p style="font-size: 0.95rem; color: var(--text-muted);">
+            Puedes realizar un depósito directo para ayudarnos a construir nuestro nuevo nido de amor:
+          </p>
+
+          <div class="bank-details-box">
+            <div class="bank-row">
+              <span class="bank-label">Banco:</span>
+              <span class="bank-val">Banco Santander</span>
+            </div>
+            <div class="bank-row">
+              <span class="bank-label">Tipo de Cuenta:</span>
+              <span class="bank-val">Cuenta Corriente</span>
+            </div>
+            <div class="bank-row">
+              <span class="bank-label">N° de Cuenta:</span>
+              <span class="bank-val">00-78451239-4</span>
+            </div>
+            <div class="bank-row">
+              <span class="bank-label">Titulares:</span>
+              <span class="bank-val">Cristopher & Reny</span>
+            </div>
+            <div class="bank-row">
+              <span class="bank-label">RUT:</span>
+              <span class="bank-val">18.765.432-1</span>
+            </div>
+            <div class="bank-row">
+              <span class="bank-label">Correo Electrónico:</span>
+              <span class="bank-val">novios@cositasparaeventos.cl</span>
+            </div>
+          </div>
+
+          <button class="btn-copy-bank" id="btnCopyBank">
+            <i class="ri-file-copy-line"></i>
+            <span>Copiar Datos Bancarios</span>
+          </button>
+
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 24px; font-style: italic;">
+            También contaremos con un buzón de <strong>Lluvia de Sobres</strong> el día del evento en la recepción.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONFIRMACIÓN DE ASISTENCIA (RSVP) -->
+    <section class="content-section rsvp-section" id="rsvp">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Pase Digital Oficial</span>
+          <h2 class="section-title">Confirmación de Asistencia (RSVP)</h2>
+          <p class="section-subtitle">Por favor confirma antes del <strong>15 de Octubre de 2026</strong>. Al completar el formulario se generará tu Pase Digital VIP para la recepción.</p>
+        </div>
+
+        <div class="rsvp-box">
+          <form id="rsvpForm">
+            <div class="rsvp-form-grid">
+              <div class="form-group form-full">
+                <label class="form-label" for="guestName">Nombre y Apellidos *</label>
+                <input type="text" id="guestName" class="form-input" placeholder="Ej: Camila Soto González" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="guestPhone">Teléfono / WhatsApp *</label>
+                <input type="tel" id="guestPhone" class="form-input" placeholder="+56 9 1234 5678" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="guestCompanions">Pases Requeridos</label>
+                <select id="guestCompanions" class="form-select">
+                  <option value="1">Solo yo (1 persona)</option>
+                  <option value="2">Yo + 1 acompañante (2 personas)</option>
+                  <option value="3">Familia (3 personas)</option>
+                  <option value="4">Familia (4 personas)</option>
+                </select>
+              </div>
+
+              <div class="form-group form-full">
+                <label class="form-label">¿Podrás acompañarnos? *</label>
+                <div class="radio-group">
+                  <label class="radio-card active">
+                    <input type="radio" name="attendance" value="yes" checked>
+                    <span>💍 ¡Sí, ahí estaré con alegría!</span>
+                  </label>
+                  <label class="radio-card">
+                    <input type="radio" name="attendance" value="no">
+                    <span>💌 Lamentablemente no podré</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="dietPreference">Preferencia Alimentaria</label>
+                <select id="dietPreference" class="form-select">
+                  <option value="standard">Menú Tradicional</option>
+                  <option value="vegetarian">Vegetariano</option>
+                  <option value="vegan">Vegano</option>
+                  <option value="celiac">Celíaco / Sin Gluten</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="guestSong">Canción que te hace bailar</label>
+                <input type="text" id="guestSong" class="form-input" placeholder="Artista - Canción">
+              </div>
+
+              <div class="form-group form-full">
+                <label class="form-label" for="guestMessage">Mensaje para Cristopher & Reny</label>
+                <textarea id="guestMessage" class="form-textarea" rows="3" placeholder="Escribe aquí un lindo deseo para nosotros..."></textarea>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-submit-rsvp">
+              <i class="ri-ticket-line"></i>
+              <span>Generar mi Pase Digital de Boda</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL PASE DIGITAL VIP GENERADO -->
+  <div class="pass-modal" id="passModal" role="dialog" aria-modal="true" aria-labelledby="ticketGuestName">
+    <div class="pass-card-container">
+      <button class="btn-close-modal" id="closePassModal" aria-label="Cerrar pase">
+        <i class="ri-close-line"></i>
+      </button>
+
+      <div class="ticket-header">
+        <span class="ticket-tag">PASE VIP DE ACCESO OFICIAL</span>
+        <h3 class="ticket-couple">Cristopher & Reny</h3>
+        <p style="font-size: 0.8rem; color: var(--gold-dark); text-transform: uppercase; letter-spacing: 2px;">Sábado 14 de Noviembre 2026 • 16:30 hrs</p>
+      </div>
+
+      <div class="ticket-body">
+        <div class="ticket-qr-box" id="ticketQr">
+          <!-- Dynamic SVG QR Code injected via JS -->
+        </div>
+
+        <h4 class="ticket-guest-name" id="ticketGuestName">Camila Soto González</h4>
+        <span class="ticket-pass-id" id="ticketPassId">VIP-CR-8942</span>
+
+        <div class="ticket-details-grid">
+          <div>
+            <strong style="color: var(--primary-forest);">Lugar:</strong><br>
+            Casona Los Olivos, Pirque
+          </div>
+          <div>
+            <strong style="color: var(--primary-forest);">Reserva:</strong><br>
+            <span id="ticketSeats">1 Asiento</span>
+          </div>
+          <div>
+            <strong style="color: var(--primary-forest);">Dress Code:</strong><br>
+            Elegante Campestre
+          </div>
+          <div>
+            <strong style="color: var(--primary-forest);">Estado:</strong><br>
+            <span style="color: #10b981; font-weight: 700;">✓ Confirmado</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ticket-actions">
+        <button class="btn-print-pass" id="btnPrintPass">
+          <i class="ri-printer-line"></i> Guardar / Imprimir Pase
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIGHTBOX MODAL PARA FOTOS -->
+  <div class="lightbox-modal" id="lightboxModal" role="dialog" aria-modal="true">
+    <div class="lightbox-content">
+      <button class="lightbox-close" id="lightboxClose" aria-label="Cerrar imagen">&times;</button>
+      <img src="" id="lightboxImg" alt="Vista previa de foto">
+    </div>
+  </div>
+
+  <!-- FLOATING AUDIO TOGGLE (MELODÍA ROMÁNTICA AMBIENTAL) -->
+  <div class="floating-audio">
+    <button class="btn-music-toggle" id="btnMusicToggle" title="Reproducir música ambiental" aria-label="Música ambiental">
+      <i class="ri-music-2-line"></i>
+    </button>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="vogue-footer">
+    <div class="container">
+      <div class="footer-monogram">C &amp; R</div>
+      <p class="footer-tagline">“Nuestra historia apenas comienza…”</p>
+      <div class="footer-divider"></div>
+      <p style="font-size: 0.95rem; color: rgba(255,255,255,0.85); margin-bottom: 8px;">
+        14 de Noviembre de 2026 • Pirque, Chile
+      </p>
+      <p class="footer-powered">
+        Invitación digital interactiva creada por <a href="../index.html">Cositas Para Eventos</a>
+      </p>
+    </div>
+  </footer>
+
+  <!-- Main JavaScript File -->
+  <script src="js/app.js"></script>
+</body>
+</html>
