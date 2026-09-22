@@ -728,6 +728,11 @@
             <p class="admin-dashboard-sub">Registra a tus invitados (1 o 2 personas), genera links personalizados y gestiona el sorteo.</p>
           </div>
           <div class="admin-top-actions">
+            <a href="organizador.html" target="_blank" class="btn-vogue-gold" style="padding: 0.5rem 1rem; font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 4px 12px rgba(197, 160, 89, 0.35);" title="Abrir Organizador de Mesas, Cronograma y Compras">
+              <i class="ri-layout-grid-fill"></i>
+              <span>📋 Mesas, Cronograma &amp; Compras</span>
+              <i class="ri-external-link-line"></i>
+            </a>
             <button class="btn-admin-logout" id="btn-admin-logout" title="Cerrar sesión">
               <i class="ri-logout-box-r-line"></i> <span>Salir</span>
             </button>
@@ -760,6 +765,9 @@
           </button>
           <button class="admin-tab-btn" data-tab="admin-tab-rsvps">
             <i class="ri-user-follow-line"></i> 2. Confirmaciones &amp; Sorteo
+          </button>
+          <button class="admin-tab-btn" data-tab="admin-tab-organizador">
+            <i class="ri-calendar-todo-line"></i> 4. Mesas, Cronograma &amp; Compras
           </button>
           <button class="admin-tab-btn" data-tab="admin-tab-photos">
             <i class="ri-image-line"></i> 3. Álbum &amp; Descargas
@@ -868,6 +876,49 @@
         </div>
 
         <!-- Tab 3: Photos Gallery & Bulk Download -->
+        
+        <!-- Tab 4: Organizador de Mesas, Cronograma & Compras -->
+        <div class="admin-tab-pane" id="admin-tab-organizador">
+          <div style="background: rgba(82, 122, 80, 0.08); border: 1.5px solid var(--border-gold); border-radius: 12px; padding: 1.8rem; margin-bottom: 1.5rem; text-align: center;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.8rem;">📋</div>
+            <h3 style="font-family: var(--font-serif); font-size: 1.6rem; color: #234233; margin-bottom: 0.5rem;">
+              Organizador Nupcial Completo
+            </h3>
+            <p style="font-size: 0.95rem; color: #5e6b63; max-width: 650px; margin: 0 auto 1.5rem; line-height: 1.5;">
+              Aquí puedes organizar la distribución de mesas de los invitados, planificar el cronograma minuto a minuto de todo el día de la boda (indicando responsables y si está OK o Pendiente) y llevar el control de todas las cosas que necesitan comprar o preparar.
+            </p>
+            <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+              <a href="organizador.html" target="_blank" class="btn-vogue-gold" style="font-size: 1rem; padding: 0.8rem 1.8rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.6rem; box-shadow: 0 6px 20px rgba(197, 160, 89, 0.4);">
+                <i class="ri-external-link-line"></i>
+                <span>Abrir Organizador en Pantalla Completa</span>
+              </a>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+            <div style="background: #ffffff; border: 1px solid var(--border-gold); border-radius: 10px; padding: 1.2rem; text-align: center;">
+              <div style="font-size: 1.8rem; color: #99742a; margin-bottom: 0.4rem;">🪑</div>
+              <h4 style="font-family: var(--font-serif); font-size: 1.15rem; color: #1c1b1a;">Mesas de Invitados</h4>
+              <p style="font-size: 0.8rem; color: #5e6b63; margin: 0.4rem 0 1rem;">Crea mesas, define capacidades y ubica a cada invitado.</p>
+              <a href="organizador.html" target="_blank" class="btn-vogue-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem; text-decoration: none;">Gestionar Mesas ↗</a>
+            </div>
+
+            <div style="background: #ffffff; border: 1px solid var(--border-gold); border-radius: 10px; padding: 1.2rem; text-align: center;">
+              <div style="font-size: 1.8rem; color: #99742a; margin-bottom: 0.4rem;">⏱️</div>
+              <h4 style="font-family: var(--font-serif); font-size: 1.15rem; color: #1c1b1a;">Cronograma Minuto a Minuto</h4>
+              <p style="font-size: 0.8rem; color: #5e6b63; margin: 0.4rem 0 1rem;">Horarios, actividades, responsables y estado Pendiente/OK.</p>
+              <a href="organizador.html" target="_blank" class="btn-vogue-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem; text-decoration: none;">Ver Cronograma ↗</a>
+            </div>
+
+            <div style="background: #ffffff; border: 1px solid var(--border-gold); border-radius: 10px; padding: 1.2rem; text-align: center;">
+              <div style="font-size: 1.8rem; color: #99742a; margin-bottom: 0.4rem;">🛍️</div>
+              <h4 style="font-family: var(--font-serif); font-size: 1.15rem; color: #1c1b1a;">Compras &amp; Pendientes</h4>
+              <p style="font-size: 0.8rem; color: #5e6b63; margin: 0.4rem 0 1rem;">Detalle de ítems por comprar con estado de compra.</p>
+              <a href="organizador.html" target="_blank" class="btn-vogue-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem; text-decoration: none;">Ver Compras ↗</a>
+            </div>
+          </div>
+        </div>
+
         <div class="admin-tab-pane" id="admin-tab-photos">
           <!-- Banner Módulo Fotos & Código QR -->
           <div style="background: rgba(82, 122, 80, 0.08); border: 1px solid var(--border-gold); border-radius: 10px; padding: 1.4rem; margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
