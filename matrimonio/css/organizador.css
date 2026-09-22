@@ -612,9 +612,13 @@ i[class^="ri-"], i[class*=" ri-"] {
   border-bottom: 1px dashed rgba(212, 175, 55, 0.3);
 }
 
-.table-card-title-wrap {
+.table-card-info {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
 }
 
 .table-card-title {
@@ -629,9 +633,7 @@ i[class^="ri-"], i[class*=" ri-"] {
 
 .table-card-header-actions {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 6px;
+  align-items: flex-start;
   flex-shrink: 0;
 }
 
