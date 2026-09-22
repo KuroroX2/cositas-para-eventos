@@ -83,74 +83,48 @@
   </div>
 
   <main>
-    <!-- HERO / PORTADA -->
-    <section class="hero-cover" id="hero">
-      <div class="hero-border-frame">
-        <!-- Theme Decorative Corner Ornaments -->
-        <div class="frame-ornament corner-tl" aria-hidden="true"></div>
-        <div class="frame-ornament corner-tr" aria-hidden="true"></div>
-        <div class="frame-ornament corner-bl" aria-hidden="true"></div>
-        <div class="frame-ornament corner-br" aria-hidden="true"></div>
-        <div class="hero-theme-crest" aria-hidden="true"></div>
-        
-        <div class="hero-headline-wrapper">
-          <p class="hero-kicker">¡QUEREMOS COMPARTIR ESTE DÍA TAN ESPECIAL CONTIGO!</p>
-          <h1 class="hero-title">
-            <span class="title-name">Reny</span>
-            <span class="title-amp">&amp;</span>
-            <span class="title-name">Cristopher</span>
-          </h1>
-          <p class="hero-biblical-verse">
-            “Cantares 8:6 Ponme como un sello sobre tu corazón, como una marca sobre tu brazo; porque fuerte es como la muerte el amor.”
-          </p>
+        <!-- HERO CINEMATOGRÁFICO CON FOTO DE FONDO (EXACTO A LA DEMO DE COSITAS PARA EVENTOS) -->
+    <section class="wedding-hero-cinematic" id="hero" style="background-image: url('assets/images/demo_hero_couple.jpg');">
+      <div class="wedding-hero-overlay"></div>
+      <div class="wedding-hero-text">
+        <div class="wedding-tag">¡Nos casamos!</div>
+        <h1 class="wedding-names">Cristopher &amp; Reny</h1>
+        <div class="wedding-date-location">
+          <span>📅 Sábado, 14 de Noviembre 2026</span>
+          <span>📍 Casona Los Olivos, Pirque</span>
         </div>
 
-        <!-- Foto de los Novios -->
-        <div class="hero-image-showcase">
-          <div class="editorial-frame">
-            <img src="assets/images/demo_hero_couple.jpg" alt="Cristopher y Reny" class="hero-photo">
-            <div class="frame-tag">14 DE NOVIEMBRE DE 2026 • CASONA LOS OLIVOS, PIRQUE</div>
+        <!-- Countdown -->
+        <div class="countdown-box" id="weddingCountdown">
+          <div class="countdown-unit">
+            <div class="countdown-num" id="cd-days">84</div>
+            <div class="countdown-label">Días</div>
+          </div>
+          <div class="countdown-unit">
+            <div class="countdown-num" id="cd-hours">14</div>
+            <div class="countdown-label">Horas</div>
+          </div>
+          <div class="countdown-unit">
+            <div class="countdown-num" id="cd-minutes">32</div>
+            <div class="countdown-label">Min</div>
+          </div>
+          <div class="countdown-unit">
+            <div class="countdown-num" id="cd-seconds">45</div>
+            <div class="countdown-label">Seg</div>
           </div>
         </div>
 
-        <!-- Contador Regresivo -->
-        <div class="countdown-editorial">
-          <p class="countdown-label">FALTAN PARA NUESTRO MATRIMONIO</p>
-          <div class="countdown-grid">
-            <div class="cd-cell">
-              <span class="cd-num" id="cd-days">00</span>
-              <span class="cd-txt">Días</span>
-            </div>
-            <span class="cd-colon">:</span>
-            <div class="cd-cell">
-              <span class="cd-num" id="cd-hours">00</span>
-              <span class="cd-txt">Horas</span>
-            </div>
-            <span class="cd-colon">:</span>
-            <div class="cd-cell">
-              <span class="cd-num" id="cd-minutes">00</span>
-              <span class="cd-txt">Minutos</span>
-            </div>
-            <span class="cd-colon">:</span>
-            <div class="cd-cell">
-              <span class="cd-num" id="cd-seconds">00</span>
-              <span class="cd-txt">Segundos</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Botones de Acción -->
-        <div class="hero-actions">
-          <div class="hero-cal-buttons">
-            <button id="btn-google-cal-hero" class="btn-vogue-secondary">
-              <i class="ri-google-fill"></i>
-              <span>Google Calendar</span>
-            </button>
-            <button id="btn-apple-cal-hero" class="btn-vogue-secondary btn-apple-cal">
-              <i class="ri-apple-fill"></i>
-              <span>iPhone / Apple</span>
-            </button>
-          </div>
+        <!-- Action Buttons -->
+        <div class="hero-action-row">
+          <a href="#rsvp" class="btn-hero-action btn-hero-rsvp">
+            <i class="ri-mail-check-line"></i> Confirmar Asistencia (RSVP)
+          </a>
+          <button id="btn-google-cal-hero" class="btn-hero-action btn-hero-cal">
+            <i class="ri-google-fill"></i> Google Calendar
+          </button>
+          <button id="btn-apple-cal-hero" class="btn-hero-action btn-hero-cal">
+            <i class="ri-apple-fill"></i> iPhone / Apple (.ics)
+          </button>
         </div>
       </div>
     </section>
