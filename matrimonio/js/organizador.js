@@ -35,6 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
   handleTabFromUrl();
   setupEventListeners();
   initDragAndDrop();
+  initViewSwitch();
+  initFloorplanDragging();
 });
 
 /* ==========================================================================
@@ -130,15 +132,69 @@ function updateNextTableNumberInput() {
   }
 }
 
+function getDefaultTableCoords(idx, total) {
+  // Coordenadas calculadas en un lienzo de 1050 x 680 px
+  if (idx === 0) return { x: 440, y: 35 }; // Novios al centro frente al escenario
+  const i = idx - 1;
+  const col = i % 3;
+  const row = Math.floor(i / 3);
+  let x = 110;
+  if (col === 1) x = 445;
+  if (col === 2) x = 780;
+  const y = 210 + row * 220;
+  return { x, y };
+}
+
+function ensureCouplesAdjacent(table) {
+  if (!table || !table.guests || table.guests.length <= 2) return;
+  const processed = new Set();
+  const ordered = [];
+
+  for (let i = 0; i < table.guests.length; i++) {
+    const g = table.guests[i];
+    const key = g.trim().toLowerCase();
+    if (processed.has(key)) continue;
+
+    ordered.push(g);
+    processed.add(key);
+
+    const companion = getCompanion(g);
+    if (companion) {
+      const compKey = companion.trim().toLowerCase();
+      const inTable = table.guests.some(x => x.trim().toLowerCase() === compKey);
+      if (inTable && !processed.has(compKey)) {
+        ordered.push(companion);
+        processed.add(compKey);
+      }
+    }
+  }
+  table.guests = ordered;
+}
+
 function loadData() {
   const savedTables = localStorage.getItem(STORAGE_KEY_TABLES);
   if (savedTables) {
     try {
       tables = JSON.parse(savedTables);
-      // Auto-corregir y normalizar: asegurar que cada mesa tenga su número y prefijo "Mesa X: "
+      // Auto-corregir y normalizar: asegurar número, tipo, coordenadas y contigüidad de parejas
       tables.forEach((t, idx) => {
         t.number = extractTableNumber(t, idx);
         t.name = getFormattedTableName(t.number, t.name);
+        if (!t.type) {
+          if (t.id === 't_1' || (t.name && t.name.toLowerCase().includes('novio'))) {
+            t.type = 'novios';
+          } else if (t.capacity <= 4) {
+            t.type = 'square';
+          } else {
+            t.type = 'round';
+          }
+        }
+        if (t.posX === undefined || t.posY === undefined) {
+          const coords = getDefaultTableCoords(idx, tables.length);
+          t.posX = coords.x;
+          t.posY = coords.y;
+        }
+        ensureCouplesAdjacent(t);
       });
       sortTablesAscending();
       saveData();
@@ -380,6 +436,7 @@ function renderAll() {
   updateNextTableNumberInput();
   renderMetrics();
   renderTables();
+  renderFloorplan();
   renderUnassignedList();
   renderTimeline();
   renderShopping();
@@ -548,16 +605,24 @@ function renderTables() {
       });
     }
 
+    const type = table.type || 'round';
+    const typeLabel = type === 'novios' ? '👑 Mesa Novios' : (type === 'square' ? '⬜ Rectangular' : '🟡 Redonda');
+
     card.innerHTML = `
       <div class="table-card-header">
         <div class="table-card-info">
+          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px;">
+            <span class="table-badge-shape" style="font-size: 0.7rem; font-weight: 700; color: #4A5568; background: #F1F5F9; padding: 2px 8px; border-radius: 50px;">
+              ${typeLabel}
+            </span>
+            <span class="table-badge-capacity ${isFull ? 'full' : ''}" title="Asientos asignados / Capacidad total">
+              ${table.guests.length} / ${table.capacity}
+            </span>
+          </div>
           <h3 class="table-card-title">${escapeHtml(table.name)}</h3>
-          <span class="table-badge-capacity ${isFull ? 'full' : ''}" title="Asientos asignados / Capacidad total">
-            ${table.guests.length} / ${table.capacity}
-          </span>
         </div>
         <div class="table-card-header-actions">
-          <button class="btn-table-edit" onclick="openEditTableModal('${table.id}')" title="Editar nombre y capacidad de asientos">
+          <button class="btn-table-edit" onclick="openEditTableModal('${table.id}')" title="Editar nombre, tipo y capacidad de asientos">
             <i class="ri-edit-line"></i> <span>Editar</span>
           </button>
         </div>
@@ -566,8 +631,11 @@ function renderTables() {
         ${guestsHtml}
       </ul>
       <div class="table-card-footer">
+        <button type="button" class="btn-manage-seats-card" onclick="openSeatsModal('${table.id}')" title="Acomodar puestos de invitados y parejas" style="background: #F1F5F9; color: var(--navy-royal); border: 1px solid #CBD5E1; padding: 6px 12px; border-radius: 50px; font-size: 0.78rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s ease;">
+          <i class="ri-user-shared-line"></i> Puestos
+        </button>
         <button class="btn-add-to-table" ${isFull ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''} onclick="openAssignModal('${table.id}')">
-          <i class="ri-user-add-line"></i> Asignar Invitado
+          <i class="ri-user-add-line"></i> Asignar
         </button>
         <button class="btn-delete-table" onclick="deleteTable('${table.id}')" title="Eliminar mesa">
           <i class="ri-delete-bin-line"></i>
@@ -580,6 +648,404 @@ function renderTables() {
 
   initItemDragListeners();
 }
+
+/* ==========================================================================
+   4.1 PLANO DEL SALÓN 2D (MESAS POSICIONABLES Y SILLAS PERIMETRALES)
+   ========================================================================== */
+function renderFloorplan() {
+  const canvas = document.getElementById('floorplanCanvas');
+  if (!canvas) return;
+
+  canvas.innerHTML = '';
+
+  tables.forEach((table, tableIdx) => {
+    const isFull = table.guests.length >= table.capacity;
+    const type = table.type || 'round';
+
+    const node = document.createElement('div');
+    node.className = `fp-table-node fp-shape-${type}`;
+    node.id = `fp_node_${table.id}`;
+    node.dataset.tableId = table.id;
+    node.style.left = `${table.posX !== undefined ? table.posX : 100}px`;
+    node.style.top = `${table.posY !== undefined ? table.posY : 100}px`;
+
+    // Corona exclusiva para la mesa de los novios
+    let noviosCrown = '';
+    if (type === 'novios') {
+      noviosCrown = '<div class="fp-novios-crown"><i class="ri-vip-crown-2-fill"></i> Mesa Novios</div>';
+    }
+
+    // Superficie central de la mesa
+    node.innerHTML = `
+      ${noviosCrown}
+      <div class="fp-table-surface" title="Arrastra para mover por el salón">
+        <span class="fp-table-number">Mesa ${table.number || (tableIdx + 1)}</span>
+        <span class="fp-table-name">${escapeHtml(getCleanTableName(table.name))}</span>
+        <span class="fp-table-capacity ${isFull ? 'full' : ''}">${table.guests.length} / ${table.capacity}</span>
+        <button type="button" class="fp-btn-manage-seats" onclick="openSeatsModal('${table.id}')" title="Acomodar puestos de invitados y parejas">
+          <i class="ri-user-shared-line"></i> Puestos
+        </button>
+      </div>
+    `;
+
+    // Renderizar sillas alrededor del perímetro
+    const chairs = generateChairsForTable(table);
+    chairs.forEach(chair => {
+      node.appendChild(chair);
+    });
+
+    canvas.appendChild(node);
+  });
+}
+
+function generateChairsForTable(table) {
+  const chairs = [];
+  const capacity = table.capacity || 8;
+  const type = table.type || 'round';
+
+  if (type === 'round') {
+    // Radio desde el centro (130px -> centro 65, 65)
+    const R = 84;
+    const centerX = 65;
+    const centerY = 65;
+
+    for (let i = 0; i < capacity; i++) {
+      const angle = (2 * Math.PI * i / capacity) - (Math.PI / 2);
+      const x = Math.round(centerX + R * Math.cos(angle));
+      const y = Math.round(centerY + R * Math.sin(angle));
+
+      chairs.push(createChairElement(table, i, x, y));
+    }
+  } else if (type === 'novios') {
+    // Mesa presidencial: 170x115. Centro (85, 57)
+    if (capacity === 2) {
+      chairs.push(createChairElement(table, 0, 50, 130));
+      chairs.push(createChairElement(table, 1, 120, 130));
+    } else {
+      for (let i = 0; i < capacity; i++) {
+        const step = 150 / (capacity + 1);
+        const x = Math.round(10 + step * (i + 1));
+        const y = 132;
+        chairs.push(createChairElement(table, i, x, y));
+      }
+    }
+  } else {
+    // Mesa Cuadrada / Rectangular (160x110)
+    const topCount = Math.ceil(capacity / 2);
+    const bottomCount = capacity - topCount;
+
+    for (let i = 0; i < topCount; i++) {
+      const step = 140 / (topCount + 1);
+      const x = Math.round(10 + step * (i + 1));
+      const y = -14;
+      chairs.push(createChairElement(table, i, x, y));
+    }
+
+    for (let j = 0; j < bottomCount; j++) {
+      const step = 140 / (bottomCount + 1);
+      const x = Math.round(10 + step * (j + 1));
+      const y = 124;
+      chairs.push(createChairElement(table, topCount + j, x, y));
+    }
+  }
+
+  return chairs;
+}
+
+function createChairElement(table, seatIndex, x, y) {
+  const chair = document.createElement('div');
+  const isOccupied = seatIndex < table.guests.length;
+  const guest = isOccupied ? table.guests[seatIndex] : null;
+
+  chair.style.left = `${x}px`;
+  chair.style.top = `${y}px`;
+
+  if (isOccupied && guest) {
+    const companion = getCompanion(guest);
+    const hasCompanionInTable = companion && table.guests.some(g => g.trim().toLowerCase() === companion.trim().toLowerCase());
+
+    chair.className = `fp-chair seated ${hasCompanionInTable ? 'couple' : ''}`;
+    chair.textContent = guest.charAt(0).toUpperCase();
+
+    const tooltipText = `Puesto ${seatIndex + 1}: ${guest}` + (hasCompanionInTable ? ` (👥 Pareja con: ${companion})` : '');
+    chair.dataset.tooltip = tooltipText;
+
+    chair.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openSeatsModal(table.id);
+    });
+  } else {
+    chair.className = 'fp-chair empty';
+    chair.innerHTML = '<i class="ri-add-line" style="font-size: 0.65rem;"></i>';
+    chair.dataset.tooltip = `Puesto ${seatIndex + 1}: Asiento Libre (Clic para asignar)`;
+
+    chair.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openAssignModal(table.id);
+    });
+  }
+
+  return chair;
+}
+
+/* ==========================================================================
+   4.2 ARRASTRE DE MESAS EN EL PLANO 2D
+   ========================================================================== */
+function initFloorplanDragging() {
+  const canvas = document.getElementById('floorplanCanvas');
+  if (!canvas) return;
+
+  let activeNode = null;
+  let startX = 0;
+  let startY = 0;
+  let initialLeft = 0;
+  let initialTop = 0;
+
+  function onPointerDown(e) {
+    if (e.target.closest('button, a, .fp-chair')) return;
+
+    const node = e.target.closest('.fp-table-node');
+    if (!node) return;
+
+    activeNode = node;
+    node.classList.add('dragging');
+
+    const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+    const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
+
+    startX = clientX;
+    startY = clientY;
+    initialLeft = parseInt(node.style.left, 10) || 0;
+    initialTop = parseInt(node.style.top, 10) || 0;
+
+    window.addEventListener('mousemove', onPointerMove, { passive: false });
+    window.addEventListener('touchmove', onPointerMove, { passive: false });
+    window.addEventListener('mouseup', onPointerUp);
+    window.addEventListener('touchend', onPointerUp);
+
+    e.preventDefault();
+  }
+
+  function onPointerMove(e) {
+    if (!activeNode) return;
+
+    const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+    const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
+
+    const dx = clientX - startX;
+    const dy = clientY - startY;
+
+    const canvasW = canvas.clientWidth || 1050;
+    const canvasH = canvas.clientHeight || 680;
+    const nodeW = activeNode.offsetWidth || 160;
+    const nodeH = activeNode.offsetHeight || 130;
+
+    const maxLeft = Math.max(0, canvasW - nodeW - 10);
+    const maxTop = Math.max(0, canvasH - nodeH - 10);
+
+    const newLeft = Math.max(10, Math.min(maxLeft, initialLeft + dx));
+    const newTop = Math.max(10, Math.min(maxTop, initialTop + dy));
+
+    activeNode.style.left = `${newLeft}px`;
+    activeNode.style.top = `${newTop}px`;
+
+    e.preventDefault();
+  }
+
+  function onPointerUp() {
+    if (!activeNode) return;
+
+    const tableId = activeNode.dataset.tableId;
+    const table = tables.find(t => t.id === tableId);
+    if (table) {
+      table.posX = parseInt(activeNode.style.left, 10);
+      table.posY = parseInt(activeNode.style.top, 10);
+      saveData();
+    }
+
+    activeNode.classList.remove('dragging');
+    activeNode = null;
+
+    window.removeEventListener('mousemove', onPointerMove);
+    window.removeEventListener('touchmove', onPointerMove);
+    window.removeEventListener('mouseup', onPointerUp);
+    window.removeEventListener('touchend', onPointerUp);
+  }
+
+  canvas.addEventListener('mousedown', onPointerDown);
+  canvas.addEventListener('touchstart', onPointerDown, { passive: false });
+}
+
+window.autoLayoutTables = function() {
+  if (tables.length === 0) return;
+
+  const noviosTable = tables.find(t => t.type === 'novios') || tables[0];
+  noviosTable.posX = 440;
+  noviosTable.posY = 35;
+
+  const others = tables.filter(t => t !== noviosTable);
+  others.forEach((t, i) => {
+    const coords = getDefaultTableCoords(i + 1, tables.length);
+    t.posX = coords.x;
+    t.posY = coords.y;
+  });
+
+  saveData();
+  renderFloorplan();
+  showToast('¡Mesas auto-alineadas armoniosamente en el salón!');
+};
+
+/* ==========================================================================
+   4.3 ORGANIZADOR DE PUESTOS CON REGLA DE PAREJAS CONTIGUAS
+   ========================================================================== */
+let currentSeatsModalTableId = null;
+
+window.openSeatsModal = function(tableId) {
+  const table = tables.find(t => t.id === tableId);
+  if (!table) return;
+
+  currentSeatsModalTableId = tableId;
+  const modal = document.getElementById('seatsModal');
+  const nameEl = document.getElementById('seatsModalTableName');
+  if (nameEl) nameEl.textContent = table.name;
+
+  ensureCouplesAdjacent(table);
+  saveData();
+  renderSeatsModalContent(table);
+
+  if (modal) modal.classList.add('active');
+};
+
+function renderSeatsModalContent(table) {
+  const container = document.getElementById('seatsArrangementContainer');
+  if (!container) return;
+
+  container.innerHTML = '';
+
+  if (table.guests.length === 0) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 30px 15px; color: var(--text-muted); background: #F8FAFC; border-radius: 12px; border: 1.5px dashed #CBD5E1;">
+        <i class="ri-user-unfollow-line" style="font-size: 2rem; color: #94A3B8; display: block; margin-bottom: 8px;"></i>
+        Esta mesa aún no tiene comensales sentados.<br>
+        Usa <strong>"Asignar Invitado"</strong> para ubicar a las personas aquí.
+      </div>
+    `;
+    return;
+  }
+
+  table.guests.forEach((guest, idx) => {
+    const companion = getCompanion(guest);
+    const hasCompanionInTable = companion && table.guests.some(g => g.trim().toLowerCase() === companion.trim().toLowerCase());
+
+    const item = document.createElement('div');
+    item.className = `seat-arr-item ${hasCompanionInTable ? 'is-couple' : ''}`;
+
+    let coupleBadge = '';
+    let swapBtn = '';
+
+    if (hasCompanionInTable) {
+      coupleBadge = `<span class="seat-arr-couple-badge"><i class="ri-heart-fill"></i> Pareja con: ${escapeHtml(companion)}</span>`;
+      swapBtn = `
+        <button type="button" class="btn-seat-swap-couple" onclick="swapCoupleSides('${table.id}', '${escapeHtml(guest)}')" title="Intercambiar lado con ${escapeHtml(companion)} (quién va a la izquierda o derecha)">
+          <i class="ri-swap-line"></i> <span>⇄ Cambiar Lado</span>
+        </button>
+      `;
+    }
+
+    item.innerHTML = `
+      <div class="seat-arr-left">
+        <span class="seat-arr-number" title="Número de puesto">${idx + 1}</span>
+        <div class="seat-arr-info">
+          <span class="seat-arr-name">${escapeHtml(guest)}</span>
+          ${coupleBadge}
+        </div>
+      </div>
+      <div class="seat-arr-actions">
+        ${swapBtn}
+        <button type="button" class="btn-seat-move" onclick="moveSeatItem('${table.id}', ${idx}, -1)" ${idx === 0 ? 'disabled' : ''} title="Mover puesto hacia adelante">
+          <i class="ri-arrow-up-line"></i>
+        </button>
+        <button type="button" class="btn-seat-move" onclick="moveSeatItem('${table.id}', ${idx}, 1)" ${idx === table.guests.length - 1 ? 'disabled' : ''} title="Mover puesto hacia atrás">
+          <i class="ri-arrow-down-line"></i>
+        </button>
+        <button type="button" class="btn-seat-remove" onclick="removeGuestFromSeatsModal('${table.id}', ${idx})" title="Quitar de esta mesa">
+          <i class="ri-close-circle-line"></i>
+        </button>
+      </div>
+    `;
+
+    container.appendChild(item);
+  });
+}
+
+window.swapCoupleSides = function(tableId, guestName) {
+  const table = tables.find(t => t.id === tableId);
+  if (!table) return;
+
+  const companion = getCompanion(guestName);
+  if (!companion) return;
+
+  const idx1 = table.guests.findIndex(g => g.trim().toLowerCase() === guestName.trim().toLowerCase());
+  const idx2 = table.guests.findIndex(g => g.trim().toLowerCase() === companion.trim().toLowerCase());
+
+  if (idx1 !== -1 && idx2 !== -1) {
+    const temp = table.guests[idx1];
+    table.guests[idx1] = table.guests[idx2];
+    table.guests[idx2] = temp;
+
+    saveData();
+    renderAll();
+    if (currentSeatsModalTableId === tableId) {
+      renderSeatsModalContent(table);
+    }
+    showToast(`¡Se intercambió la posición de ${guestName} y ${companion}!`);
+  }
+};
+
+window.moveSeatItem = function(tableId, guestIndex, direction) {
+  const table = tables.find(t => t.id === tableId);
+  if (!table || !table.guests) return;
+
+  const guest = table.guests[guestIndex];
+  const companion = getCompanion(guest);
+  const companionIdx = companion ? table.guests.findIndex(g => g.trim().toLowerCase() === companion.trim().toLowerCase()) : -1;
+
+  if (companionIdx !== -1 && Math.abs(guestIndex - companionIdx) === 1) {
+    // Es un bloque de pareja
+    const minIdx = Math.min(guestIndex, companionIdx);
+    const maxIdx = Math.max(guestIndex, companionIdx);
+
+    if (direction === -1 && minIdx > 0) {
+      const itemBefore = table.guests.splice(minIdx - 1, 1)[0];
+      table.guests.splice(maxIdx, 0, itemBefore);
+    } else if (direction === 1 && maxIdx < table.guests.length - 1) {
+      const itemAfter = table.guests.splice(maxIdx + 1, 1)[0];
+      table.guests.splice(minIdx, 0, itemAfter);
+    }
+  } else {
+    // Comensal individual
+    const targetIdx = guestIndex + direction;
+    if (targetIdx >= 0 && targetIdx < table.guests.length) {
+      const temp = table.guests[guestIndex];
+      table.guests[guestIndex] = table.guests[targetIdx];
+      table.guests[targetIdx] = temp;
+    }
+  }
+
+  saveData();
+  renderAll();
+  if (currentSeatsModalTableId === tableId) {
+    renderSeatsModalContent(table);
+  }
+};
+
+window.removeGuestFromSeatsModal = function(tableId, guestIndex) {
+  removeGuestFromTable(tableId, guestIndex);
+  const table = tables.find(t => t.id === tableId);
+  if (table && currentSeatsModalTableId === tableId) {
+    renderSeatsModalContent(table);
+  }
+};
 
 function renderUnassignedList() {
   const listEl = document.getElementById('unassignedList');
@@ -806,6 +1272,11 @@ window.openEditTableModal = function(tableId) {
   // Mostrar nombre limpio sin el prefijo "Mesa X: "
   nameInput.value = getCleanTableName(table.name);
 
+  const typeSelect = document.getElementById('editTableType');
+  if (typeSelect) {
+    typeSelect.value = table.type || 'round';
+  }
+
   capInput.value = table.capacity;
   capInput.min = Math.max(1, table.guests.length);
 
@@ -991,16 +1462,22 @@ function setupEventListeners() {
       const num = parseInt(numInput.value, 10) || getNextTableNumber();
       let rawName = nameInput.value.trim();
       const capacity = parseInt(capSelect.value, 10);
+      const typeSelect = document.getElementById('newTableType');
+      const type = typeSelect ? typeSelect.value : 'round';
 
       if (!rawName) return;
 
       const cleanName = getCleanTableName(rawName);
       const fullName = getFormattedTableName(num, cleanName || rawName);
+      const coords = getDefaultTableCoords(tables.length, tables.length + 1);
 
       tables.push({
         id: 't_' + Date.now(),
         number: num,
         name: fullName,
+        type: type,
+        posX: coords.x,
+        posY: coords.y,
         capacity: capacity,
         guests: []
       });
@@ -1041,10 +1518,13 @@ function setupEventListeners() {
 
       const cleanName = getCleanTableName(rawName);
       const fullName = getFormattedTableName(newNum, cleanName || rawName);
+      const typeSelect = document.getElementById('editTableType');
+      const newType = typeSelect ? typeSelect.value : (table.type || 'round');
 
       table.number = newNum;
       table.name = fullName;
       table.capacity = newCap;
+      table.type = newType;
 
       sortTablesAscending();
       saveData();
@@ -1190,6 +1670,56 @@ function setupEventListeners() {
   if (btnPrint) {
     btnPrint.addEventListener('click', () => {
       window.print();
+    });
+  }
+
+  initViewSwitch();
+}
+
+function initViewSwitch() {
+  const btnCards = document.getElementById('btnViewCards');
+  const btnFp = document.getElementById('btnViewFloorplan');
+  const containerCards = document.getElementById('viewModeCardsContainer');
+  const containerFp = document.getElementById('viewModeFloorplanContainer');
+
+  if (btnCards && btnFp && containerCards && containerFp) {
+    btnCards.addEventListener('click', () => {
+      btnCards.classList.add('active');
+      btnFp.classList.remove('active');
+      containerCards.style.display = 'block';
+      containerFp.style.display = 'none';
+      renderTables();
+    });
+
+    btnFp.addEventListener('click', () => {
+      btnFp.classList.add('active');
+      btnCards.classList.remove('active');
+      containerCards.style.display = 'none';
+      containerFp.style.display = 'block';
+      renderFloorplan();
+    });
+  }
+
+  const btnAuto = document.getElementById('btnAutoLayout');
+  if (btnAuto) {
+    btnAuto.addEventListener('click', autoLayoutTables);
+  }
+
+  const btnReset = document.getElementById('btnResetFloorplanZoom');
+  if (btnReset) {
+    btnReset.addEventListener('click', () => {
+      const wrapper = document.getElementById('floorplanWrapper');
+      if (wrapper) {
+        wrapper.scrollTo({ left: 0, top: 0, behavior: 'smooth' });
+      }
+    });
+  }
+
+  const btnCloseSeats = document.getElementById('btnCloseSeatsModal');
+  if (btnCloseSeats) {
+    btnCloseSeats.addEventListener('click', () => {
+      const modal = document.getElementById('seatsModal');
+      if (modal) modal.classList.remove('active');
     });
   }
 }

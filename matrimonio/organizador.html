@@ -106,10 +106,20 @@
 
     <!-- PANE 1: ORGANIZACIÓN DE MESAS -->
     <section class="org-pane active" id="pane-tables">
-      <div class="section-top-bar">
+      <div class="section-top-bar" style="flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between;">
         <div>
           <h2>Distribución y Ubicación de Invitados</h2>
           <p>Organiza a tus invitados por afinidad o familia. Todo cambio se guarda automáticamente.</p>
+        </div>
+
+        <!-- Conmutador de Vistas: Tarjetas vs Plano del Salón -->
+        <div class="view-switch-box">
+          <button type="button" class="view-switch-btn active" id="btnViewCards" data-view="cards" title="Vista clásica de tarjetas con lista de invitados">
+            <i class="ri-layout-grid-line"></i> <span>Vista Tarjetas</span>
+          </button>
+          <button type="button" class="view-switch-btn" id="btnViewFloorplan" data-view="floorplan" title="Plano 2D interactivo con distribución y puestos del salón">
+            <i class="ri-compasses-2-line"></i> <span>Plano del Salón 2D</span>
+          </button>
         </div>
       </div>
 
@@ -120,7 +130,7 @@
           <!-- Card Crear Nueva Mesa (Estilo Panel de Control) -->
           <div class="side-card side-card-create">
             <h3 class="side-card-title"><i class="ri-layout-masonry-line" style="color: var(--gold-dark);"></i> Crear Nueva Mesa</h3>
-            <p class="side-card-desc">Define el nombre y la cantidad de comensales:</p>
+            <p class="side-card-desc">Define el número, nombre, tipo y capacidad:</p>
             <form id="formAddTable">
               <div class="form-group-org">
                 <label for="newTableNumber">Número de Mesa *</label>
@@ -131,6 +141,14 @@
               <div class="form-group-org">
                 <label for="newTableName">Nombre de la Mesa *</label>
                 <input type="text" id="newTableName" class="input-org" placeholder="Ej.: Familia Novia / Primos" required>
+              </div>
+              <div class="form-group-org">
+                <label for="newTableType">Tipo / Forma de Mesa *</label>
+                <select id="newTableType" class="select-org">
+                  <option value="round" selected>🟡 Redonda (Estándar)</option>
+                  <option value="square">⬜ Cuadrada / Rectangular</option>
+                  <option value="novios">👑 Mesa de los Novios (Presidencial)</option>
+                </select>
               </div>
               <div class="form-group-org">
                 <label for="newTableCapacity">Capacidad Máxima *</label>
@@ -167,14 +185,48 @@
           </div>
         </aside>
 
-        <!-- Tables Display Grid (A LA DERECHA) -->
+        <!-- Tables Display Area (A LA DERECHA) -->
         <div class="tables-main-area">
-          <div class="tables-main-header">
-            <h3 class="tables-main-title"><i class="ri-restaurant-line"></i> Mesas del Salón</h3>
-            <span class="tables-main-hint">Usa "Asignar Invitado" en cada mesa para ubicar a las personas.</span>
+          <!-- MODO 1: VISTA TARJETAS / LISTA (EXISTENTE) -->
+          <div id="viewModeCardsContainer" class="view-mode-container active">
+            <div class="tables-main-header">
+              <h3 class="tables-main-title"><i class="ri-restaurant-line"></i> Mesas del Salón</h3>
+              <span class="tables-main-hint">Usa "Asignar Invitado" o "Puestos" en cada mesa para ubicar a las personas.</span>
+            </div>
+            <div class="tables-grid" id="tablesGrid">
+              <!-- Rendered dynamically by organizador.js -->
+            </div>
           </div>
-          <div class="tables-grid" id="tablesGrid">
-            <!-- Rendered dynamically by organizador.js -->
+
+          <!-- MODO 2: PLANO DEL SALÓN 2D INTERACTIVO (NUEVO) -->
+          <div id="viewModeFloorplanContainer" class="view-mode-container" style="display: none;">
+            <div class="floorplan-toolbar">
+              <div class="floorplan-title-block">
+                <h3 class="tables-main-title"><i class="ri-compasses-2-line" style="color: var(--gold-dark);"></i> Plano de Ubicación en el Salón</h3>
+                <span class="tables-main-hint">Arrastra y suelta las mesas para ubicarlas exactamente como estarán en el centro de eventos. Haz clic en "Acomodar Puestos" para elegir quién va al lado de quién.</span>
+              </div>
+              <div class="floorplan-actions">
+                <button type="button" class="btn-fp-action" id="btnAutoLayout" title="Ordenar mesas automáticamente en una distribución armónica en el salón">
+                  <i class="ri-magic-line"></i> <span>Auto-Alinear</span>
+                </button>
+                <button type="button" class="btn-fp-action" id="btnResetFloorplanZoom" title="Centrar el plano">
+                  <i class="ri-focus-3-line"></i> <span>Centrar</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Escenario y Lienzo del Centro de Eventos -->
+            <div class="floorplan-wrapper" id="floorplanWrapper">
+              <!-- Indicador arquitectónico: Pista de Baile / Escenario -->
+              <div class="salon-stage-banner">
+                <i class="ri-music-2-line"></i> PISTA DE BAILE &amp; ESCENARIO PRINCIPAL
+              </div>
+
+              <!-- Lienzo Interactivo de Mesas -->
+              <div class="floorplan-canvas" id="floorplanCanvas">
+                <!-- Mesas y puestos renderizados dinámicamente por organizador.js -->
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -363,6 +415,14 @@
           <input type="text" id="editTableName" class="input-org" required>
         </div>
         <div class="form-group-org">
+          <label for="editTableType">Tipo / Forma de Mesa *</label>
+          <select id="editTableType" class="select-org">
+            <option value="round">🟡 Redonda (Estándar)</option>
+            <option value="square">⬜ Cuadrada / Rectangular</option>
+            <option value="novios">👑 Mesa de los Novios (Presidencial)</option>
+          </select>
+        </div>
+        <div class="form-group-org">
           <label for="editTableCapacity">Capacidad Máxima de Asientos *</label>
           <input type="number" id="editTableCapacity" class="input-org" min="1" max="30" required>
           <small id="editTableCurrentSeats" style="display: block; font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;"></small>
@@ -394,6 +454,31 @@
 
       <div class="pick-tables-list" id="pickTablesList">
         <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL ORGANIZAR PUESTOS & REUBICACIÓN DE ASIENTOS CON REGLA DE PAREJAS -->
+  <div class="org-modal" id="seatsModal">
+    <div class="org-modal-card" style="max-width: 680px;">
+      <button class="btn-close-modal" aria-label="Cerrar"><i class="ri-close-line"></i></button>
+      <div style="margin-bottom: 18px;">
+        <span class="side-card-tag tag-amber" style="margin-bottom: 6px;"><i class="ri-layout-masonry-line"></i> Puestos y Ubicación</span>
+        <h3 class="org-modal-title" style="margin-bottom: 6px;"><i class="ri-user-shared-line" style="color: var(--gold-dark);"></i> Acomodar Puestos en <span id="seatsModalTableName" style="color: var(--gold-dark);"></span></h3>
+        <p style="font-size: 0.84rem; color: var(--text-muted); line-height: 1.5; margin: 0;">
+          Define quién se sienta al lado de quién moviendo los puestos. <strong>Las parejas registradas siempre van juntas una al lado de la otra</strong>, y puedes cambiar en qué lado va cada una con el botón <strong>⇄ Cambiar Lado</strong>.
+        </p>
+      </div>
+
+      <!-- Contenedor dinámico de asientos ordenados -->
+      <div class="seats-arrangement-container" id="seatsArrangementContainer">
+        <!-- Generado dinámicamente por organizador.js -->
+      </div>
+
+      <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="btn-org-action" id="btnCloseSeatsModal">
+          <i class="ri-check-line"></i> <span>Listo / Guardar Distribución</span>
+        </button>
       </div>
     </div>
   </div>

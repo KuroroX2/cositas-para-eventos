@@ -1078,3 +1078,496 @@ i[class^="ri-"], i[class*=" ri-"] {
   pointer-events: auto;
   transform: translateY(0);
 }
+
+/* ==========================================================================
+   CONMUTADOR DE VISTAS (TARJETAS VS PLANO 2D)
+   ========================================================================== */
+.view-switch-box {
+  display: inline-flex;
+  align-items: center;
+  background: #F1F5F9;
+  padding: 4px;
+  border-radius: 50px;
+  border: 1px solid #CBD5E1;
+  gap: 4px;
+}
+
+.view-switch-btn {
+  padding: 6px 14px;
+  border-radius: 50px;
+  border: none;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--navy-royal);
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
+.view-switch-btn:hover {
+  background: rgba(10, 24, 40, 0.06);
+}
+
+.view-switch-btn.active {
+  background: var(--navy-royal);
+  color: #F5E6B3;
+  box-shadow: 0 2px 8px rgba(10, 24, 40, 0.2);
+}
+
+/* ==========================================================================
+   PLANO DEL SALÓN 2D INTERACTIVO
+   ========================================================================== */
+.floorplan-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.9rem;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.floorplan-title-block {
+  flex: 1;
+  min-width: 260px;
+}
+
+.floorplan-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-fp-action {
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  color: var(--navy-royal);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.btn-fp-action:hover {
+  border-color: var(--gold-dark);
+  color: var(--gold-dark);
+  background: #FFFDF9;
+}
+
+.floorplan-wrapper {
+  position: relative;
+  background-color: #F8FAFC;
+  background-image: radial-gradient(#CBD5E1 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+  border: 1.5px solid rgba(212, 175, 55, 0.4);
+  border-radius: 16px;
+  overflow: auto;
+  min-height: 640px;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.03);
+  padding: 16px;
+}
+
+.salon-stage-banner {
+  background: linear-gradient(135deg, #0A1828, #1E293B);
+  color: #D4AF37;
+  text-align: center;
+  padding: 8px 20px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  border-radius: 8px;
+  margin: 0 auto 20px auto;
+  max-width: 380px;
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.floorplan-canvas {
+  position: relative;
+  width: 1050px;
+  height: 680px;
+  margin: 0 auto;
+  user-select: none;
+}
+
+/* ==========================================================================
+   NODOS DE MESA EN EL PLANO (REDONDA, CUADRADA/RECTANGULAR, NOVIOS)
+   ========================================================================== */
+.fp-table-node {
+  position: absolute;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: box-shadow 0.2s ease, transform 0.1s ease;
+  z-index: 10;
+}
+
+.fp-table-node:active {
+  cursor: grabbing !important;
+  z-index: 30 !important;
+  transform: scale(1.03);
+}
+
+.fp-table-node.dragging {
+  cursor: grabbing !important;
+  z-index: 40 !important;
+  box-shadow: 0 14px 32px rgba(10, 24, 40, 0.28) !important;
+}
+
+/* Mesa Redonda */
+.fp-table-node.fp-shape-round .fp-table-surface {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  border: 2px solid #527A50;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  position: relative;
+}
+
+/* Mesa Cuadrada / Rectangular */
+.fp-table-node.fp-shape-square .fp-table-surface {
+  width: 160px;
+  height: 110px;
+  border-radius: 14px;
+  background: #FFFFFF;
+  border: 2px solid #4A5568;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  position: relative;
+}
+
+/* Mesa de los Novios (Presidencial / VIP) */
+.fp-table-node.fp-shape-novios .fp-table-surface {
+  width: 170px;
+  height: 115px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #FFFDF8, #FBF6E9);
+  border: 2.5px solid #D4AF37;
+  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.35);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  position: relative;
+}
+
+.fp-novios-crown {
+  position: absolute;
+  top: -12px;
+  background: #0A1828;
+  color: #D4AF37;
+  border: 1px solid #D4AF37;
+  border-radius: 50px;
+  padding: 2px 8px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.fp-table-number {
+  font-family: var(--font-display, inherit);
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--navy-royal);
+  margin-bottom: 2px;
+}
+
+.fp-table-name {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #475569;
+  max-width: 110px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+}
+
+.fp-table-capacity {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 50px;
+  background: #EDF2F7;
+  color: #2D3748;
+}
+
+.fp-table-capacity.full {
+  background: #D4EDDA;
+  color: #155724;
+}
+
+.fp-btn-manage-seats {
+  margin-top: 6px;
+  background: var(--navy-royal);
+  color: #F5E6B3;
+  border: none;
+  border-radius: 50px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  transition: all 0.2s ease;
+}
+
+.fp-btn-manage-seats:hover {
+  background: #D4AF37;
+  color: var(--navy-royal);
+  transform: scale(1.05);
+}
+
+/* ==========================================================================
+   SILLAS / PUESTOS EN EL PLANO
+   ========================================================================== */
+.fp-chair {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  border: 1.5px solid #64748B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--navy-royal);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  z-index: 5;
+  cursor: pointer;
+}
+
+.fp-chair:hover {
+  transform: translate(-50%, -50%) scale(1.2);
+  z-index: 25;
+  border-color: #D4AF37;
+  background: #FFFDF5;
+}
+
+.fp-chair.seated {
+  background: #E8F5E9;
+  border-color: #2E7D32;
+  color: #1B5E20;
+}
+
+.fp-chair.couple {
+  border-color: #D4AF37;
+  background: #FFFBEB;
+  color: #92400E;
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+}
+
+.fp-chair.empty {
+  background: #F8FAFC;
+  border: 1.5px dashed #CBD5E1;
+  color: #94A3B8;
+}
+
+/* Tooltip nativo o flotante al pasar el mouse por una silla */
+.fp-chair[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0A1828;
+  color: #F5E6B3;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+}
+
+/* ==========================================================================
+   MODAL PARA ACOMODAR PUESTOS CON REGLA DE PAREJAS
+   ========================================================================== */
+.seats-arrangement-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.seat-arr-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #FFFFFF;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  transition: all 0.2s ease;
+}
+
+.seat-arr-item:hover {
+  border-color: #CBD5E1;
+  background: #F8FAFC;
+}
+
+.seat-arr-item.is-couple {
+  border-color: rgba(212, 175, 55, 0.7);
+  background: #FFFEFA;
+  box-shadow: 0 2px 10px rgba(212, 175, 55, 0.08);
+}
+
+.seat-arr-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.seat-arr-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #F1F5F9;
+  color: var(--navy-royal);
+  font-weight: 800;
+  font-size: 0.84rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid #CBD5E1;
+}
+
+.seat-arr-item.is-couple .seat-arr-number {
+  background: #FEF3C7;
+  color: #92400E;
+  border-color: #F59E0B;
+}
+
+.seat-arr-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.seat-arr-name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--navy-royal);
+}
+
+.seat-arr-couple-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #B45309;
+}
+
+.seat-arr-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.btn-seat-swap-couple {
+  background: #FEF3C7;
+  color: #92400E;
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  border-radius: 50px;
+  padding: 5px 11px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.btn-seat-swap-couple:hover {
+  background: #FDE68A;
+  transform: scale(1.04);
+}
+
+.btn-seat-move {
+  background: #F1F5F9;
+  border: 1px solid #CBD5E1;
+  color: var(--navy-royal);
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-seat-move:hover:not(:disabled) {
+  background: var(--navy-royal);
+  color: #F5E6B3;
+  border-color: var(--navy-royal);
+}
+
+.btn-seat-move:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btn-seat-remove {
+  background: none;
+  border: none;
+  color: #EF4444;
+  cursor: pointer;
+  font-size: 1.15rem;
+  padding: 4px;
+  border-radius: 6px;
+  transition: transform 0.2s ease;
+}
+
+.btn-seat-remove:hover {
+  transform: scale(1.2);
+}
+
