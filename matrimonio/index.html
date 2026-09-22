@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cristopher & Reny — Nuestro Matrimonio | Invitación Oficial</title>
-  <meta name="description" content="Te invitamos a celebrar nuestro matrimonio. Cristopher y Reny. Sábado 14 de Noviembre de 2026 en Casona Los Olivos, Pirque.">
+    <title>Evelyn & Yimmy — Nuestro Matrimonio | Invitación Oficial</title>
+  <meta name="description" content="Te invitamos a celebrar nuestro matrimonio. Evelyn López y Yimmy Salgado. Sábado 21 de Noviembre de 2026 en Casa Pirque.">
 
-  <!-- Google Fonts -->
+  <!-- Google Fonts: Italiana, Cinzel, Pinyon Script, Cormorant Garamond, Great Vibes, Alex Brush, Playfair Display, Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Italiana&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Great+Vibes&family=Italiana&family=Pinyon+Script&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Remix Icon CDN -->
+  <!-- Remix Icon -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
 
   <!-- Main Stylesheet -->
@@ -20,645 +20,897 @@
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💍</text></svg>">
 </head>
-<body>
+<body class="vogue-theme theme-campestre">
 
-  <!-- Interactive Atmosphere Background Canvas -->
-  <canvas id="particleCanvas" class="particle-canvas" aria-hidden="true"></canvas>
+  <!-- Interactive Atmosphere Canvas (Drifting Eucalyptus Leaves) -->
+  <canvas id="particle-canvas" class="particle-canvas" aria-hidden="true"></canvas>
 
-  <!-- Ambient Glow Effects -->
-  <div class="ambient-glow glow-1" aria-hidden="true"></div>
-  <div class="ambient-glow glow-2" aria-hidden="true"></div>
+  <!-- Background Ambient Glow -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
 
-  <!-- Floating Navigation Bar -->
-  <header class="vogue-nav" id="navbar">
-    <div class="nav-container">
+
+  <!-- Navigation Bar -->
+  <header class="vogue-header" id="navbar">
+    <div class="header-inner">
       <a href="#" class="brand-monogram">
-        <span class="brand-initials">C & R</span>
-        <span class="brand-date">14 • 11 • 2026</span>
+        <span class="brand-initials">E & Y</span>
+        <span class="brand-tagline">21 • 11 • 2026</span>
       </a>
 
-      <ul class="nav-links">
-        <li><a href="#fecha-lugar" class="nav-link">Fecha & Lugar</a></li>
-        <li><a href="#itinerario" class="nav-link">Itinerario</a></li>
-        <li><a href="#galeria" class="nav-link">Momentos</a></li>
-        <li><a href="#dinamicas" class="nav-link">Caza de Fotos</a></li>
-        <li><a href="#dresscode" class="nav-link">Dress Code</a></li>
-        <li><a href="#regalos" class="nav-link">Regalos</a></li>
-      </ul>
-
-      <div class="nav-actions">
-        <a href="../index.html" class="btn-back-home" title="Volver a Cositas Para Eventos">
-          <i class="ri-arrow-left-line"></i>
-          <span>Cositas Para Eventos</span>
-        </a>
-        <a href="#rsvp" class="btn-rsvp-nav">
-          Confirmar
-        </a>
-        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menú de navegación">
-          <i class="ri-menu-3-line"></i>
+      <nav class="nav-links" id="nav-menu">
+        <a href="#fecha-lugar" class="nav-item">Fecha & Lugar</a>
+        <a href="#itinerario" class="nav-item">Itinerario</a>
+        <a href="#pasto" class="nav-item">Momento Pasto</a>
+        <a href="#dresscode" class="nav-item">Dress Code</a>
+        <a href="#regalos" class="nav-item">Lista de Regalos</a>
+        <a href="#rsvp" class="nav-item" id="nav-link-rsvp" style="display: inline-flex;">Confirmación</a>
+        <a href="../index.html" class="nav-btn-admin" style="text-decoration: none; margin-right: 6px;" title="Volver a Cositas Para Eventos"><i class="ri-arrow-left-line"></i> Volver a Cositas</a>
+        <button class="nav-btn-admin" id="btn-navbar-admin" title="Panel exclusivo para los novios">
+          <i class="ri-lock-line"></i> Acceso Novios
         </button>
-      </div>
+      </nav>
+
+      <button class="mobile-toggle" id="btn-mobile-toggle" aria-label="Abrir menú">
+        <i class="ri-menu-3-line"></i>
+      </button>
     </div>
   </header>
 
-  <!-- Mobile Drawer Overlay -->
-  <div class="drawer-overlay" id="drawerOverlay"></div>
-  <aside class="mobile-nav-drawer" id="mobileDrawer">
-    <button class="drawer-close" id="drawerClose" aria-label="Cerrar menú">
+  <!-- Mobile Overlay Drawer -->
+  <div class="mobile-drawer" id="mobile-drawer">
+    <button class="mobile-close" id="btn-mobile-close" aria-label="Cerrar menú">
       <i class="ri-close-line"></i>
     </button>
-    <div style="margin-bottom: 24px;">
-      <span style="font-family: var(--font-cinzel); font-size: 1.5rem; color: var(--primary-forest); font-weight: 700;">C & R</span>
-      <p style="font-size: 0.8rem; color: var(--gold-dark); text-transform: uppercase; letter-spacing: 2px;">14 Noviembre 2026</p>
+    <div class="drawer-header">
+      <span class="drawer-script">Evelyn & Yimmy</span>
+      <span class="drawer-sub">¡Nos Casamos!</span>
     </div>
-    <ul class="drawer-links">
-      <li><a href="#fecha-lugar">Fecha & Lugar</a></li>
-      <li><a href="#itinerario">Itinerario del Día</a></li>
-      <li><a href="#galeria">Nuestros Recuerdos</a></li>
-      <li><a href="#dinamicas">Caza de Fotos 📸</a></li>
-      <li><a href="#dresscode">Código de Vestimenta</a></li>
-      <li><a href="#regalos">Lista de Regalos 🎁</a></li>
-      <li><a href="#rsvp" style="color: var(--gold-warm); font-weight: 700;">Confirmar Asistencia (RSVP)</a></li>
+
+    <ul class="drawer-nav">
+      <li><a href="#fecha-lugar" class="drawer-link">Fecha & Ubicación</a></li>
+      <li><a href="#itinerario" class="drawer-link">Itinerario del Día</a></li>
+      <li><a href="#pasto" class="drawer-link">Momento Pasto 🧺</a></li>
+      <li><a href="#dresscode" class="drawer-link">Código de Vestimenta</a></li>
+      <li><a href="#regalos" class="drawer-link">Lista de Regalos 🎁</a></li>
+      <li id="drawer-item-rsvp" style="display: block;"><a href="#rsvp" class="drawer-link">Confirmar Asistencia (RSVP)</a></li>
+      <li>
+        <button class="drawer-admin-btn" id="btn-drawer-admin">
+          <i class="ri-lock-line"></i> 💍 Acceso Novios (Administración)
+        </button>
+      </li>
     </ul>
-    <div style="margin-top: auto; padding-top: 20px;">
-      <a href="../index.html" class="btn-back-home" style="justify-content: center; width: 100%;">
-        <i class="ri-arrow-left-line"></i>
-        <span>Volver a Cositas Para Eventos</span>
-      </a>
-    </div>
-  </aside>
+  </div>
 
   <main>
-    <!-- HERO SECTION / PORTADA -->
-    <section class="hero-section" id="hero">
-      <div class="container">
-        <div class="hero-editorial-frame">
-          <!-- Ornamental Corners -->
-          <div class="ornament-corner ornament-tl" aria-hidden="true"></div>
-          <div class="ornament-corner ornament-tr" aria-hidden="true"></div>
-          <div class="ornament-corner ornament-bl" aria-hidden="true"></div>
-          <div class="ornament-corner ornament-br" aria-hidden="true"></div>
-
-          <p class="hero-tagline">¡Queremos compartir este día tan especial contigo!</p>
-
+    <!-- HERO / PORTADA -->
+    <section class="hero-cover" id="hero">
+      <div class="hero-border-frame">
+        <!-- Theme Decorative Corner Ornaments -->
+        <div class="frame-ornament corner-tl" aria-hidden="true"></div>
+        <div class="frame-ornament corner-tr" aria-hidden="true"></div>
+        <div class="frame-ornament corner-bl" aria-hidden="true"></div>
+        <div class="frame-ornament corner-br" aria-hidden="true"></div>
+        <div class="hero-theme-crest" aria-hidden="true"></div>
+        
+        <div class="hero-headline-wrapper">
+          <p class="hero-kicker">¡QUEREMOS COMPARTIR ESTE DÍA TAN ESPECIAL CONTIGO!</p>
           <h1 class="hero-title">
-            <span class="hero-name">Cristopher</span>
-            <span class="hero-amp">&amp;</span>
-            <span class="hero-name">Reny</span>
+            <span class="title-name">Evelyn</span>
+            <span class="title-amp">&amp;</span>
+            <span class="title-name">Yimmy</span>
           </h1>
-
-          <p class="hero-verse">
-            “El amor no consiste en mirarse el uno al otro, sino en mirar juntos hacia la misma dirección. Hoy comenzamos nuestra aventura para siempre.”
+          <p class="hero-biblical-verse">
+            “Cantares 8:6 Ponme como un sello sobre tu corazón, como una marca sobre tu brazo; porque fuerte es como la muerte el amor.”
           </p>
+        </div>
 
-          <!-- Showcase Image -->
-          <div class="hero-showcase">
-            <div class="hero-img-wrapper">
-              <img src="assets/images/demo_hero_couple.jpg" alt="Cristopher & Reny - Foto Oficial de Boda" loading="eager">
-              <div class="hero-badge-overlay">
-                💍 14 DE NOVIEMBRE DE 2026 • CASONA LOS OLIVOS, PIRQUE
-              </div>
+        <!-- Foto de los Novios -->
+        <div class="hero-image-showcase">
+          <div class="editorial-frame">
+            <img src="assets/images/couple_picnic_portrait.jpg?v=2026" alt="Evelyn y Yimmy" class="hero-photo">
+            <div class="frame-tag">21 DE NOVIEMBRE DE 2026 • CASA PIRQUE</div>
+          </div>
+        </div>
+
+        <!-- Contador Regresivo -->
+        <div class="countdown-editorial">
+          <p class="countdown-label">FALTAN PARA NUESTRO MATRIMONIO</p>
+          <div class="countdown-grid">
+            <div class="cd-cell">
+              <span class="cd-num" id="cd-days">00</span>
+              <span class="cd-txt">Días</span>
+            </div>
+            <span class="cd-colon">:</span>
+            <div class="cd-cell">
+              <span class="cd-num" id="cd-hours">00</span>
+              <span class="cd-txt">Horas</span>
+            </div>
+            <span class="cd-colon">:</span>
+            <div class="cd-cell">
+              <span class="cd-num" id="cd-minutes">00</span>
+              <span class="cd-txt">Minutos</span>
+            </div>
+            <span class="cd-colon">:</span>
+            <div class="cd-cell">
+              <span class="cd-num" id="cd-seconds">00</span>
+              <span class="cd-txt">Segundos</span>
             </div>
           </div>
+        </div>
 
-          <!-- Countdown Grid -->
-          <div class="countdown-container">
-            <p class="countdown-label">Faltan para nuestro matrimonio</p>
-            <div class="countdown-grid">
-              <div class="countdown-box">
-                <div class="countdown-num" id="countDays">00</div>
-                <div class="countdown-unit">Días</div>
-              </div>
-              <div class="countdown-box">
-                <div class="countdown-num" id="countHours">00</div>
-                <div class="countdown-unit">Horas</div>
-              </div>
-              <div class="countdown-box">
-                <div class="countdown-num" id="countMins">00</div>
-                <div class="countdown-unit">Min</div>
-              </div>
-              <div class="countdown-box">
-                <div class="countdown-num" id="countSecs">00</div>
-                <div class="countdown-unit">Seg</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Action Buttons -->
-          <div class="hero-cta-buttons">
-            <button class="btn-outline" id="btnGoogleCal">
+        <!-- Botones de Acción -->
+        <div class="hero-actions">
+          <div class="hero-cal-buttons">
+            <button id="btn-google-cal-hero" class="btn-vogue-secondary">
               <i class="ri-google-fill"></i>
               <span>Google Calendar</span>
             </button>
-            <button class="btn-outline" id="btnIcsCal">
-              <i class="ri-calendar-event-fill"></i>
-              <span>Apple / Outlook (.ics)</span>
+            <button id="btn-apple-cal-hero" class="btn-vogue-secondary btn-apple-cal">
+              <i class="ri-apple-fill"></i>
+              <span>iPhone / Apple</span>
             </button>
-            <a href="#rsvp" class="btn-primary">
-              <i class="ri-mail-check-fill"></i>
-              <span>Confirmar Asistencia</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: FECHA & LUGAR -->
+    <section class="section-editorial section-dark reveal" id="fecha-lugar">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Fecha &amp; Lugar</h2>
+          <p class="section-subtitle">Queremos que disfrutes cada rincón junto a nosotros en este hermoso entorno natural.</p>
+          <div class="title-divider"></div>
+        </div>
+
+        <div class="venue-editorial-grid">
+          <!-- Tarjeta Fecha -->
+          <div class="editorial-card date-card">
+            <div class="card-icon-header">
+              <i class="ri-calendar-event-line"></i>
+            </div>
+            <h3 class="card-headline">Cuándo</h3>
+            <p class="card-big-text">SÁBADO 21 DE NOVIEMBRE, 2026</p>
+            <p class="card-detail">Hora de llegada y bienvenida: <strong>11:30 AM</strong></p>
+            <p class="card-detail">Ceremonia Civil &amp; Religiosa: <strong>13:00 PM</strong></p>
+            <div class="card-calendar-actions">
+              <button class="btn-card-action" id="btn-google-cal">
+                <i class="ri-google-fill"></i> Agendar en Google Calendar
+              </button>
+              <button class="btn-card-action btn-card-apple" id="btn-apple-cal">
+                <i class="ri-apple-fill"></i> Agendar en iPhone / Apple Calendar
+              </button>
+            </div>
+          </div>
+
+          <!-- Tarjeta Ubicación -->
+          <div class="editorial-card location-card">
+            <div class="card-icon-header">
+              <i class="ri-map-pin-2-line"></i>
+            </div>
+            <h3 class="card-headline">Dónde</h3>
+            <p class="card-big-text">CASA PIRQUE</p>
+            <p class="card-detail">Pirque, Región Metropolitana, Chile</p>
+            <p class="card-subtext">Un lugar campestre maravilloso para compartir bajo los árboles y la naturaleza.</p>
+            <div class="card-calendar-actions">
+              <a href="https://maps.app.goo.gl/8gNhkzaojtvb8rRaA?g_st=aw" target="_blank" rel="noopener" class="btn-card-action">
+                <i class="ri-map-pin-user-line"></i> Ver Ubicación en Google Maps
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: ITINERARIO -->
+    <section class="section-editorial reveal" id="itinerario">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Itinerario de Nuestro Día</h2>
+          <p class="section-subtitle">Así viviremos juntos cada momento de nuestra celebración:</p>
+          <div class="title-divider"></div>
+        </div>
+
+        <div class="timeline-vogue">
+          <!-- 11:30 AM -->
+          <div class="timeline-item">
+            <div class="timeline-time">11:30 AM</div>
+            <div class="timeline-bullet"><i class="ri-sun-line"></i></div>
+            <div class="timeline-content">
+              <h4 class="t-title">Llegada &amp; Momento Manta</h4>
+              <p class="t-desc">Los esperamos para instalarse con su manta en el lugar que más les guste del césped, disfrutar el paisaje campestre y compartir el cóctel previo a la ceremonia.</p>
+            </div>
+          </div>
+
+          <!-- 13:00 PM -->
+          <div class="timeline-item">
+            <div class="timeline-time">01:00 PM</div>
+            <div class="timeline-bullet"><i class="ri-hearts-line"></i></div>
+            <div class="timeline-content">
+              <h4 class="t-title">Ceremonia Civil &amp; Religiosa</h4>
+              <p class="t-desc">Comenzaremos con nuestro matrimonio Civil y a continuación celebraremos la ceremonia Religiosa para bendecir nuestra unión.</p>
+            </div>
+          </div>
+
+          <!-- 15:00 PM -->
+          <div class="timeline-item">
+            <div class="timeline-time">03:00 PM</div>
+            <div class="timeline-bullet"><i class="ri-restaurant-2-line"></i></div>
+            <div class="timeline-content">
+              <h4 class="t-title">El Almuerzo</h4>
+              <p class="t-desc">Nos reuniremos a disfrutar de una deliciosa comida campestre, compartir risas y brindar todos juntos.</p>
+            </div>
+          </div>
+
+          <!-- Tarde / Fotos Instagrameables -->
+          <div class="timeline-item">
+            <div class="timeline-time">Tarde</div>
+            <div class="timeline-bullet"><i class="ri-camera-lens-line"></i></div>
+            <div class="timeline-content">
+              <h4 class="t-title">Sobremesa &amp; Fotos Instagrameables 📸✨</h4>
+              <p class="t-desc">Tendremos espacios especialmente decorados y hermosos spots preparados para que se tomen fotos increíbles para Instagram, descansen en el césped y disfruten de la tarde.</p>
+            </div>
+          </div>
+
+          <!-- 16:00 PM -->
+          <div class="timeline-item">
+            <div class="timeline-time">04:00 PM</div>
+            <div class="timeline-bullet"><i class="ri-music-fill"></i></div>
+            <div class="timeline-content">
+              <h4 class="t-title">¡Música &amp; Fiesta!</h4>
+              <p class="t-desc">Comenzará la música y la pista de baile para todos los que quieran darlo todo celebrando.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: MOMENTO PASTO -->
+    <section class="section-editorial section-picnic reveal" id="pasto">
+      <div class="container">
+        <div class="picnic-card-box">
+          <div class="picnic-text-side">
+            <h2 class="picnic-heading">Momento Pasto 🧺</h2>
+            <p class="picnic-p">
+              Queremos que sea una boda relajada, acogedora y al aire libre. Por eso los invitamos a sumarse a nuestra dinámica favorita:
+            </p>
+            <div class="picnic-feature-list">
+              <div class="picnic-item">
+                <i class="ri-checkbox-circle-line"></i>
+                <span><strong>Trae tu manta favorita:</strong> Elige tu rincón preferido en el césped bajo la sombra de los árboles para instalarte apenas llegues.</span>
+              </div>
+              <div class="picnic-item">
+                <i class="ri-checkbox-circle-line"></i>
+                <span>Disfrutaremos de tragos refrescantes, buena conversación y naturaleza antes de la ceremonia y después de la comida.</span>
+              </div>
+              <div class="picnic-item">
+                <i class="ri-checkbox-circle-line"></i>
+                <span>¡Habrán cojines, sombra y muy buena compañía!</span>
+              </div>
+            </div>
+          </div>
+          <div class="picnic-image-side">
+            <img src="assets/images/picnic_lawn.jpg" alt="Momento Manta y Picnic" class="picnic-img">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: DRESS CODE -->
+    <section class="section-editorial reveal" id="dresscode">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Código de Vestimenta</h2>
+          <p class="section-subtitle">Campestre Elegante / Formal de Día</p>
+          <div class="title-divider"></div>
+        </div>
+
+        <div class="lookbook-grid">
+          <!-- Damas -->
+          <div class="lookbook-card">
+            <div class="lookbook-img-frame">
+              <img src="assets/images/dresscode_women.jpg" alt="Vestimenta Damas" class="lookbook-img">
+              <span class="lookbook-tag">DAMAS</span>
+            </div>
+            <div class="lookbook-body">
+              <h3 class="lookbook-name">Elegancia Primaveral</h3>
+              <p class="lookbook-desc">
+                Vestimenta midi o largos frescos, telas livianas, estampados florales o colores alegres.
+              </p>
+              <div class="lookbook-tips">
+                <p><strong>💡 Calzado sugerido:</strong> Taco ancho, terraplén o sandalias cómodas para el césped.</p>
+                <p><strong>🚫 Evitar:</strong> Color blanco / marfil (reservado para la novia).</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Varones -->
+          <div class="lookbook-card">
+            <div class="lookbook-img-frame">
+              <img src="assets/images/dresscode_men.jpg" alt="Vestimenta Varones" class="lookbook-img">
+              <span class="lookbook-tag">VARONES</span>
+            </div>
+            <div class="lookbook-body">
+              <h3 class="lookbook-name">Formal Contemporáneo</h3>
+              <p class="lookbook-desc">
+                Traje ligero o combinación de pantalón de vestir con camisa formal y blazer. Tonos beige, azul, gris o lino.
+              </p>
+              <div class="lookbook-tips">
+                <p><strong>💡 Estilo:</strong> Zapatos o mocasines cómodos.</p>
+                <p><strong>🚫 Evitar:</strong> ¡Por favor NO llevar camiseta del Colo! (ni ropa deportiva 😉⚽).</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: LISTA DE REGALOS -->
+    <section class="section-editorial section-dark reveal" id="regalos">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Lista de Regalos</h2>
+          <p class="section-subtitle">Su presencia es nuestro regalo más importante. Si de todas formas quieren hacernos un presente, les dejamos las siguientes alternativas:</p>
+          <div class="title-divider"></div>
+        </div>
+
+        <div class="registry-grid">
+          <!-- Lista Online Falabella -->
+          <div class="registry-card">
+            <div class="registry-badge"><i class="ri-gift-2-line"></i></div>
+            <h3 class="registry-title">Novios Falabella</h3>
+            <p class="registry-text">Creamos nuestra lista oficial de novios en Falabella con distintas alternativas para nuestro nuevo hogar.</p>
+            <p class="registry-code">Código de Evento: <strong>#2106057</strong></p>
+            <a href="https://novios.falabella.com/info-evento/evento?codigoEvento=2106057" target="_blank" rel="noopener" class="btn-vogue-gold">
+              <span>Ver Lista de Novios</span>
+              <i class="ri-external-link-line"></i>
             </a>
           </div>
+
+          <!-- Transferencia Directa -->
+          <div class="registry-card">
+            <div class="registry-badge"><i class="ri-bank-card-line"></i></div>
+            <h3 class="registry-title">Transferencia Directa</h3>
+            <p class="registry-text">
+              Si deseas hacernos un presente mediante transferencia electrónica, ponemos a tu disposición nuestros datos bancarios:
+            </p>
+            <button class="btn-vogue-outline" id="btn-show-bank">
+              <i class="ri-file-copy-line"></i>
+              <span>Ver Datos Bancarios</span>
+            </button>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- GALERÍA DE RECUERDOS -->
-    <section class="content-section" id="galeria">
+    <!-- SECTION: NUESTRA HISTORIA / DEDICATORIA DE LOS NOVIOS -->
+    <section class="section-editorial section-love-story reveal" id="nosotros">
       <div class="container">
-        <div class="section-header">
-          <span class="section-tag">Nuestra Historia</span>
-          <h2 class="section-title">Momentos que Guardamos en el Corazón</h2>
-          <p class="section-subtitle">Un vistazo a nuestras risas, aventuras y el camino que nos trajo hasta este gran paso.</p>
-        </div>
-
-        <div class="gallery-grid">
-          <article class="gallery-card">
-            <img src="assets/images/demo_forest_walk.jpg" alt="Paseo por el bosque">
-            <div class="gallery-overlay">
-              <h3 class="gallery-title">Paseo en el Bosque</h3>
-              <p class="gallery-desc">Caminatas al atardecer</p>
-            </div>
-          </article>
-
-          <article class="gallery-card">
-            <img src="assets/images/demo_closeup_smile.jpg" alt="Risas y complicidad">
-            <div class="gallery-overlay">
-              <h3 class="gallery-title">Risas & Complicidad</h3>
-              <p class="gallery-desc">La magia de cada día</p>
-            </div>
-          </article>
-
-          <article class="gallery-card">
-            <img src="assets/images/demo_sunset_tree.jpg" alt="Atardecer Dorado">
-            <div class="gallery-overlay">
-              <h3 class="gallery-title">Atardecer Dorado</h3>
-              <p class="gallery-desc">Donde todo comenzó</p>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- FECHA, HORARIO & UBICACIÓN -->
-    <section class="content-section section-bg-alt" id="fecha-lugar">
-      <div class="container">
-        <div class="section-header">
-          <span class="section-tag">Dónde & Cuándo</span>
-          <h2 class="section-title">El Lugar de Nuestro Gran Día</h2>
-          <p class="section-subtitle">Hemos elegido un rincón mágico rodeado de naturaleza y viñedos en Pirque.</p>
-        </div>
-
-        <div class="venue-grid">
-          <!-- Tarjeta Fecha & Hora -->
-          <div class="venue-card">
-            <div>
-              <div class="venue-icon-box">
-                <i class="ri-calendar-2-line"></i>
-              </div>
-              <h3 class="venue-title">Fecha & Horarios</h3>
-              <p class="venue-address">
-                <strong>Sábado, 14 de Noviembre de 2026</strong><br>
-                Recepción: 16:30 hrs.<br>
-                Ceremonia Civil & Votos: 17:00 hrs. en punto.
-              </p>
-              <div class="venue-badges">
-                <span class="venue-badge">🌤️ Clima Primavera Campestre</span>
-                <span class="venue-badge">🌿 Jardines al aire libre</span>
-              </div>
-            </div>
-            <div class="venue-actions">
-              <a href="#itinerario" class="btn-outline" style="width: 100%; justify-content: center;">
-                <i class="ri-time-line"></i> Ver Itinerario Detallado
-              </a>
+        <div class="love-story-card">
+          <div class="love-story-img-wrap">
+            <div class="editorial-frame">
+              <img src="assets/images/evelyn_yimmy_portrait.jpg?v=2026" alt="Evelyn &amp; Yimmy" class="love-story-img" style="object-position: center 20%;">
+              <div class="frame-tag" style="background: rgba(82, 122, 80, 0.92); color: #FFFFFF; font-weight: 700;">EVELYN &amp; YIMMY • 2026</div>
             </div>
           </div>
-
-          <!-- Tarjeta Casona Los Olivos -->
-          <div class="venue-card">
-            <div>
-              <div class="venue-icon-box">
-                <i class="ri-map-pin-2-line"></i>
-              </div>
-              <h3 class="venue-title">Casona Los Olivos</h3>
-              <p class="venue-address">
-                Camino El Principal #4520, Comuna de Pirque, Región Metropolitana, Chile.
-              </p>
-              <div class="venue-badges">
-                <span class="venue-badge">🚗 Estacionamiento Privado</span>
-                <span class="venue-badge">🔒 Seguridad en el recinto</span>
-              </div>
-            </div>
-            <div class="venue-actions">
-              <a href="https://maps.google.com/?q=Pirque+Chile" target="_blank" rel="noopener noreferrer" class="btn-map-action btn-gmaps">
-                <i class="ri-google-fill"></i> Google Maps
-              </a>
-              <a href="https://waze.com/ul?q=Pirque" target="_blank" rel="noopener noreferrer" class="btn-map-action btn-waze">
-                <i class="ri-navigation-line"></i> Waze
-              </a>
+          <div class="love-story-content">
+            <span class="love-story-kicker">NUESTRO COMPROMISO</span>
+            <h2 class="love-story-title">Unidos para Siempre</h2>
+            <div class="title-divider" style="margin: 0.8rem 0 1.2rem;"></div>
+            <p class="love-story-text">
+              Cada momento que hemos compartido nos ha traído hasta este día tan especial. Nada nos llena más el corazón que celebrar el inicio de nuestra nueva etapa juntos rodeados del amor de nuestra familia y amigos.
+            </p>
+            <p class="love-story-verse">
+              “Así que no son ya más dos, sino una sola carne; por tanto, lo que Dios juntó, no lo separe el hombre.”
+              <br><small style="font-weight: 700; color: #527A50; font-style: normal; margin-top: 4px; display: inline-block;">— Mateo 19:6</small>
+            </p>
+            <div class="love-story-signature">
+              <span class="sig-script">Evelyn &amp; Yimmy</span>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ITINERARIO DEL DÍA -->
-    <section class="content-section" id="itinerario">
+    <!-- SECTION: RSVP (CONFIRMACIÓN DE ASISTENCIA - SOLO CON LINK PERSONALIZADO) -->
+    <section class="section-editorial section-rsvp reveal" id="rsvp" style="display: block;">
       <div class="container">
-        <div class="section-header">
-          <span class="section-tag">Cronograma</span>
-          <h2 class="section-title">Itinerario del Matrimonio</h2>
-          <p class="section-subtitle">Queremos que disfrutes cada momento desde la llegada hasta la última canción.</p>
-        </div>
+        <div class="rsvp-editorial-wrapper">
+          <div class="rsvp-header-box">
+            <h2 class="rsvp-title">Confirmar Asistencia</h2>
+            <p class="rsvp-lead">Les pedimos confirmar su asistencia antes del <strong>15 de octubre</strong> para recibirlos con todo preparado. Al confirmar se generará tu pase digital con código para el sorteo oficial. ¡Guarda tu código para participar en el sorteo de premios durante la boda!</p>
+            <div class="title-divider"></div>
+          </div>
 
-        <div class="timeline">
-          <div class="timeline-item left">
-            <div class="timeline-dot"></div>
-            <div class="timeline-card">
-              <span class="timeline-time">16:30 HRS</span>
-              <h3 class="timeline-title">🥂 Llegada & Bienvenida</h3>
-              <p class="timeline-desc">Recepción de los invitados en los jardines con aguas frescas aromáticas y música acústica.</p>
+          <!-- Banner de Invitación Personalizada (si viene por link) -->
+          <div class="personalized-invitation-badge" id="personalized-invitation-badge" style="display: none;">
+            <i class="ri-mail-open-line"></i>
+            <div class="badge-text-box">
+              <span class="badge-kicker">INVITACIÓN ESPECIAL PARA:</span>
+              <h4 class="badge-guest-names" id="badge-guest-names">Invitado Especial</h4>
+              <span class="badge-passes-info" id="badge-passes-info">Pase válido para 1 Persona</span>
             </div>
           </div>
 
-          <div class="timeline-item right">
-            <div class="timeline-dot"></div>
-            <div class="timeline-card">
-              <span class="timeline-time">17:00 HRS</span>
-              <h3 class="timeline-title">💍 Ceremonia & Votos</h3>
-              <p class="timeline-desc">Nuestra unión civil y bendición simbólica bajo la sombra de los olivos centenarios.</p>
-            </div>
-          </div>
-
-          <div class="timeline-item left">
-            <div class="timeline-dot"></div>
-            <div class="timeline-card">
-              <span class="timeline-time">18:00 HRS</span>
-              <h3 class="timeline-title">🧺 Cóctel & "Momento Pasto"</h3>
-              <p class="timeline-desc">Degustación de aperitivos campestres, sesión de fotos y juego de Caza de Fotos.</p>
-            </div>
-          </div>
-
-          <div class="timeline-item right">
-            <div class="timeline-dot"></div>
-            <div class="timeline-card">
-              <span class="timeline-time">19:30 HRS</span>
-              <h3 class="timeline-title">🍽️ Cena & Brindis de Honor</h3>
-              <p class="timeline-desc">Banquete al atardecer, palabras de nuestros seres queridos y el esperado brindis.</p>
-            </div>
-          </div>
-
-          <div class="timeline-item left">
-            <div class="timeline-dot"></div>
-            <div class="timeline-card">
-              <span class="timeline-time">21:00 HRS</span>
-              <h3 class="timeline-title">💃 Baile de Novios & Fiesta</h3>
-              <p class="timeline-desc">Apertura oficial de la pista de baile, barra abierta, cotillón y mucha diversión.</p>
-            </div>
-          </div>
-
-          <div class="timeline-item right">
-            <div class="timeline-dot"></div>
-            <div class="timeline-card">
-              <span class="timeline-time">02:00 HRS</span>
-              <h3 class="timeline-title">🎆 Cierre con Chispitas</h3>
-              <p class="timeline-desc">Despedida mágica iluminada con luces de bengala y un abrazo fraterno.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- DINÁMICA / JUEGO CAZA DE FOTOS -->
-    <section class="content-section section-bg-alt" id="dinamicas">
-      <div class="container">
-        <div class="section-header">
-          <span class="section-tag">Juego Interactivo</span>
-          <h2 class="section-title">Caza de Fotos: Misiones de los Invitados</h2>
-          <p class="section-subtitle">¡Sé nuestro fotógrafo secreto! Cumple estas misiones divertidas durante la celebración.</p>
-        </div>
-
-        <div class="quest-grid">
-          <div class="quest-card">
-            <span class="quest-number">MISIÓN 01</span>
-            <div class="quest-icon">📸</div>
-            <h3 class="quest-title">Selfie con los Novios</h3>
-            <p class="quest-desc">Captura una sonrisa espontánea junto a Cristopher y Reny durante la fiesta.</p>
-            <button class="quest-status-btn"><span>Completar Misión</span></button>
-          </div>
-
-          <div class="quest-card">
-            <span class="quest-number">MISIÓN 02</span>
-            <div class="quest-icon">🥂</div>
-            <h3 class="quest-title">El Brindis Efusivo</h3>
-            <p class="quest-desc">Fotografía a tu mesa chocando las copas con la mayor alegría posible.</p>
-            <button class="quest-status-btn"><span>Completar Misión</span></button>
-          </div>
-
-          <div class="quest-card">
-            <span class="quest-number">MISIÓN 03</span>
-            <div class="quest-icon">🕺</div>
-            <h3 class="quest-title">El Mejor Paso de Baile</h3>
-            <p class="quest-desc">Captura al rey o reina de la pista dándolo todo con la mejor coreografía.</p>
-            <button class="quest-status-btn"><span>Completar Misión</span></button>
-          </div>
-
-          <div class="quest-card">
-            <span class="quest-number">MISIÓN 04</span>
-            <div class="quest-icon">🥺</div>
-            <h3 class="quest-title">Lágrima de Emoción</h3>
-            <p class="quest-desc">Inmortaliza el rostro emocionado de un familiar o amigo durante los votos.</p>
-            <button class="quest-status-btn"><span>Completar Misión</span></button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- DRESS CODE -->
-    <section class="content-section" id="dresscode">
-      <div class="container">
-        <div class="section-header">
-          <span class="section-tag">Cómo Vestir</span>
-          <h2 class="section-title">Código de Vestimenta</h2>
-          <p class="section-subtitle">Estilo: <strong>Elegante Campestre / Formal de Tarde</strong>. Queremos que luzcas increíble y te sientas muy cómodo.</p>
-        </div>
-
-        <div class="dresscode-grid">
-          <!-- Damas -->
-          <article class="dresscode-card">
-            <div class="dresscode-img-wrapper">
-              <img src="assets/images/dresscode_women.jpg" alt="Sugerencia de vestuario para mujeres">
-            </div>
-            <div class="dresscode-content">
-              <span class="dresscode-role">Para Ellas</span>
-              <h3 class="dresscode-title">Vestidos Fluidos & Frescura</h3>
-              <ul class="dresscode-list">
-                <li><i class="ri-check-line"></i> Vestidos largos o midi en telas livianas y frescas.</li>
-                <li><i class="ri-check-line"></i> Se recomienda tacón ancho, cuñas o flats para caminar cómodamente en el pasto.</li>
-                <li><i class="ri-close-line" style="color: #ef4444;"></i> Reservar el color blanco y marfil exclusivamente para la novia.</li>
-              </ul>
-            </div>
-          </article>
-
-          <!-- Caballeros -->
-          <article class="dresscode-card">
-            <div class="dresscode-img-wrapper">
-              <img src="assets/images/dresscode_men.jpg" alt="Sugerencia de vestuario para hombres">
-            </div>
-            <div class="dresscode-content">
-              <span class="dresscode-role">Para Ellos</span>
-              <h3 class="dresscode-title">Traje Formal de Tarde</h3>
-              <ul class="dresscode-list">
-                <li><i class="ri-check-line"></i> Traje de dos piezas en tonos azul, gris, beige o tierra.</li>
-                <li><i class="ri-check-line"></i> Camisa formal; corbata o corbatín opcional para mayor frescura.</li>
-                <li><i class="ri-check-line"></i> Zapatos de cuero o calzado formal cómodo para exteriores.</li>
-              </ul>
-            </div>
-          </article>
-        </div>
-
-        <!-- Paleta de Colores Sugerida -->
-        <div class="color-palette-showcase">
-          <h4 style="font-family: var(--font-serif); font-size: 1.4rem; color: var(--primary-forest);">Gama de Colores Inspirada en el Entorno</h4>
-          <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 4px;">Tonos botánicos y tierra que complementan el paisaje campestre:</p>
-          <div class="palette-swatches">
-            <div class="swatch">
-              <div class="swatch-circle" style="background: #7c9d8b;"></div>
-              <span class="swatch-name">Verde Salvia</span>
-            </div>
-            <div class="swatch">
-              <div class="swatch-circle" style="background: #c46851;"></div>
-              <span class="swatch-name">Terracota</span>
-            </div>
-            <div class="swatch">
-              <div class="swatch-circle" style="background: #e6d3a3;"></div>
-              <span class="swatch-name">Champagne</span>
-            </div>
-            <div class="swatch">
-              <div class="swatch-circle" style="background: #2c5945;"></div>
-              <span class="swatch-name">Eucalipto</span>
-            </div>
-            <div class="swatch">
-              <div class="swatch-circle" style="background: #4a5568;"></div>
-              <span class="swatch-name">Azul Noche</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- LISTA DE REGALOS -->
-    <section class="content-section section-bg-alt" id="regalos">
-      <div class="container">
-        <div class="section-header">
-          <span class="section-tag">Muestras de Cariño</span>
-          <h2 class="section-title">Lista de Regalos & Buenos Deseos</h2>
-          <p class="section-subtitle">Tu presencia es nuestro mejor obsequio. Si deseas hacernos un regalo para nuestro nuevo hogar y luna de miel, ponemos a tu disposición estos datos:</p>
-        </div>
-
-        <div class="gifts-wrapper">
-          <div style="font-size: 2.8rem; margin-bottom: 12px;">🎁</div>
-          <h3 style="font-family: var(--font-serif); font-size: 1.8rem; color: var(--primary-forest); margin-bottom: 8px;">Transferencia Bancaria</h3>
-          <p style="font-size: 0.95rem; color: var(--text-muted);">
-            Puedes realizar un depósito directo para ayudarnos a construir nuestro nuevo nido de amor:
-          </p>
-
-          <div class="bank-details-box">
-            <div class="bank-row">
-              <span class="bank-label">Banco:</span>
-              <span class="bank-val">Banco Santander</span>
-            </div>
-            <div class="bank-row">
-              <span class="bank-label">Tipo de Cuenta:</span>
-              <span class="bank-val">Cuenta Corriente</span>
-            </div>
-            <div class="bank-row">
-              <span class="bank-label">N° de Cuenta:</span>
-              <span class="bank-val">00-78451239-4</span>
-            </div>
-            <div class="bank-row">
-              <span class="bank-label">Titulares:</span>
-              <span class="bank-val">Cristopher & Reny</span>
-            </div>
-            <div class="bank-row">
-              <span class="bank-label">RUT:</span>
-              <span class="bank-val">18.765.432-1</span>
-            </div>
-            <div class="bank-row">
-              <span class="bank-label">Correo Electrónico:</span>
-              <span class="bank-val">novios@cositasparaeventos.cl</span>
-            </div>
-          </div>
-
-          <button class="btn-copy-bank" id="btnCopyBank">
-            <i class="ri-file-copy-line"></i>
-            <span>Copiar Datos Bancarios</span>
-          </button>
-
-          <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 24px; font-style: italic;">
-            También contaremos con un buzón de <strong>Lluvia de Sobres</strong> el día del evento en la recepción.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- CONFIRMACIÓN DE ASISTENCIA (RSVP) -->
-    <section class="content-section rsvp-section" id="rsvp">
-      <div class="container">
-        <div class="section-header">
-          <span class="section-tag">Pase Digital Oficial</span>
-          <h2 class="section-title">Confirmación de Asistencia (RSVP)</h2>
-          <p class="section-subtitle">Por favor confirma antes del <strong>15 de Octubre de 2026</strong>. Al completar el formulario se generará tu Pase Digital VIP para la recepción.</p>
-        </div>
-
-        <div class="rsvp-box">
-          <form id="rsvpForm">
-            <div class="rsvp-form-grid">
-              <div class="form-group form-full">
-                <label class="form-label" for="guestName">Nombre y Apellidos *</label>
-                <input type="text" id="guestName" class="form-input" placeholder="Ej: Camila Soto González" required>
+          <form class="rsvp-form" id="rsvp-form" onsubmit="handleRsvpSubmit(event); return false;">
+            <!-- BLOQUE INVITADO 1 -->
+            <div class="guest-card-block" id="group-guest-1">
+              <div class="guest-block-header">
+                <i class="ri-user-heart-line"></i>
+                <h4 id="heading-guest-1">Primer Invitado</h4>
               </div>
 
               <div class="form-group">
-                <label class="form-label" for="guestPhone">Teléfono / WhatsApp *</label>
-                <input type="tel" id="guestPhone" class="form-input" placeholder="+56 9 1234 5678" required>
+                <label for="rsvp-name" id="lbl-rsvp-name">Tu Nombre y Apellido *</label>
+                <input type="text" id="rsvp-name" name="name" placeholder="Ej.: Cristopher Hormazábal" required>
               </div>
 
               <div class="form-group">
-                <label class="form-label" for="guestCompanions">Pases Requeridos</label>
-                <select id="guestCompanions" class="form-select">
-                  <option value="1">Solo yo (1 persona)</option>
-                  <option value="2">Yo + 1 acompañante (2 personas)</option>
-                  <option value="3">Familia (3 personas)</option>
-                  <option value="4">Familia (4 personas)</option>
-                </select>
-              </div>
-
-              <div class="form-group form-full">
-                <label class="form-label">¿Podrás acompañarnos? *</label>
-                <div class="radio-group">
-                  <label class="radio-card active">
-                    <input type="radio" name="attendance" value="yes" checked>
-                    <span>💍 ¡Sí, ahí estaré con alegría!</span>
+                <label class="form-label" id="lbl-attendance-1">¿Nos acompañarás en nuestro gran día? *</label>
+                <div class="attendance-radios">
+                  <label class="radio-card">
+                    <input type="radio" name="attendance" value="si" checked>
+                    <span class="radio-ui">
+                      <i class="ri-check-line"></i>
+                      <strong>¡Sí, los acompañaré feliz!</strong>
+                    </span>
                   </label>
                   <label class="radio-card">
                     <input type="radio" name="attendance" value="no">
-                    <span>💌 Lamentablemente no podré</span>
+                    <span class="radio-ui">
+                      <i class="ri-close-line"></i>
+                      <strong>No podré ir, pero les mando un abrazo gigante</strong>
+                    </span>
                   </label>
                 </div>
               </div>
 
-              <div class="form-group">
-                <label class="form-label" for="dietPreference">Preferencia Alimentaria</label>
-                <select id="dietPreference" class="form-select">
-                  <option value="standard">Menú Tradicional</option>
-                  <option value="vegetarian">Vegetariano</option>
-                  <option value="vegan">Vegano</option>
-                  <option value="celiac">Celíaco / Sin Gluten</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label" for="guestSong">Canción que te hace bailar</label>
-                <input type="text" id="guestSong" class="form-input" placeholder="Artista - Canción">
-              </div>
-
-              <div class="form-group form-full">
-                <label class="form-label" for="guestMessage">Mensaje para Cristopher & Reny</label>
-                <textarea id="guestMessage" class="form-textarea" rows="3" placeholder="Escribe aquí un lindo deseo para nosotros..."></textarea>
+              <div class="form-row" id="attendance-details-group">
+                <div class="form-group">
+                  <label for="rsvp-dietary" id="lbl-rsvp-dietary">Menú Especial / Restricciones</label>
+                  <select id="rsvp-dietary" name="dietary">
+                    <option value="ninguna">Sin restricciones (Menú tradicional)</option>
+                    <option value="vegetariano">Vegetariano</option>
+                    <option value="vegano">Vegano</option>
+                    <option value="celiaco">Celíaco / Sin Gluten</option>
+                    <option value="alergia">Alergia específica (indicar en dedicatoria)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="rsvp-song" id="lbl-rsvp-song">Canción que sugieres para la fiesta</label>
+                  <input type="text" id="rsvp-song" name="song" placeholder="Ej.: Vivir mi vida - Marc Anthony">
+                </div>
               </div>
             </div>
 
-            <button type="submit" class="btn-submit-rsvp">
-              <i class="ri-ticket-line"></i>
-              <span>Generar mi Pase Digital de Boda</span>
-            </button>
+            <!-- BLOQUE INVITADO 2 (SOLO SI LA INVITACIÓN ES PARA 2 PERSONAS) -->
+            <div class="guest-card-block guest-2-container" id="guest-2-container" style="display: none; background: rgba(82, 122, 80, 0.08); border: 1px dashed var(--border-gold); padding: 1.4rem 1.2rem; border-radius: var(--border-radius-card); margin-top: 1.5rem; margin-bottom: 1.5rem;">
+              <div class="guest-block-header">
+                <i class="ri-user-add-line" style="color: var(--gold-dark);"></i>
+                <h4 id="heading-guest-2" style="font-family: var(--font-serif); font-size: 1.15rem; color: var(--text-main); margin-bottom: 0.8rem;">
+                  Segundo Invitado (Acompañante)
+                </h4>
+              </div>
+
+              <div class="form-group">
+                <label for="rsvp-name-2" id="lbl-rsvp-name-2">Nombre y Apellido del Acompañante *</label>
+                <input type="text" id="rsvp-name-2" name="name_2" placeholder="Ej.: Reny Rebolledo">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" id="lbl-attendance-2">¿Nos acompañarás en nuestro gran día?</label>
+                <div class="attendance-radios">
+                  <label class="radio-card">
+                    <input type="radio" name="attendance_2" value="si" checked>
+                    <span class="radio-ui">
+                      <i class="ri-check-line"></i>
+                      <strong>¡Sí, los acompañaré feliz!</strong>
+                    </span>
+                  </label>
+                  <label class="radio-card">
+                    <input type="radio" name="attendance_2" value="no">
+                    <span class="radio-ui">
+                      <i class="ri-close-line"></i>
+                      <strong>No podré ir, pero les mando un abrazo gigante</strong>
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-row" id="attendance-details-group-2">
+                <div class="form-group">
+                  <label for="rsvp-dietary-2">Menú de tu acompañante</label>
+                  <select id="rsvp-dietary-2" name="dietary_2">
+                    <option value="ninguna">Sin restricciones (Menú tradicional)</option>
+                    <option value="vegetariano">Vegetariano</option>
+                    <option value="vegano">Vegano</option>
+                    <option value="celiaco">Celíaco / Sin Gluten</option>
+                    <option value="alergia">Alergia específica</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="rsvp-song-2">Canción que sugiere tu acompañante</label>
+                  <input type="text" id="rsvp-song-2" name="song_2" placeholder="Ej.: Danza Kuduro - Don Omar">
+                </div>
+              </div>
+            </div>
+
+            <!-- BLOQUE MENSAJE COMPARTIDO DE PARTE DE LOS DOS -->
+            <div class="form-group" style="margin-top: 1.5rem;">
+              <label for="rsvp-message" id="lbl-rsvp-message">Un mensaje o dedicatoria para nosotros (de parte de ustedes)</label>
+              <textarea id="rsvp-message" name="message" rows="3" placeholder="Escríbannos unas lindas palabras..."></textarea>
+            </div>
+
+            <div class="form-submit-row">
+              <button type="button" class="btn-vogue-submit" id="btn-submit-rsvp-action" onclick="handleRsvpSubmit(event)">
+                <i class="ri-check-double-line" id="btn-rsvp-icon" style="font-size: 1.2rem;"></i>
+                <span id="btn-rsvp-submit-text">Confirmar Asistencia &amp; Ver Mi Pase</span>
+              </button>
+            </div>
           </form>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- MODAL PASE DIGITAL VIP GENERADO -->
-  <div class="pass-modal" id="passModal" role="dialog" aria-modal="true" aria-labelledby="ticketGuestName">
-    <div class="pass-card-container">
-      <button class="btn-close-modal" id="closePassModal" aria-label="Cerrar pase">
+  <!-- FOOTER -->
+  <footer class="vogue-footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <h3 class="footer-title">Evelyn &amp; Yimmy</h3>
+        <p class="footer-subtitle">SÁBADO 21 DE NOVIEMBRE DE 2026 • CASA PIRQUE</p>
+      </div>
+      <p class="footer-quote">“Cantares 8:6 — Fuerte es como la muerte el amor.”</p>
+      <div class="footer-credits">
+        <p>Casa Pirque • Región Metropolitana, Chile</p>
+        <button class="btn-admin-access" id="btn-open-admin" title="Acceso exclusivo para los novios">
+          <i class="ri-lock-line"></i> Acceso Novios (Administración)
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- MODAL: DATOS BANCARIOS -->
+  <div class="modal-overlay" id="bank-modal">
+    <div class="modal-vogue-card">
+      <button class="modal-close-btn" id="btn-close-bank" aria-label="Cerrar modal">
         <i class="ri-close-line"></i>
       </button>
-
-      <div class="ticket-header">
-        <span class="ticket-tag">PASE VIP DE ACCESO OFICIAL</span>
-        <h3 class="ticket-couple">Cristopher & Reny</h3>
-        <p style="font-size: 0.8rem; color: var(--gold-dark); text-transform: uppercase; letter-spacing: 2px;">Sábado 14 de Noviembre 2026 • 16:30 hrs</p>
+      <div class="modal-header">
+        <i class="ri-bank-card-2-line modal-icon"></i>
+        <h3 class="modal-title">Datos para Transferencia Directa</h3>
+        <p class="modal-desc">¡Muchísimas gracias por tu cariño y por celebrar con nosotros!</p>
       </div>
-
-      <div class="ticket-body">
-        <div class="ticket-qr-box" id="ticketQr">
-          <!-- Dynamic SVG QR Code injected via JS -->
+      <div class="bank-details-box">
+        <div class="bank-row">
+          <span class="bank-label">Banco:</span>
+          <span class="bank-value">BancoEstado</span>
         </div>
-
-        <h4 class="ticket-guest-name" id="ticketGuestName">Camila Soto González</h4>
-        <span class="ticket-pass-id" id="ticketPassId">VIP-CR-8942</span>
-
-        <div class="ticket-details-grid">
-          <div>
-            <strong style="color: var(--primary-forest);">Lugar:</strong><br>
-            Casona Los Olivos, Pirque
-          </div>
-          <div>
-            <strong style="color: var(--primary-forest);">Reserva:</strong><br>
-            <span id="ticketSeats">1 Asiento</span>
-          </div>
-          <div>
-            <strong style="color: var(--primary-forest);">Dress Code:</strong><br>
-            Elegante Campestre
-          </div>
-          <div>
-            <strong style="color: var(--primary-forest);">Estado:</strong><br>
-            <span style="color: #10b981; font-weight: 700;">✓ Confirmado</span>
-          </div>
+        <div class="bank-row">
+          <span class="bank-label">Tipo de Cuenta:</span>
+          <span class="bank-value">Cuenta Vista</span>
+        </div>
+        <div class="bank-row">
+          <span class="bank-label">N° de Cuenta:</span>
+          <span class="bank-value">15789104</span>
+        </div>
+        <div class="bank-row">
+          <span class="bank-label">RUT:</span>
+          <span class="bank-value">15.789.104-9</span>
+        </div>
+        <div class="bank-row">
+          <span class="bank-label">Titular:</span>
+          <span class="bank-value">Yimmy Salgado</span>
+        </div>
+        <div class="bank-row">
+          <span class="bank-label">Email:</span>
+          <span class="bank-value">Yimsalgado@gmail.com</span>
         </div>
       </div>
+      <button class="btn-copy-bank" id="btn-copy-bank-data">
+        <i class="ri-file-copy-line"></i> Copiar Datos
+      </button>
+    </div>
+  </div>
 
-      <div class="ticket-actions">
-        <button class="btn-print-pass" id="btnPrintPass">
-          <i class="ri-printer-line"></i> Guardar / Imprimir Pase
+  <!-- MODAL: PASE DE ACCESO DIGITAL CON CÓDIGO DE SORTEO -->
+  <div class="modal-overlay" id="guest-pass-modal">
+    <div class="modal-vogue-card modal-pass-card">
+      <button class="modal-close-btn" id="btn-close-pass-modal" aria-label="Cerrar modal">
+        <i class="ri-close-line"></i>
+      </button>
+      
+      <div class="pass-ticket-render" id="pass-ticket-render">
+        <div class="ticket-top">
+          <span class="ticket-sub">PASE DE ENTRADA</span>
+          <h3 class="ticket-title">Evelyn &amp; Yimmy</h3>
+          <span class="ticket-date">SÁBADO 21 DE NOVIEMBRE DE 2026 • 11:30 AM</span>
+        </div>
+        <div class="ticket-divider-line"></div>
+        <div class="ticket-body">
+          <div class="ticket-row">
+            <span class="t-k">INVITADO(S):</span>
+            <span class="t-v" id="pass-guest-name">—</span>
+          </div>
+          <div class="ticket-row">
+            <span class="t-k">ESTADO:</span>
+            <span class="t-v" id="pass-status" style="color: #27ae60;">¡Asistencia Confirmada!</span>
+          </div>
+          <div class="ticket-row">
+            <span class="t-k">PASE(S):</span>
+            <span class="t-v" id="pass-pases-count">1 Persona</span>
+          </div>
+          <div class="ticket-row" id="pass-dietary-row" style="display: none;">
+            <span class="t-k">MENÚ:</span>
+            <span class="t-v" id="pass-dietary-val">—</span>
+          </div>
+          <div class="ticket-row" id="pass-song-row" style="display: none;">
+            <span class="t-k">CANCIÓN(ES):</span>
+            <span class="t-v" id="pass-song-val">—</span>
+          </div>
+          <div class="ticket-row">
+            <span class="t-k">LUGAR:</span>
+            <span class="t-v">Casa Pirque, Chile</span>
+          </div>
+          <div class="ticket-row" style="border-top: 1px dashed rgba(28,27,26,0.15); padding-top: 0.5rem; margin-top: 0.3rem;">
+            <span class="t-k" style="font-weight: 700; color: var(--gold-dark);">CÓDIGO DE SORTEO:</span>
+            <span class="t-v code-mono" id="pass-code" style="font-size: 1.15rem; font-weight: 800; color: var(--gold-dark);">EY-2026</span>
+          </div>
+        </div>
+
+        <!-- Banner especial para sorteo -->
+        <div class="ticket-special-notice">
+          <i class="ri-gift-line"></i>
+          <span>¡Guarda este código porque se vienen cositas! 🎁✨</span>
+        </div>
+
+        <div class="ticket-footer-seal">
+          <i class="ri-heart-fill" style="color: #527A50;"></i>
+          <span>¡NOS VEMOS PRONTO EN CASA PIRQUE!</span>
+        </div>
+      </div>
+
+      <div class="pass-actions">
+        <button class="btn-vogue-print" id="btn-print-pass">
+          <i class="ri-printer-line"></i>
+          <span>Guardar / Imprimir Mi Pase</span>
+        </button>
+        <button class="btn-vogue-print btn-copy-pass-btn" id="btn-copy-pass-code" style="background: rgba(0,0,0,0.05); color: var(--text-main); border: 1px solid var(--border-gold);">
+          <i class="ri-file-copy-line"></i>
+          <span>Copiar Mi Código</span>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- LIGHTBOX MODAL PARA FOTOS -->
-  <div class="lightbox-modal" id="lightboxModal" role="dialog" aria-modal="true">
-    <div class="lightbox-content">
-      <button class="lightbox-close" id="lightboxClose" aria-label="Cerrar imagen">&times;</button>
-      <img src="" id="lightboxImg" alt="Vista previa de foto">
+  <!-- MODAL: PANEL DE ADMINISTRACIÓN NOVIOS (EVELYN & YIMMY) -->
+  <div class="modal-overlay" id="admin-modal">
+    <div class="modal-vogue-card modal-admin-card">
+
+      <!-- Vista 1: Login con PIN exclusivo novios -->
+      <div class="admin-login-box" id="admin-login-box">
+        <div class="modal-header">
+          <i class="ri-shield-keyhole-line modal-icon"></i>
+          <h3 class="modal-title">Panel Exclusivo de los Novios 💍</h3>
+          <p class="modal-desc">Ingresa la clave secreta de los novios para registrar invitados, ver confirmaciones y fotos.</p>
+        </div>
+        <form id="admin-login-form" class="admin-login-form">
+          <div class="form-group" style="text-align: left;">
+            <label for="admin-pin-input" style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.85rem; font-weight: 700; color: #243525; margin-bottom: 0.45rem;">
+              <i class="ri-lock-2-line" style="color: #527A50;"></i>
+              <span>Clave Secreta de Acceso</span>
+            </label>
+            <div class="admin-pin-wrapper">
+              <i class="ri-key-2-line admin-pin-left-icon"></i>
+              <input type="password" id="admin-pin-input" placeholder="Escribe la clave aquí..." required autofocus autocomplete="off">
+              <button type="button" id="btn-toggle-pin-visibility" class="btn-toggle-pin-visibility" title="Mostrar / Ocultar clave">
+                <i class="ri-eye-line" id="icon-toggle-pin"></i>
+              </button>
+            </div>
+          </div>
+          <div class="admin-login-error" id="admin-login-error" style="display: none; color: #e74c3c; font-size: 0.82rem; margin-bottom: 0.8rem; text-align: center; font-weight: 600;"></div>
+          <button type="submit" class="btn-vogue-gold" style="width: 100%;">
+            <i class="ri-login-circle-line"></i>
+            <span>Ingresar al Panel de Novios</span>
+          </button>
+          <button type="button" class="btn-admin-close-view" id="btn-close-admin-login" style="width: 100%; margin-top: 0.6rem; justify-content: center;">
+            <span>Cerrar</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Vista 2: Dashboard de Administración -->
+      <div class="admin-dashboard" id="admin-dashboard" style="display: none;">
+        <div class="admin-top-bar">
+          <div>
+            <h3 class="admin-dashboard-title">💍 Panel de Control — Evelyn &amp; Yimmy</h3>
+            <p class="admin-dashboard-sub">Registra a tus invitados (1 o 2 personas), genera links personalizados y gestiona el sorteo.</p>
+          </div>
+          <div class="admin-top-actions">
+            <button class="btn-admin-logout" id="btn-admin-logout" title="Cerrar sesión">
+              <i class="ri-logout-box-r-line"></i> <span>Salir</span>
+            </button>
+            <button class="btn-admin-close-view" id="btn-close-admin-view" title="Cerrar panel">
+              <i class="ri-close-line"></i> <span>Cerrar</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Metric Summary Cards -->
+        <div class="admin-stats-grid">
+          <div class="stat-card stat-total">
+            <span class="stat-num" id="admin-count-invitations">0</span>
+            <span class="stat-lbl">Invitaciones Creadas</span>
+          </div>
+          <div class="stat-card stat-yes">
+            <span class="stat-num" id="admin-count-yes">0</span>
+            <span class="stat-lbl">Confirmados (Sí Asisten)</span>
+          </div>
+          <div class="stat-card stat-no">
+            <span class="stat-num" id="admin-count-no">0</span>
+            <span class="stat-lbl">No Podrán Asistir</span>
+          </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="admin-tabs">
+          <button class="admin-tab-btn active" data-tab="admin-tab-invitations">
+            <i class="ri-mail-send-line"></i> 1. Registro de Invitados &amp; Links
+          </button>
+          <button class="admin-tab-btn" data-tab="admin-tab-rsvps">
+            <i class="ri-user-follow-line"></i> 2. Confirmaciones &amp; Sorteo
+          </button>
+          <button class="admin-tab-btn" data-tab="admin-tab-photos">
+            <i class="ri-image-line"></i> 3. Álbum &amp; Descargas
+          </button>
+        </div>
+
+        <!-- Tab 1: Registro de Invitados & Generador de Links -->
+        <div class="admin-tab-pane active" id="admin-tab-invitations">
+          <!-- Formulario para Crear Invitación -->
+          <div class="create-invitation-box" style="background: rgba(82, 122, 80, 0.08); border: 1px solid var(--border-gold); padding: 1.2rem; border-radius: var(--border-radius-card); margin-bottom: 1.5rem;">
+            <h4 style="font-family: var(--font-serif); font-size: 1.15rem; color: var(--text-main); margin-bottom: 0.8rem;">
+              <i class="ri-user-add-line" style="color: var(--gold-dark);"></i> Registrar Nuevo(s) Invitado(s)
+            </h4>
+            <form id="form-create-invitation" class="form-create-invitation">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="inv-type">Tipo de Invitación *</label>
+                  <select id="inv-type" required>
+                    <option value="1">1 Persona (Individual / Sin Acompañante)</option>
+                    <option value="2" selected>2 Personas (Con Acompañante)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="inv-phone">Teléfono / WhatsApp (Opcional para envío directo)</label>
+                  <input type="tel" id="inv-phone" placeholder="Ej.: +56 9 1234 5678">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="inv-name-1">Nombre Invitado 1 *</label>
+                <input type="text" id="inv-name-1" placeholder="Ej.: Cristopher Hormazábal" required>
+              </div>
+
+              <div class="form-group" id="inv-name-2-group">
+                <label for="inv-name-2">Nombre Invitado 2 (Acompañante) *</label>
+                <input type="text" id="inv-name-2" placeholder="Ej.: Reny Rebolledo">
+              </div>
+
+              <div style="margin-top: 1rem;">
+                <button type="submit" class="btn-vogue-gold" style="width: 100%;">
+                  <i class="ri-check-line"></i>
+                  <span>Registrar Invitación &amp; Generar Link</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Tabla de Invitaciones Creadas -->
+          <div class="admin-actions-bar" style="justify-content: space-between; align-items: center;">
+            <h4 style="font-family: var(--font-serif); font-size: 1.1rem; color: var(--text-main);">
+              <i class="ri-file-list-3-line"></i> Lista de Invitaciones Personalizadas
+            </h4>
+          </div>
+
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Invitado(s)</th>
+                  <th>Pases</th>
+                  <th>Estado</th>
+                  <th>Acciones / Link WhatsApp</th>
+                  <th>Eliminar</th>
+                </tr>
+              </thead>
+              <tbody id="admin-invitations-tbody">
+                <!-- Rendered dynamically by admin.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab 2: Confirmaciones & Cupones de Sorteo -->
+        <div class="admin-tab-pane" id="admin-tab-rsvps">
+          <div class="admin-actions-bar">
+            <button class="btn-admin-action" id="btn-print-raffle-tickets">
+              <i class="ri-ticket-2-line"></i>
+              <span>🎟️ Imprimir Cupones para Sorteo</span>
+            </button>
+            <button class="btn-admin-action btn-outline-action" id="btn-export-rsvps-csv">
+              <i class="ri-file-excel-line"></i>
+              <span>📥 Exportar Lista a Excel / CSV</span>
+            </button>
+          </div>
+
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Invitado(a)</th>
+                  <th>Estado</th>
+                  <th>Pases</th>
+                  <th>Código Pase</th>
+                  <th>Menú / Dieta</th>
+                  <th>Canción</th>
+                  <th>Dedicatoria</th>
+                  <th>Fecha</th>
+                  <th>Eliminar</th>
+                </tr>
+              </thead>
+              <tbody id="admin-rsvps-tbody">
+                <!-- Rendered dynamically by admin.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab 3: Photos Gallery & Bulk Download -->
+        <div class="admin-tab-pane" id="admin-tab-photos">
+          <!-- Banner Módulo Fotos & Código QR -->
+          <div style="background: rgba(82, 122, 80, 0.08); border: 1px solid var(--border-gold); border-radius: 10px; padding: 1.4rem; margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
+            <div>
+              <h4 style="font-family: var(--font-serif); font-size: 1.15rem; color: var(--text-main); margin-bottom: 0.3rem;">
+                📸 Módulo Exclusivo del Evento &amp; Código QR
+              </h4>
+              <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0; line-height: 1.4;">
+                URL para imprimir en carteles y mesas de Casa Pirque: <strong style="color: var(--gold-dark);">https://cositasparaeventos.cl/matrimonio/yimmy-eve/fotos/</strong>
+              </p>
+            </div>
+            <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+              <a href="fotos/" target="_blank" class="btn-vogue-gold" style="font-size: 0.82rem; padding: 0.6rem 1rem; text-decoration: none;">
+                <i class="ri-external-link-line"></i> <span>Abrir Álbum en Vivo</span>
+              </a>
+              <button type="button" class="btn-admin-close-view" style="font-size: 0.82rem; padding: 0.6rem 1rem;" onclick="navigator.clipboard.writeText('https://cositasparaeventos.cl/matrimonio/yimmy-eve/fotos/').then(() => alert('¡Enlace del Código QR copiado al portapapeles!'))">
+                <i class="ri-file-copy-line"></i> <span>Copiar Link QR</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="admin-actions-bar">
+            <button class="btn-admin-action" id="btn-download-all-photos">
+              <i class="ri-download-cloud-2-line"></i>
+              <span>📥 Descargar Todas las Fotos del Matrimonio en ZIP</span>
+            </button>
+          </div>
+
+          <div class="admin-photos-grid" id="admin-photos-grid">
+            <!-- Rendered dynamically by admin.js -->
+          </div>
+        </div>
+
+      </div>
     </div>
   </div>
 
-  <!-- FLOATING AUDIO TOGGLE (MELODÍA ROMÁNTICA AMBIENTAL) -->
-  <div class="floating-audio">
-    <button class="btn-music-toggle" id="btnMusicToggle" title="Reproducir música ambiental" aria-label="Música ambiental">
-      <i class="ri-music-2-line"></i>
-    </button>
-  </div>
-
-  <!-- FOOTER -->
-  <footer class="vogue-footer">
-    <div class="container">
-      <div class="footer-monogram">C &amp; R</div>
-      <p class="footer-tagline">“Nuestra historia apenas comienza…”</p>
-      <div class="footer-divider"></div>
-      <p style="font-size: 0.95rem; color: rgba(255,255,255,0.85); margin-bottom: 8px;">
-        14 de Noviembre de 2026 • Pirque, Chile
-      </p>
-      <p class="footer-powered">
-        Invitación digital interactiva creada por <a href="../index.html">Cositas Para Eventos</a>
-      </p>
-    </div>
-  </footer>
-
-  <!-- Main JavaScript File -->
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/rsvp.js"></script>
+  <script src="js/admin.js"></script>
 </body>
 </html>
