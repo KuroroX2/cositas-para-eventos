@@ -457,7 +457,6 @@ function renderTables() {
               <i class="ri-edit-line"></i> <span>Editar</span>
             </button>
           </div>
-          <span style="font-size: 0.76rem; color: var(--gold-dark); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Mesa de Banquete</span>
         </div>
         <span class="table-badge-capacity ${isFull ? 'full' : ''}">
           ${table.guests.length} / ${table.capacity}
