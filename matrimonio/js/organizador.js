@@ -50,8 +50,18 @@ let shopping = [];
 let unassignedGuests = [];
 
 
+function getCleanTableName(rawName) {
+  if (!rawName) return '';
+  return rawName.replace(/^Mesa\s*\d+\s*[:\-–]?\s*/i, '').trim();
+}
+
+function getFormattedTableName(number, name) {
+  const clean = getCleanTableName(name);
+  return `Mesa ${number}: ${clean || name}`;
+}
+
 function extractTableNumber(table, idx) {
-  if (table.number !== undefined && !isNaN(parseInt(table.number, 10))) {
+  if (table.number !== undefined && !isNaN(parseInt(table.number, 10)) && parseInt(table.number, 10) > 0) {
     return parseInt(table.number, 10);
   }
   const match = (table.name || '').match(/Mesa\s*(\d+)/i);
@@ -122,8 +132,18 @@ function updateNextTableNumberInput() {
 function loadData() {
   const savedTables = localStorage.getItem(STORAGE_KEY_TABLES);
   if (savedTables) {
-    tables = JSON.parse(savedTables);
-    sortTablesAscending();
+    try {
+      tables = JSON.parse(savedTables);
+      // Auto-corregir y normalizar: asegurar que cada mesa tenga su número y prefijo "Mesa X: "
+      tables.forEach((t, idx) => {
+        t.number = extractTableNumber(t, idx);
+        t.name = getFormattedTableName(t.number, t.name);
+      });
+      sortTablesAscending();
+      saveData();
+    } catch (e) {
+      console.error('Error cargando mesas:', e);
+    }
   } else {
     tables = [
       {
@@ -737,7 +757,7 @@ window.openEditTableModal = function(tableId) {
 
   const modal = document.getElementById('editTableModal');
   const idInput = document.getElementById('editTableId');
-  const numInput = document.getElementById('editTableNumber');
+  const numSelect = document.getElementById('editTableNumber');
   const nameInput = document.getElementById('editTableName');
   const capInput = document.getElementById('editTableCapacity');
   const seatsHint = document.getElementById('editTableCurrentSeats');
@@ -747,29 +767,43 @@ window.openEditTableModal = function(tableId) {
   idInput.value = table.id;
   const currentNum = table.number || extractTableNumber(table, 0);
 
-  if (numInput) {
+  if (numSelect) {
     const available = getAvailableTableNumbers(table.id);
-    if (!available.includes(currentNum)) {
-      available.push(currentNum);
-      available.sort((a, b) => a - b);
-    }
-    numInput.innerHTML = '';
+    const allOptions = [];
+
+    // Números disponibles (no usados)
     available.forEach(n => {
-      const opt = document.createElement('option');
-      opt.value = n;
-      opt.textContent = `Mesa ${n}` + (n === currentNum ? ' (Actual)' : '');
-      numInput.appendChild(opt);
+      allOptions.push({ number: n, label: `Mesa ${n}` + (n === currentNum ? ' (Actual)' : '') });
     });
-    numInput.value = currentNum;
+    if (!allOptions.some(o => o.number === currentNum)) {
+      allOptions.push({ number: currentNum, label: `Mesa ${currentNum} (Actual)` });
+    }
+
+    // Permitir elegir un número de otra mesa e intercambiarlo
+    tables.forEach(t => {
+      if (t.id !== table.id) {
+        const otherNum = t.number || extractTableNumber(t, 0);
+        if (!allOptions.some(o => o.number === otherNum)) {
+          const otherClean = getCleanTableName(t.name);
+          allOptions.push({ number: otherNum, label: `Mesa ${otherNum} (Intercambiar con: ${otherClean || 'otra mesa'})` });
+        }
+      }
+    });
+
+    allOptions.sort((a, b) => a.number - b.number);
+
+    numSelect.innerHTML = '';
+    allOptions.forEach(optData => {
+      const opt = document.createElement('option');
+      opt.value = optData.number;
+      opt.textContent = optData.label;
+      numSelect.appendChild(opt);
+    });
+    numSelect.value = currentNum;
   }
 
-  // Clean name to display just the description if it starts with "Mesa X: "
-  let cleanName = table.name;
-  const match = cleanName.match(/^Mesa\s*\d+\s*:\s*(.*)$/i);
-  if (match) {
-    cleanName = match[1];
-  }
-  nameInput.value = cleanName;
+  // Mostrar nombre limpio sin el prefijo "Mesa X: "
+  nameInput.value = getCleanTableName(table.name);
 
   capInput.value = table.capacity;
   capInput.min = Math.max(1, table.guests.length);
@@ -959,11 +993,8 @@ function setupEventListeners() {
 
       if (!rawName) return;
 
-      // Ensure formatted name e.g. "Mesa 7: Primos" if user just typed "Primos"
-      let fullName = rawName;
-      if (!rawName.toLowerCase().startsWith('mesa ')) {
-        fullName = `Mesa ${num}: ${rawName}`;
-      }
+      const cleanName = getCleanTableName(rawName);
+      const fullName = getFormattedTableName(num, cleanName || rawName);
 
       tables.push({
         id: 't_' + Date.now(),
@@ -1000,10 +1031,15 @@ function setupEventListeners() {
         return;
       }
 
-      let fullName = rawName;
-      if (!rawName.toLowerCase().startsWith('mesa ')) {
-        fullName = `Mesa ${newNum}: ${rawName}`;
+      // Si el número elegido ya pertenece a otra mesa, intercambiamos los números
+      const conflictingTable = tables.find(t => t.id !== id && (t.number === newNum || extractTableNumber(t, 0) === newNum));
+      if (conflictingTable) {
+        conflictingTable.number = table.number || extractTableNumber(table, 0);
+        conflictingTable.name = getFormattedTableName(conflictingTable.number, conflictingTable.name);
       }
+
+      const cleanName = getCleanTableName(rawName);
+      const fullName = getFormattedTableName(newNum, cleanName || rawName);
 
       table.number = newNum;
       table.name = fullName;
