@@ -17,14 +17,14 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ==========================================================================
    0. ESTILO VISUAL: CAMPESTRE RÚSTICO & BOTÁNICO (Estilo Oficial Elegido)
    ========================================================================== */
-let activeAtmosphereTheme = 'theme-campestre';
+let activeAtmosphereTheme = 'theme-tradicional';
 
 function initThemeSwitcher() {
   document.body.classList.remove('theme-vogue', 'theme-tradicional', 'theme-florido');
-  document.body.classList.add('theme-campestre');
-  activeAtmosphereTheme = 'theme-campestre';
+  document.body.classList.add('theme-tradicional');
+  activeAtmosphereTheme = 'theme-tradicional';
   if (window.resetAtmosphereParticles) {
-    window.resetAtmosphereParticles('theme-campestre');
+    window.resetAtmosphereParticles('theme-tradicional');
   }
 }
 
@@ -85,14 +85,26 @@ function initAtmosphereParticles() {
       ctx.scale(Math.cos(this.flip), 1);
       ctx.globalAlpha = this.opacity;
 
-      // Green Eucalyptus/Olive leaf for Campestre theme
-      ctx.fillStyle = '#8BAE88';
-      ctx.beginPath();
-      ctx.ellipse(0, 0, this.size * 0.45, this.size * 1.1, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#527A50';
-      ctx.globalAlpha = this.opacity * 0.6;
-      ctx.fill();
+      if (this.theme === 'theme-tradicional') {
+        // Destellos dorados y perlas flotantes para estilo Clásico Elegante
+        ctx.fillStyle = this.size > 8 ? '#D4AF37' : '#F5E6B3';
+        ctx.beginPath();
+        if (this.size > 9) {
+          ctx.ellipse(0, 0, this.size * 0.4, this.size * 0.8, 0, 0, Math.PI * 2);
+        } else {
+          ctx.arc(0, 0, this.size * 0.5, 0, Math.PI * 2);
+        }
+        ctx.fill();
+      } else {
+        // Green Eucalyptus/Olive leaf for Campestre theme
+        ctx.fillStyle = '#8BAE88';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, this.size * 0.45, this.size * 1.1, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#527A50';
+        ctx.globalAlpha = this.opacity * 0.6;
+        ctx.fill();
+      }
 
       ctx.restore();
     }
@@ -109,7 +121,7 @@ function initAtmosphereParticles() {
     setupParticles(theme);
   };
 
-  setupParticles('theme-campestre');
+  setupParticles('theme-tradicional');
 
   function loop() {
     ctx.clearRect(0, 0, width, height);

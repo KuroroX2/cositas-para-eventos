@@ -4428,3 +4428,79 @@ body.theme-florido .ch-num {
   border-color: #ffffff;
   transform: translateY(-2px);
 }
+
+
+/* ==========================================================================
+   ESTILO CLÁSICO ELEGANTE (THEME-TRADICIONAL) PARA EL HERO CINEMATOGRÁFICO
+   ========================================================================== */
+body.theme-tradicional .wedding-hero-cinematic {
+  background-position: center 20%;
+}
+
+body.theme-tradicional .wedding-hero-cinematic .wedding-hero-overlay {
+  background: linear-gradient(to top, #0A1828 15%, rgba(10, 24, 40, 0.6) 65%, rgba(10, 24, 40, 0.25) 100%);
+}
+
+body.theme-tradicional .wedding-hero-cinematic .wedding-tag {
+  color: #D4AF37;
+  font-family: 'Great Vibes', cursive;
+  font-size: clamp(2.5rem, 4.5vw, 3.6rem);
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.85);
+  margin-bottom: 0;
+}
+
+body.theme-tradicional .wedding-hero-cinematic .wedding-names {
+  font-family: 'Cormorant Garamond', serif;
+  color: #FFFFFF;
+  letter-spacing: 0.5px;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.85);
+}
+
+body.theme-tradicional .wedding-hero-cinematic .wedding-date-location {
+  color: #E2E8F0;
+}
+
+body.theme-tradicional .wedding-hero-cinematic .countdown-unit {
+  background: rgba(10, 24, 40, 0.88);
+  border: 1.5px solid rgba(212, 175, 55, 0.45);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+body.theme-tradicional .wedding-hero-cinematic .countdown-unit:hover {
+  border-color: #D4AF37;
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+}
+
+body.theme-tradicional .wedding-hero-cinematic .countdown-num {
+  color: #F5E6B3;
+  text-shadow: 0 0 16px rgba(212, 175, 55, 0.6);
+}
+
+body.theme-tradicional .wedding-hero-cinematic .countdown-label {
+  color: #D4AF37;
+  font-weight: 800;
+}
+
+body.theme-tradicional .wedding-hero-cinematic .btn-hero-rsvp {
+  background: linear-gradient(135deg, #D4AF37 0%, #F5E6B3 50%, #A68218 100%);
+  color: #0A1828;
+  font-weight: 800;
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.45);
+}
+
+body.theme-tradicional .wedding-hero-cinematic .btn-hero-rsvp:hover {
+  background: #D4AF37;
+  color: #FFFFFF;
+  box-shadow: 0 8px 26px rgba(212, 175, 55, 0.65);
+}
+
+body.theme-tradicional .wedding-hero-cinematic .btn-hero-cal {
+  background: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+}
+
+body.theme-tradicional .wedding-hero-cinematic .btn-hero-cal:hover {
+  background: rgba(212, 175, 55, 0.25);
+  border-color: #D4AF37;
+}
