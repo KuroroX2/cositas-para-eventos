@@ -447,7 +447,15 @@
     const tbody = document.getElementById('admin-invitations-tbody');
     const countInvEl = document.getElementById('admin-count-invitations');
 
-    if (countInvEl) countInvEl.textContent = adminInvitations.length;
+    let totalPeopleInv = 0;
+    adminInvitations.forEach(inv => {
+      const p = parseInt(inv.pases, 10) || (inv.name2 ? 2 : 1);
+      totalPeopleInv += p;
+    });
+
+    if (countInvEl) {
+      countInvEl.innerHTML = `<strong>${adminInvitations.length}</strong> inv. (<strong>${totalPeopleInv}</strong> pers.)`;
+    }
     if (!tbody) return;
 
     if (adminInvitations.length === 0) {

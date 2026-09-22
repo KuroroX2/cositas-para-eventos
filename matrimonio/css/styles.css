@@ -4663,11 +4663,17 @@ body.theme-tradicional .wedding-hero-cinematic .btn-hero-cal:hover {
 }
 
 .stat-info .stat-num {
-  font-size: 1.7rem;
-  font-weight: 800;
+  font-size: clamp(1.15rem, 1.8vw, 1.45rem);
+  font-weight: 600;
   color: #0A1828;
-  line-height: 1.1;
+  line-height: 1.2;
   font-family: var(--font-sans);
+}
+
+.stat-info .stat-num strong {
+  font-weight: 800;
+  font-size: 1.12em;
+  color: #0A1828;
 }
 
 .stat-info .stat-lbl {
