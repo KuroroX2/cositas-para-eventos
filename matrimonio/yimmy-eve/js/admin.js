@@ -430,7 +430,7 @@
       const verb = isPlural ? 'invitarlos' : 'invitarte';
       const waitVerb = isPlural ? '¡Los esperamos con todo nuestro cariño!' : '¡Te esperamos con todo nuestro cariño!';
 
-      const waMsg = `${greeting}\nCon muchísima alegría queremos ${verb} a nuestro matrimonio en Casona Los Olivos, Pirque el sábado 21 de noviembre de 2026.\n\nAquí tienes tu invitación oficial con tus pases reservados:\n${link}\n\n${waitVerb}\n— Cristopher & Reny`;
+      const waMsg = `${greeting}\nCon muchísima alegría queremos ${verb} a nuestro matrimonio en Casa Pirque el sábado 21 de noviembre de 2026.\n\nAquí tienes tu invitación oficial con tus pases reservados:\n${link}\n\n${waitVerb}\n— Evelyn & Yimmy`;
 
       let cleanPhone = (inv.phone || '').replace(/\D/g, '');
       if (cleanPhone.length === 9 && cleanPhone.startsWith('9')) {
@@ -494,7 +494,7 @@
           const isNone = (newMode === 'none');
 
           const existingR = adminRsvps.find(r => r.invCode === invId || r.name === name1);
-          const code = existingR ? existingR.code : ('CR-' + Math.floor(1000 + Math.random() * 9000));
+          const code = existingR ? existingR.code : ('EY-' + Math.floor(1000 + Math.random() * 9000));
           
           const updatedR = {
             id: existingR ? existingR.id : ('manual_' + Date.now()),
@@ -671,7 +671,7 @@
             </select>
           </td>
           <td>${pasesBadge}</td>
-          <td><strong class="code-tag">${escapeHtml(r.code || 'CR-0000')}</strong></td>
+          <td><strong class="code-tag">${escapeHtml(r.code || 'EY-0000')}</strong></td>
           <td>
             <small>${escapeHtml(r.dietary && r.dietary !== 'ninguna' ? r.dietary : 'Tradicional')}${r.dietary2 && r.dietary2 !== 'ninguna' ? ' / ' + escapeHtml(r.dietary2) : ''}</small>
           </td>
@@ -790,7 +790,7 @@
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', `Confirmados_Matrimonio_Reny_Cristopher_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `Confirmados_Matrimonio_Evelyn_Yimmy_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -824,8 +824,8 @@
         <div class="raffle-ticket">
           <div class="ticket-brand">MATRIMONIO EVELYN & YIMMY • SORTEO</div>
           <div class="ticket-guest-name">${namesText}</div>
-          <div class="ticket-code-box">CÓDIGO DE PASE: <strong>${escapeHtml(r.code || 'CR-0000')}</strong></div>
-          <div class="ticket-foot">21 de Noviembre de 2026 • Casona Los Olivos, Pirque 🎁</div>
+          <div class="ticket-code-box">CÓDIGO DE PASE: <strong>${escapeHtml(r.code || 'EY-0000')}</strong></div>
+          <div class="ticket-foot">21 de Noviembre de 2026 • Casa Pirque 🎁</div>
         </div>
       `;
     }).join('');
@@ -835,7 +835,7 @@
       <html lang="es">
       <head>
         <meta charset="UTF-8">
-        <title>Cupones de Sorteo - Cristopher & Reny</title>
+        <title>Cupones de Sorteo - Evelyn & Yimmy</title>
         <style>
           @page { size: letter portrait; margin: 10mm; }
           body { font-family: 'Segoe UI', Arial, sans-serif; background: #fff; margin: 0; padding: 10px; color: #111; }
@@ -857,7 +857,7 @@
         </style>
       </head>
       <body>
-        <h2>🎟️ Cupones de Sorteo de Premios — Cristopher & Reny</h2>
+        <h2>🎟️ Cupones de Sorteo de Premios — Evelyn & Yimmy</h2>
         <p class="sub">Total de pases confirmados: ${confirmedYes.length} • Corta por la línea punteada para la tómbola del sorteo.</p>
         <div class="raffle-grid">
           ${ticketsHtml}
@@ -877,7 +877,7 @@
       if (url.startsWith('data:image')) {
         const link = document.createElement('a');
         link.href = url;
-        link.download = filename || 'Foto_Boda_Eve_Cristopher.jpg';
+        link.download = filename || 'Foto_Boda_Eve_Yimmy.jpg';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -888,7 +888,7 @@
       const blobUrl = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = blobUrl;
-      link.download = filename || 'Foto_Boda_Eve_Cristopher.jpg';
+      link.download = filename || 'Foto_Boda_Eve_Yimmy.jpg';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -897,7 +897,7 @@
       const link = document.createElement('a');
       link.href = url;
       link.target = '_blank';
-      link.download = filename || 'Foto_Boda_Eve_Cristopher.jpg';
+      link.download = filename || 'Foto_Boda_Eve_Yimmy.jpg';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -960,7 +960,7 @@
     try {
       if (typeof window.JSZip === 'function') {
         const zip = new window.JSZip();
-        const folder = zip.folder('Fotos_Matrimonio_Reny_Cristopher_2026');
+        const folder = zip.folder('Fotos_Matrimonio_Evelyn_Yimmy_2026');
 
         for (let i = 0; i < photos.length; i++) {
           const p = photos[i];
@@ -995,7 +995,7 @@
         const zipUrl = URL.createObjectURL(zipBlob);
         const link = document.createElement('a');
         link.href = zipUrl;
-        link.download = `Fotos_Matrimonio_Reny_Cristopher_${new Date().toISOString().slice(0, 10)}.zip`;
+        link.download = `Fotos_Matrimonio_Evelyn_Yimmy_${new Date().toISOString().slice(0, 10)}.zip`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -1008,7 +1008,7 @@
           setTimeout(() => {
             const link = document.createElement('a');
             link.href = p.url || p.photo_url || '';
-            link.download = `Boda_Eve_Cristopher_${idx + 1}.jpg`;
+            link.download = `Boda_Eve_Yimmy_${idx + 1}.jpg`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);

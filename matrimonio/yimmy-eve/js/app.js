@@ -17,14 +17,14 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ==========================================================================
    0. ESTILO VISUAL: CAMPESTRE RÚSTICO & BOTÁNICO (Estilo Oficial Elegido)
    ========================================================================== */
-let activeAtmosphereTheme = 'theme-tradicional';
+let activeAtmosphereTheme = 'theme-campestre';
 
 function initThemeSwitcher() {
   document.body.classList.remove('theme-vogue', 'theme-tradicional', 'theme-florido');
-  document.body.classList.add('theme-tradicional');
-  activeAtmosphereTheme = 'theme-tradicional';
+  document.body.classList.add('theme-campestre');
+  activeAtmosphereTheme = 'theme-campestre';
   if (window.resetAtmosphereParticles) {
-    window.resetAtmosphereParticles('theme-tradicional');
+    window.resetAtmosphereParticles('theme-campestre');
   }
 }
 
@@ -85,26 +85,14 @@ function initAtmosphereParticles() {
       ctx.scale(Math.cos(this.flip), 1);
       ctx.globalAlpha = this.opacity;
 
-      if (this.theme === 'theme-tradicional') {
-        // Destellos dorados y perlas flotantes para estilo Clásico Elegante
-        ctx.fillStyle = this.size > 8 ? '#D4AF37' : '#F5E6B3';
-        ctx.beginPath();
-        if (this.size > 9) {
-          ctx.ellipse(0, 0, this.size * 0.4, this.size * 0.8, 0, 0, Math.PI * 2);
-        } else {
-          ctx.arc(0, 0, this.size * 0.5, 0, Math.PI * 2);
-        }
-        ctx.fill();
-      } else {
-        // Green Eucalyptus/Olive leaf for Campestre theme
-        ctx.fillStyle = '#8BAE88';
-        ctx.beginPath();
-        ctx.ellipse(0, 0, this.size * 0.45, this.size * 1.1, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#527A50';
-        ctx.globalAlpha = this.opacity * 0.6;
-        ctx.fill();
-      }
+      // Green Eucalyptus/Olive leaf for Campestre theme
+      ctx.fillStyle = '#8BAE88';
+      ctx.beginPath();
+      ctx.ellipse(0, 0, this.size * 0.45, this.size * 1.1, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#527A50';
+      ctx.globalAlpha = this.opacity * 0.6;
+      ctx.fill();
 
       ctx.restore();
     }
@@ -121,7 +109,7 @@ function initAtmosphereParticles() {
     setupParticles(theme);
   };
 
-  setupParticles('theme-tradicional');
+  setupParticles('theme-campestre');
 
   function loop() {
     ctx.clearRect(0, 0, width, height);
@@ -139,7 +127,7 @@ function initAtmosphereParticles() {
    1. COUNTDOWN TIMER (November 21, 2026 at 11:30 AM Santiago)
    ========================================================================== */
 function initCountdown() {
-  const weddingDate = new Date('2026-11-14T11:30:00-03:00').getTime();
+  const weddingDate = new Date('2026-11-21T11:30:00-03:00').getTime();
 
   const daysEl = document.getElementById('cd-days');
   const hoursEl = document.getElementById('cd-hours');
@@ -189,9 +177,9 @@ function initCalendarActions() {
     document.getElementById('btn-apple-cal-hero')
   ];
 
-  const title = encodeURIComponent("Matrimonio Reny López & Cristopher Salgado 💍");
-  const details = encodeURIComponent("¡Celebración del matrimonio de Cristopher y Reny en Casona Los Olivos, Pirque! Dress Code: Campestre Elegante. Recuerda traer tu manta para instalarte en el césped 🧺🌿.");
-  const location = encodeURIComponent("Casona Los Olivos, Pirque, Pirque, Región Metropolitana, Chile");
+  const title = encodeURIComponent("Matrimonio Evelyn López & Yimmy Salgado 💍");
+  const details = encodeURIComponent("¡Celebración del matrimonio de Evelyn y Yimmy en Casa Pirque! Dress Code: Campestre Elegante. Recuerda traer tu manta para instalarte en el césped 🧺🌿.");
+  const location = encodeURIComponent("Casa Pirque, Pirque, Región Metropolitana, Chile");
   const startIso = "20261121T143000Z";
   const endIso = "20261122T040000Z";
 
@@ -221,14 +209,14 @@ function downloadAppleIcsCalendar() {
   const icsData = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Cristopher & Reny//Matrimonio 2026//ES',
+    'PRODID:-//Evelyn & Yimmy//Matrimonio 2026//ES',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',
-    'UID:boda-cristopher-reny-20261121@casapirque',
-    'SUMMARY:💍 Matrimonio Reny López & Cristopher Salgado',
-    'DESCRIPTION:¡Celebración de nuestro matrimonio en Casona Los Olivos, Pirque! Dress Code: Campestre Elegante. Recuerda traer tu manta para el momento pasto 🧺🌿.',
-    'LOCATION:Casona Los Olivos, Pirque, Pirque, Región Metropolitana, Chile',
+    'UID:boda-evelyn-yimmy-20261121@casapirque',
+    'SUMMARY:💍 Matrimonio Evelyn López & Yimmy Salgado',
+    'DESCRIPTION:¡Celebración de nuestro matrimonio en Casa Pirque! Dress Code: Campestre Elegante. Recuerda traer tu manta para el momento pasto 🧺🌿.',
+    'LOCATION:Casa Pirque, Pirque, Región Metropolitana, Chile',
     'DTSTART:20261121T143000Z',
     'DTEND:20261122T040000Z',
     'STATUS:CONFIRMED',
@@ -240,7 +228,7 @@ function downloadAppleIcsCalendar() {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.setAttribute('download', 'Matrimonio_Reny_y_Cristopher.ics');
+  link.setAttribute('download', 'Matrimonio_Evelyn_y_Yimmy.ics');
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -289,7 +277,7 @@ function initBankModal() {
 
   if (copyBtn) {
     copyBtn.addEventListener('click', () => {
-      const textToCopy = `DATOS DE TRANSFERENCIA DIRECTA MATRIMONIO EVELYN & YIMMY\nBanco: Banco Santander\nTipo de Cuenta: Cuenta Corriente\nN° de Cuenta: 00-78451239-4\nRUT: 18.765.432-1\nTitular: Cristopher Salgado\nEmail: novios@cositasparaeventos.cl`;
+      const textToCopy = `DATOS DE TRANSFERENCIA DIRECTA MATRIMONIO EVELYN & YIMMY\nBanco: BancoEstado\nTipo de Cuenta: Cuenta Vista\nN° de Cuenta: 15789104\nRUT: 15.789.104-9\nTitular: Yimmy Salgado\nEmail: Yimsalgado@gmail.com`;
       navigator.clipboard.writeText(textToCopy).then(() => {
         copyBtn.innerHTML = '<i class="ri-check-line"></i> ¡Datos Copiados!';
         setTimeout(() => {
