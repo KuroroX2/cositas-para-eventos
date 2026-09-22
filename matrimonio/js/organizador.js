@@ -370,7 +370,7 @@ function renderTables() {
       table.guests.forEach((guest, idx) => {
         guestsHtml += `
           <li class="guest-seat-item">
-            <span>🪑 ${guest}</span>
+            <span class="guest-name-pill"><i class="ri-user-line"></i> ${guest}</span>
             <button class="btn-remove-seat" onclick="removeGuestFromTable('${table.id}', ${idx})" title="Desasignar invitado">
               <i class="ri-close-line"></i>
             </button>
@@ -420,8 +420,8 @@ function renderUnassignedList() {
     const item = document.createElement('li');
     item.className = 'unassigned-item';
     item.innerHTML = `
-      <span>👤 ${guest}</span>
-      <button class="btn-header" style="padding: 3px 8px; font-size: 0.75rem;" onclick="quickAssignGuest(${idx})">
+      <span class="guest-name-pill"><i class="ri-user-line"></i> ${guest}</span>
+      <button class="btn-assign-quick" onclick="quickAssignGuest(${idx})">
         Ubicar ↗
       </button>
     `;
@@ -521,7 +521,7 @@ function renderTimeline() {
       <td style="color: var(--text-muted); font-size: 0.88rem;">${item.detail}</td>
       <td>
         <button class="badge-status ${isOk ? 'ok' : 'pending'}" onclick="toggleTimelineStatus(${idx})" title="Clic para cambiar estado">
-          ${isOk ? '<i class="ri-checkbox-circle-fill"></i> Listo / OK' : '<i class="ri-hourglass-2-line"></i> Pendiente'}
+          ${isOk ? '<i class="ri-check-line"></i> Listo / OK' : '<i class="ri-time-line"></i> Pendiente'}
         </button>
       </td>
       <td>
@@ -571,7 +571,7 @@ function renderShopping() {
       <td><strong style="color: var(--gold-dark);">${item.cost || '—'}</strong></td>
       <td>
         <button class="badge-status ${isOk ? 'ok' : 'pending'}" onclick="toggleShoppingStatus(${idx})" title="Clic para cambiar estado">
-          ${isOk ? '<i class="ri-check-double-line"></i> Comprado / OK' : '<i class="ri-time-line"></i> Pendiente'}
+          ${isOk ? '<i class="ri-check-line"></i> Comprado / OK' : '<i class="ri-time-line"></i> Pendiente'}
         </button>
       </td>
       <td>

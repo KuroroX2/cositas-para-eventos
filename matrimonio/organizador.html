@@ -26,10 +26,12 @@
   <header class="org-header">
     <div class="org-header-inner">
       <div class="org-brand">
-        <div class="org-monogram">C &amp; R</div>
+        <div class="org-monogram-badge">
+          <span class="org-monogram-initials">C &amp; R</span>
+        </div>
         <div class="org-title-box">
           <h1>Organizador del Matrimonio</h1>
-          <p>Planificación de Mesas • Cronograma del Día • Compras &amp; Pendientes</p>
+          <p>Cristopher &amp; Reny • Mesas, Cronograma &amp; Compras</p>
         </div>
       </div>
 
@@ -48,31 +50,31 @@
 
     <!-- Metric Progress Counters -->
     <div class="metrics-row">
-      <div class="metric-card">
-        <div class="metric-icon-box"><i class="ri-restaurant-line"></i></div>
+      <div class="metric-card metric-tables">
+        <div class="metric-icon-box"><i class="ri-layout-masonry-line"></i></div>
         <div class="metric-data">
           <div class="num" id="metricTotalTables">6</div>
           <div class="lbl">Mesas Creadas</div>
         </div>
       </div>
 
-      <div class="metric-card">
-        <div class="metric-icon-box"><i class="ri-user-follow-line"></i></div>
+      <div class="metric-card metric-seated">
+        <div class="metric-icon-box"><i class="ri-user-heart-line"></i></div>
         <div class="metric-data">
           <div class="num" id="metricTotalSeated">0 / 0</div>
           <div class="lbl">Invitados Asignados</div>
         </div>
       </div>
 
-      <div class="metric-card">
-        <div class="metric-icon-box"><i class="ri-armchair-line"></i></div>
+      <div class="metric-card metric-seats">
+        <div class="metric-icon-box"><i class="ri-vip-crown-line"></i></div>
         <div class="metric-data">
           <div class="num" id="metricAvailableSeats">0</div>
           <div class="lbl">Asientos Libres</div>
         </div>
       </div>
 
-      <div class="metric-card">
+      <div class="metric-card metric-time">
         <div class="metric-icon-box"><i class="ri-time-line"></i></div>
         <div class="metric-data">
           <div class="num" id="metricTimelineProgress">0 / 0</div>
@@ -80,8 +82,8 @@
         </div>
       </div>
 
-      <div class="metric-card">
-        <div class="metric-icon-box"><i class="ri-shopping-bag-3-line"></i></div>
+      <div class="metric-card metric-shop">
+        <div class="metric-icon-box"><i class="ri-shopping-bag-line"></i></div>
         <div class="metric-data">
           <div class="num" id="metricShoppingProgress">0 / 0</div>
           <div class="lbl">Compras Listas</div>
@@ -95,10 +97,10 @@
         <i class="ri-layout-grid-line"></i> <span>1. Organización de Mesas</span>
       </button>
       <button class="tab-btn" data-target="pane-timeline">
-        <i class="ri-calendar-event-line"></i> <span>2. Cronograma Minuto a Minuto</span>
+        <i class="ri-calendar-line"></i> <span>2. Cronograma Minuto a Minuto</span>
       </button>
       <button class="tab-btn" data-target="pane-shopping">
-        <i class="ri-shopping-cart-2-line"></i> <span>3. Cosas por Comprar &amp; Pendientes</span>
+        <i class="ri-shopping-bag-line"></i> <span>3. Cosas por Comprar &amp; Pendientes</span>
       </button>
     </nav>
 
@@ -112,16 +114,14 @@
       </div>
 
       <div class="tables-layout">
-        <!-- Tables Display Grid -->
-        <div class="tables-grid" id="tablesGrid">
-          <!-- Rendered dynamically by organizador.js -->
-        </div>
-
-        <!-- Sidebar: Add Table & Unassigned Pool -->
+        <!-- Sidebar A LA IZQUIERDA: Panel de Creación & Banco de Invitados -->
         <aside class="tables-sidebar">
-          <!-- Card Crear Nueva Mesa -->
-          <div class="side-card">
-            <h3 class="side-card-title"><i class="ri-add-circle-line" style="color: var(--gold-dark);"></i> Crear Nueva Mesa</h3>
+          
+          <!-- Card Crear Nueva Mesa (Estilo Panel de Control) -->
+          <div class="side-card side-card-create">
+            <span class="side-card-tag"><i class="ri-add-line"></i> Herramienta</span>
+            <h3 class="side-card-title"><i class="ri-layout-masonry-line" style="color: var(--gold-dark);"></i> Crear Nueva Mesa</h3>
+            <p class="side-card-desc">Define el nombre y la cantidad de comensales:</p>
             <form id="formAddTable">
               <div class="form-group-org">
                 <label for="newTableName">Nombre o Número de Mesa *</label>
@@ -139,20 +139,21 @@
                 </select>
               </div>
               <button type="submit" class="btn-org-action">
-                <i class="ri-check-line"></i> <span>Agregar Mesa</span>
+                <i class="ri-add-line"></i> <span>Agregar Mesa</span>
               </button>
             </form>
           </div>
 
-          <!-- Card Invitados por Ubicar -->
-          <div class="side-card">
-            <h3 class="side-card-title"><i class="ri-user-search-line" style="color: var(--gold-dark);"></i> Invitados por Ubicar</h3>
-            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">Invitados confirmados que aún no tienen mesa asignada:</p>
+          <!-- Card Invitados por Asignar (Banco de Invitados) -->
+          <div class="side-card side-card-unassigned">
+            <span class="side-card-tag tag-amber"><i class="ri-user-line"></i> Pendientes</span>
+            <h3 class="side-card-title"><i class="ri-user-heart-line" style="color: var(--gold-dark);"></i> Invitados por Ubicar</h3>
+            <p class="side-card-desc">Invitados confirmados que aún no tienen mesa asignada:</p>
             
-            <form id="formAddUnassigned" style="display: flex; gap: 8px; margin-bottom: 12px;">
-              <input type="text" id="newGuestName" class="input-org" placeholder="Añadir invitado..." required style="padding: 8px 12px; font-size: 0.85rem;">
-              <button type="submit" class="btn-header btn-header-primary" style="padding: 8px 12px;">
-                <i class="ri-user-add-line"></i>
+            <form id="formAddUnassigned" style="display: flex; gap: 8px; margin-bottom: 14px;">
+              <input type="text" id="newGuestName" class="input-org" placeholder="Añadir invitado rápido..." required style="padding: 9px 12px; font-size: 0.85rem;">
+              <button type="submit" class="btn-quick-add" title="Agregar invitado a la lista de pendientes">
+                <i class="ri-add-line"></i>
               </button>
             </form>
 
@@ -161,6 +162,17 @@
             </ul>
           </div>
         </aside>
+
+        <!-- Tables Display Grid (A LA DERECHA) -->
+        <div class="tables-main-area">
+          <div class="tables-main-header">
+            <h3 class="tables-main-title"><i class="ri-restaurant-line"></i> Mesas del Salón de Banquete</h3>
+            <span class="tables-main-hint">Usa "Asignar Invitado" en cada mesa para ubicar a las personas.</span>
+          </div>
+          <div class="tables-grid" id="tablesGrid">
+            <!-- Rendered dynamically by organizador.js -->
+          </div>
+        </div>
       </div>
     </section>
 
