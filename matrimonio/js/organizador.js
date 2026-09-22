@@ -460,7 +460,7 @@ function renderTables() {
           <span style="font-size: 0.76rem; color: var(--gold-dark); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Mesa de Banquete</span>
         </div>
         <span class="table-badge-capacity ${isFull ? 'full' : ''}">
-          ${table.guests.length} / ${table.capacity} ${isFull ? '• Completa' : 'Asientos'}
+          ${table.guests.length} / ${table.capacity}
         </span>
       </div>
       <ul class="table-guests-list">
@@ -629,7 +629,7 @@ window.openPickTableModal = function(guestName) {
       <div class="pick-table-info">
         <span class="pick-table-name">${escapeHtml(table.name)}</span>
         <span class="pick-table-seats">
-          ${freeSeats} asiento(s) libre(s) • ${table.guests.length} de ${table.capacity} ocupados
+          ${table.guests.length} / ${table.capacity} (${freeSeats} disponibles)
         </span>
       </div>
       <button class="btn-select-table" ${hasSpace ? '' : 'disabled'} onclick="handlePickTableSelect('${escapeHtml(guestName)}', '${table.id}')">
