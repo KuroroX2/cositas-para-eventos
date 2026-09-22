@@ -341,6 +341,56 @@
     </div>
   </div>
 
+  <!-- MODAL EDITAR MESA (Nombre y Capacidad) -->
+  <div class="org-modal" id="editTableModal">
+    <div class="org-modal-card">
+      <button class="btn-close-modal" aria-label="Cerrar"><i class="ri-close-line"></i></button>
+      <h3 class="org-modal-title"><i class="ri-edit-line" style="color: var(--gold-dark); font-size: 1.3rem;"></i> Editar Mesa</h3>
+      <form id="formEditTable">
+        <input type="hidden" id="editTableId">
+        <div class="form-group-org">
+          <label for="editTableName">Nombre o Número de Mesa *</label>
+          <input type="text" id="editTableName" class="input-org" required>
+        </div>
+        <div class="form-group-org">
+          <label for="editTableCapacity">Capacidad Máxima de Asientos *</label>
+          <input type="number" id="editTableCapacity" class="input-org" min="1" max="30" required>
+          <small id="editTableCurrentSeats" style="display: block; font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;"></small>
+        </div>
+        <div style="margin-top: 22px;">
+          <button type="submit" class="btn-org-action">
+            <i class="ri-check-line"></i> <span>Guardar Cambios</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL ELEGIR MESA PARA INVITADO (Botón Ubicar) -->
+  <div class="org-modal" id="pickTableModal">
+    <div class="org-modal-card" style="max-width: 560px;">
+      <button class="btn-close-modal" aria-label="Cerrar"><i class="ri-close-line"></i></button>
+      <div style="margin-bottom: 16px;">
+        <span class="side-card-tag tag-amber" style="margin-bottom: 6px;"><i class="ri-user-heart-line"></i> Asignación de Mesa</span>
+        <h3 class="org-modal-title" style="margin-bottom: 4px;">Ubicar a <span id="pickGuestName" style="color: var(--gold-dark);"></span></h3>
+        <div id="pickCompanionAlert" style="display: none; background: #FEF3C7; color: #92400E; border: 1px solid rgba(245, 158, 11, 0.35); padding: 9px 13px; border-radius: 10px; font-size: 0.82rem; margin-top: 10px; line-height: 1.45;">
+          <i class="ri-heart-line" style="color: #B45309;"></i> <strong>Pareja / Acompañante:</strong> <span id="pickCompanionName" style="font-weight: 700;"></span> (se asignarán automáticamente juntos en la misma mesa).
+        </div>
+      </div>
+
+      <div style="margin-bottom: 12px;">
+        <label style="font-size: 0.82rem; font-weight: 700; color: var(--navy-royal);">Selecciona la mesa a la que deseas asignarlo(s):</label>
+      </div>
+
+      <div class="pick-tables-list" id="pickTablesList">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="orgToast" class="org-toast" aria-live="polite"></div>
+
   <!-- Script -->
   <script src="js/organizador.js"></script>
 </body>

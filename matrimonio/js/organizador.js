@@ -1,13 +1,39 @@
 /**
  * ORGANIZADOR NUPCIAL — LÓGICA & PERSISTENCIA (LOCALSTORAGE)
+ * Incluye: Drag & Drop, Asignación de Parejas en la misma mesa,
+ * Edición de Nombre y Capacidad de Mesas, y Modal de Ubicación.
  * Cositas Para Eventos
  */
+
+// 19 Parejas oficiales iniciales migradas desde la demo
+const DEFAULT_SEED_INVITATIONS = [
+  { id: "inv_mt8t3dh4_mdcy", pases: 2, name1: "Roberto", name2: "Acompañante" },
+  { id: "inv_mt7agi0j_r812", pases: 1, name1: "Karen", name2: "" },
+  { id: "inv_mt7agb8r_yhi2", pases: 1, name1: "Sandra", name2: "" },
+  { id: "inv_mt7ag1bu_s3mf", pases: 1, name1: "Jhankhel", name2: "" },
+  { id: "inv_mt7afpe6_kfg4", pases: 1, name1: "Yorka", name2: "" },
+  { id: "inv_mt7afe11_3wr0", pases: 2, name1: "Pamela", name2: "Marcial" },
+  { id: "inv_mt7af2wd_bc93", pases: 1, name1: "Constanza", name2: "" },
+  { id: "inv_mt7aerri_0o4h", pases: 1, name1: "Cecilia", name2: "" },
+  { id: "inv_mt7aefqb_ewjp", pases: 1, name1: "Barbara", name2: "" },
+  { id: "inv_mt7ae4tr_3c2o", pases: 1, name1: "Claudia", name2: "" },
+  { id: "inv_mt7ado96_pjjz", pases: 2, name1: "Camila", name2: "Tah" },
+  { id: "inv_mt7ad2wi_m84w", pases: 2, name1: "Daniela", name2: "Hugo" },
+  { id: "inv_mt7acqee_bjth", pases: 2, name1: "Jessica", name2: "Eduardo" },
+  { id: "inv_mt7ac5s2_2ko9", pases: 2, name1: "Cristopher", name2: "Reny" },
+  { id: "inv_mt7abo4o_ixxm", pases: 2, name1: "Carlos", name2: "Carola" },
+  { id: "inv_mt79v1i5_fj7j", pases: 2, name1: "Felipe", name2: "Camila" },
+  { id: "inv_mt79ukht_iqcm", pases: 2, name1: "Guisselle", name2: "Nicolas" },
+  { id: "inv_mt79u2qe_of3f", pases: 2, name1: "Jaqueline", name2: "Luis" },
+  { id: "inv_mt797yfq_46ak", pases: 2, name1: "Isaac", name2: "Denisse" }
+];
 
 document.addEventListener('DOMContentLoaded', () => {
   initTabs();
   loadData();
   renderAll();
   setupEventListeners();
+  initDragAndDrop();
 });
 
 /* ==========================================================================
@@ -72,7 +98,7 @@ function loadData() {
   if (savedUnassigned) {
     unassignedGuests = JSON.parse(savedUnassigned);
   } else {
-    unassignedGuests = ['Roberto', 'Karen', 'Sandra', 'Yorka', 'Claudia'];
+    unassignedGuests = ['Roberto', 'Acompañante', 'Karen', 'Sandra', 'Yorka', 'Claudia', 'Tah'];
   }
 
   const savedTimeline = localStorage.getItem(STORAGE_KEY_TIMELINE);
@@ -162,34 +188,18 @@ function loadData() {
       },
       {
         id: 'act_11',
-        time: '21:15',
-        title: 'Apertura de Fiesta & Barra Abierta',
-        responsible: 'Bartenders & DJ',
-        detail: 'Inicio de la fiesta bailable con música variada',
+        time: '21:30',
+        title: 'Apertura de Barra Libre & Fiesta',
+        responsible: 'Barman & DJ',
+        detail: 'Tragos preparados, cotillón y pista de baile habilitada',
         status: 'pending'
       },
       {
         id: 'act_12',
-        time: '23:30',
-        title: 'Lanzamiento del Ramo & Liga',
-        responsible: 'Animador / Novios',
-        detail: 'Llamar a todos los solteros y solteras al centro',
-        status: 'pending'
-      },
-      {
-        id: 'act_13',
-        time: '00:30',
-        title: 'Bajón de Medianoche (Snacks calientes)',
+        time: '01:00',
+        title: 'Bajón de Medianoche & Pizza / Tapaditos',
         responsible: 'Banquetera',
-        detail: 'Empanaditas, tapaditos y mini churros',
-        status: 'pending'
-      },
-      {
-        id: 'act_14',
-        time: '02:00',
-        title: 'Despedida con Chispitas & Cierre',
-        responsible: 'Todos los Invitados',
-        detail: 'Túnel de luces de bengala para despedir a los recién casados',
+        detail: 'Comida reconfortante caliente para la fiesta',
         status: 'pending'
       }
     ];
@@ -202,82 +212,58 @@ function loadData() {
     shopping = [
       {
         id: 'shop_1',
-        item: 'Copas de cristal grabadas para el brindis',
+        item: 'Kit de Luces de Bengala para Salida de Ceremonia',
         category: 'Ceremonia',
-        detail: 'Grabadas con C & R y fecha 14.11.2026',
-        cost: '$18.000',
+        detail: '100 unidades de chispas largas (45 cm) para el atardecer',
+        cost: '$25.000',
         status: 'ok'
       },
       {
         id: 'shop_2',
-        item: 'Cesta de mimbre para pétalos de flores',
-        category: 'Ceremonia',
-        detail: 'Comprar 2 cestitas rústicas en Meiggs o feria artesanal',
-        cost: '$9.000',
+        item: 'Cámaras Desechables Vintage para cada mesa',
+        category: 'Detalles',
+        detail: '8 cámaras instantáneas desechables para las mesas',
+        cost: '$60.000',
         status: 'ok'
       },
       {
         id: 'shop_3',
-        item: 'Marcadores de números para las mesas',
-        category: 'Decoración',
-        detail: 'Números en madera dorada del 1 al 10',
-        cost: '$15.000',
+        item: 'Pantuflas y Chalas Cómodas para la Fiesta',
+        category: 'Fiesta',
+        detail: '40 pares surtidos de tallas M y L para bailarines',
+        cost: '$45.000',
         status: 'ok'
       },
       {
         id: 'shop_4',
-        item: 'Pizarra rústica de bienvenida "Bienvenidos a nuestra boda"',
-        category: 'Decoración',
-        detail: 'Caballete de madera y tiza líquida blanca',
-        cost: '$22.000',
+        item: 'Kit de Baño / Emergencia (Hombres y Mujeres)',
+        category: 'Varios',
+        detail: 'Costurero, desodorantes, paracetamol, pañuelitos y mentas',
+        cost: '$18.000',
         status: 'pending'
       },
       {
         id: 'shop_5',
-        item: 'Kit de luces de bengala largas (100 unidades)',
-        category: 'Fiesta',
-        detail: 'Para la despedida nocturna en el jardín',
-        cost: '$16.000',
+        item: 'Carteles y Marcos para Códigos QR de Fotos',
+        category: 'Decoración',
+        detail: '6 marcos dorados de sobremesa con el link del álbum',
+        cost: '$15.000',
         status: 'pending'
       },
       {
         id: 'shop_6',
-        item: 'Cotillón luminoso LED (varitas, lentes, pulseras)',
-        category: 'Fiesta',
-        detail: 'Pack fiesta flúor para 80 personas',
-        cost: '$45.000',
+        item: 'Bolsitas de Arroz y Pétalos de Olivo',
+        category: 'Ceremonia',
+        detail: '70 conos de papel kraft biodegradables',
+        cost: '$12.000',
         status: 'pending'
       },
       {
         id: 'shop_7',
-        item: 'Pantuflas / sandalias cómodas para invitadas',
-        category: 'Detalles',
-        detail: '30 pares tallas variadas para descansar los tacones en el pasto',
+        item: 'Cotillón Neón y Pulseras Luminosas LED',
+        category: 'Fiesta',
+        detail: 'Pack fiesta flúor con lentes LED y barras de luz',
         cost: '$35.000',
-        status: 'pending'
-      },
-      {
-        id: 'shop_8',
-        item: 'Canasto de emergencia para baños de damas y varones',
-        category: 'Detalles',
-        detail: 'Desodorante, costurero, chicles, toallitas, horquillas, curitas',
-        cost: '$14.000',
-        status: 'pending'
-      },
-      {
-        id: 'shop_9',
-        item: 'Lazos y cintas de tela para el auto de los novios',
-        category: 'Ceremonia',
-        detail: 'Cinta de gasa marfil y tul',
-        cost: '$8.500',
-        status: 'pending'
-      },
-      {
-        id: 'shop_10',
-        item: 'Recuerdos especiales para padrinos y testigos',
-        category: 'Regalos',
-        detail: 'Vinos reserva con etiqueta personalizada de Cositas Para Eventos',
-        cost: '$32.000',
         status: 'pending'
       }
     ];
@@ -291,28 +277,6 @@ function saveData() {
   localStorage.setItem(STORAGE_KEY_SHOPPING, JSON.stringify(shopping));
 }
 
-/* ==========================================================================
-   2. Pestañas de Navegación
-   ========================================================================== */
-function initTabs() {
-  const tabs = document.querySelectorAll('.tab-btn');
-  const panes = document.querySelectorAll('.org-pane');
-
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      panes.forEach(p => p.classList.remove('active'));
-
-      tab.classList.add('active');
-      const targetPane = document.getElementById(tab.dataset.target);
-      if (targetPane) targetPane.classList.add('active');
-    });
-  });
-}
-
-/* ==========================================================================
-   3. Renderizador General
-   ========================================================================== */
 function renderAll() {
   renderMetrics();
   renderTables();
@@ -321,12 +285,106 @@ function renderAll() {
   renderShopping();
 }
 
+/* ==========================================================================
+   2. DETECCIÓN DE PAREJAS / MISMA INVITACIÓN (Acompañantes Vinculados)
+   ========================================================================== */
+function getCompanion(guestName) {
+  if (!guestName) return null;
+  const clean = guestName.trim().toLowerCase();
+
+  // 1. Obtener invitaciones guardadas en localStorage
+  let invs = [];
+  try {
+    const raw = localStorage.getItem('wedding_invitations_cloud_v1');
+    if (raw) invs = JSON.parse(raw);
+  } catch (e) {}
+
+  const allInvs = [...invs, ...DEFAULT_SEED_INVITATIONS];
+
+  for (const inv of allInvs) {
+    if (inv.name1 && inv.name2) {
+      const n1 = inv.name1.trim().toLowerCase();
+      const n2 = inv.name2.trim().toLowerCase();
+      if (clean === n1) return inv.name2.trim();
+      if (clean === n2) return inv.name1.trim();
+    }
+  }
+  return null;
+}
+
+function removeGuestFromEverywhere(guestName) {
+  const clean = guestName.trim().toLowerCase();
+  unassignedGuests = unassignedGuests.filter(g => g.trim().toLowerCase() !== clean);
+  tables.forEach(t => {
+    t.guests = t.guests.filter(g => g.trim().toLowerCase() !== clean);
+  });
+}
+
+/**
+ * Asigna un invitado a una mesa, y si tiene acompañante en la misma invitación,
+ * también asigna automáticamente a su acompañante a la misma mesa.
+ */
+function assignGuestToTable(guestName, tableId) {
+  const table = tables.find(t => t.id === tableId);
+  if (!table) return false;
+
+  const companion = getCompanion(guestName);
+  const companionAlreadyThere = companion && table.guests.some(g => g.trim().toLowerCase() === companion.trim().toLowerCase());
+
+  let companionToMove = null;
+  let neededSeats = 1;
+
+  if (companion && !companionAlreadyThere) {
+    companionToMove = companion;
+    neededSeats = 2;
+  }
+
+  const availableSeats = table.capacity - table.guests.length;
+  if (availableSeats < 1) {
+    alert(`La "${table.name}" está completa. No tiene asientos disponibles.`);
+    return false;
+  }
+
+  // Asignar al invitado principal
+  removeGuestFromEverywhere(guestName);
+  table.guests.push(guestName);
+
+  let toastMessage = `¡Se asignó a ${guestName} a "${table.name}"!`;
+
+  // Asignar automáticamente a la pareja si tienen la misma invitación
+  if (companionToMove) {
+    if (availableSeats >= 2) {
+      removeGuestFromEverywhere(companionToMove);
+      table.guests.push(companionToMove);
+      toastMessage = `¡Se asignó a ${guestName} y a su acompañante (${companionToMove}) juntos a "${table.name}"!`;
+    } else {
+      alert(`Se asignó a ${guestName} a la "${table.name}", pero la mesa no tiene suficiente espacio libre para su acompañante (${companionToMove}). Aumenta la capacidad de la mesa para incluirlo.`);
+    }
+  }
+
+  saveData();
+  renderAll();
+  showToast(toastMessage);
+  return true;
+}
+
+function unassignGuest(guestName) {
+  removeGuestFromEverywhere(guestName);
+  unassignedGuests.push(guestName);
+  saveData();
+  renderAll();
+  showToast(`Se movió a ${guestName} a la lista de invitados por ubicar.`);
+}
+
+/* ==========================================================================
+   3. Renderizado de Métricas
+   ========================================================================== */
 function renderMetrics() {
-  // Mesas
   let totalCapacity = 0;
   let totalSeated = 0;
+
   tables.forEach(t => {
-    totalCapacity += t.capacity;
+    totalCapacity += parseInt(t.capacity, 10) || 0;
     totalSeated += t.guests.length;
   });
 
@@ -338,19 +396,17 @@ function renderMetrics() {
   if (totalSeatedEl) totalSeatedEl.textContent = `${totalSeated} / ${totalCapacity}`;
   if (availableSeatsEl) availableSeatsEl.textContent = Math.max(0, totalCapacity - totalSeated);
 
-  // Timeline
   const okTimeline = timeline.filter(t => t.status === 'ok').length;
   const metricTimelineEl = document.getElementById('metricTimelineProgress');
   if (metricTimelineEl) metricTimelineEl.textContent = `${okTimeline} / ${timeline.length}`;
 
-  // Shopping
   const okShopping = shopping.filter(s => s.status === 'ok').length;
   const metricShoppingEl = document.getElementById('metricShoppingProgress');
   if (metricShoppingEl) metricShoppingEl.textContent = `${okShopping} / ${shopping.length}`;
 }
 
 /* ==========================================================================
-   4. MÓDULO 1: ORGANIZADOR DE MESAS
+   4. MÓDULO 1: ORGANIZADOR DE MESAS (CON DRAG & DROP Y BOTÓN EDITAR)
    ========================================================================== */
 function renderTables() {
   const container = document.getElementById('tablesGrid');
@@ -362,15 +418,28 @@ function renderTables() {
     const isFull = table.guests.length >= table.capacity;
     const card = document.createElement('div');
     card.className = 'table-card';
+    card.dataset.tableId = table.id;
+
+    // Dropzone attributes
+    card.addEventListener('dragover', (e) => handleTableDragOver(e, table.id));
+    card.addEventListener('dragleave', (e) => handleTableDragLeave(e, table.id));
+    card.addEventListener('drop', (e) => handleTableDrop(e, table.id));
 
     let guestsHtml = '';
     if (table.guests.length === 0) {
-      guestsHtml = '<li style="color: var(--text-muted); font-size: 0.85rem; font-style: italic;">Sin invitados asignados aún</li>';
+      guestsHtml = '<li style="color: var(--text-muted); font-size: 0.85rem; font-style: italic; padding: 8px 0;">Sin invitados asignados aún (arrastra aquí)</li>';
     } else {
       table.guests.forEach((guest, idx) => {
+        const companion = getCompanion(guest);
+        const companionBadge = companion ? `<small style="font-size: 0.72rem; color: #99742a; font-weight: 700;" title="Acompañante de invitación: ${escapeHtml(companion)}">👥 Pareja: ${escapeHtml(companion)}</small>` : '';
+
         guestsHtml += `
-          <li class="guest-seat-item">
-            <span class="guest-name-pill"><i class="ri-user-line"></i> ${guest}</span>
+          <li class="guest-seat-item" draggable="true" data-guest="${escapeHtml(guest)}" data-table-id="${table.id}" title="Arrastra a otra mesa o a la lista de pendientes">
+            <div class="guest-name-pill">
+              <i class="ri-user-line"></i>
+              <span>${escapeHtml(guest)}</span>
+              ${companionBadge}
+            </div>
             <button class="btn-remove-seat" onclick="removeGuestFromTable('${table.id}', ${idx})" title="Desasignar invitado">
               <i class="ri-close-line"></i>
             </button>
@@ -382,8 +451,13 @@ function renderTables() {
     card.innerHTML = `
       <div class="table-card-header">
         <div>
-          <h3 class="table-card-title">${table.name}</h3>
-          <span style="font-size: 0.78rem; color: var(--gold-dark); font-weight: 600;">Mesa Nupcial</span>
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
+            <h3 class="table-card-title">${escapeHtml(table.name)}</h3>
+            <button class="btn-table-edit" onclick="openEditTableModal('${table.id}')" title="Editar nombre y capacidad de asientos">
+              <i class="ri-edit-line"></i> <span>Editar</span>
+            </button>
+          </div>
+          <span style="font-size: 0.76rem; color: var(--gold-dark); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Mesa de Banquete</span>
         </div>
         <span class="table-badge-capacity ${isFull ? 'full' : ''}">
           ${table.guests.length} / ${table.capacity} ${isFull ? '• Completa' : 'Asientos'}
@@ -404,6 +478,8 @@ function renderTables() {
 
     container.appendChild(card);
   });
+
+  initItemDragListeners();
 }
 
 function renderUnassignedList() {
@@ -412,33 +488,210 @@ function renderUnassignedList() {
 
   listEl.innerHTML = '';
   if (unassignedGuests.length === 0) {
-    listEl.innerHTML = '<li style="font-size: 0.85rem; color: var(--text-muted); padding: 8px 0; text-align: center;">¡Todos los invitados están asignados! 🎉</li>';
+    listEl.innerHTML = '<li style="font-size: 0.85rem; color: var(--text-muted); padding: 12px 0; text-align: center;">¡Todos los invitados están asignados! 🎉</li>';
     return;
   }
 
   unassignedGuests.forEach((guest, idx) => {
+    const companion = getCompanion(guest);
+    const companionBadge = companion ? `<small style="font-size: 0.7rem; color: #99742a; font-weight: 700; display: block;">👥 Pareja: ${escapeHtml(companion)}</small>` : '';
+
     const item = document.createElement('li');
     item.className = 'unassigned-item';
+    item.draggable = true;
+    item.dataset.guest = guest;
+    item.dataset.source = 'unassigned';
+    item.title = "Arrastra hacia cualquier mesa o pulsa 'Ubicar'";
+
     item.innerHTML = `
-      <span class="guest-name-pill"><i class="ri-user-line"></i> ${guest}</span>
-      <button class="btn-assign-quick" onclick="quickAssignGuest(${idx})">
+      <div class="guest-name-pill" style="flex-direction: column; align-items: flex-start; gap: 2px;">
+        <span style="display: flex; align-items: center; gap: 5px;">
+          <i class="ri-user-line" style="color: #99742a;"></i>
+          <strong>${escapeHtml(guest)}</strong>
+        </span>
+        ${companionBadge}
+      </div>
+      <button class="btn-assign-quick" onclick="openPickTableModal('${escapeHtml(guest)}')">
         Ubicar ↗
       </button>
     `;
     listEl.appendChild(item);
   });
+
+  initItemDragListeners();
 }
 
+/* ==========================================================================
+   5. DRAG & DROP API (Arrastrar Invitados a Mesas)
+   ========================================================================== */
+let draggedGuestName = null;
+let draggedSourceTableId = null;
+
+function initDragAndDrop() {
+  const unassignedListEl = document.getElementById('unassignedList');
+  if (unassignedListEl) {
+    unassignedListEl.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      unassignedListEl.classList.add('drag-over');
+    });
+    unassignedListEl.addEventListener('dragleave', () => {
+      unassignedListEl.classList.remove('drag-over');
+    });
+    unassignedListEl.addEventListener('drop', (e) => {
+      e.preventDefault();
+      unassignedListEl.classList.remove('drag-over');
+      if (draggedGuestName) {
+        unassignGuest(draggedGuestName);
+        draggedGuestName = null;
+        draggedSourceTableId = null;
+      }
+    });
+  }
+}
+
+function initItemDragListeners() {
+  document.querySelectorAll('[draggable="true"]').forEach(el => {
+    el.addEventListener('dragstart', (e) => {
+      draggedGuestName = el.dataset.guest;
+      draggedSourceTableId = el.dataset.tableId || 'unassigned';
+      el.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', draggedGuestName);
+      e.dataTransfer.effectAllowed = 'move';
+    });
+
+    el.addEventListener('dragend', () => {
+      el.classList.remove('dragging');
+      document.querySelectorAll('.table-card').forEach(c => c.classList.remove('drag-over'));
+      const u = document.getElementById('unassignedList');
+      if (u) u.classList.remove('drag-over');
+    });
+  });
+}
+
+function handleTableDragOver(e, tableId) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  const card = document.querySelector(`.table-card[data-table-id="${tableId}"]`);
+  if (card) card.classList.add('drag-over');
+}
+
+function handleTableDragLeave(e, tableId) {
+  const card = document.querySelector(`.table-card[data-table-id="${tableId}"]`);
+  if (card) card.classList.remove('drag-over');
+}
+
+function handleTableDrop(e, tableId) {
+  e.preventDefault();
+  const card = document.querySelector(`.table-card[data-table-id="${tableId}"]`);
+  if (card) card.classList.remove('drag-over');
+
+  const guestName = draggedGuestName || e.dataTransfer.getData('text/plain');
+  if (!guestName) return;
+
+  assignGuestToTable(guestName, tableId);
+  draggedGuestName = null;
+  draggedSourceTableId = null;
+}
+
+/* ==========================================================================
+   6. MODAL UBICAR: MOSTRAR LISTA DE MESAS DISPONIBLES AL PULSAR "UBICAR"
+   ========================================================================== */
+window.openPickTableModal = function(guestName) {
+  const modal = document.getElementById('pickTableModal');
+  const nameEl = document.getElementById('pickGuestName');
+  const companionAlert = document.getElementById('pickCompanionAlert');
+  const companionNameEl = document.getElementById('pickCompanionName');
+  const listEl = document.getElementById('pickTablesList');
+
+  if (!modal || !nameEl || !listEl) return;
+
+  nameEl.textContent = guestName;
+
+  const companion = getCompanion(guestName);
+  if (companion) {
+    companionAlert.style.display = 'block';
+    companionNameEl.textContent = companion;
+  } else {
+    companionAlert.style.display = 'none';
+  }
+
+  listEl.innerHTML = '';
+
+  tables.forEach(table => {
+    const freeSeats = table.capacity - table.guests.length;
+    const needed = companion ? 2 : 1;
+    const hasSpace = freeSeats >= needed;
+
+    const row = document.createElement('div');
+    row.className = `pick-table-row ${hasSpace ? '' : 'disabled'}`;
+
+    row.innerHTML = `
+      <div class="pick-table-info">
+        <span class="pick-table-name">${escapeHtml(table.name)}</span>
+        <span class="pick-table-seats">
+          ${freeSeats} asiento(s) libre(s) • ${table.guests.length} de ${table.capacity} ocupados
+        </span>
+      </div>
+      <button class="btn-select-table" ${hasSpace ? '' : 'disabled'} onclick="handlePickTableSelect('${escapeHtml(guestName)}', '${table.id}')">
+        ${hasSpace ? 'Asignar a esta Mesa ↗' : 'Mesa Llena'}
+      </button>
+    `;
+    listEl.appendChild(row);
+  });
+
+  modal.classList.add('active');
+};
+
+window.handlePickTableSelect = function(guestName, tableId) {
+  const success = assignGuestToTable(guestName, tableId);
+  if (success) {
+    const modal = document.getElementById('pickTableModal');
+    if (modal) modal.classList.remove('active');
+  }
+};
+
+/* ==========================================================================
+   7. MODAL EDITAR MESA (Nombre y Capacidad de Asientos)
+   ========================================================================== */
+window.openEditTableModal = function(tableId) {
+  const table = tables.find(t => t.id === tableId);
+  if (!table) return;
+
+  const modal = document.getElementById('editTableModal');
+  const idInput = document.getElementById('editTableId');
+  const nameInput = document.getElementById('editTableName');
+  const capInput = document.getElementById('editTableCapacity');
+  const seatsHint = document.getElementById('editTableCurrentSeats');
+
+  if (!modal || !idInput || !nameInput || !capInput) return;
+
+  idInput.value = table.id;
+  nameInput.value = table.name;
+  capInput.value = table.capacity;
+  capInput.min = Math.max(1, table.guests.length);
+
+  if (seatsHint) {
+    seatsHint.textContent = `Actualmente hay ${table.guests.length} personas sentadas. La capacidad mínima permitida es ${table.guests.length}.`;
+  }
+
+  modal.classList.add('active');
+};
+
+/* ==========================================================================
+   8. Acciones de Mesa (Eliminar, Desasignar, Asignar)
+   ========================================================================== */
 window.deleteTable = function(tableId) {
   const table = tables.find(t => t.id === tableId);
   if (!table) return;
 
   if (confirm(`¿Estás seguro de eliminar la "${table.name}"? Los invitados sentados volverán a la lista de pendientes.`)) {
-    // Return guests to unassigned list
-    table.guests.forEach(g => unassignedGuests.push(g));
+    table.guests.forEach(g => {
+      if (!unassignedGuests.includes(g)) unassignedGuests.push(g);
+    });
     tables = tables.filter(t => t.id !== tableId);
     saveData();
     renderAll();
+    showToast(`Se eliminó la "${table.name}".`);
   }
 };
 
@@ -447,9 +700,12 @@ window.removeGuestFromTable = function(tableId, guestIndex) {
   if (!table) return;
 
   const removedGuest = table.guests.splice(guestIndex, 1)[0];
-  unassignedGuests.push(removedGuest);
+  if (!unassignedGuests.includes(removedGuest)) {
+    unassignedGuests.push(removedGuest);
+  }
   saveData();
   renderAll();
+  showToast(`Se desasignó a ${removedGuest} de "${table.name}".`);
 };
 
 window.openAssignModal = function(tableId) {
@@ -459,48 +715,32 @@ window.openAssignModal = function(tableId) {
   if (unassignedGuests.length === 0) {
     const customName = prompt(`No hay invitados pendientes en lista. Escribe el nombre del invitado para agregar a "${targetTable.name}":`);
     if (customName && customName.trim()) {
-      targetTable.guests.push(customName.trim());
-      saveData();
-      renderAll();
+      assignGuestToTable(customName.trim(), tableId);
     }
     return;
   }
 
-  // Populate assign modal select
   const modal = document.getElementById('assignModal');
   const select = document.getElementById('selectAssignGuest');
-  const tableTitle = document.getElementById('assignModalTableTitle');
+  const title = document.getElementById('assignModalTableTitle');
 
-  if (!modal || !select) return;
+  if (modal && select && title) {
+    title.textContent = targetTable.name;
+    modal.dataset.targetTableId = tableId;
 
-  tableTitle.textContent = targetTable.name;
-  select.innerHTML = '<option value="">-- Selecciona un invitado --</option>';
+    select.innerHTML = '<option value="">-- Elige un invitado pendiente --</option>';
+    unassignedGuests.forEach((g, idx) => {
+      const comp = getCompanion(g);
+      const label = comp ? `${g} (Pareja: ${comp})` : g;
+      select.innerHTML += `<option value="${idx}">${label}</option>`;
+    });
 
-  unassignedGuests.forEach((g, idx) => {
-    select.innerHTML += `<option value="${idx}">${g}</option>`;
-  });
-
-  modal.dataset.targetTableId = tableId;
-  modal.classList.add('active');
-};
-
-window.quickAssignGuest = function(unassignedIdx) {
-  const guest = unassignedGuests[unassignedIdx];
-  // Find first table with available seat
-  const availableTable = tables.find(t => t.guests.length < t.capacity);
-  if (!availableTable) {
-    alert('No hay mesas con asientos libres. Por favor crea una nueva mesa primero.');
-    return;
+    modal.classList.add('active');
   }
-
-  availableTable.guests.push(guest);
-  unassignedGuests.splice(unassignedIdx, 1);
-  saveData();
-  renderAll();
 };
 
 /* ==========================================================================
-   5. MÓDULO 2: CRONOGRAMA & ACTIVIDADES
+   9. Cronograma & Compras
    ========================================================================== */
 function renderTimeline() {
   const tbody = document.getElementById('timelineTableBody');
@@ -515,10 +755,10 @@ function renderTimeline() {
     tr.innerHTML = `
       <td><span class="time-badge"><i class="ri-time-line"></i> ${item.time}</span></td>
       <td>
-        <strong style="color: var(--primary-forest); font-size: 0.95rem;">${item.title}</strong>
+        <strong style="color: var(--navy-royal); font-size: 0.95rem;">${escapeHtml(item.title)}</strong>
       </td>
-      <td><span style="color: var(--gold-dark); font-weight: 600;"><i class="ri-user-star-line"></i> ${item.responsible}</span></td>
-      <td style="color: var(--text-muted); font-size: 0.88rem;">${item.detail}</td>
+      <td><span style="color: var(--gold-dark); font-weight: 700;"><i class="ri-user-star-line"></i> ${escapeHtml(item.responsible)}</span></td>
+      <td style="color: var(--text-muted); font-size: 0.88rem;">${escapeHtml(item.detail)}</td>
       <td>
         <button class="badge-status ${isOk ? 'ok' : 'pending'}" onclick="toggleTimelineStatus(${idx})" title="Clic para cambiar estado">
           ${isOk ? '<i class="ri-check-line"></i> Listo / OK' : '<i class="ri-time-line"></i> Pendiente'}
@@ -549,9 +789,6 @@ window.deleteTimelineActivity = function(idx) {
   }
 };
 
-/* ==========================================================================
-   6. MÓDULO 3: LISTA DE COMPRAS & NECESIDADES
-   ========================================================================== */
 function renderShopping() {
   const tbody = document.getElementById('shoppingTableBody');
   if (!tbody) return;
@@ -564,11 +801,11 @@ function renderShopping() {
 
     tr.innerHTML = `
       <td>
-        <strong style="color: var(--primary-forest); font-size: 0.95rem;">${item.item}</strong>
+        <strong style="color: var(--navy-royal); font-size: 0.95rem;">${escapeHtml(item.item)}</strong>
       </td>
-      <td><span class="time-badge" style="background: var(--bg-main); font-size: 0.78rem;">${item.category}</span></td>
-      <td style="color: var(--text-muted); font-size: 0.88rem;">${item.detail}</td>
-      <td><strong style="color: var(--gold-dark);">${item.cost || '—'}</strong></td>
+      <td><span class="time-badge" style="background: #F4EFEA; font-size: 0.78rem;">${escapeHtml(item.category)}</span></td>
+      <td style="color: var(--text-muted); font-size: 0.88rem;">${escapeHtml(item.detail)}</td>
+      <td><strong style="color: var(--gold-dark);">${escapeHtml(item.cost || '—')}</strong></td>
       <td>
         <button class="badge-status ${isOk ? 'ok' : 'pending'}" onclick="toggleShoppingStatus(${idx})" title="Clic para cambiar estado">
           ${isOk ? '<i class="ri-check-line"></i> Comprado / OK' : '<i class="ri-time-line"></i> Pendiente'}
@@ -592,7 +829,7 @@ window.toggleShoppingStatus = function(idx) {
 };
 
 window.deleteShoppingItem = function(idx) {
-  if (confirm(`¿Eliminar "${shopping[idx].item}" de la lista de compras?`)) {
+  if (confirm(`¿Eliminar el ítem "${shopping[idx].item}"?`)) {
     shopping.splice(idx, 1);
     saveData();
     renderAll();
@@ -600,19 +837,19 @@ window.deleteShoppingItem = function(idx) {
 };
 
 /* ==========================================================================
-   7. Formularios y Event Listeners
+   10. Listeners de Formularios y Modales
    ========================================================================== */
 function setupEventListeners() {
-  // 1. Form Crear Mesa
+  // Formulario Crear Mesa
   const formAddTable = document.getElementById('formAddTable');
   if (formAddTable) {
     formAddTable.addEventListener('submit', (e) => {
       e.preventDefault();
       const nameInput = document.getElementById('newTableName');
-      const capInput = document.getElementById('newTableCapacity');
+      const capSelect = document.getElementById('newTableCapacity');
 
       const name = nameInput.value.trim();
-      const capacity = parseInt(capInput.value, 10) || 8;
+      const capacity = parseInt(capSelect.value, 10);
 
       if (!name) return;
 
@@ -626,26 +863,58 @@ function setupEventListeners() {
       nameInput.value = '';
       saveData();
       renderAll();
+      showToast(`¡Mesa "${name}" agregada con éxito!`);
     });
   }
 
-  // 2. Form Agregar Invitado a la lista general
+  // Formulario Editar Mesa
+  const formEditTable = document.getElementById('formEditTable');
+  if (formEditTable) {
+    formEditTable.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const id = document.getElementById('editTableId').value;
+      const newName = document.getElementById('editTableName').value.trim();
+      const newCap = parseInt(document.getElementById('editTableCapacity').value, 10);
+
+      const table = tables.find(t => t.id === id);
+      if (!table) return;
+
+      if (newCap < table.guests.length) {
+        alert(`La capacidad no puede ser menor a la cantidad de personas ya sentadas (${table.guests.length}).`);
+        return;
+      }
+
+      table.name = newName;
+      table.capacity = newCap;
+
+      saveData();
+      renderAll();
+
+      const modal = document.getElementById('editTableModal');
+      if (modal) modal.classList.remove('active');
+
+      showToast(`¡Mesa actualizada: "${newName}" (${newCap} asientos)!`);
+    });
+  }
+
+  // Formulario Agregar Invitado Rápido a Pendientes
   const formAddUnassigned = document.getElementById('formAddUnassigned');
   if (formAddUnassigned) {
     formAddUnassigned.addEventListener('submit', (e) => {
       e.preventDefault();
-      const guestInput = document.getElementById('newGuestName');
-      const name = guestInput.value.trim();
+      const input = document.getElementById('newGuestName');
+      const name = input.value.trim();
       if (!name) return;
 
       unassignedGuests.push(name);
-      guestInput.value = '';
+      input.value = '';
       saveData();
       renderAll();
+      showToast(`¡"${name}" agregado a invitados por ubicar!`);
     });
   }
 
-  // 3. Confirmar Asignación Modal
+  // Modal Asignar Invitado a Mesa específica
   const btnConfirmAssign = document.getElementById('btnConfirmAssign');
   const assignModal = document.getElementById('assignModal');
   if (btnConfirmAssign && assignModal) {
@@ -659,19 +928,15 @@ function setupEventListeners() {
         return;
       }
 
-      const targetTable = tables.find(t => t.id === targetTableId);
-      if (targetTable) {
-        const guestName = unassignedGuests.splice(parseInt(unassignedIdx, 10), 1)[0];
-        targetTable.guests.push(guestName);
-        saveData();
-        renderAll();
+      const guestName = unassignedGuests[parseInt(unassignedIdx, 10)];
+      if (guestName) {
+        assignGuestToTable(guestName, targetTableId);
       }
-
       assignModal.classList.remove('active');
     });
   }
 
-  // 4. Modal Nueva Actividad
+  // Modal Nueva Actividad Cronograma
   const btnOpenActivityModal = document.getElementById('btnOpenActivityModal');
   const activityModal = document.getElementById('activityModal');
   const formAddActivity = document.getElementById('formAddActivity');
@@ -700,17 +965,17 @@ function setupEventListeners() {
         status: status
       });
 
-      // Sort timeline by time
       timeline.sort((a, b) => a.time.localeCompare(b.time));
 
       formAddActivity.reset();
       activityModal.classList.remove('active');
       saveData();
       renderAll();
+      showToast(`¡Actividad "${title}" agregada al cronograma!`);
     });
   }
 
-  // 5. Modal Nuevo Ítem de Compra
+  // Modal Nuevo Ítem de Compra
   const btnOpenShoppingModal = document.getElementById('btnOpenShoppingModal');
   const shoppingModal = document.getElementById('shoppingModal');
   const formAddShopping = document.getElementById('formAddShopping');
@@ -743,10 +1008,11 @@ function setupEventListeners() {
       shoppingModal.classList.remove('active');
       saveData();
       renderAll();
+      showToast(`¡Ítem "${item}" agregado a compras!`);
     });
   }
 
-  // Close modals
+  // Botones de cierre para todos los modales
   document.querySelectorAll('.btn-close-modal').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.org-modal').forEach(m => m.classList.remove('active'));
@@ -759,11 +1025,49 @@ function setupEventListeners() {
     });
   });
 
-  // Print button
+  // Imprimir Plan
   const btnPrint = document.getElementById('btnPrintSummary');
   if (btnPrint) {
     btnPrint.addEventListener('click', () => {
       window.print();
     });
   }
+}
+
+/* ==========================================================================
+   11. Pestañas y Helpers
+   ========================================================================== */
+function initTabs() {
+  const tabs = document.querySelectorAll('.org-nav-tabs .tab-btn');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.org-pane').forEach(p => p.classList.remove('active'));
+
+      tab.classList.add('active');
+      const targetId = tab.dataset.target;
+      const targetPane = document.getElementById(targetId);
+      if (targetPane) targetPane.classList.add('active');
+    });
+  });
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('orgToast');
+  if (!toast) return;
+  toast.innerHTML = `<i class="ri-checkbox-circle-line" style="color: #D4AF37; margin-right: 6px;"></i> ${msg}`;
+  toast.classList.add('show');
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3500);
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }

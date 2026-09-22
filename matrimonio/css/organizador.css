@@ -892,3 +892,165 @@ i[class^="ri-"], i[class*=" ri-"] {
   color: var(--navy-royal);
   background: rgba(0, 0, 0, 0.05);
 }
+
+
+/* ==========================================================================
+   INTERACTIVIDAD: DRAG & DROP, MODAL DE MESAS Y BOTÓN EDITAR MESA
+   ========================================================================== */
+
+/* Botón Editar Mesa en Cabecera */
+.btn-table-edit {
+  background: none;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  color: #99742a;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: var(--transition);
+}
+
+.btn-table-edit:hover {
+  background: var(--navy-royal);
+  color: #D4AF37;
+  border-color: var(--navy-royal);
+}
+
+/* Drag & Drop Visuals */
+[draggable="true"] {
+  cursor: grab !important;
+  user-select: none;
+}
+
+[draggable="true"]:active {
+  cursor: grabbing !important;
+}
+
+.dragging {
+  opacity: 0.4 !important;
+  transform: scale(0.96);
+}
+
+.table-card.drag-over {
+  border: 2px dashed #D4AF37 !important;
+  background: #FFFDF9 !important;
+  box-shadow: 0 0 25px rgba(212, 175, 55, 0.35) !important;
+  transform: scale(1.02);
+}
+
+.unassigned-list.drag-over {
+  background: rgba(212, 175, 55, 0.12);
+  border-radius: 12px;
+  outline: 2px dashed #D4AF37;
+  padding: 8px;
+}
+
+/* Modal Seleccionar Mesa (Botón Ubicar) */
+.pick-tables-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 380px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.pick-table-row {
+  background: #FAF8F5;
+  border: 1.5px solid rgba(212, 175, 55, 0.3);
+  border-radius: 12px;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: var(--transition);
+  gap: 12px;
+}
+
+.pick-table-row:hover:not(.disabled) {
+  border-color: var(--gold-primary);
+  background: #FFFDF9;
+  box-shadow: 0 4px 14px rgba(212, 175, 55, 0.16);
+}
+
+.pick-table-row.disabled {
+  opacity: 0.55;
+  background: #F1F5F9;
+  border-color: #E2E8F0;
+}
+
+.pick-table-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pick-table-name {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--navy-royal);
+  margin-bottom: 2px;
+}
+
+.pick-table-seats {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.btn-select-table {
+  background: var(--navy-royal);
+  color: #D4AF37;
+  border: 1px solid #D4AF37;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.btn-select-table:hover {
+  background: #D4AF37;
+  color: var(--navy-royal);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.btn-select-table:disabled {
+  background: #E2E8F0;
+  color: #94A3B8;
+  border-color: #CBD5E0;
+  cursor: not-allowed;
+}
+
+/* Toast Notificación */
+.org-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #0A1828;
+  color: #F5E6B3;
+  border: 1.5px solid #D4AF37;
+  padding: 12px 22px;
+  border-radius: 50px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(16px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  max-width: 90vw;
+}
+
+.org-toast.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
