@@ -59,10 +59,29 @@ function extractTableNumber(table, idx) {
   return idx + 1;
 }
 
+function getAvailableTableNumbers(excludeTableId = null) {
+  const usedNumbers = new Set();
+  tables.forEach((t, idx) => {
+    if (excludeTableId && t.id === excludeTableId) return;
+    const num = extractTableNumber(t, idx);
+    usedNumbers.add(num);
+  });
+
+  const available = [];
+  const maxUsed = usedNumbers.size > 0 ? Math.max(...Array.from(usedNumbers)) : 0;
+  const limit = Math.max(30, maxUsed + 10);
+
+  for (let i = 1; i <= limit; i++) {
+    if (!usedNumbers.has(i)) {
+      available.push(i);
+    }
+  }
+  return available;
+}
+
 function getNextTableNumber() {
-  if (tables.length === 0) return 1;
-  const numbers = tables.map((t, idx) => extractTableNumber(t, idx));
-  return Math.max(...numbers, 0) + 1;
+  const available = getAvailableTableNumbers();
+  return available.length > 0 ? available[0] : 1;
 }
 
 function sortTablesAscending() {
@@ -79,9 +98,24 @@ function sortTablesAscending() {
 }
 
 function updateNextTableNumberInput() {
-  const numInput = document.getElementById('newTableNumber');
-  if (numInput) {
-    numInput.value = getNextTableNumber();
+  const numSelect = document.getElementById('newTableNumber');
+  if (!numSelect) return;
+
+  const available = getAvailableTableNumbers();
+  const currentVal = parseInt(numSelect.value, 10);
+
+  numSelect.innerHTML = '';
+  available.forEach(n => {
+    const opt = document.createElement('option');
+    opt.value = n;
+    opt.textContent = `Mesa ${n}`;
+    numSelect.appendChild(opt);
+  });
+
+  if (available.includes(currentVal)) {
+    numSelect.value = currentVal;
+  } else if (available.length > 0) {
+    numSelect.value = available[0];
   }
 }
 
@@ -711,7 +745,23 @@ window.openEditTableModal = function(tableId) {
   if (!modal || !idInput || !nameInput || !capInput) return;
 
   idInput.value = table.id;
-  if (numInput) numInput.value = table.number || extractTableNumber(table, 0);
+  const currentNum = table.number || extractTableNumber(table, 0);
+
+  if (numInput) {
+    const available = getAvailableTableNumbers(table.id);
+    if (!available.includes(currentNum)) {
+      available.push(currentNum);
+      available.sort((a, b) => a - b);
+    }
+    numInput.innerHTML = '';
+    available.forEach(n => {
+      const opt = document.createElement('option');
+      opt.value = n;
+      opt.textContent = `Mesa ${n}` + (n === currentNum ? ' (Actual)' : '');
+      numInput.appendChild(opt);
+    });
+    numInput.value = currentNum;
+  }
 
   // Clean name to display just the description if it starts with "Mesa X: "
   let cleanName = table.name;
