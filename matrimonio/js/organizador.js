@@ -614,9 +614,6 @@ function renderTables() {
       <div class="table-card-header">
         <div class="table-card-info">
           <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px;">
-            <span class="table-badge-shape" style="font-size: 0.7rem; font-weight: 700; color: #4A5568; background: #F1F5F9; padding: 2px 8px; border-radius: 50px;">
-              ${typeLabel}
-            </span>
             <span class="table-badge-capacity ${isFull ? 'full' : ''}" title="Asientos asignados / Capacidad total">
               ${table.guests.length} / ${table.capacity}
             </span>
@@ -624,7 +621,7 @@ function renderTables() {
           <h3 class="table-card-title">${escapeHtml(table.name)}</h3>
         </div>
         <div class="table-card-header-actions">
-          <button class="btn-table-edit" onclick="openEditTableModal('${table.id}')" title="Editar nombre, tipo y capacidad de asientos">
+          <button class="btn-table-edit" onclick="openEditTableModal('${table.id}')" title="Editar nombre y capacidad de asientos">
             <i class="ri-edit-line"></i> <span>Editar</span>
           </button>
         </div>
@@ -730,6 +727,7 @@ function renderFloorplan() {
     const isFull = table.guests.length >= table.capacity;
     const isNovios = isNoviosTable(table);
     const shape = getTableShape(table);
+    const rectWidth = Math.max(200, (table.capacity || 8) * 75 + 40);
 
     const node = document.createElement('div');
     node.className = `fp-table-node fp-shape-${shape} ${isNovios ? 'fp-is-novios' : ''}`;
@@ -738,18 +736,29 @@ function renderFloorplan() {
     node.style.left = `${table.posX !== undefined ? table.posX : 100}px`;
     node.style.top = `${table.posY !== undefined ? table.posY : 100}px`;
 
-    // Corona exclusiva para la mesa de los novios
-    let noviosCrown = '';
-    if (isNovios) {
-      noviosCrown = '<div class="fp-novios-crown"><i class="ri-vip-crown-2-fill"></i> Mesa Novios</div>';
+    if (shape === 'rectangular') {
+      node.style.width = `${rectWidth}px`;
+      node.style.height = '85px';
+    } else {
+      node.style.width = '';
+      node.style.height = '';
     }
+
+    // Distintivo de Cabecera para Mesa de los Novios (100% visible dentro de la superficie)
+    let noviosCrownTag = '';
+    if (isNovios) {
+      noviosCrownTag = '<div class="fp-novios-crown-tag"><i class="ri-vip-crown-2-fill"></i> Mesa de los Novios</div>';
+    }
+
+    const cleanName = getCleanTableName(table.name);
+    const displayName = isNovios ? (cleanName || 'Presidencial') : cleanName;
 
     // Superficie central de la mesa
     node.innerHTML = `
-      ${noviosCrown}
-      <div class="fp-table-surface" title="Arrastra para mover por el salón">
+      <div class="fp-table-surface" title="Arrastra la mesa para moverla por el salón">
+        ${noviosCrownTag}
         <span class="fp-table-number">Mesa ${table.number || (tableIdx + 1)}</span>
-        <span class="fp-table-name">${escapeHtml(getCleanTableName(table.name))}</span>
+        <span class="fp-table-name" title="${escapeHtml(displayName)}">${escapeHtml(displayName)}</span>
         <span class="fp-table-capacity ${isFull ? 'full' : ''}">${table.guests.length} / ${table.capacity}</span>
         <button type="button" class="fp-btn-manage-seats" onclick="openSeatsModal('${table.id}')" title="Acomodar puestos de invitados y parejas">
           <i class="ri-user-shared-line"></i> Puestos
@@ -757,7 +766,31 @@ function renderFloorplan() {
       </div>
     `;
 
-    // Renderizar sillas alrededor del perímetro de toda la mesa
+    // Dropzone en la superficie de la mesa para asignar invitados arrastrados
+    node.addEventListener('dragover', (e) => {
+      if (e.target.closest('.fp-chair')) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      node.classList.add('drag-over');
+    });
+
+    node.addEventListener('dragleave', (e) => {
+      node.classList.remove('drag-over');
+    });
+
+    node.addEventListener('drop', (e) => {
+      if (e.target.closest('.fp-chair')) return;
+      e.preventDefault();
+      node.classList.remove('drag-over');
+      if (draggedGuestName) {
+        assignGuestToTable(draggedGuestName, table.id);
+        draggedGuestName = null;
+        draggedSourceTableId = null;
+        draggedSourceSeatIndex = null;
+      }
+    });
+
+    // Renderizar sillas con nombres visibles y puestos arrastrables
     const chairs = generateChairsForTable(table);
     chairs.forEach(chair => {
       node.appendChild(chair);
@@ -765,6 +798,25 @@ function renderFloorplan() {
 
     canvas.appendChild(node);
   });
+}
+
+function ensureNoviosInCenterOfTable(table) {
+  if (!isNoviosTable(table) || !table.guests || table.guests.length < 2) return;
+
+  const novio1 = table.guests[0];
+  const comp = getCompanion(novio1);
+  let compIdx = comp ? table.guests.findIndex(g => g.trim().toLowerCase() === comp.trim().toLowerCase()) : 1;
+  if (compIdx === -1) compIdx = 1;
+  const novio2 = table.guests[compIdx];
+
+  const others = table.guests.filter(g => g !== novio1 && g !== novio2);
+  if (others.length === 0) return;
+
+  const leftCount = Math.floor(others.length / 2);
+  const leftGuests = others.slice(0, leftCount);
+  const rightGuests = others.slice(leftCount);
+
+  table.guests = [...leftGuests, novio1, novio2, ...rightGuests];
 }
 
 function generateChairsForTable(table) {
@@ -775,10 +827,9 @@ function generateChairsForTable(table) {
 
   if (shape === 'round') {
     // 🟡 Redonda (Circular): Puestos distribuidos uniformemente en 360°
-    // Ancho/Alto: 136px -> Centro: (68, 68)
-    const R = 86; // Radio exterior
-    const centerX = 68;
-    const centerY = 68;
+    const R = 88;
+    const centerX = 70;
+    const centerY = 70;
 
     for (let i = 0; i < capacity; i++) {
       const angle = (2 * Math.PI * i / capacity) - (Math.PI / 2);
@@ -789,7 +840,6 @@ function generateChairsForTable(table) {
     }
   } else if (shape === 'square') {
     // ⬜ Cuadrada: Puestos distribuidos alrededor de los 4 costados (Arriba, Derecha, Abajo, Izquierda)
-    // Ancho/Alto: 136px -> Centro: (68, 68)
     const N = capacity;
     const q = Math.floor(N / 4);
     const r = N % 4;
@@ -803,7 +853,7 @@ function generateChairsForTable(table) {
 
     // 1. Lado Arriba (de izquierda a derecha)
     for (let k = 0; k < topCount; k++) {
-      const step = 136 / (topCount + 1);
+      const step = 140 / (topCount + 1);
       const x = Math.round(step * (k + 1));
       const y = -14;
       chairs.push(createChairElement(table, seatIdx++, x, y));
@@ -811,70 +861,41 @@ function generateChairsForTable(table) {
 
     // 2. Lado Derecho (de arriba a abajo)
     for (let k = 0; k < rightCount; k++) {
-      const step = 136 / (rightCount + 1);
-      const x = 150;
+      const step = 140 / (rightCount + 1);
+      const x = 154;
       const y = Math.round(step * (k + 1));
       chairs.push(createChairElement(table, seatIdx++, x, y));
     }
 
     // 3. Lado Abajo (de derecha a izquierda)
     for (let k = 0; k < bottomCount; k++) {
-      const step = 136 / (bottomCount + 1);
-      const x = Math.round(136 - step * (k + 1));
-      const y = 150;
+      const step = 140 / (bottomCount + 1);
+      const x = Math.round(140 - step * (k + 1));
+      const y = 154;
       chairs.push(createChairElement(table, seatIdx++, x, y));
     }
 
     // 4. Lado Izquierdo (de abajo a arriba)
     for (let k = 0; k < leftCount; k++) {
-      const step = 136 / (leftCount + 1);
+      const step = 140 / (leftCount + 1);
       const x = -14;
-      const y = Math.round(136 - step * (k + 1));
+      const y = Math.round(140 - step * (k + 1));
       chairs.push(createChairElement(table, seatIdx++, x, y));
     }
   } else {
-    // ▭ Rectangular: Puestos distribuidos alrededor de los 4 costados
-    // Ancho: 170px, Alto: 105px -> Centro: (85, 52.5)
-    if (capacity === 2) {
-      // 2 comensales (ej. Novios): puestos frente a la mesa uno al lado del otro
-      chairs.push(createChairElement(table, 0, 50, 119));
-      chairs.push(createChairElement(table, 1, 120, 119));
-    } else {
-      // 1 en cada cabecera (Izquierda y Derecha) si capacity >= 4
-      const hasEnds = capacity >= 4;
-      const endSeats = hasEnds ? 2 : 0;
-      const remaining = capacity - endSeats;
+    // ▭ Rectangular: Todos los invitados ubicados uno al lado del otro en un solo lado (frente al salón)
+    // y los novios al centro de la mesa
+    if (isNovios) {
+      ensureNoviosInCenterOfTable(table);
+    }
 
-      const topCount = Math.ceil(remaining / 2);
-      const bottomCount = remaining - topCount;
+    const rectWidth = Math.max(200, capacity * 75 + 40);
+    const step = rectWidth / (capacity + 1);
+    const y = 112; // Todos en el frente / costado inferior hacia la pista de baile
 
-      let seatIdx = 0;
-
-      // Cabecera Izquierda
-      if (hasEnds) {
-        chairs.push(createChairElement(table, seatIdx++, -14, 52));
-      }
-
-      // Lado Superior (de izquierda a derecha)
-      for (let k = 0; k < topCount; k++) {
-        const step = 170 / (topCount + 1);
-        const x = Math.round(step * (k + 1));
-        const y = -14;
-        chairs.push(createChairElement(table, seatIdx++, x, y));
-      }
-
-      // Cabecera Derecha
-      if (hasEnds) {
-        chairs.push(createChairElement(table, seatIdx++, 184, 52));
-      }
-
-      // Lado Inferior (de derecha a izquierda)
-      for (let k = 0; k < bottomCount; k++) {
-        const step = 170 / (bottomCount + 1);
-        const x = Math.round(170 - step * (k + 1));
-        const y = 119;
-        chairs.push(createChairElement(table, seatIdx++, x, y));
-      }
+    for (let i = 0; i < capacity; i++) {
+      const x = Math.round(step * (i + 1));
+      chairs.push(createChairElement(table, i, x, y));
     }
   }
 
@@ -885,28 +906,89 @@ function createChairElement(table, seatIndex, x, y) {
   const chair = document.createElement('div');
   const isOccupied = seatIndex < table.guests.length;
   const guest = isOccupied ? table.guests[seatIndex] : null;
+  const isNovios = isNoviosTable(table);
 
   chair.style.left = `${x}px`;
   chair.style.top = `${y}px`;
+  chair.dataset.tableId = table.id;
+  chair.dataset.seatIndex = seatIndex;
+
+  // Drop targets para sillas (reubicar o intercambiar puestos)
+  chair.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = 'move';
+    chair.classList.add('drag-over');
+  });
+
+  chair.addEventListener('dragleave', (e) => {
+    e.stopPropagation();
+    chair.classList.remove('drag-over');
+  });
+
+  chair.addEventListener('drop', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    chair.classList.remove('drag-over');
+    handleChairDrop(table.id, seatIndex);
+  });
 
   if (isOccupied && guest) {
+    chair.draggable = true;
+    chair.dataset.guest = guest;
+
     const companion = getCompanion(guest);
     const hasCompanionInTable = companion && table.guests.some(g => g.trim().toLowerCase() === companion.trim().toLowerCase());
+    
+    // Si la mesa es de novios y son los dos comensales centrales o iniciales
+    const isNovioSeat = isNovios && (seatIndex === 0 || seatIndex === 1 || (hasCompanionInTable && seatIndex <= 3));
 
-    chair.className = `fp-chair seated ${hasCompanionInTable ? 'couple' : ''}`;
-    chair.textContent = guest.charAt(0).toUpperCase();
+    chair.className = `fp-chair seated ${hasCompanionInTable ? 'couple' : ''} ${isNovioSeat ? 'is-novio' : ''}`;
 
-    const tooltipText = `Puesto ${seatIndex + 1}: ${guest}` + (hasCompanionInTable ? ` (👥 Pareja con: ${companion})` : '');
+    const firstName = guest.split(' ')[0] || guest;
+    const initial = isNovioSeat ? '<i class="ri-vip-crown-2-fill"></i>' : guest.charAt(0).toUpperCase();
+
+    chair.innerHTML = `
+      <div class="fp-chair-circle">${initial}</div>
+      <div class="fp-chair-name" title="${escapeHtml(guest)}">${escapeHtml(firstName)}</div>
+    `;
+
+    const tooltipText = `Puesto ${seatIndex + 1}: ${guest}` + (hasCompanionInTable ? ` (👥 Pareja con: ${companion})` : '') + ' (Arrastra para mover de puesto)';
     chair.dataset.tooltip = tooltipText;
+
+    chair.addEventListener('dragstart', (e) => {
+      e.stopPropagation();
+      draggedGuestName = guest;
+      draggedSourceTableId = table.id;
+      draggedSourceSeatIndex = seatIndex;
+      chair.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', guest);
+      e.dataTransfer.effectAllowed = 'move';
+    });
+
+    chair.addEventListener('dragend', () => {
+      chair.classList.remove('dragging');
+      document.querySelectorAll('.fp-chair, .fp-table-node, .table-card, #unassignedList').forEach(el => {
+        el.classList.remove('drag-over');
+      });
+      draggedGuestName = null;
+      draggedSourceTableId = null;
+      draggedSourceSeatIndex = null;
+    });
 
     chair.addEventListener('click', (e) => {
       e.stopPropagation();
       openSeatsModal(table.id);
     });
+
   } else {
+    // Asiento libre
     chair.className = 'fp-chair empty';
-    chair.innerHTML = '<i class="ri-add-line" style="font-size: 0.65rem;"></i>';
-    chair.dataset.tooltip = `Puesto ${seatIndex + 1}: Asiento Libre (Clic para asignar)`;
+    chair.innerHTML = `
+      <div class="fp-chair-circle"><i class="ri-add-line" style="font-size: 0.72rem;"></i></div>
+      <div class="fp-chair-name empty">Libre</div>
+    `;
+    chair.dataset.tooltip = `Puesto ${seatIndex + 1}: Asiento Libre (Clic o arrastra un invitado aquí)`;
 
     chair.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -915,6 +997,82 @@ function createChairElement(table, seatIndex, x, y) {
   }
 
   return chair;
+}
+
+function handleChairDrop(targetTableId, targetSeatIndex) {
+  if (!draggedGuestName) return;
+
+  const targetTable = tables.find(t => t.id === targetTableId);
+  if (!targetTable) return;
+
+  const srcTableId = draggedSourceTableId;
+  const srcSeatIdx = draggedSourceSeatIndex;
+
+  if (srcTableId === targetTableId) {
+    // Reubicación dentro de la misma mesa
+    if (srcSeatIdx !== null && srcSeatIdx !== undefined && srcSeatIdx !== targetSeatIndex) {
+      if (targetSeatIndex < targetTable.guests.length) {
+        // Intercambiar de puesto entre dos comensales
+        const temp = targetTable.guests[srcSeatIdx];
+        targetTable.guests[srcSeatIdx] = targetTable.guests[targetSeatIndex];
+        targetTable.guests[targetSeatIndex] = temp;
+      } else {
+        // Mover puesto hacia el final
+        const moved = targetTable.guests.splice(srcSeatIdx, 1)[0];
+        targetTable.guests.push(moved);
+      }
+      saveData();
+      renderAll();
+      showToast(`¡Puesto de ${draggedGuestName} reubicado en "${targetTable.name}"!`);
+    }
+  } else if (srcTableId === 'unassigned') {
+    // Asignar desde la lista de pendientes al asiento
+    const guestIdx = unassignedGuests.indexOf(draggedGuestName);
+    if (guestIdx !== -1) {
+      unassignedGuests.splice(guestIdx, 1);
+    }
+    if (targetSeatIndex < targetTable.guests.length) {
+      targetTable.guests.splice(targetSeatIndex, 0, draggedGuestName);
+      if (targetTable.guests.length > targetTable.capacity) {
+        const overflow = targetTable.guests.pop();
+        if (!unassignedGuests.includes(overflow)) unassignedGuests.push(overflow);
+      }
+    } else {
+      targetTable.guests.push(draggedGuestName);
+    }
+    saveData();
+    renderAll();
+    showToast(`¡${draggedGuestName} asignado al puesto en "${targetTable.name}"!`);
+  } else {
+    // Mover desde otra mesa hacia esta
+    const srcTable = tables.find(t => t.id === srcTableId);
+    if (!srcTable) return;
+
+    if (targetSeatIndex < targetTable.guests.length) {
+      // Asiento ocupado -> Intercambiar invitados entre ambas mesas
+      const targetGuest = targetTable.guests[targetSeatIndex];
+      srcTable.guests[srcSeatIdx] = targetGuest;
+      targetTable.guests[targetSeatIndex] = draggedGuestName;
+      saveData();
+      renderAll();
+      showToast(`¡Intercambiados ${draggedGuestName} y ${targetGuest} entre mesas!`);
+    } else {
+      // Asiento disponible en la mesa destino
+      if (targetTable.guests.length >= targetTable.capacity) {
+        showToast(`La mesa "${targetTable.name}" ya alcanzó su capacidad máxima.`);
+        return;
+      }
+      srcTable.guests.splice(srcSeatIdx, 1);
+      targetTable.guests.push(draggedGuestName);
+      saveData();
+      renderAll();
+      showToast(`¡${draggedGuestName} movido a "${targetTable.name}"!`);
+    }
+  }
+
+  draggedGuestName = null;
+  draggedSourceTableId = null;
+  draggedSourceSeatIndex = null;
 }
 
 /* ==========================================================================
@@ -1401,11 +1559,6 @@ window.openEditTableModal = function(tableId) {
   // Mostrar nombre limpio sin el prefijo "Mesa X: "
   nameInput.value = getCleanTableName(table.name);
 
-  const typeSelect = document.getElementById('editTableType');
-  if (typeSelect) {
-    typeSelect.value = table.type || 'round';
-  }
-
   capInput.value = table.capacity;
   capInput.min = Math.max(1, table.guests.length);
 
@@ -1591,8 +1744,7 @@ function setupEventListeners() {
       const num = parseInt(numInput.value, 10) || getNextTableNumber();
       let rawName = nameInput.value.trim();
       const capacity = parseInt(capSelect.value, 10);
-      const typeSelect = document.getElementById('newTableType');
-      const type = typeSelect ? typeSelect.value : 'round';
+      const type = getGuestTablesShape();
 
       if (!rawName) return;
 
@@ -1647,13 +1799,10 @@ function setupEventListeners() {
 
       const cleanName = getCleanTableName(rawName);
       const fullName = getFormattedTableName(newNum, cleanName || rawName);
-      const typeSelect = document.getElementById('editTableType');
-      const newType = typeSelect ? typeSelect.value : (table.type || 'round');
 
       table.number = newNum;
       table.name = fullName;
       table.capacity = newCap;
-      table.type = newType;
 
       sortTablesAscending();
       saveData();

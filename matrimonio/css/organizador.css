@@ -1335,9 +1335,15 @@ i[class^="ri-"], i[class*=" ri-"] {
 }
 
 /* Mesa Rectangular */
+.fp-table-node.fp-shape-rectangular {
+  min-width: 190px;
+  height: 85px;
+}
+
 .fp-table-node.fp-shape-rectangular .fp-table-surface {
-  width: 170px;
-  height: 105px;
+  width: 100%;
+  min-width: 190px;
+  height: 85px;
   border-radius: 14px;
   background: #FFFFFF;
   border: 2px solid #4A5568;
@@ -1358,38 +1364,46 @@ i[class^="ri-"], i[class*=" ri-"] {
 }
 
 .fp-table-node.fp-is-novios.fp-shape-round .fp-table-surface {
-  width: 136px;
-  height: 136px;
+  width: 140px;
+  height: 140px;
   border-radius: 50% !important;
 }
 
 .fp-table-node.fp-is-novios.fp-shape-square .fp-table-surface {
-  width: 136px;
-  height: 136px;
+  width: 140px;
+  height: 140px;
   border-radius: 18px !important;
 }
 
+.fp-table-node.fp-is-novios.fp-shape-rectangular {
+  min-width: 200px;
+  height: 90px;
+}
+
 .fp-table-node.fp-is-novios.fp-shape-rectangular .fp-table-surface {
-  width: 170px;
-  height: 105px;
+  width: 100%;
+  min-width: 200px;
+  height: 90px;
   border-radius: 14px !important;
 }
 
-.fp-novios-crown {
-  position: absolute;
-  top: -12px;
+/* Distintivo de Cabecera para Mesa de los Novios (100% visible dentro de la superficie) */
+.fp-novios-crown-tag {
   background: #0A1828;
   color: #D4AF37;
-  border: 1px solid #D4AF37;
+  border: 1.5px solid #D4AF37;
   border-radius: 50px;
-  padding: 2px 8px;
+  padding: 2px 10px;
   font-size: 0.68rem;
   font-weight: 800;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   letter-spacing: 0.05em;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  margin-bottom: 4px;
+  user-select: none;
+  z-index: 10;
 }
 
 .fp-table-number {
@@ -1403,8 +1417,8 @@ i[class^="ri-"], i[class*=" ri-"] {
 .fp-table-name {
   font-size: 0.72rem;
   font-weight: 600;
-  color: #475569;
-  max-width: 110px;
+  color: #334155;
+  max-width: 130px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1426,7 +1440,7 @@ i[class^="ri-"], i[class*=" ri-"] {
 }
 
 .fp-btn-manage-seats {
-  margin-top: 6px;
+  margin-top: 5px;
   background: var(--navy-royal);
   color: #F5E6B3;
   border: none;
@@ -1448,59 +1462,143 @@ i[class^="ri-"], i[class*=" ri-"] {
 }
 
 /* ==========================================================================
-   SILLAS / PUESTOS EN EL PLANO
+   SILLAS / PUESTOS EN EL PLANO (CON NOMBRES VISIBLES Y DRAG & DROP DIRECTO)
    ========================================================================== */
 .fp-chair {
   position: absolute;
-  width: 28px;
-  height: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+  z-index: 15;
+  cursor: grab;
+  user-select: none;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.fp-chair:active {
+  cursor: grabbing;
+}
+
+.fp-chair.dragging {
+  opacity: 0.45 !important;
+  transform: translate(-50%, -50%) scale(0.9) !important;
+}
+
+.fp-chair.drag-over {
+  transform: translate(-50%, -50%) scale(1.22) !important;
+  z-index: 40 !important;
+}
+
+.fp-chair.drag-over .fp-chair-circle {
+  border-color: #D4AF37 !important;
+  box-shadow: 0 0 16px rgba(212, 175, 55, 0.9) !important;
+  background: #FFFDF0 !important;
+}
+
+/* Círculo del Asiento */
+.fp-chair-circle {
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background: #FFFFFF;
-  border: 1.5px solid #64748B;
+  border: 1.8px solid #64748B;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.65rem;
+  font-size: 0.72rem;
   font-weight: 800;
   color: var(--navy-royal);
-  transform: translate(-50%, -50%);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
-  z-index: 5;
-  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
 
-.fp-chair:hover {
-  transform: translate(-50%, -50%) scale(1.2);
-  z-index: 25;
+.fp-chair:hover .fp-chair-circle {
+  transform: scale(1.15);
   border-color: #D4AF37;
-  background: #FFFDF5;
+  box-shadow: 0 3px 10px rgba(212, 175, 55, 0.4);
 }
 
-.fp-chair.seated {
+/* Etiqueta del Nombre del Invitado Siempre Visible */
+.fp-chair-name {
+  margin-top: 3px;
+  font-size: 0.67rem;
+  font-weight: 700;
+  color: #0F172A;
+  background: #FFFFFF;
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  border-radius: 4px;
+  padding: 1px 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+  max-width: 76px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  pointer-events: none;
+  line-height: 1.25;
+}
+
+/* Estado Asiento Ocupado */
+.fp-chair.seated .fp-chair-circle {
   background: #E8F5E9;
   border-color: #2E7D32;
   color: #1B5E20;
 }
 
-.fp-chair.couple {
+/* Estado Pareja / Acompañante */
+.fp-chair.couple .fp-chair-circle {
   border-color: #D4AF37;
   background: #FFFBEB;
   color: #92400E;
-  box-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.45);
 }
 
+.fp-chair.couple .fp-chair-name {
+  border-color: #D4AF37;
+  color: #92400E;
+  background: #FEF3C7;
+}
+
+/* Estado Puesto de Novio / Novia VIP */
+.fp-chair.is-novio .fp-chair-circle {
+  border-color: #D4AF37;
+  background: #0A1828;
+  color: #D4AF37;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.65);
+}
+
+.fp-chair.is-novio .fp-chair-name {
+  border-color: #D4AF37;
+  color: #0A1828;
+  background: #FBF6E9;
+  font-weight: 800;
+}
+
+/* Estado Asiento Libre */
 .fp-chair.empty {
+  cursor: pointer;
+}
+
+.fp-chair.empty .fp-chair-circle {
   background: #F8FAFC;
-  border: 1.5px dashed #CBD5E1;
+  border: 1.5px dashed #94A3B8;
   color: #94A3B8;
+}
+
+.fp-chair.empty .fp-chair-name {
+  color: #94A3B8;
+  border: 1px dashed #CBD5E1;
+  background: #F8FAFC;
+  font-weight: 600;
 }
 
 /* Tooltip nativo o flotante al pasar el mouse por una silla */
 .fp-chair[data-tooltip]:hover::after {
   content: attr(data-tooltip);
   position: absolute;
-  bottom: 125%;
+  bottom: 110%;
   left: 50%;
   transform: translateX(-50%);
   background: #0A1828;
@@ -1513,7 +1611,9 @@ i[class^="ri-"], i[class*=" ri-"] {
   pointer-events: none;
   box-shadow: 0 4px 12px rgba(0,0,0,0.25);
   border: 1px solid rgba(212, 175, 55, 0.4);
+  z-index: 50;
 }
+
 
 /* ==========================================================================
    MODAL PARA ACOMODAR PUESTOS CON REGLA DE PAREJAS
