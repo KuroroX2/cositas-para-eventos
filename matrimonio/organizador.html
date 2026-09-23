@@ -203,7 +203,7 @@
             <div class="floorplan-toolbar">
               <div class="floorplan-title-block">
                 <h3 class="tables-main-title"><i class="ri-compasses-2-line" style="color: var(--gold-dark);"></i> Plano de Ubicación en el Salón</h3>
-                <span class="tables-main-hint">Arrastra y suelta las mesas para ubicarlas exactamente como estarán en el centro de eventos. Haz clic en "Acomodar Puestos" para elegir quién va al lado de quién.</span>
+                <span class="tables-main-hint">Arrastra y suelta las mesas para ubicarlas en el centro de eventos. Haz clic en "Puestos" para organizar los asientos.</span>
               </div>
               <div class="floorplan-actions">
                 <button type="button" class="btn-fp-action" id="btnAutoLayout" title="Ordenar mesas automáticamente en una distribución armónica en el salón">
@@ -212,6 +212,41 @@
                 <button type="button" class="btn-fp-action" id="btnResetFloorplanZoom" title="Centrar el plano">
                   <i class="ri-focus-3-line"></i> <span>Centrar</span>
                 </button>
+              </div>
+            </div>
+
+            <!-- Panel de Selección de Formas de Mesa dentro del Plano 2D -->
+            <div class="floorplan-shape-panel">
+              <div class="fp-shape-group">
+                <span class="fp-shape-label"><i class="ri-community-line"></i> Mesas de Invitados:</span>
+                <div class="fp-shape-buttons" id="groupGuestTableShapes">
+                  <button type="button" class="btn-shape-toggle active" data-guest-shape="round" title="Cambiar todas las mesas de invitados a redondas">
+                    🟡 <span>Redondas</span>
+                  </button>
+                  <button type="button" class="btn-shape-toggle" data-guest-shape="square" title="Cambiar todas las mesas de invitados a cuadradas">
+                    ⬜ <span>Cuadradas</span>
+                  </button>
+                  <button type="button" class="btn-shape-toggle" data-guest-shape="rectangular" title="Cambiar todas las mesas de invitados a rectangulares">
+                    ▭ <span>Rectangulares</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="fp-shape-divider"></div>
+
+              <div class="fp-shape-group">
+                <span class="fp-shape-label"><i class="ri-vip-crown-2-fill" style="color: #D4AF37;"></i> Mesa Novios:</span>
+                <div class="fp-shape-buttons" id="groupNoviosTableShapes">
+                  <button type="button" class="btn-shape-toggle" data-novios-shape="round" title="Forma redonda para la mesa de los novios">
+                    🟡 <span>Redonda</span>
+                  </button>
+                  <button type="button" class="btn-shape-toggle" data-novios-shape="square" title="Forma cuadrada para la mesa de los novios">
+                    ⬜ <span>Cuadrada</span>
+                  </button>
+                  <button type="button" class="btn-shape-toggle active" data-novios-shape="rectangular" title="Forma rectangular para la mesa de los novios">
+                    ▭ <span>Rectangular</span>
+                  </button>
+                </div>
               </div>
             </div>
 

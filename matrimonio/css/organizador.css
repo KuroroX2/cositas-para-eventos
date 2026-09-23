@@ -1162,6 +1162,77 @@ i[class^="ri-"], i[class*=" ri-"] {
   background: #FFFDF9;
 }
 
+/* Panel de Selección de Formas de Mesas dentro del Plano 2D */
+.floorplan-shape-panel {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: #FFFFFF;
+  border: 1.5px solid rgba(212, 175, 55, 0.4);
+  border-radius: 12px;
+  padding: 8px 14px;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.fp-shape-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.fp-shape-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--navy-royal);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.fp-shape-buttons {
+  display: inline-flex;
+  background: #F1F5F9;
+  padding: 3px;
+  border-radius: 50px;
+  border: 1px solid #CBD5E1;
+  gap: 3px;
+}
+
+.btn-shape-toggle {
+  background: transparent;
+  border: none;
+  border-radius: 50px;
+  padding: 5px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.btn-shape-toggle:hover {
+  color: var(--navy-royal);
+  background: rgba(10, 24, 40, 0.05);
+}
+
+.btn-shape-toggle.active {
+  background: var(--navy-royal);
+  color: #F5E6B3;
+  box-shadow: 0 2px 6px rgba(10, 24, 40, 0.25);
+}
+
+.fp-shape-divider {
+  width: 1px;
+  height: 24px;
+  background: #E2E8F0;
+}
+
 .floorplan-wrapper {
   position: relative;
   background-color: #F8FAFC;
@@ -1203,7 +1274,7 @@ i[class^="ri-"], i[class*=" ri-"] {
 }
 
 /* ==========================================================================
-   NODOS DE MESA EN EL PLANO (REDONDA, CUADRADA/RECTANGULAR, NOVIOS)
+   NODOS DE MESA EN EL PLANO (REDONDA, CUADRADA, RECTANGULAR, NOVIOS)
    ========================================================================== */
 .fp-table-node {
   position: absolute;
@@ -1233,8 +1304,8 @@ i[class^="ri-"], i[class*=" ri-"] {
 
 /* Mesa Redonda */
 .fp-table-node.fp-shape-round .fp-table-surface {
-  width: 130px;
-  height: 130px;
+  width: 136px;
+  height: 136px;
   border-radius: 50%;
   background: #FFFFFF;
   border: 2px solid #527A50;
@@ -1247,10 +1318,26 @@ i[class^="ri-"], i[class*=" ri-"] {
   position: relative;
 }
 
-/* Mesa Cuadrada / Rectangular */
+/* Mesa Cuadrada */
 .fp-table-node.fp-shape-square .fp-table-surface {
-  width: 160px;
-  height: 110px;
+  width: 136px;
+  height: 136px;
+  border-radius: 18px;
+  background: #FFFFFF;
+  border: 2px solid #4A5568;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  position: relative;
+}
+
+/* Mesa Rectangular */
+.fp-table-node.fp-shape-rectangular .fp-table-surface {
+  width: 170px;
+  height: 105px;
   border-radius: 14px;
   background: #FFFFFF;
   border: 2px solid #4A5568;
@@ -1263,20 +1350,29 @@ i[class^="ri-"], i[class*=" ri-"] {
   position: relative;
 }
 
-/* Mesa de los Novios (Presidencial / VIP) */
-.fp-table-node.fp-shape-novios .fp-table-surface {
+/* Mesa de los Novios (Presidencial / VIP) con sus 3 formas */
+.fp-table-node.fp-is-novios .fp-table-surface {
+  background: linear-gradient(135deg, #FFFDF8, #FBF6E9) !important;
+  border: 2.5px solid #D4AF37 !important;
+  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.35) !important;
+}
+
+.fp-table-node.fp-is-novios.fp-shape-round .fp-table-surface {
+  width: 136px;
+  height: 136px;
+  border-radius: 50% !important;
+}
+
+.fp-table-node.fp-is-novios.fp-shape-square .fp-table-surface {
+  width: 136px;
+  height: 136px;
+  border-radius: 18px !important;
+}
+
+.fp-table-node.fp-is-novios.fp-shape-rectangular .fp-table-surface {
   width: 170px;
-  height: 115px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #FFFDF8, #FBF6E9);
-  border: 2.5px solid #D4AF37;
-  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.35);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
-  position: relative;
+  height: 105px;
+  border-radius: 14px !important;
 }
 
 .fp-novios-crown {

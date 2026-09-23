@@ -605,8 +605,10 @@ function renderTables() {
       });
     }
 
-    const type = table.type || 'round';
-    const typeLabel = type === 'novios' ? '👑 Mesa Novios' : (type === 'square' ? '⬜ Rectangular' : '🟡 Redonda');
+    const isNovios = isNoviosTable(table);
+    const shape = getTableShape(table);
+    const shapeName = shape === 'round' ? '🟡 Redonda' : (shape === 'square' ? '⬜ Cuadrada' : '▭ Rectangular');
+    const typeLabel = isNovios ? `👑 Novios (${shapeName})` : shapeName;
 
     card.innerHTML = `
       <div class="table-card-header">
@@ -652,18 +654,85 @@ function renderTables() {
 /* ==========================================================================
    4.1 PLANO DEL SALÓN 2D (MESAS POSICIONABLES Y SILLAS PERIMETRALES)
    ========================================================================== */
+const STORAGE_KEY_GUEST_SHAPE = 'boda_org_guest_shape_v2';
+const STORAGE_KEY_NOVIOS_SHAPE = 'boda_org_novios_shape_v2';
+
+function isNoviosTable(table) {
+  if (!table) return false;
+  return table.id === 't_1' || table.number === 1 || (table.name && table.name.toLowerCase().includes('novio'));
+}
+
+function getGuestTablesShape() {
+  return localStorage.getItem(STORAGE_KEY_GUEST_SHAPE) || 'round';
+}
+
+function getNoviosTableShape() {
+  return localStorage.getItem(STORAGE_KEY_NOVIOS_SHAPE) || 'rectangular';
+}
+
+function getTableShape(table) {
+  if (isNoviosTable(table)) {
+    return table.shape || getNoviosTableShape();
+  }
+  return table.shape || getGuestTablesShape();
+}
+
+window.setAllGuestTablesShape = function(newShape) {
+  localStorage.setItem(STORAGE_KEY_GUEST_SHAPE, newShape);
+  tables.forEach(t => {
+    if (!isNoviosTable(t)) {
+      t.shape = newShape;
+      t.type = newShape;
+    }
+  });
+  saveData();
+  renderAll();
+  updateShapeToggleButtons();
+  const label = newShape === 'round' ? 'redondas' : (newShape === 'square' ? 'cuadradas' : 'rectangulares');
+  showToast(`¡Todas las mesas de invitados cambiaron a forma ${label}!`);
+};
+
+window.setNoviosTableShape = function(newShape) {
+  localStorage.setItem(STORAGE_KEY_NOVIOS_SHAPE, newShape);
+  const noviosTable = tables.find(isNoviosTable);
+  if (noviosTable) {
+    noviosTable.shape = newShape;
+    noviosTable.type = newShape;
+    saveData();
+  }
+  renderAll();
+  updateShapeToggleButtons();
+  const label = newShape === 'round' ? 'redonda' : (newShape === 'square' ? 'cuadrada' : 'rectangular');
+  showToast(`¡Mesa de los novios cambiada a forma ${label}!`);
+};
+
+function updateShapeToggleButtons() {
+  const guestShape = getGuestTablesShape();
+  const noviosShape = getNoviosTableShape();
+
+  document.querySelectorAll('#groupGuestTableShapes .btn-shape-toggle').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.guestShape === guestShape);
+  });
+
+  document.querySelectorAll('#groupNoviosTableShapes .btn-shape-toggle').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.noviosShape === noviosShape);
+  });
+}
+
 function renderFloorplan() {
   const canvas = document.getElementById('floorplanCanvas');
   if (!canvas) return;
 
   canvas.innerHTML = '';
+  updateShapeToggleButtons();
 
   tables.forEach((table, tableIdx) => {
     const isFull = table.guests.length >= table.capacity;
-    const type = table.type || 'round';
+    const isNovios = isNoviosTable(table);
+    const shape = getTableShape(table);
 
     const node = document.createElement('div');
-    node.className = `fp-table-node fp-shape-${type}`;
+    node.className = `fp-table-node fp-shape-${shape} ${isNovios ? 'fp-is-novios' : ''}`;
     node.id = `fp_node_${table.id}`;
     node.dataset.tableId = table.id;
     node.style.left = `${table.posX !== undefined ? table.posX : 100}px`;
@@ -671,7 +740,7 @@ function renderFloorplan() {
 
     // Corona exclusiva para la mesa de los novios
     let noviosCrown = '';
-    if (type === 'novios') {
+    if (isNovios) {
       noviosCrown = '<div class="fp-novios-crown"><i class="ri-vip-crown-2-fill"></i> Mesa Novios</div>';
     }
 
@@ -688,7 +757,7 @@ function renderFloorplan() {
       </div>
     `;
 
-    // Renderizar sillas alrededor del perímetro
+    // Renderizar sillas alrededor del perímetro de toda la mesa
     const chairs = generateChairsForTable(table);
     chairs.forEach(chair => {
       node.appendChild(chair);
@@ -701,13 +770,15 @@ function renderFloorplan() {
 function generateChairsForTable(table) {
   const chairs = [];
   const capacity = table.capacity || 8;
-  const type = table.type || 'round';
+  const isNovios = isNoviosTable(table);
+  const shape = getTableShape(table);
 
-  if (type === 'round') {
-    // Radio desde el centro (130px -> centro 65, 65)
-    const R = 84;
-    const centerX = 65;
-    const centerY = 65;
+  if (shape === 'round') {
+    // 🟡 Redonda (Circular): Puestos distribuidos uniformemente en 360°
+    // Ancho/Alto: 136px -> Centro: (68, 68)
+    const R = 86; // Radio exterior
+    const centerX = 68;
+    const centerY = 68;
 
     for (let i = 0; i < capacity; i++) {
       const angle = (2 * Math.PI * i / capacity) - (Math.PI / 2);
@@ -716,36 +787,94 @@ function generateChairsForTable(table) {
 
       chairs.push(createChairElement(table, i, x, y));
     }
-  } else if (type === 'novios') {
-    // Mesa presidencial: 170x115. Centro (85, 57)
-    if (capacity === 2) {
-      chairs.push(createChairElement(table, 0, 50, 130));
-      chairs.push(createChairElement(table, 1, 120, 130));
-    } else {
-      for (let i = 0; i < capacity; i++) {
-        const step = 150 / (capacity + 1);
-        const x = Math.round(10 + step * (i + 1));
-        const y = 132;
-        chairs.push(createChairElement(table, i, x, y));
-      }
+  } else if (shape === 'square') {
+    // ⬜ Cuadrada: Puestos distribuidos alrededor de los 4 costados (Arriba, Derecha, Abajo, Izquierda)
+    // Ancho/Alto: 136px -> Centro: (68, 68)
+    const N = capacity;
+    const q = Math.floor(N / 4);
+    const r = N % 4;
+
+    const topCount = q + (r > 0 ? 1 : 0);
+    const rightCount = q + (r > 2 ? 1 : 0);
+    const bottomCount = q + (r > 1 ? 1 : 0);
+    const leftCount = q;
+
+    let seatIdx = 0;
+
+    // 1. Lado Arriba (de izquierda a derecha)
+    for (let k = 0; k < topCount; k++) {
+      const step = 136 / (topCount + 1);
+      const x = Math.round(step * (k + 1));
+      const y = -14;
+      chairs.push(createChairElement(table, seatIdx++, x, y));
+    }
+
+    // 2. Lado Derecho (de arriba a abajo)
+    for (let k = 0; k < rightCount; k++) {
+      const step = 136 / (rightCount + 1);
+      const x = 150;
+      const y = Math.round(step * (k + 1));
+      chairs.push(createChairElement(table, seatIdx++, x, y));
+    }
+
+    // 3. Lado Abajo (de derecha a izquierda)
+    for (let k = 0; k < bottomCount; k++) {
+      const step = 136 / (bottomCount + 1);
+      const x = Math.round(136 - step * (k + 1));
+      const y = 150;
+      chairs.push(createChairElement(table, seatIdx++, x, y));
+    }
+
+    // 4. Lado Izquierdo (de abajo a arriba)
+    for (let k = 0; k < leftCount; k++) {
+      const step = 136 / (leftCount + 1);
+      const x = -14;
+      const y = Math.round(136 - step * (k + 1));
+      chairs.push(createChairElement(table, seatIdx++, x, y));
     }
   } else {
-    // Mesa Cuadrada / Rectangular (160x110)
-    const topCount = Math.ceil(capacity / 2);
-    const bottomCount = capacity - topCount;
+    // ▭ Rectangular: Puestos distribuidos alrededor de los 4 costados
+    // Ancho: 170px, Alto: 105px -> Centro: (85, 52.5)
+    if (capacity === 2) {
+      // 2 comensales (ej. Novios): puestos frente a la mesa uno al lado del otro
+      chairs.push(createChairElement(table, 0, 50, 119));
+      chairs.push(createChairElement(table, 1, 120, 119));
+    } else {
+      // 1 en cada cabecera (Izquierda y Derecha) si capacity >= 4
+      const hasEnds = capacity >= 4;
+      const endSeats = hasEnds ? 2 : 0;
+      const remaining = capacity - endSeats;
 
-    for (let i = 0; i < topCount; i++) {
-      const step = 140 / (topCount + 1);
-      const x = Math.round(10 + step * (i + 1));
-      const y = -14;
-      chairs.push(createChairElement(table, i, x, y));
-    }
+      const topCount = Math.ceil(remaining / 2);
+      const bottomCount = remaining - topCount;
 
-    for (let j = 0; j < bottomCount; j++) {
-      const step = 140 / (bottomCount + 1);
-      const x = Math.round(10 + step * (j + 1));
-      const y = 124;
-      chairs.push(createChairElement(table, topCount + j, x, y));
+      let seatIdx = 0;
+
+      // Cabecera Izquierda
+      if (hasEnds) {
+        chairs.push(createChairElement(table, seatIdx++, -14, 52));
+      }
+
+      // Lado Superior (de izquierda a derecha)
+      for (let k = 0; k < topCount; k++) {
+        const step = 170 / (topCount + 1);
+        const x = Math.round(step * (k + 1));
+        const y = -14;
+        chairs.push(createChairElement(table, seatIdx++, x, y));
+      }
+
+      // Cabecera Derecha
+      if (hasEnds) {
+        chairs.push(createChairElement(table, seatIdx++, 184, 52));
+      }
+
+      // Lado Inferior (de derecha a izquierda)
+      for (let k = 0; k < bottomCount; k++) {
+        const step = 170 / (bottomCount + 1);
+        const x = Math.round(170 - step * (k + 1));
+        const y = 119;
+        chairs.push(createChairElement(table, seatIdx++, x, y));
+      }
     }
   }
 
@@ -1715,6 +1844,24 @@ function initViewSwitch() {
     });
   }
 
+  // Listeners para los botones de cambio de forma de mesas
+  document.querySelectorAll('#groupGuestTableShapes .btn-shape-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.dataset.guestShape) {
+        setAllGuestTablesShape(btn.dataset.guestShape);
+      }
+    });
+  });
+
+  document.querySelectorAll('#groupNoviosTableShapes .btn-shape-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.dataset.noviosShape) {
+        setNoviosTableShape(btn.dataset.noviosShape);
+      }
+    });
+  });
+
+  // Listener para cerrar modal de puestos
   const btnCloseSeats = document.getElementById('btnCloseSeatsModal');
   if (btnCloseSeats) {
     btnCloseSeats.addEventListener('click', () => {
@@ -1722,6 +1869,8 @@ function initViewSwitch() {
       if (modal) modal.classList.remove('active');
     });
   }
+
+  updateShapeToggleButtons();
 }
 
 /* ==========================================================================
