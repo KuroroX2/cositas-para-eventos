@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="css/organizador.css?v=3.3">
+  <link rel="stylesheet" href="css/organizador.css?v=3.4">
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
@@ -270,12 +270,42 @@
 
     <!-- PANE 2: CRONOGRAMA MINUTO A MINUTO -->
     <section class="org-pane" id="pane-timeline">
-      <div class="section-top-bar">
+      <div class="section-top-bar" style="margin-bottom: 20px;">
         <div>
           <h2>Cronograma del Gran Día</h2>
           <p>Hitos en orden cronológico. Haz clic en cualquier horario para ver todas las actividades, encargados y compras que van dentro.</p>
         </div>
-        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+      </div>
+
+      <!-- Resumen de Métricas del Cronograma -->
+      <div class="timeline-summary-bar" id="timelineSummaryBar">
+        <!-- Rendered dynamically by organizador.js -->
+      </div>
+
+      <!-- Barra de Acciones y Proveedores DEBAJO del Resumen de Hitos -->
+      <div class="timeline-controls-bar">
+        <!-- Panel Compacto de Proveedores & Responsables -->
+        <div class="providers-compact-panel" id="providersCompactPanel">
+          <div class="providers-compact-top">
+            <span class="providers-compact-title">
+              <i class="ri-team-line" style="color: var(--gold-dark);"></i> Proveedores &amp; Responsables
+            </span>
+            <button type="button" class="btn-sm-add-provider" onclick="openAddResponsibleModal()" title="Agregar nuevo responsable o proveedor">
+              <i class="ri-user-add-line"></i> + Agregar
+            </button>
+          </div>
+          <div class="providers-compact-bottom">
+            <select id="selectQuickProvider" class="select-org select-quick-provider" title="Selecciona un proveedor del listado">
+              <!-- Cargado dinámicamente -->
+            </select>
+            <button type="button" class="btn-sm-edit-provider" id="btnEditSelectedProvider" onclick="editSelectedProviderFromCombobox()" title="Editar el proveedor seleccionado">
+              <i class="ri-edit-line"></i> Editar
+            </button>
+          </div>
+        </div>
+
+        <!-- Botones de Acción de Hitos & Directorio -->
+        <div class="timeline-action-buttons">
           <button type="button" class="btn-header" id="btnOpenResponsiblesModal" onclick="openResponsiblesModal()" style="background: #FFFFFF; color: var(--navy-royal); border: 1.5px solid rgba(212,175,55,0.4); box-shadow: var(--shadow-sm);">
             <i class="ri-team-line" style="color: var(--gold-dark);"></i> <span>Responsables &amp; Proveedores (<span id="countResponsibles">0</span>)</span>
           </button>
@@ -286,31 +316,6 @@
             <i class="ri-add-line"></i> <span>+ Nuevo Hito / Horario</span>
           </button>
         </div>
-      </div>
-
-      <!-- Panel Compacto de Proveedores & Responsables -->
-      <div class="providers-compact-panel" id="providersCompactPanel">
-        <div class="providers-compact-top">
-          <span class="providers-compact-title">
-            <i class="ri-team-line" style="color: var(--gold-dark);"></i> Proveedores &amp; Responsables
-          </span>
-          <button type="button" class="btn-sm-add-provider" onclick="openAddResponsibleModal()" title="Agregar nuevo responsable o proveedor">
-            <i class="ri-user-add-line"></i> + Agregar
-          </button>
-        </div>
-        <div class="providers-compact-bottom">
-          <select id="selectQuickProvider" class="select-org select-quick-provider" title="Selecciona un proveedor del listado">
-            <!-- Cargado dinámicamente -->
-          </select>
-          <button type="button" class="btn-sm-edit-provider" id="btnEditSelectedProvider" onclick="editSelectedProviderFromCombobox()" title="Editar el proveedor seleccionado">
-            <i class="ri-edit-line"></i> Editar
-          </button>
-        </div>
-      </div>
-
-      <!-- Resumen de Métricas del Cronograma -->
-      <div class="timeline-summary-bar" id="timelineSummaryBar">
-        <!-- Rendered dynamically by organizador.js -->
       </div>
 
       <!-- Contenedor Interactivo de Hitos (Cards / Acordeón) -->
@@ -696,6 +701,6 @@
   <!-- Scripts con sincronización Supabase Cloud -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js?v=2.6"></script>
-  <script src="js/organizador.js?v=4.0"></script>
+  <script src="js/organizador.js?v=4.2"></script>
 </body>
 </html>
