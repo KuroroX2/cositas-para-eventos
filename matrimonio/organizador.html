@@ -273,29 +273,26 @@
       <div class="section-top-bar">
         <div>
           <h2>Cronograma del Gran Día</h2>
-          <p>Hitos del matrimonio ordenados por hora, con encargados y compras asociadas.</p>
+          <p>Hitos en orden cronológico. Haz clic en cualquier horario para ver todas las actividades, encargados y compras que van dentro.</p>
         </div>
-        <button class="btn-header btn-header-primary" id="btnOpenActivityModal">
-          <i class="ri-add-line"></i> <span>Nuevo Hito / Actividad</span>
-        </button>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <button type="button" class="btn-header" id="btnToggleAllTimeline" onclick="toggleAllTimelineMilestones()" style="background: #FFFFFF; color: var(--navy-royal); border: 1.5px solid rgba(212,175,55,0.4); box-shadow: var(--shadow-sm);">
+            <i class="ri-expand-up-down-line"></i> <span id="toggleAllTimelineText">Expandir Todo</span>
+          </button>
+          <button class="btn-header btn-header-primary" id="btnOpenActivityModal">
+            <i class="ri-add-line"></i> <span>+ Nuevo Hito / Horario</span>
+          </button>
+        </div>
       </div>
 
-      <div class="timeline-management-card">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th style="width: 140px;">Horario</th>
-              <th style="min-width: 180px;">Actividad / Hito</th>
-              <th style="width: 180px;">Encargado(a)</th>
-              <th>Detalle &amp; Notas Clave</th>
-              <th style="width: 220px;">Compras / Insumos</th>
-              <th style="width: 50px;"></th>
-            </tr>
-          </thead>
-          <tbody id="timelineTableBody">
-            <!-- Rendered dynamically by organizador.js -->
-          </tbody>
-        </table>
+      <!-- Resumen de Métricas del Cronograma -->
+      <div class="timeline-summary-bar" id="timelineSummaryBar">
+        <!-- Rendered dynamically by organizador.js -->
+      </div>
+
+      <!-- Contenedor Interactivo de Hitos (Cards / Acordeón) -->
+      <div class="timeline-cards-container" id="timelineCardsContainer">
+        <!-- Rendered dynamically by organizador.js -->
       </div>
     </section>
 
@@ -615,6 +612,6 @@
   <!-- Scripts con sincronización Supabase Cloud -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js?v=2.6"></script>
-  <script src="js/organizador.js?v=3.5"></script>
+  <script src="js/organizador.js?v=3.6"></script>
 </body>
 </html>

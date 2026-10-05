@@ -2149,3 +2149,449 @@ i[class^="ri-"], i[class*=" ri-"] {
   color: var(--amber-text);
   border: 1px solid var(--amber-border);
 }
+
+
+/* ==========================================================================
+   NUEVO CRONOGRAMA INTERACTIVO (TARJETAS VOGUE & ACORDEÓN INTUITIVO)
+   ========================================================================== */
+
+/* Barra de Resumen / Métricas Rápidas */
+.timeline-summary-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.timeline-metric-card {
+  background: #FFFFFF;
+  border-radius: var(--radius-md);
+  border: 1.5px solid rgba(212, 175, 55, 0.25);
+  box-shadow: var(--shadow-sm);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: var(--transition);
+}
+
+.timeline-metric-card:hover {
+  border-color: var(--gold-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(212, 175, 55, 0.12);
+}
+
+.timeline-metric-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #FAF8F5;
+  color: var(--gold-dark);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  flex-shrink: 0;
+}
+
+.timeline-metric-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.timeline-metric-value {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--navy-royal);
+  line-height: 1.1;
+}
+
+.timeline-metric-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Contenedor de Tarjetas de Hitos */
+.timeline-cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 30px;
+}
+
+.timeline-milestone-card {
+  background: #FFFFFF;
+  border-radius: var(--radius-lg);
+  border: 1.5px solid rgba(212, 175, 55, 0.28);
+  box-shadow: 0 3px 10px rgba(10, 24, 40, 0.03);
+  overflow: hidden;
+  transition: all 0.22s ease-in-out;
+}
+
+.timeline-milestone-card:hover {
+  border-color: var(--gold-primary);
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.12);
+}
+
+.timeline-milestone-card.expanded {
+  border-color: var(--gold-primary);
+  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.18);
+}
+
+/* Header del Hito (Interactivo / Clickeable) */
+.milestone-card-header {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  background: #FFFFFF;
+  transition: background 0.18s ease;
+  gap: 14px;
+}
+
+.timeline-milestone-card.expanded .milestone-card-header {
+  background: #FAF8F3;
+  border-bottom: 1.5px solid rgba(212, 175, 55, 0.25);
+}
+
+.milestone-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  flex: 1;
+}
+
+/* Píldora de Horario */
+.milestone-time-pill {
+  background: var(--navy-royal);
+  color: #D4AF37;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  box-shadow: 0 2px 6px rgba(10, 24, 40, 0.15);
+  flex-shrink: 0;
+}
+
+.milestone-time-pill i {
+  font-size: 1rem;
+  color: var(--gold-primary);
+}
+
+/* Título e Info Principal */
+.milestone-title-wrap {
+  min-width: 0;
+}
+
+.milestone-title {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--navy-royal);
+  margin: 0 0 2px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.milestone-subheading {
+  font-size: 0.82rem;
+  color: #64748B;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.milestone-subheading strong {
+  color: var(--gold-dark);
+}
+
+/* Header Derecho (Badges y Chevron) */
+.milestone-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.milestone-chip {
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 0.76rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.milestone-chip.chip-act {
+  background: #F1F5F9;
+  color: #334155;
+  border: 1px solid #E2E8F0;
+}
+
+.milestone-chip.chip-shop {
+  background: #FEF3C7;
+  color: #92400E;
+  border: 1px solid #FDE68A;
+}
+
+.milestone-chevron-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #F8FAFC;
+  border: 1px solid #CBD5E1;
+  color: var(--navy-royal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition: transform 0.25s ease, background 0.2s ease;
+}
+
+.timeline-milestone-card.expanded .milestone-chevron-btn {
+  transform: rotate(180deg);
+  background: var(--navy-royal);
+  color: #D4AF37;
+  border-color: var(--gold-primary);
+}
+
+/* Interior del Hito (Body desplegable) */
+.milestone-card-body {
+  padding: 20px 24px;
+  background: #FFFFFF;
+}
+
+.milestone-context-box {
+  background: #FAF8F5;
+  border-left: 3.5px solid var(--gold-primary);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 14px;
+  margin-bottom: 18px;
+  font-size: 0.88rem;
+  color: #475569;
+  line-height: 1.45;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.milestone-context-box i {
+  color: var(--gold-dark);
+  font-size: 1.1rem;
+  margin-top: 1px;
+}
+
+.milestone-section-title {
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--navy-royal);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Grilla de Subactividades */
+.milestone-subacts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.subact-vogue-item {
+  background: #FFFDFB;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+  transition: var(--transition);
+}
+
+.subact-vogue-item:hover {
+  background: #FFFFFF;
+  border-color: var(--gold-primary);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.1);
+}
+
+.subact-vogue-name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--navy-royal);
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  line-height: 1.35;
+}
+
+.subact-vogue-name i {
+  color: var(--gold-dark);
+  font-size: 0.9rem;
+  margin-top: 2px;
+}
+
+.subact-vogue-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 6px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.06);
+  font-size: 0.8rem;
+}
+
+.subact-vogue-resp {
+  color: #64748B;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.subact-vogue-resp strong {
+  color: var(--gold-dark);
+}
+
+/* Sección de Compras dentro del Hito */
+.milestone-shop-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.shop-vogue-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  padding: 8px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.shop-vogue-card:hover {
+  border-color: var(--gold-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+}
+
+.shop-vogue-card.in_progress {
+  border-color: rgba(212, 175, 55, 0.5);
+  background: #FFFDF7;
+}
+
+.shop-vogue-title {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--navy-royal);
+}
+
+.shop-vogue-cost {
+  font-size: 0.78rem;
+  color: #64748B;
+}
+
+/* Barra de Acciones del Hito */
+.milestone-actions-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 14px;
+  border-top: 1.5px dashed rgba(212, 175, 55, 0.25);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.milestone-actions-left {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.milestone-actions-right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-milestone-action {
+  background: #F8FAFC;
+  border: 1px solid #CBD5E1;
+  color: var(--navy-royal);
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: var(--transition);
+}
+
+.btn-milestone-action:hover {
+  background: #FAF8F5;
+  border-color: var(--gold-primary);
+  color: var(--gold-dark);
+}
+
+.btn-milestone-del {
+  background: transparent;
+  border: 1px solid #FECACA;
+  color: #DC2626;
+  padding: 5px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: var(--transition);
+}
+
+.btn-milestone-del:hover {
+  background: #FEE2E2;
+}
+
+@media (max-width: 768px) {
+  .milestone-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .milestone-header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .milestone-actions-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .milestone-actions-left, .milestone-actions-right {
+    justify-content: space-between;
+  }
+}

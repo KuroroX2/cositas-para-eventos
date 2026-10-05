@@ -2249,8 +2249,26 @@ window.goToShopping = function(shopId) {
   }, 120);
 };
 
-window.goToTimelineActivity = function(title) {
+window.goToTimelineActivity = function(titleOrId) {
   switchTab('pane-timeline');
+  if (!window.expandedMilestones) window.expandedMilestones = new Set();
+  const act = timeline.find(t => t.id === titleOrId || (t.title && t.title.toLowerCase().includes((titleOrId || '').toLowerCase())));
+  if (act) {
+    window.expandedMilestones.add(act.id);
+    renderTimeline();
+    setTimeout(() => {
+      const card = document.querySelector(`.timeline-milestone-card[data-milestone-id="${act.id}"]`);
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        card.style.transition = 'box-shadow 0.4s ease, border-color 0.4s ease';
+        card.style.borderColor = 'var(--gold-primary)';
+        card.style.boxShadow = '0 0 0 3px rgba(212, 175, 55, 0.4)';
+        setTimeout(() => {
+          card.style.boxShadow = '';
+        }, 1800);
+      }
+    }, 100);
+  }
 };
 
 window.quickAddShopForActivity = function(activityId) {
@@ -2407,139 +2425,372 @@ window.toggleMilestoneSubactResp = function(milestoneId, subactIdx) {
   showToast(`Estado del encargado actualizado a "${m.activities[subactIdx].responsibleStatus === 'ok' ? 'Confirmado' : 'Por Buscar'}"`);
 };
 
-function renderTimeline() {
-  const tbody = document.getElementById('timelineTableBody');
-  if (!tbody) return;
+// Estado global de hitos expandidos en el cronograma
+window.expandedMilestones = window.expandedMilestones || new Set();
 
-  tbody.innerHTML = '';
+function getMilestoneIcon(item) {
+  const t = (item.title || '').toLowerCase();
+  const d = (item.detail || '').toLowerCase();
+  if (t.includes('maquillaje') || t.includes('peinado') || d.includes('peinado')) return 'ri-magic-line';
+  if (t.includes('foto') || t.includes('fotógrafo') || t.includes('cámara') || t.includes('spot')) return 'ri-camera-lens-line';
+  if (t.includes('montaje') || t.includes('floral') || t.includes('decor') || t.includes('mesa')) return 'ri-flower-line';
+  if (t.includes('sonido') || t.includes('dj') || t.includes('micrófono')) return 'ri-mic-line';
+  if (t.includes('manta') || t.includes('llegada') || t.includes('pasto') || t.includes('bienvenida')) return 'ri-sun-line';
+  if (t.includes('ceremonia') || t.includes('votos') || t.includes('civil') || t.includes('religios')) return 'ri-hearts-line';
+  if (t.includes('cóctel') || t.includes('coctel') || t.includes('brindis') || t.includes('champaña')) return 'ri-goblet-line';
+  if (t.includes('almuerzo') || t.includes('banquete') || t.includes('cena') || t.includes('comida')) return 'ri-restaurant-2-line';
+  if (t.includes('sobremesa') || t.includes('café') || t.includes('torta') || t.includes('postre')) return 'ri-cake-3-line';
+  if (t.includes('vals') || t.includes('baile')) return 'ri-music-2-line';
+  if (t.includes('fiesta') || t.includes('música') || t.includes('barra')) return 'ri-disc-line';
+  if (t.includes('bajón') || t.includes('trasnoche') || t.includes('despedida') || t.includes('bengala')) return 'ri-moon-line';
+  return 'ri-time-line';
+}
+
+function updateToggleAllButtonText() {
+  const btn = document.getElementById('btnToggleAllTimeline');
+  const txt = document.getElementById('toggleAllTimelineText');
+  if (!btn || !txt) return;
+  const isAllExpanded = timeline.length > 0 && window.expandedMilestones.size >= timeline.length;
+  if (isAllExpanded) {
+    btn.innerHTML = '<i class="ri-collapse-diagonal-line"></i> <span id="toggleAllTimelineText">Colapsar Todo</span>';
+  } else {
+    btn.innerHTML = '<i class="ri-expand-up-down-line"></i> <span id="toggleAllTimelineText">Expandir Todo</span>';
+  }
+}
+
+window.toggleMilestoneCard = function(id) {
+  if (!window.expandedMilestones) window.expandedMilestones = new Set();
+  const card = document.querySelector(`.timeline-milestone-card[data-milestone-id="${id}"]`);
+  if (window.expandedMilestones.has(id)) {
+    window.expandedMilestones.delete(id);
+    if (card) card.classList.remove('expanded');
+  } else {
+    window.expandedMilestones.add(id);
+    if (card) card.classList.add('expanded');
+  }
+  updateToggleAllButtonText();
+};
+
+window.toggleAllTimelineMilestones = function() {
+  if (!window.expandedMilestones) window.expandedMilestones = new Set();
+  const allCards = document.querySelectorAll('.timeline-milestone-card');
+  const shouldExpand = window.expandedMilestones.size < timeline.length;
+  if (shouldExpand) {
+    timeline.forEach(t => window.expandedMilestones.add(t.id));
+    allCards.forEach(c => c.classList.add('expanded'));
+  } else {
+    window.expandedMilestones.clear();
+    allCards.forEach(c => c.classList.remove('expanded'));
+  }
+  updateToggleAllButtonText();
+};
+
+window.quickAddSubActivityToMilestone = function(milestoneId) {
+  const m = timeline.find(t => t.id === milestoneId);
+  if (!m) return;
+  const name = prompt(`Nueva actividad que va dentro de "${m.title}":`);
+  if (!name || !name.trim()) return;
+  const resp = prompt(`¿Quién será el encargado(a) para "${name}"?`, m.responsible || '');
+  if (!m.activities) m.activities = [];
+  m.activities.push({
+    id: 'sub_' + Date.now(),
+    name: name.trim(),
+    responsible: (resp || '').trim() || 'Por definir',
+    responsibleStatus: 'ok'
+  });
+  saveData();
+  renderAll();
+  showToast(`Actividad agregada al horario de "${m.title}"`);
+};
+
+window.editMilestone = function(milestoneId) {
+  const m = timeline.find(t => t.id === milestoneId);
+  if (!m) return;
+  const newTitle = prompt('Editar título del hito:', m.title);
+  if (newTitle === null) return;
+  if (!newTitle.trim()) { alert('El título no puede estar vacío'); return; }
+  m.title = newTitle.trim();
+
+  const newTimeStart = prompt('Hora de inicio (ej. 11:30):', m.timeStart || m.time || '12:00');
+  if (newTimeStart !== null) m.timeStart = newTimeStart.trim();
+
+  const newTimeEnd = prompt('Hora de término (ej. 13:00) [opcional]:', m.timeEnd || '');
+  if (newTimeEnd !== null) m.timeEnd = newTimeEnd.trim();
+
+  const newDetail = prompt('Detalle / Notas clave:', m.detail || '');
+  if (newDetail !== null) m.detail = newDetail.trim();
+
+  timeline.sort((a, b) => getTimelineSortKey(a).localeCompare(getTimelineSortKey(b)));
+  saveData();
+  renderAll();
+  showToast(`Hito "${m.title}" actualizado con éxito`);
+};
+
+window.deleteTimelineActivity = function(idx) {
+  if (!timeline[idx]) return;
+  const item = timeline[idx];
+  if (confirm(`¿Eliminar el hito "${item.title}" y sus actividades asociadas del cronograma?`)) {
+    const deleted = timeline.splice(idx, 1)[0];
+    if (window.expandedMilestones) window.expandedMilestones.delete(deleted.id);
+    saveData();
+    renderAll();
+    showToast(`Hito "${deleted.title}" eliminado`);
+  }
+};
+
+window.toggleMilestoneSubactResp = function(milestoneId, subactIdx) {
+  const m = timeline.find(t => t.id === milestoneId);
+  if (!m || !m.activities || !m.activities[subactIdx]) return;
+  const current = m.activities[subactIdx].responsibleStatus || 'ok';
+  m.activities[subactIdx].responsibleStatus = (current === 'ok') ? 'pending' : 'ok';
+  saveData();
+  renderAll();
+  showToast(`Estado del encargado: "${m.activities[subactIdx].responsibleStatus === 'ok' ? 'Confirmado' : 'Por Buscar'}"`);
+};
+
+/* ==========================================================================
+   RENDER DEL CRONOGRAMA MINUTO A MINUTO (ACORDEÓN INTUITIVO VOGUE)
+   ========================================================================== */
+function renderTimeline() {
+  const container = document.getElementById('timelineCardsContainer');
+  const summaryBar = document.getElementById('timelineSummaryBar');
+  if (!container) return;
+
+  // 1. Render de Métricas Rápidas en la barra superior
+  if (summaryBar) {
+    let totalActs = 0;
+    let okResps = 0;
+    let pendingResps = 0;
+
+    timeline.forEach(item => {
+      const acts = (item.activities && item.activities.length > 0) ? item.activities : [{ responsibleStatus: item.responsibleStatus || 'ok' }];
+      totalActs += acts.length;
+      acts.forEach(a => {
+        if (a.responsibleStatus === 'ok') okResps++;
+        else pendingResps++;
+      });
+    });
+
+    const totalShopLinked = shopping.filter(s => s.activityId || s.activityTitle).length;
+
+    summaryBar.innerHTML = `
+      <div class="timeline-metric-card">
+        <div class="timeline-metric-icon"><i class="ri-calendar-check-line"></i></div>
+        <div class="timeline-metric-info">
+          <span class="timeline-metric-value">${timeline.length}</span>
+          <span class="timeline-metric-label">Hitos Programados</span>
+        </div>
+      </div>
+      <div class="timeline-metric-card">
+        <div class="timeline-metric-icon"><i class="ri-list-check-2"></i></div>
+        <div class="timeline-metric-info">
+          <span class="timeline-metric-value">${totalActs}</span>
+          <span class="timeline-metric-label">Actividades Totales</span>
+        </div>
+      </div>
+      <div class="timeline-metric-card">
+        <div class="timeline-metric-icon" style="color: #059669; background: #ECFDF5; border-color: #A7F3D0;"><i class="ri-user-star-line"></i></div>
+        <div class="timeline-metric-info">
+          <span class="timeline-metric-value">${okResps} <small style="font-size: 0.8rem; color: #64748B;">/ ${okResps + pendingResps}</small></span>
+          <span class="timeline-metric-label">Encargados OK</span>
+        </div>
+      </div>
+      <div class="timeline-metric-card">
+        <div class="timeline-metric-icon" style="color: #D97706; background: #FFFBEB; border-color: #FDE68A;"><i class="ri-shopping-bag-3-line"></i></div>
+        <div class="timeline-metric-info">
+          <span class="timeline-metric-value">${totalShopLinked}</span>
+          <span class="timeline-metric-label">Compras Vinculadas</span>
+        </div>
+      </div>
+    `;
+  }
+
+  // 2. Render de Tarjetas de Hitos
+  container.innerHTML = '';
+
+  if (timeline.length === 0) {
+    container.innerHTML = `
+      <div style="background: #FFFFFF; border: 1.5px dashed rgba(212,175,55,0.4); border-radius: 16px; padding: 40px 20px; text-align: center;">
+        <i class="ri-calendar-line" style="font-size: 3rem; color: var(--gold-primary); margin-bottom: 12px; display: block;"></i>
+        <h3 style="font-family: var(--font-serif); color: var(--navy-royal); margin-bottom: 6px;">No hay hitos en el cronograma</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 18px;">Comienza agregando el primer horario de tu gran día.</p>
+        <button class="btn-org-action" onclick="document.getElementById('btnOpenActivityModal').click()">
+          <i class="ri-add-line"></i> Agregar Primer Hito
+        </button>
+      </div>
+    `;
+    updateToggleAllButtonText();
+    return;
+  }
 
   timeline.forEach((item, idx) => {
-    const tr = document.createElement('tr');
     const timeFormatted = formatTimelineTime(item);
-    const respOk = item.responsibleStatus === 'ok';
+    const iconClass = getMilestoneIcon(item);
+    const isExpanded = window.expandedMilestones && window.expandedMilestones.has(item.id);
 
-    // Compras vinculadas a este hito
-    const linkedItems = shopping.filter(s => {
+    // Actividades internas
+    const subActs = (item.activities && Array.isArray(item.activities) && item.activities.length > 0)
+      ? item.activities
+      : [
+          {
+            id: 'sub_default_' + idx,
+            name: item.title,
+            responsible: item.responsible || 'Novios / Coordinador',
+            responsibleStatus: item.responsibleStatus || 'ok'
+          }
+        ];
+
+    // Compras vinculadas
+    const linkedShopItems = shopping.filter(s => {
       if (s.activityId && s.activityId === item.id) return true;
-      if (s.activityTitle && isGuestNameMatch(s.activityTitle, item.title)) return true;
+      if (s.activityTitle && (s.activityTitle.toLowerCase().includes(item.title.toLowerCase()) || isGuestNameMatch(s.activityTitle, item.title))) return true;
       return false;
     });
 
-    let shoppingCellHtml = '';
-    if (linkedItems.length > 0) {
-      shoppingCellHtml = linkedItems.map(s => {
-        const st = s.status || 'pending';
-        let bClass = 'pending';
-        let bIcon = 'ri-time-line';
-        let bText = 'Pendiente';
-        if (st === 'ok') {
-          bClass = 'ok';
-          bIcon = 'ri-checkbox-circle-fill';
-          bText = 'Listo';
-        } else if (st === 'in_progress') {
-          bClass = 'in_progress';
-          bIcon = 'ri-palette-line';
-          bText = 'Mandado a Hacer';
-        }
-        return `
-          <div class="timeline-linked-shop-badge ${bClass}" onclick="goToShopping('${s.id}')" title="Clic para ver en la pestaña de compras (${bText})">
-            <i class="${bIcon}"></i>
-            <span class="shop-name">${escapeHtml(s.item)}</span>
-            <span class="shop-tag">${bText}</span>
-          </div>
-        `;
-      }).join('');
-    } else {
-      shoppingCellHtml = `
-        <button type="button" class="btn-sm-add-shop" onclick="quickAddShopForActivity('${item.id}')" title="Agregar una compra o insumo necesario para este hito">
-          <i class="ri-add-line"></i> <span>+ Compra</span>
-        </button>
-      `;
-    }
+    const card = document.createElement('div');
+    card.className = `timeline-milestone-card ${isExpanded ? 'expanded' : ''}`;
+    card.dataset.milestoneId = item.id;
+    card.dataset.title = item.title;
 
-    // Bloque Actividades & Encargados
-    let activitiesColHtml = '';
-    if (item.activities && Array.isArray(item.activities) && item.activities.length > 0) {
-      activitiesColHtml = `
-        <div class="milestone-subacts-table">
-          ${item.activities.map((act, actIdx) => {
-            const isSubRespOk = act.responsibleStatus === 'ok';
+    // Encargado principal de resumen
+    const mainResp = item.responsible || (subActs[0] ? subActs[0].responsible : 'Novios');
+
+    card.innerHTML = `
+      <!-- Header Clickeable para desplegar/contraer -->
+      <div class="milestone-card-header" onclick="toggleMilestoneCard('${item.id}')" title="Haz clic para ${isExpanded ? 'colapsar' : 'ver todo lo que va dentro de este horario'}">
+        <div class="milestone-header-left">
+          <span class="milestone-time-pill">
+            <i class="${iconClass}"></i>
+            <span>${escapeHtml(timeFormatted)}</span>
+          </span>
+          <div class="milestone-title-wrap">
+            <h3 class="milestone-title">${escapeHtml(item.title)}</h3>
+            <div class="milestone-subheading">
+              <i class="ri-user-star-line"></i> Encargado(a): <strong>${escapeHtml(mainResp)}</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="milestone-header-right">
+          <span class="milestone-chip chip-act" title="Número de actividades en este horario">
+            <i class="ri-checkbox-circle-line"></i> ${subActs.length} ${subActs.length === 1 ? 'actividad' : 'actividades'}
+          </span>
+          ${linkedShopItems.length > 0 ? `
+            <span class="milestone-chip chip-shop" title="Compras o mandados a hacer asociados">
+              <i class="ri-shopping-bag-3-line"></i> ${linkedShopItems.length} compra${linkedShopItems.length > 1 ? 's' : ''}
+            </span>
+          ` : ''}
+          <button type="button" class="milestone-chevron-btn" aria-label="Desplegar">
+            <i class="ri-arrow-down-s-line"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Contenido Interior que se ve al abrir el horario -->
+      <div class="milestone-card-body" style="display: ${isExpanded ? 'block' : 'none'};">
+        ${item.detail ? `
+          <div class="milestone-context-box">
+            <i class="ri-information-line"></i>
+            <div>${escapeHtml(item.detail)}</div>
+          </div>
+        ` : ''}
+
+        <!-- Subactividades & Encargados -->
+        <div class="milestone-section-title">
+          <i class="ri-task-line" style="color: var(--gold-dark);"></i> Actividades dentro de este horario (${subActs.length}):
+        </div>
+        <div class="milestone-subacts-grid">
+          ${subActs.map((act, actIdx) => {
+            const isOk = act.responsibleStatus === 'ok';
             return `
-              <div class="milestone-subact-row">
-                <div class="subact-main">
-                  <i class="ri-checkbox-blank-circle-fill" style="color: var(--gold-dark); font-size: 0.45rem;"></i>
-                  <strong>${escapeHtml(act.name)}</strong>
+              <div class="subact-vogue-item">
+                <div class="subact-vogue-name">
+                  <i class="ri-checkbox-circle-fill"></i>
+                  <span>${escapeHtml(act.name)}</span>
                 </div>
-                <div class="subact-resp-box">
-                  <span class="subact-resp-name"><i class="ri-user-star-line"></i> ${escapeHtml(act.responsible || 'Por definir')}</span>
-                  <button type="button" class="badge-status-xs ${isSubRespOk ? 'ok' : 'pending'}" onclick="toggleMilestoneSubactResp('${item.id}', ${actIdx})" title="Clic para alternar si el encargado está confirmado o pendiente de buscar">
-                    ${isSubRespOk ? '✓ OK' : '⏳ Por Buscar'}
+                <div class="subact-vogue-meta">
+                  <span class="subact-vogue-resp">
+                    <i class="ri-user-star-line"></i> <strong>${escapeHtml(act.responsible || 'Por definir')}</strong>
+                  </span>
+                  <button type="button" class="badge-status-xs ${isOk ? 'ok' : 'pending'}" onclick="event.stopPropagation(); toggleMilestoneSubactResp('${item.id}', ${actIdx})" title="Clic para alternar si el encargado está confirmado o pendiente de buscar">
+                    ${isOk ? '✓ Confirmado' : '⏳ Por Buscar'}
                   </button>
                 </div>
               </div>
             `;
           }).join('')}
         </div>
-      `;
-    } else {
-      activitiesColHtml = `
-        <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
-          <span style="color: var(--gold-dark); font-weight: 700; font-size: 0.88rem;">
-            <i class="ri-user-star-line"></i> ${escapeHtml(item.responsible || 'Por definir')}
-          </span>
-          <button type="button" class="badge-status ${respOk ? 'ok' : 'pending'}" onclick="toggleTimelineRespStatus(${idx})" title="Clic para alternar si el encargado está confirmado o pendiente de buscar">
-            ${respOk ? '<i class="ri-check-line"></i> Confirmado' : '<i class="ri-search-eye-line"></i> Por Buscar'}
-          </button>
-        </div>
-      `;
-    }
 
-    tr.innerHTML = `
-      <td>
-        <span class="time-badge"><i class="ri-time-line"></i> ${escapeHtml(timeFormatted)}</span>
-      </td>
-      <td>
-        <strong style="color: var(--navy-royal); font-size: 1.02rem; display: block; margin-bottom: 2px;">${escapeHtml(item.title)}</strong>
-        ${item.detail ? `<div style="color: var(--text-muted); font-size: 0.82rem; line-height: 1.4;">${escapeHtml(item.detail)}</div>` : ''}
-      </td>
-      <td>
-        ${activitiesColHtml}
-      </td>
-      <td style="color: var(--text-muted); font-size: 0.88rem;">
-        ${item.detail ? escapeHtml(item.detail) : '—'}
-      </td>
-      <td>
-        <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start;">
-          ${shoppingCellHtml}
+        <!-- Compras & Mandados a Hacer vinculados -->
+        <div class="milestone-section-title" style="margin-top: 16px;">
+          <i class="ri-shopping-cart-2-line" style="color: var(--gold-dark);"></i> Compras, Insumos o Encargos:
         </div>
-      </td>
-      <td>
-        <button class="btn-table-del" onclick="deleteTimelineActivity(${idx})" title="Eliminar actividad">
-          <i class="ri-delete-bin-line"></i>
-        </button>
-      </td>
+        ${linkedShopItems.length > 0 ? `
+          <div class="milestone-shop-grid">
+            ${linkedShopItems.map(s => {
+              const st = s.status || 'pending';
+              let badgeColor = 'var(--amber-bg)';
+              let badgeText = '⏳ Pendiente';
+              let tagClass = 'pending';
+              if (st === 'ok') {
+                badgeColor = 'var(--mint-bg)';
+                badgeText = '✓ Ya Listo';
+                tagClass = 'ok';
+              } else if (st === 'in_progress') {
+                badgeColor = '#FFFDF0';
+                badgeText = '🎨 Mandado a Hacer';
+                tagClass = 'in_progress';
+              }
+              return `
+                <div class="shop-vogue-card ${tagClass}" onclick="goToShopping('${s.id}')" title="Clic para ver en la pestaña de Compras (${badgeText})">
+                  <div style="display: flex; flex-direction: column; gap: 2px;">
+                    <span class="shop-vogue-title"><i class="ri-shopping-bag-line" style="color: var(--gold-dark);"></i> ${escapeHtml(s.item)}</span>
+                    <span class="shop-vogue-cost">${escapeHtml(s.category || 'General')} • ${escapeHtml(s.cost || 'Sin costo')}</span>
+                  </div>
+                  <span class="badge-status-xs ${tagClass}">${badgeText}</span>
+                </div>
+              `;
+            }).join('')}
+            <button type="button" class="btn-milestone-action" onclick="event.stopPropagation(); quickAddShopForActivity('${item.id}')" title="Agregar otra compra para este hito">
+              <i class="ri-add-line"></i> + Otra Compra
+            </button>
+          </div>
+        ` : `
+          <div style="display: flex; align-items: center; justify-content: space-between; background: #FAF9F6; border: 1px dashed rgba(212,175,55,0.3); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px;">
+            <span style="font-size: 0.84rem; color: #64748B;">No hay compras asociadas a este horario.</span>
+            <button type="button" class="btn-milestone-action" onclick="event.stopPropagation(); quickAddShopForActivity('${item.id}')">
+              <i class="ri-add-line"></i> + Agregar Compra / Insumo
+            </button>
+          </div>
+        `}
+
+        <!-- Barra inferior de acciones del hito -->
+        <div class="milestone-actions-bar">
+          <div class="milestone-actions-left">
+            <button type="button" class="btn-milestone-action" onclick="event.stopPropagation(); quickAddSubActivityToMilestone('${item.id}')">
+              <i class="ri-add-circle-line"></i> + Actividad adentro
+            </button>
+            <button type="button" class="btn-milestone-action" onclick="event.stopPropagation(); quickAddShopForActivity('${item.id}')">
+              <i class="ri-shopping-cart-line"></i> + Compra adentro
+            </button>
+          </div>
+          <div class="milestone-actions-right">
+            <button type="button" class="btn-milestone-action" onclick="event.stopPropagation(); editMilestone('${item.id}')" title="Editar horario o descripción">
+              <i class="ri-edit-line"></i> Editar Horario
+            </button>
+            <button type="button" class="btn-milestone-del" onclick="event.stopPropagation(); deleteTimelineActivity(${idx})" title="Eliminar este hito del cronograma">
+              <i class="ri-delete-bin-line"></i> Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
     `;
 
-    tbody.appendChild(tr);
+    container.appendChild(card);
   });
+
+  updateToggleAllButtonText();
 }
-
-window.toggleTimelineRespStatus = function(idx) {
-  if (!timeline[idx]) return;
-  timeline[idx].responsibleStatus = timeline[idx].responsibleStatus === 'ok' ? 'pending' : 'ok';
-  saveData();
-  renderAll();
-  showToast(`Estado del encargado actualizado a "${timeline[idx].responsibleStatus === 'ok' ? 'Confirmado' : 'Por Buscar'}"`);
-};
-
-window.deleteTimelineActivity = function(idx) {
-  if (!timeline[idx]) return;
-  if (confirm(`¿Eliminar la actividad "${timeline[idx].title}"?`)) {
-    timeline.splice(idx, 1);
-    saveData();
-    renderAll();
-  }
-};
 
 function renderShopping() {
   const tbody = document.getElementById('shoppingTableBody');
