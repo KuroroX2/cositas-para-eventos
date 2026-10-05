@@ -868,8 +868,9 @@ i[class^="ri-"], i[class*=" ri-"] {
   display: none;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  padding: 20px 16px;
   z-index: 1000;
+  overflow-y: auto;
 }
 
 .org-modal.active {
@@ -882,10 +883,30 @@ i[class^="ri-"], i[class*=" ri-"] {
   border: 2px solid var(--gold-primary);
   box-shadow: var(--shadow-lg);
   width: 100%;
-  max-width: 480px;
-  padding: 28px;
+  max-width: 580px;
+  max-height: min(88vh, 760px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 24px 28px 24px;
   position: relative;
+  margin: auto;
+  box-sizing: border-box;
   animation: fadeIn 0.25s ease;
+}
+
+.org-modal-card::-webkit-scrollbar {
+  width: 7px;
+}
+.org-modal-card::-webkit-scrollbar-track {
+  background: #F8FAFC;
+  border-radius: 10px;
+}
+.org-modal-card::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 10px;
+}
+.org-modal-card::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-light);
 }
 
 .org-modal-title {
@@ -1911,5 +1932,29 @@ i[class^="ri-"], i[class*=" ri-"] {
 
 .badge-shopping-activity:hover {
   background: #DBEAFE;
+  transform: translateY(-1px);
+}
+
+/* Estado Mandado a Hacer / En Proceso */
+.badge-status.in-progress {
+  background: #F3E8FF;
+  color: #6B21A8;
+  border: 1px solid #D8B4FE;
+}
+
+.badge-status.in-progress:hover {
+  background: #E9D5FF;
+}
+
+.timeline-linked-shop-badge.in_progress,
+.timeline-linked-shop-badge.in-progress {
+  background: #F3E8FF;
+  color: #6B21A8;
+  border: 1px solid #D8B4FE;
+}
+
+.timeline-linked-shop-badge.in_progress:hover,
+.timeline-linked-shop-badge.in-progress:hover {
+  background: #E9D5FF;
   transform: translateY(-1px);
 }

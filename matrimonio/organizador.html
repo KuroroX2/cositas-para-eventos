@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="css/organizador.css?v=3.0">
+  <link rel="stylesheet" href="css/organizador.css?v=3.1">
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
@@ -421,17 +421,18 @@
               </div>
             </div>
             <div class="form-group-org" style="margin-bottom: 0;">
-              <label for="actShopStatus">¿La compra ya está lista?</label>
+              <label for="actShopStatus">¿Estado de la compra o insumo?</label>
               <select id="actShopStatus" class="select-org">
                 <option value="pending" selected>⏳ Pendiente por Comprar</option>
-                <option value="ok">✓ Ya Comprado / OK</option>
+                <option value="in_progress">🎨 Mandado a Hacer / En Proceso</option>
+                <option value="ok">✓ Ya Comprado / Listo</option>
               </select>
             </div>
           </div>
         </div>
 
-        <div style="margin-top: 20px;">
-          <button type="submit" class="btn-org-action">
+        <div style="margin-top: 22px; padding-bottom: 8px;">
+          <button type="submit" class="btn-org-action" style="width: 100%; justify-content: center; padding: 13px 20px; font-size: 0.95rem;">
             <i class="ri-check-line"></i> <span>Guardar Hito en Cronograma</span>
           </button>
         </div>
@@ -492,15 +493,16 @@
           <input type="text" id="shopDetail" class="input-org" placeholder="Ej.: Mercado Libre, tienda o encargo especial">
         </div>
         <div class="form-group-org">
-          <label for="shopStatus">¿Compra Ya Realizada?</label>
+          <label for="shopStatus">¿Estado de la Compra / Insumo?</label>
           <select id="shopStatus" class="select-org">
             <option value="pending" selected>⏳ Pendiente por Comprar</option>
-            <option value="ok">✓ Comprado / OK</option>
+            <option value="in_progress">🎨 Mandado a Hacer / En Proceso</option>
+            <option value="ok">✓ Ya Comprado / Listo</option>
           </select>
         </div>
-        <div style="margin-top: 20px;">
-          <button type="submit" class="btn-org-action">
-            <i class="ri-check-line"></i> Guardar Ítem
+        <div style="margin-top: 22px; padding-bottom: 8px;">
+          <button type="submit" class="btn-org-action" style="width: 100%; justify-content: center; padding: 13px 20px; font-size: 0.95rem;">
+            <i class="ri-check-line"></i> <span>Guardar Ítem en Compras</span>
           </button>
         </div>
       </form>
@@ -591,6 +593,6 @@
   <!-- Scripts con sincronización Supabase Cloud -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js?v=2.6"></script>
-  <script src="js/organizador.js?v=3.0"></script>
+  <script src="js/organizador.js?v=3.1"></script>
 </body>
 </html>

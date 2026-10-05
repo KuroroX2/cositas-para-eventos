@@ -2143,12 +2143,24 @@ function renderTimeline() {
     let shoppingCellHtml = '';
     if (linkedItems.length > 0) {
       shoppingCellHtml = linkedItems.map(s => {
-        const isShopOk = s.status === 'ok';
+        const st = s.status || 'pending';
+        let bClass = 'pending';
+        let bIcon = 'ri-time-line';
+        let bText = 'Pendiente';
+        if (st === 'ok') {
+          bClass = 'ok';
+          bIcon = 'ri-checkbox-circle-fill';
+          bText = 'Listo';
+        } else if (st === 'in_progress') {
+          bClass = 'in_progress';
+          bIcon = 'ri-palette-line';
+          bText = 'Mandado a Hacer';
+        }
         return `
-          <div class="timeline-linked-shop-badge ${isShopOk ? 'ok' : 'pending'}" onclick="goToShopping('${s.id}')" title="Clic para ver en la pestaña de compras">
-            <i class="${isShopOk ? 'ri-checkbox-circle-fill' : 'ri-time-line'}"></i>
+          <div class="timeline-linked-shop-badge ${bClass}" onclick="goToShopping('${s.id}')" title="Clic para ver en la pestaña de compras (${bText})">
+            <i class="${bIcon}"></i>
             <span class="shop-name">${escapeHtml(s.item)}</span>
-            <span class="shop-tag">${isShopOk ? 'Comprado' : 'Pendiente'}</span>
+            <span class="shop-tag">${bText}</span>
           </div>
         `;
       }).join('');
@@ -2251,9 +2263,16 @@ function renderShopping() {
       </td>
       <td><strong style="color: var(--gold-dark);">${escapeHtml(item.cost || '—')}</strong></td>
       <td>
-        <button class="badge-status ${isOk ? 'ok' : 'pending'}" onclick="toggleShoppingStatus(${idx})" title="Clic para marcar si ya está comprado">
-          ${isOk ? '<i class="ri-check-line"></i> Comprado / OK' : '<i class="ri-time-line"></i> Pendiente'}
-        </button>
+        ${(() => {
+          const st = item.status || 'pending';
+          if (st === 'ok') {
+            return `<button class="badge-status ok" onclick="toggleShoppingStatus(${idx})" title="Estado: Comprado / Listo. Clic para cambiar a Pendiente"><i class="ri-check-line"></i> Comprado / OK</button>`;
+          } else if (st === 'in_progress') {
+            return `<button class="badge-status in-progress" onclick="toggleShoppingStatus(${idx})" title="Estado: Mandado a Hacer / En Proceso. Clic para marcar como Listo"><i class="ri-palette-line"></i> Mandado a Hacer</button>`;
+          } else {
+            return `<button class="badge-status pending" onclick="toggleShoppingStatus(${idx})" title="Estado: Pendiente por Comprar. Clic para cambiar a Mandado a Hacer"><i class="ri-time-line"></i> Pendiente</button>`;
+          }
+        })()}
       </td>
       <td>
         <button class="btn-table-del" onclick="deleteShoppingItem(${idx})" title="Eliminar ítem">
@@ -2268,9 +2287,23 @@ function renderShopping() {
 
 window.toggleShoppingStatus = function(idx) {
   if (!shopping[idx]) return;
-  shopping[idx].status = shopping[idx].status === 'ok' ? 'pending' : 'ok';
+  const current = shopping[idx].status || 'pending';
+  let next = 'pending';
+  let msg = '';
+  if (current === 'pending') {
+    next = 'in_progress';
+    msg = `"${shopping[idx].item}" marcado como: 🎨 Mandado a Hacer / En Proceso`;
+  } else if (current === 'in_progress') {
+    next = 'ok';
+    msg = `¡"${shopping[idx].item}" marcado como: ✓ Ya Comprado / Listo!`;
+  } else {
+    next = 'pending';
+    msg = `"${shopping[idx].item}" marcado como: ⏳ Pendiente por Comprar`;
+  }
+  shopping[idx].status = next;
   saveData();
   renderAll();
+  showToast(msg);
 };
 
 window.toggleShoppingRespStatus = function(idx) {
@@ -2431,6 +2464,11 @@ function setupEventListeners() {
     actNeedsPurchase.addEventListener('change', () => {
       actPurchaseFields.style.display = actNeedsPurchase.checked ? 'block' : 'none';
       if (actShopItem) actShopItem.required = actNeedsPurchase.checked;
+      if (actNeedsPurchase.checked) {
+        setTimeout(() => {
+          actPurchaseFields.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 60);
+      }
     });
   }
 
