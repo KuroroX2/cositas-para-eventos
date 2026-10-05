@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
    1. Datos Iniciales & Persistencia
    ========================================================================== */
 const STORAGE_KEY_TABLES = 'boda_org_tables_v2';
-const STORAGE_KEY_TIMELINE = 'boda_org_timeline_v2';
+const STORAGE_KEY_TIMELINE = 'boda_org_timeline_v3';
 const STORAGE_KEY_SHOPPING = 'boda_org_shopping_v2';
 const STORAGE_KEY_UNASSIGNED = 'boda_org_unassigned_v2';
 
@@ -535,152 +535,254 @@ function loadData() {
     }).catch(e => console.warn('Supabase sync notice in organizador:', e));
   }
 
-  const savedTimeline = localStorage.getItem(STORAGE_KEY_TIMELINE);
-  if (savedTimeline) {
+  // ==========================================
+  // CRONOGRAMA DE EJEMPLO ALINEADO A LA INVITACIÓN
+  // Horarios de la invitación:
+  // - 11:30 AM: Llegada & Momento Manta
+  // - 01:00 PM: Ceremonia Civil & Religiosa
+  // - 03:00 PM: El Almuerzo
+  // - Tarde (16:30): Sobremesa & Fotos Instagrameables 📸✨
+  // - 04:00 PM (18:00 - 21:00): ¡Música & Fiesta!
+  // + Todas las actividades previas y logísticas mantenidas
+  // ==========================================
+  const DEFAULT_EXAMPLE_TIMELINE = [
+    {
+      id: 'act_previa_maquillaje',
+      time: '08:30',
+      timeStart: '08:30',
+      timeEnd: '10:30',
+      title: 'Maquillaje y Peinado de la Novia',
+      responsible: 'Estilista & Novia',
+      responsibleStatus: 'ok',
+      detail: 'Preparación y sesión de peinado en la suite de Casona Los Olivos',
+      activities: [
+        { id: 'sub_maq_1', name: 'Peinado y colocación del velo', responsible: 'Estilista', responsibleStatus: 'ok' },
+        { id: 'sub_maq_2', name: 'Maquillaje de novia y retoques madrina', responsible: 'Maquilladora', responsibleStatus: 'ok' }
+      ]
+    },
+    {
+      id: 'act_previa_decoracion',
+      time: '09:30',
+      timeStart: '09:30',
+      timeEnd: '11:00',
+      title: 'Montaje floral, mesas y mantelería',
+      responsible: 'Decoradora Floral',
+      responsibleStatus: 'ok',
+      detail: 'Revisión de mantelería, centros de mesa campestres y flores en el jardín',
+      activities: [
+        { id: 'sub_dec_1', name: 'Distribución de centros de mesa y cubertería', responsible: 'Decoradora', responsibleStatus: 'ok' },
+        { id: 'sub_dec_2', name: 'Montaje del arco nupcial campestre', responsible: 'Equipo Montaje', responsibleStatus: 'ok', needsPurchase: true, shopItem: 'Arco y Flores Campestres', shopCategory: 'Decoración', shopCost: '$45.000', shopStatus: 'ok' }
+      ]
+    },
+    {
+      id: 'act_previa_foto',
+      time: '10:00',
+      timeStart: '10:00',
+      timeEnd: '11:30',
+      title: 'Llegada del Fotógrafo (Sesión previa)',
+      responsible: 'Equipo Fotográfico',
+      responsibleStatus: 'ok',
+      detail: 'Fotos de detalles: vestido, anillos, zapatos, traje del novio y primeros retratos',
+      activities: [
+        { id: 'sub_fot_1', name: 'Fotos de detalles (anillos, zapatos, ramo)', responsible: 'Fotógrafo', responsibleStatus: 'ok' },
+        { id: 'sub_fot_2', name: 'First look íntimo de los novios', responsible: 'Fotógrafo', responsibleStatus: 'ok' }
+      ]
+    },
+    {
+      id: 'act_previa_sonido',
+      time: '10:30',
+      timeStart: '10:30',
+      timeEnd: '11:30',
+      title: 'Prueba de Sonido & Micrófonos con DJ',
+      responsible: 'DJ & Sonidista',
+      responsibleStatus: 'ok',
+      detail: 'Confirmar lista de canciones, audio campestre y micrófonos inalámbricos para votos',
+      activities: [
+        { id: 'sub_son_1', name: 'Prueba de audio y micrófono inalámbrico de ceremonia', responsible: 'DJ', responsibleStatus: 'ok' },
+        { id: 'sub_son_2', name: 'Audio ambiental acústico en zona de pasto', responsible: 'DJ', responsibleStatus: 'ok' }
+      ]
+    },
+    {
+      id: 'act_inv_llegada',
+      time: '11:30',
+      timeStart: '11:30',
+      timeEnd: '13:00',
+      title: 'Llegada & Momento Manta',
+      responsible: 'Hermano del Novio & Equipo Recepción',
+      responsibleStatus: 'ok',
+      detail: 'Instalación de mantas en el césped, aguas frescas, música acústica y cóctel previo',
+      activities: [
+        { id: 'sub_rec_cartel', name: 'Instalación de Cartel de Bienvenida', responsible: 'Hermano del Novio', responsibleStatus: 'ok', needsPurchase: true, shopItem: 'Cartel de Bienvenidos (Madera / Acrílico)', shopCategory: 'Decoración', shopCost: '$25.000', shopStatus: 'in_progress' },
+        { id: 'sub_rec_mantas', name: 'Distribución de mantas y canastas en el pasto', responsible: 'Equipo Recepción', responsibleStatus: 'ok', needsPurchase: true, shopItem: 'Mantas campestres para picnic', shopCategory: 'Mobiliario', shopCost: '$30.000', shopStatus: 'ok' },
+        { id: 'sub_rec_aguas', name: 'Dispensadores de aguas saborizadas y limonadas', responsible: 'Banquetera', responsibleStatus: 'ok' }
+      ]
+    },
+    {
+      id: 'act_inv_ceremonia',
+      time: '13:00',
+      timeStart: '13:00',
+      timeEnd: '14:15',
+      title: 'Ceremonia Civil & Religiosa',
+      responsible: 'Oficial Civil & Párroco',
+      responsibleStatus: 'ok',
+      detail: 'Matrimonio Civil y posterior bendición religiosa para sellar nuestra unión',
+      activities: [
+        { id: 'sub_cer_1', name: 'Lectura de votos y entrega de argollas', responsible: 'Novios & Padrinos', responsibleStatus: 'ok' },
+        { id: 'sub_cer_2', name: 'Firma de actas de matrimonio civil', responsible: 'Testigos', responsibleStatus: 'ok' },
+        { id: 'sub_cer_3', name: 'Lluvia de pétalos naturales a la salida', responsible: 'Damas de Honor', responsibleStatus: 'ok', needsPurchase: true, shopItem: 'Conos con pétalos naturales', shopCategory: 'Ceremonia', shopCost: '$15.000', shopStatus: 'ok' }
+      ]
+    },
+    {
+      id: 'act_coctel_fotos',
+      time: '14:15',
+      timeStart: '14:15',
+      timeEnd: '15:00',
+      title: 'Cóctel Campestre & Fotos Post-Ceremonia',
+      responsible: 'Banquetera & Fotógrafo',
+      responsibleStatus: 'ok',
+      detail: 'Aperitivos campestres y fotos grupales con novios y familias en los jardines',
+      activities: [
+        { id: 'sub_coc_1', name: 'Servicio de aperitivos campestres y cóctel de autor', responsible: 'Banquetera', responsibleStatus: 'ok' },
+        { id: 'sub_coc_2', name: 'Fotos con familiares y amigos en spots de jardines', responsible: 'Fotógrafo', responsibleStatus: 'ok' }
+      ]
+    },
+    {
+      id: 'act_inv_almuerzo',
+      time: '15:00',
+      timeStart: '15:00',
+      timeEnd: '16:30',
+      title: 'El Almuerzo',
+      responsible: 'Banquetera & Maestro de Ceremonia',
+      responsibleStatus: 'ok',
+      detail: 'Almuerzo campestre, mesa de novios, brindis de honor y compartir juntos',
+      activities: [
+        { id: 'sub_alm_1', name: 'Servicio del banquete campestre en mesas', responsible: 'Garzones & Banquetera', responsibleStatus: 'ok' },
+        { id: 'sub_alm_2', name: 'Brindis de honor con champaña y discursos', responsible: 'Padres & Padrinos', responsibleStatus: 'ok', needsPurchase: true, shopItem: 'Copas grabadas para brindis de novios', shopCategory: 'Banquete', shopCost: '$18.000', shopStatus: 'ok' }
+      ]
+    },
+    {
+      id: 'act_inv_sobremesa',
+      time: '16:30',
+      timeStart: '16:30',
+      timeEnd: '17:30',
+      title: 'Sobremesa & Fotos Instagrameables 📸✨',
+      responsible: 'Novios & Encargado de Spots',
+      responsibleStatus: 'ok',
+      detail: 'Spots decorados para Instagram, descanso en el césped, café, torta y postres',
+      activities: [
+        { id: 'sub_sob_1', name: 'Activación de photo spots y cámaras vintage en mesas', responsible: 'Encargado de Spots', responsibleStatus: 'ok', needsPurchase: true, shopItem: 'Cámaras Desechables Vintage para cada mesa', shopCategory: 'Detalles', shopCost: '$60.000', shopStatus: 'ok' },
+        { id: 'sub_sob_2', name: 'Corte de torta de novios y estación de café', responsible: 'Banquetera', responsibleStatus: 'ok' }
+      ]
+    },
+    {
+      id: 'act_vals_novios',
+      time: '17:30',
+      timeStart: '17:30',
+      timeEnd: '18:00',
+      title: 'Primer Baile de Novios (Vals)',
+      responsible: 'DJ & Novios',
+      responsibleStatus: 'ok',
+      detail: 'Vals tradicional de los novios y apertura de la pista de baile',
+      activities: [
+        { id: 'sub_vals_1', name: 'Vals de novios con iluminación cálida', responsible: 'DJ', responsibleStatus: 'ok' },
+        { id: 'sub_vals_2', name: 'Baile con padres y llamado general a la pista', responsible: 'DJ', responsibleStatus: 'ok' }
+      ]
+    },
+    {
+      id: 'act_inv_fiesta',
+      time: '18:00',
+      timeStart: '18:00',
+      timeEnd: '21:00',
+      title: '¡Música & Fiesta!',
+      responsible: 'DJ & Barman',
+      responsibleStatus: 'ok',
+      detail: 'Pista de baile encendida, cotillón festivo y barra abierta campestre',
+      activities: [
+        { id: 'sub_fie_1', name: 'Apertura de barra campestre libre', responsible: 'Barman', responsibleStatus: 'ok' },
+        { id: 'sub_fie_2', name: 'Reparto de cotillón temático y pantuflas cómodas', responsible: 'Amigos de los Novios', responsibleStatus: 'ok', needsPurchase: true, shopItem: 'Pantuflas y Chalas Cómodas para la Fiesta', shopCategory: 'Fiesta', shopCost: '$40.000', shopStatus: 'ok' }
+      ]
+    },
+    {
+      id: 'act_bajon_final',
+      time: '21:00',
+      timeStart: '21:00',
+      timeEnd: '22:00',
+      title: 'Bajón de Tarde-Noche & Despedida',
+      responsible: 'Banquetera & Hermano del Novio',
+      responsibleStatus: 'ok',
+      detail: 'Tapaditos calientes, pizzas artesanales y despedida de novios con bengalas',
+      activities: [
+        { id: 'sub_baj_1', name: 'Servicio de trasnoche con tapaditos calientes y café', responsible: 'Banquetera', responsibleStatus: 'ok' },
+        { id: 'sub_baj_2', name: 'Túnel de despedida con chispas de bengala', responsible: 'Hermano del Novio', responsibleStatus: 'ok', needsPurchase: true, shopItem: 'Kit de Luces de Bengala para Despedida', shopCategory: 'Detalles', shopCost: '$25.000', shopStatus: 'ok' }
+      ]
+    }
+  ];
+
+  // Carga inteligente de cronograma y migración
+  const savedTimelineV3 = localStorage.getItem('boda_org_timeline_v3');
+  const savedTimelineV2 = localStorage.getItem('boda_org_timeline_v2') || localStorage.getItem('boda_org_timeline');
+  let rawTimeline = savedTimelineV3 || savedTimelineV2;
+  let parsedTimeline = null;
+
+  if (rawTimeline) {
     try {
-      timeline = JSON.parse(savedTimeline);
+      parsedTimeline = JSON.parse(rawTimeline);
     } catch(e) {
       console.error('Error parsing timeline:', e);
-      timeline = [];
     }
   }
 
-  // Respaldo de hitos personalizados del usuario
+  // Identificadores de ejemplos antiguos
+  const legacyDefaultIds = new Set(['act_1', 'act_2', 'act_recepcion', 'act_3', 'act_4', 'act_5', 'act_6', 'act_7', 'act_8', 'act_9', 'act_10', 'act_11', 'act_12']);
+  
+  // Rescatar hitos creados por el usuario que NO eran parte del ejemplo viejo
+  let customUserItems = [];
+  if (parsedTimeline && Array.isArray(parsedTimeline)) {
+    customUserItems = parsedTimeline.filter(item => !legacyDefaultIds.has(item.id) && !item.id.startsWith('act_inv_') && !item.id.startsWith('act_previa_') && item.id !== 'act_vals_novios' && item.id !== 'act_bajon_final');
+  }
+
+  // Respaldo secundario permanente
   try {
     const customSaved = JSON.parse(localStorage.getItem('boda_org_timeline_custom') || '[]');
     if (Array.isArray(customSaved) && customSaved.length > 0) {
-      if (!timeline) timeline = [];
       customSaved.forEach(c => {
-        if (!timeline.some(t => t.id === c.id || (t.title === c.title && t.timeStart === c.timeStart))) {
-          timeline.push(c);
+        if (!customUserItems.some(u => u.id === c.id || (u.title === c.title && u.timeStart === c.timeStart))) {
+          customUserItems.push(c);
         }
       });
     }
   } catch(e) {}
 
-  if (!timeline || timeline.length === 0) {
-    timeline = [
-      {
-        id: 'act_1',
-        time: '09:00',
-        title: 'Maquillaje y Peinado de la Novia',
-        responsible: 'Estilista & Novia',
-        detail: 'Preparación en la suite de Casona Los Olivos',
-        status: 'ok'
-      },
-      {
-        id: 'act_2',
-        time: '11:30',
-        title: 'Llegada del Fotógrafo (Sesión previa)',
-        responsible: 'Equipo Fotográfico',
-        detail: 'Fotos de detalles: vestido, anillos, zapatos y traje del novio',
-        status: 'ok'
-      },
-      {
-        id: 'act_recepcion',
-        time: '11:30',
-        timeStart: '11:30',
-        timeEnd: '17:00',
-        title: 'Recepción',
-        responsible: 'Hermano del Novio',
-        responsibleStatus: 'ok',
-        detail: 'Recepción de invitados y montaje de bienvenida',
-        activities: [
-          {
-            id: 'sub_rec_1',
-            name: 'Instalación de Cartel de Bienvenida',
-            responsible: 'Hermano del Novio',
-            responsibleStatus: 'ok',
-            needsPurchase: true,
-            shopItem: 'Cartel de bienvenidos',
-            shopCategory: 'Decoración',
-            shopCost: '$25.000',
-            shopStatus: 'in_progress'
-          }
-        ]
-      },
-      {
-        id: 'act_3',
-        time: '14:00',
-        title: 'Montaje floral y mesas',
-        responsible: 'Decoradora Floral',
-        detail: 'Revisión de mantelería, flores y centros de mesa',
-        status: 'ok'
-      },
-      {
-        id: 'act_4',
-        time: '15:30',
-        title: 'Prueba de Sonido & Micrófonos con DJ',
-        responsible: 'DJ & Sonidista',
-        detail: 'Confirmar lista de canciones y micrófono inalámbrico para votos',
-        status: 'pending'
-      },
-      {
-        id: 'act_5',
-        time: '16:30',
-        title: 'Llegada y Bienvenida de los Invitados',
-        responsible: 'Equipo Recepción',
-        detail: 'Entrega de aguas aromáticas frescas y música acústica',
-        status: 'pending'
-      },
-      {
-        id: 'act_6',
-        time: '17:00',
-        title: 'Ceremonia Civil & Votos Simbólicos',
-        responsible: 'Oficial Civil & Padrinos',
-        detail: 'Entrada de los novios, lectura de votos y firma',
-        status: 'pending'
-      },
-      {
-        id: 'act_7',
-        time: '18:00',
-        title: 'Cóctel Campestre & Momento Pasto 🧺',
-        responsible: 'Banquetera',
-        detail: 'Aperitivos fríos y calientes, fotos de grupos en jardines',
-        status: 'pending'
-      },
-      {
-        id: 'act_8',
-        time: '19:30',
-        title: 'Entrada Triunfal al Salón & Banquete',
-        responsible: 'Maestro de Ceremonia & Banquetera',
-        detail: 'Cena principal de 3 tiempos para los invitados',
-        status: 'pending'
-      },
-      {
-        id: 'act_9',
-        time: '20:30',
-        title: 'Brindis de Honor & Palabras',
-        responsible: 'Padres y Testigos',
-        detail: 'Champaña servida en todas las mesas',
-        status: 'pending'
-      },
-      {
-        id: 'act_10',
-        time: '21:00',
-        title: 'Primer Baile de Novios (Vals)',
-        responsible: 'DJ & Novios',
-        detail: 'Encendido de luces tenues y humo bajo',
-        status: 'pending'
-      },
-      {
-        id: 'act_11',
-        time: '21:30',
-        title: 'Apertura de Barra Libre & Fiesta',
-        responsible: 'Barman & DJ',
-        detail: 'Tragos preparados, cotillón y pista de baile habilitada',
-        status: 'pending'
-      },
-      {
-        id: 'act_12',
-        time: '01:00',
-        title: 'Bajón de Medianoche & Pizza / Tapaditos',
-        responsible: 'Banquetera',
-        detail: 'Comida reconfortante caliente para la fiesta',
-        status: 'pending'
-      }
-    ];
+  // Si no hay v3 o se detecta cronograma antiguo vespertino (con ceremonia a las 17:00), actualizar al de la invitación
+  const hasOldEveningSchedule = parsedTimeline && parsedTimeline.some(item => 
+    item.id === 'act_6' || item.time === '17:00' || item.title === 'Ceremonia Civil & Votos Simbólicos' || item.title === 'Entrada Triunfal al Salón & Banquete'
+  );
+
+  if (!savedTimelineV3 || hasOldEveningSchedule || !parsedTimeline || parsedTimeline.length === 0) {
+    timeline = JSON.parse(JSON.stringify(DEFAULT_EXAMPLE_TIMELINE));
+    // Conservar hitos personalizados del usuario
+    if (customUserItems.length > 0) {
+      customUserItems.forEach(c => {
+        if (!timeline.some(t => t.id === c.id || (t.title === c.title && t.timeStart === c.timeStart))) {
+          timeline.push(c);
+        }
+      });
+    }
+    // Guardar en v3
+    localStorage.setItem(STORAGE_KEY_TIMELINE, JSON.stringify(timeline));
+  } else {
+    timeline = parsedTimeline;
+    if (customUserItems.length > 0) {
+      customUserItems.forEach(c => {
+        if (!timeline.some(t => t.id === c.id || (t.title === c.title && t.timeStart === c.timeStart))) {
+          timeline.push(c);
+        }
+      });
+    }
   }
+
+  // Ordenar cronograma por hora de inicio
+  timeline.sort((a, b) => getTimelineSortKey(a).localeCompare(getTimelineSortKey(b)));
 
   const savedShopping = localStorage.getItem(STORAGE_KEY_SHOPPING);
   if (savedShopping) {
@@ -690,7 +792,8 @@ function loadData() {
       {
         id: 'shop_cartel_rec',
         item: 'Cartel de Bienvenidos (Madera / Acrílico)',
-        activityTitle: 'Recepción: Instalación de Cartel de Bienvenida',
+        activityTitle: 'Llegada & Momento Manta: Instalación de Cartel de Bienvenida',
+        activityId: 'act_inv_llegada',
         category: 'Decoración',
         responsible: 'Hermano del Novio',
         responsibleStatus: 'ok',
@@ -701,6 +804,8 @@ function loadData() {
       {
         id: 'shop_1',
         item: 'Kit de Luces de Bengala para Salida de Ceremonia',
+        activityTitle: 'Bajón de Tarde-Noche & Despedida: Túnel de despedida con chispas de bengala',
+        activityId: 'act_bajon_final',
         category: 'Ceremonia',
         detail: '100 unidades de chispas largas (45 cm) para el atardecer',
         cost: '$25.000',
@@ -709,6 +814,8 @@ function loadData() {
       {
         id: 'shop_2',
         item: 'Cámaras Desechables Vintage para cada mesa',
+        activityTitle: 'Sobremesa & Fotos Instagrameables 📸✨: Activación de photo spots y cámaras vintage en mesas',
+        activityId: 'act_inv_sobremesa',
         category: 'Detalles',
         detail: '8 cámaras instantáneas desechables para las mesas',
         cost: '$60.000',
@@ -717,6 +824,8 @@ function loadData() {
       {
         id: 'shop_3',
         item: 'Pantuflas y Chalas Cómodas para la Fiesta',
+        activityTitle: '¡Música & Fiesta!: Reparto de cotillón temático y pantuflas cómodas',
+        activityId: 'act_inv_fiesta',
         category: 'Fiesta',
         detail: '40 pares surtidos de tallas M y L para bailarines',
         cost: '$45.000',
