@@ -276,6 +276,9 @@
           <p>Hitos en orden cronológico. Haz clic en cualquier horario para ver todas las actividades, encargados y compras que van dentro.</p>
         </div>
         <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <button type="button" class="btn-header" id="btnOpenResponsiblesModal" onclick="openResponsiblesModal()" style="background: #FFFFFF; color: var(--navy-royal); border: 1.5px solid rgba(212,175,55,0.4); box-shadow: var(--shadow-sm);">
+            <i class="ri-team-line" style="color: var(--gold-dark);"></i> <span>Responsables &amp; Proveedores (<span id="countResponsibles">0</span>)</span>
+          </button>
           <button type="button" class="btn-header" id="btnToggleAllTimeline" onclick="toggleAllTimelineMilestones()" style="background: #FFFFFF; color: var(--navy-royal); border: 1.5px solid rgba(212,175,55,0.4); box-shadow: var(--shadow-sm);">
             <i class="ri-expand-up-down-line"></i> <span id="toggleAllTimelineText">Expandir Todo</span>
           </button>
@@ -283,6 +286,11 @@
             <i class="ri-add-line"></i> <span>+ Nuevo Hito / Horario</span>
           </button>
         </div>
+      </div>
+
+      <!-- Directorio Rápido de Responsables & Proveedores -->
+      <div class="responsibles-chips-bar" id="responsiblesChipsBar">
+        <!-- Rendered dynamically by organizador.js -->
       </div>
 
       <!-- Resumen de Métricas del Cronograma -->
@@ -399,7 +407,7 @@
               <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; margin-bottom: 10px;">
                 <div class="form-group-org" style="margin-bottom: 0;">
                   <label>Encargado(a)</label>
-                  <input type="text" class="input-org input-subact-resp" placeholder="Ej.: Hermano del Novio / Banquetera">
+                  <input type="text" class="input-org input-subact-resp" list="responsiblesDatalist" placeholder="Ej.: Hermano del Novio / Banquetera">
                 </div>
                 <div class="form-group-org" style="margin-bottom: 0;">
                   <label>¿Encargado OK?</label>
@@ -447,6 +455,11 @@
                 </div>
               </div>
             </div>
+          </div>
+          <div style="margin-top: 12px; display: flex; justify-content: flex-end;">
+            <button type="button" class="btn-add-subact" id="btnAddSubActivityBottom" style="background: #FFFDF8; border: 1.5px dashed var(--gold-primary); color: var(--gold-dark); font-weight: 700;">
+              <i class="ri-add-line"></i> <span>Agregar otra actividad</span>
+            </button>
           </div>
         </div>
 
@@ -497,7 +510,7 @@
         <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px;">
           <div class="form-group-org">
             <label for="shopResponsible">Encargado(a)</label>
-            <input type="text" id="shopResponsible" class="input-org" placeholder="Ej.: Padrinos / Novios">
+            <input type="text" id="shopResponsible" class="input-org" list="responsiblesDatalist" placeholder="Ej.: Padrinos / Novios">
           </div>
           <div class="form-group-org">
             <label for="shopRespStatus">¿Encargado OK?</label>
@@ -529,6 +542,57 @@
   </div>
 
   <!-- MODAL EDITAR MESA (Nombre y Capacidad) -->
+    <!-- DATALIST GLOBAL DE RESPONSABLES & PROVEEDORES -->
+  <datalist id="responsiblesDatalist"></datalist>
+
+  <!-- MODAL GESTIÓN DE RESPONSABLES Y PROVEEDORES -->
+  <div class="org-modal" id="responsiblesModal">
+    <div class="org-modal-card" style="max-width: 580px;">
+      <button class="btn-close-modal" aria-label="Cerrar"><i class="ri-close-line"></i></button>
+      <h3 class="org-modal-title"><i class="ri-team-line" style="color: var(--gold-dark);"></i> Directorio de Responsables &amp; Proveedores</h3>
+      <p style="color: var(--text-muted); font-size: 0.86rem; margin-top: -6px; margin-bottom: 16px;">
+        Registra a los encargados, cortejo o proveedores para seleccionarlos al instante en cada actividad o compra.
+      </p>
+
+      <!-- Formulario para agregar nuevo responsable -->
+      <form id="formAddResponsible" onsubmit="handleSaveResponsible(event)" style="background: #FAF8F5; border: 1px solid rgba(212,175,55,0.25); border-radius: 12px; padding: 14px; margin-bottom: 18px;">
+        <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div class="form-group-org" style="margin-bottom: 0;">
+            <label for="newRespName">Nombre / Empresa *</label>
+            <input type="text" id="newRespName" class="input-org" placeholder="Ej.: Banquetera Los Olivos / Pamela" required>
+          </div>
+          <div class="form-group-org" style="margin-bottom: 0;">
+            <label for="newRespCategory">Rol / Categoría</label>
+            <select id="newRespCategory" class="select-org">
+              <option value="Proveedor">Proveedor / Servicio</option>
+              <option value="Familia">Familia</option>
+              <option value="Novios">Novios</option>
+              <option value="Amigos / Cortejo">Amigos / Cortejo</option>
+              <option value="Logística">Logística / Coordinación</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: flex-end;">
+          <div class="form-group-org" style="margin-bottom: 0;">
+            <label for="newRespPhone">Teléfono / Contacto (Opcional)</label>
+            <input type="text" id="newRespPhone" class="input-org" placeholder="Ej.: +56 9 1234 5678">
+          </div>
+          <button type="submit" class="btn-org-action" style="padding: 10px 18px;">
+            <i class="ri-user-add-line"></i> Agregar
+          </button>
+        </div>
+      </form>
+
+      <!-- Lista de responsables existentes -->
+      <div style="max-height: 280px; overflow-y: auto; padding-right: 4px;">
+        <div id="responsiblesListContainer" style="display: flex; flex-direction: column; gap: 8px;">
+          <!-- Rendered dynamically by organizador.js -->
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="org-modal" id="editTableModal">
     <div class="org-modal-card">
       <button class="btn-close-modal" aria-label="Cerrar"><i class="ri-close-line"></i></button>
@@ -612,6 +676,6 @@
   <!-- Scripts con sincronización Supabase Cloud -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js?v=2.6"></script>
-  <script src="js/organizador.js?v=3.8"></script>
+  <script src="js/organizador.js?v=3.9"></script>
 </body>
 </html>

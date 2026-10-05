@@ -60,6 +60,24 @@ const STORAGE_KEY_UNASSIGNED = 'boda_org_unassigned_v2';
 let tables = [];
 let timeline = [];
 let shopping = [];
+const STORAGE_KEY_RESPONSIBLES = 'boda_org_responsibles_v1';
+let responsibles = [];
+
+const DEFAULT_RESPONSIBLES = [
+  { id: 'resp_1', name: 'Novios (Cristopher & Reny)', category: 'Novios', phone: '' },
+  { id: 'resp_2', name: 'Hermano del Novio', category: 'Familia', phone: '' },
+  { id: 'resp_3', name: 'Banquetera', category: 'Proveedor', phone: '' },
+  { id: 'resp_4', name: 'Equipo Fotográfico', category: 'Proveedor', phone: '' },
+  { id: 'resp_5', name: 'DJ & Sonidista', category: 'Proveedor', phone: '' },
+  { id: 'resp_6', name: 'Decoradora Floral', category: 'Proveedor', phone: '' },
+  { id: 'resp_7', name: 'Estilista & Novia', category: 'Proveedor', phone: '' },
+  { id: 'resp_8', name: 'Oficial Civil & Párroco', category: 'Proveedor', phone: '' },
+  { id: 'resp_9', name: 'Padres & Padrinos', category: 'Familia', phone: '' },
+  { id: 'resp_10', name: 'Damas de Honor', category: 'Amigos / Cortejo', phone: '' },
+  { id: 'resp_11', name: 'Equipo Recepción', category: 'Logística', phone: '' },
+  { id: 'resp_12', name: 'Barman', category: 'Proveedor', phone: '' }
+];
+
 let unassignedGuests = [];
 
 
@@ -407,6 +425,7 @@ function syncConfirmedGuestsWithUnassigned() {
 }
 
 function loadData() {
+  loadResponsibles();
   const savedTables = localStorage.getItem(STORAGE_KEY_TABLES);
   if (savedTables) {
     try {
@@ -976,6 +995,7 @@ function renderAll() {
   renderUnassignedList();
   renderTimeline();
   renderShopping();
+  renderResponsibles();
 }
 
 /* ==========================================================================
@@ -2394,7 +2414,7 @@ function createSubActivityCard(data = {}) {
     <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; margin-bottom: 10px;">
       <div class="form-group-org" style="margin-bottom: 0;">
         <label>Encargado(a)</label>
-        <input type="text" class="input-org input-subact-resp" placeholder="Ej.: Hermano del Novio / Banquetera" value="${escapeHtml(data.responsible || '')}">
+        <input type="text" class="input-org input-subact-resp" list="responsiblesDatalist" placeholder="Selecciona o escribe encargado..." value="${escapeHtml(data.responsible || '')}">
       </div>
       <div class="form-group-org" style="margin-bottom: 0;">
         <label>¿Encargado OK?</label>
@@ -2942,6 +2962,205 @@ window.editShoppingItem = function(shopId) {
   if (modal) modal.classList.add('active');
 };
 
+
+/* ==========================================================================
+   DIRECTORIO DE RESPONSABLES Y PROVEEDORES
+   ========================================================================== */
+function loadResponsibles() {
+  const saved = localStorage.getItem(STORAGE_KEY_RESPONSIBLES);
+  if (saved) {
+    try {
+      responsibles = JSON.parse(saved);
+    } catch(e) {
+      responsibles = [];
+    }
+  }
+  if (!responsibles || responsibles.length === 0) {
+    responsibles = JSON.parse(JSON.stringify(DEFAULT_RESPONSIBLES));
+    localStorage.setItem(STORAGE_KEY_RESPONSIBLES, JSON.stringify(responsibles));
+  }
+}
+
+function saveResponsibles() {
+  localStorage.setItem(STORAGE_KEY_RESPONSIBLES, JSON.stringify(responsibles));
+}
+
+window.openResponsiblesModal = function() {
+  renderResponsibles();
+  const modal = document.getElementById('responsiblesModal');
+  if (modal) modal.classList.add('active');
+};
+
+window.ensureResponsibleExists = function(name, category = 'Proveedor') {
+  if (!name || !name.trim()) return;
+  const clean = name.trim();
+  if (!responsibles.some(r => r.name.toLowerCase() === clean.toLowerCase())) {
+    responsibles.push({
+      id: 'resp_' + Date.now(),
+      name: clean,
+      category: category,
+      phone: ''
+    });
+    saveResponsibles();
+    renderResponsibles();
+  }
+};
+
+window.handleSaveResponsible = function(e) {
+  if (e) e.preventDefault();
+  const nameInput = document.getElementById('newRespName');
+  const catInput = document.getElementById('newRespCategory');
+  const phoneInput = document.getElementById('newRespPhone');
+
+  const name = (nameInput?.value || '').trim();
+  const cat = catInput?.value || 'Proveedor';
+  const phone = (phoneInput?.value || '').trim();
+
+  if (!name) return;
+
+  if (responsibles.some(r => r.name.toLowerCase() === name.toLowerCase())) {
+    showToast(`El responsable "${name}" ya está registrado.`);
+    return;
+  }
+
+  responsibles.push({
+    id: 'resp_' + Date.now(),
+    name: name,
+    category: cat,
+    phone: phone
+  });
+
+  saveResponsibles();
+  renderResponsibles();
+
+  if (nameInput) nameInput.value = '';
+  if (phoneInput) phoneInput.value = '';
+
+  showToast(`¡"${name}" agregado al directorio de responsables!`);
+};
+
+window.deleteResponsible = function(idx) {
+  if (!responsibles[idx]) return;
+  const deleted = responsibles.splice(idx, 1)[0];
+  saveResponsibles();
+  renderResponsibles();
+  showToast(`"${deleted.name}" eliminado del directorio.`);
+};
+
+function renderResponsibles() {
+  // 1. Contador en el botón
+  const countEl = document.getElementById('countResponsibles');
+  if (countEl) countEl.textContent = responsibles.length;
+
+  // 2. Datalist para autocompletar en todos los inputs
+  const datalist = document.getElementById('responsiblesDatalist');
+  if (datalist) {
+    datalist.innerHTML = responsibles.map(r => `<option value="${escapeHtml(r.name)}">${escapeHtml(r.name)} (${escapeHtml(r.category)})</option>`).join('');
+  }
+
+  // 3. Barra de Chips al inicio del cronograma
+  const chipsBar = document.getElementById('responsiblesChipsBar');
+  if (chipsBar) {
+    const previewResps = responsibles.slice(0, 7);
+    chipsBar.innerHTML = `
+      <span class="responsibles-chips-label"><i class="ri-team-line" style="color: var(--gold-dark);"></i> Responsables:</span>
+      ${previewResps.map(r => `
+        <span class="resp-chip" title="${escapeHtml(r.category)}">
+          <i class="ri-user-star-line" style="color: var(--gold-dark); font-size: 0.8rem;"></i>
+          <span>${escapeHtml(r.name)}</span>
+          <span class="resp-tag">${escapeHtml(r.category)}</span>
+        </span>
+      `).join('')}
+      ${responsibles.length > 7 ? `<span class="resp-chip" onclick="openResponsiblesModal()" style="cursor: pointer;">+${responsibles.length - 7} más...</span>` : ''}
+      <button type="button" class="btn-add-resp-chip" onclick="openResponsiblesModal()" title="Gestionar directorio de responsables y proveedores">
+        <i class="ri-user-add-line"></i> + Administrar
+      </button>
+    `;
+  }
+
+  // 4. Lista dentro del modal
+  const listContainer = document.getElementById('responsiblesListContainer');
+  if (listContainer) {
+    listContainer.innerHTML = responsibles.map((r, idx) => `
+      <div class="resp-item-row">
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <strong style="color: var(--navy-royal); font-size: 0.9rem;">
+            <i class="ri-user-star-line" style="color: var(--gold-dark);"></i> ${escapeHtml(r.name)}
+          </strong>
+          <span style="font-size: 0.78rem; color: #64748B;">
+            ${escapeHtml(r.category)} ${r.phone ? `• 📞 ${escapeHtml(r.phone)}` : ''}
+          </span>
+        </div>
+        <button type="button" class="btn-table-del" onclick="deleteResponsible(${idx})" title="Eliminar responsable">
+          <i class="ri-delete-bin-line"></i>
+        </button>
+      </div>
+    `).join('');
+  }
+}
+
+/* ==========================================================================
+   ACTUALIZACIÓN INLINE EN TABLA DE COMPRAS (SIN ENTRAR A EDITAR)
+   ========================================================================== */
+window.quickUpdateShoppingResp = function(shopId, selectedValue) {
+  const item = shopping.find(s => s.id === shopId);
+  if (!item) return;
+
+  if (selectedValue === '__new_resp__') {
+    const newName = prompt('Nombre de la persona o proveedor encargado:');
+    if (!newName || !newName.trim()) {
+      renderShopping();
+      return;
+    }
+    const cleanName = newName.trim();
+    window.ensureResponsibleExists(cleanName, 'Proveedor');
+    item.responsible = cleanName;
+    item.responsibleStatus = 'ok';
+    showToast(`Encargado(a) "${cleanName}" asignado a "${item.item}".`);
+  } else {
+    item.responsible = selectedValue;
+    if (selectedValue) {
+      item.responsibleStatus = 'ok';
+      showToast(`Encargado(a) de "${item.item}" actualizado a "${selectedValue}".`);
+    } else {
+      item.responsibleStatus = 'pending';
+      showToast(`Encargado(a) de "${item.item}" desasignado.`);
+    }
+  }
+
+  saveData();
+  renderAll();
+};
+
+window.reassignShoppingMilestone = function(shopId, newMilestoneId) {
+  const item = shopping.find(s => s.id === shopId);
+  if (!item) return;
+
+  if (!newMilestoneId) {
+    item.activityId = '';
+    item.activityTitle = '';
+    showToast(`"${item.item}" marcada como Compra General.`);
+  } else {
+    const m = timeline.find(t => t.id === newMilestoneId);
+    if (m) {
+      item.activityId = m.id;
+      item.activityTitle = m.title;
+      showToast(`"${item.item}" reasignada al hito "${m.title}".`);
+    }
+  }
+
+  try {
+    const customShop = JSON.parse(localStorage.getItem('boda_org_shopping_custom') || '[]');
+    const idx = customShop.findIndex(x => x.id === item.id);
+    if (idx >= 0) customShop[idx] = item;
+    else customShop.push(item);
+    localStorage.setItem('boda_org_shopping_custom', JSON.stringify(customShop));
+  } catch(e) {}
+
+  saveData();
+  renderAll();
+};
+
 function renderShopping() {
   const tbody = document.getElementById('shoppingTableBody');
   if (!tbody) return;
@@ -2954,32 +3173,41 @@ function renderShopping() {
     const isOk = item.status === 'ok';
     const respOk = item.responsibleStatus === 'ok';
 
-    let activityBadge = '';
-    if (item.activityTitle) {
-      activityBadge = `
-        <span class="badge-shopping-activity" onclick="goToTimelineActivity('${escapeHtml(item.activityTitle)}')" title="Clic para ir al hito en el cronograma">
-          <i class="ri-calendar-event-line"></i> ${escapeHtml(item.activityTitle)}
-        </span>
-      `;
-    } else {
-      activityBadge = `<span style="color: #94A3B8; font-size: 0.82rem;">General (Todo el evento)</span>`;
-    }
+    // Selector interactivo para cambiar hito directamente desde la tabla de compras
+    const milestoneSelectorHtml = `
+      <select class="select-inline-milestone" onchange="reassignShoppingMilestone('${item.id}', this.value)" title="Cambiar hito al que corresponde esta compra">
+        <option value="">— Ninguno (Compra General) —</option>
+        ${timeline.map(m => {
+          const isMatch = (item.activityId === m.id) || (!item.activityId && item.activityTitle && (item.activityTitle.toLowerCase().includes(m.title.toLowerCase()) || isGuestNameMatch(item.activityTitle, m.title)));
+          const timeFmt = formatTimelineTime(m);
+          return `<option value="${m.id}" ${isMatch ? 'selected' : ''}>[${escapeHtml(timeFmt)}] ${escapeHtml(m.title)}</option>`;
+        }).join('')}
+      </select>
+    `;
+
+    // Selector interactivo para cambiar encargado directamente sin entrar a editar
+    const respSelectorHtml = `
+      <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
+        <select class="select-inline-resp" onchange="quickUpdateShoppingResp('${item.id}', this.value)" title="Cambiar encargado(a) directamente">
+          <option value="">— Sin Asignar —</option>
+          ${responsibles.map(r => `<option value="${escapeHtml(r.name)}" ${r.name === item.responsible ? 'selected' : ''}>👤 ${escapeHtml(r.name)}</option>`).join('')}
+          ${(!responsibles.some(r => r.name === item.responsible) && item.responsible) ? `<option value="${escapeHtml(item.responsible)}" selected>👤 ${escapeHtml(item.responsible)}</option>` : ''}
+          <option value="__new_resp__">+ Nuevo Encargado...</option>
+        </select>
+        <button type="button" class="badge-status ${respOk ? 'ok' : 'pending'}" onclick="toggleShoppingRespStatus(${idx})" title="Clic para alternar estado del encargado">
+          ${respOk ? '<i class="ri-check-line"></i> Confirmado' : '<i class="ri-search-eye-line"></i> Por Buscar'}
+        </button>
+      </div>
+    `;
 
     tr.innerHTML = `
       <td>
         <strong style="color: var(--navy-royal); font-size: 0.95rem;">${escapeHtml(item.item)}</strong>
         ${item.detail ? `<div style="color: var(--text-muted); font-size: 0.82rem; margin-top: 3px;">${escapeHtml(item.detail)}</div>` : ''}
       </td>
-      <td>${activityBadge}</td>
+      <td style="min-width: 170px;">${milestoneSelectorHtml}</td>
       <td><span class="time-badge" style="background: #F4EFEA; font-size: 0.78rem;">${escapeHtml(item.category || 'Varios')}</span></td>
-      <td>
-        <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
-          <span style="font-size: 0.85rem; font-weight: 700; color: var(--navy-royal);">${escapeHtml(item.responsible || 'Por definir')}</span>
-          <button type="button" class="badge-status ${respOk ? 'ok' : 'pending'}" onclick="toggleShoppingRespStatus(${idx})" title="Clic para cambiar estado del encargado">
-            ${respOk ? '<i class="ri-check-line"></i> Confirmado' : '<i class="ri-search-eye-line"></i> Por Buscar'}
-          </button>
-        </div>
-      </td>
+      <td style="min-width: 160px;">${respSelectorHtml}</td>
       <td><strong style="color: var(--gold-dark);">${escapeHtml(item.cost || '—')}</strong></td>
       <td>
         ${(() => {
@@ -3179,17 +3407,24 @@ function setupEventListeners() {
   const formAddActivity = document.getElementById('formAddActivity');
   const btnAddSubActivity = document.getElementById('btnAddSubActivity');
 
+  function handleAppendSubActivity() {
+    const container = document.getElementById('subActivitiesContainer');
+    if (container) {
+      const card = createSubActivityCard();
+      container.appendChild(card);
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      const nameInput = card.querySelector('.input-subact-name');
+      if (nameInput) setTimeout(() => nameInput.focus(), 80);
+    }
+  }
+
   if (btnAddSubActivity) {
-    btnAddSubActivity.addEventListener('click', () => {
-      const container = document.getElementById('subActivitiesContainer');
-      if (container) {
-        const card = createSubActivityCard();
-        container.appendChild(card);
-        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        const nameInput = card.querySelector('.input-subact-name');
-        if (nameInput) setTimeout(() => nameInput.focus(), 80);
-      }
-    });
+    btnAddSubActivity.addEventListener('click', handleAppendSubActivity);
+  }
+
+  const btnAddSubActivityBottom = document.getElementById('btnAddSubActivityBottom');
+  if (btnAddSubActivityBottom) {
+    btnAddSubActivityBottom.addEventListener('click', handleAppendSubActivity);
   }
 
   if (btnOpenActivityModal && activityModal) {
