@@ -1767,3 +1767,149 @@ i[class^="ri-"], i[class*=" ri-"] {
   transform: scale(1.2);
 }
 
+
+/* ==========================================================================
+   LEYENDA DE COLORES EN EL PLANO 2D & COMPRAS VINCULADAS EN CRONOGRAMA
+   ========================================================================== */
+.fp-color-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: var(--radius-pill);
+  padding: 8px 18px;
+  margin: 12px auto 14px;
+  max-width: fit-content;
+  box-shadow: var(--shadow-sm);
+  font-size: 0.8rem;
+  color: var(--navy-royal);
+}
+
+.fp-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.fp-legend-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  flex-shrink: 0;
+}
+
+.fp-legend-dot.dot-green {
+  background: #E8F5E9;
+  border: 2px solid #2E7D32;
+}
+
+.fp-legend-dot.dot-yellow {
+  background: #FFFBEB;
+  border: 2px solid #D4AF37;
+  box-shadow: 0 0 6px rgba(212, 175, 55, 0.4);
+}
+
+.fp-legend-dot.dot-gold {
+  background: #0A1828;
+  border: 2px solid #D4AF37;
+  color: #D4AF37;
+  font-size: 0.6rem;
+}
+
+.fp-legend-dot.dot-empty {
+  background: #FFFFFF;
+  border: 2px dashed #94A3B8;
+  color: #94A3B8;
+}
+
+/* Badges de Compras Vinculadas en Cronograma */
+.timeline-linked-shop-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+}
+
+.timeline-linked-shop-badge.ok {
+  background: #ECFDF5;
+  color: #065F46;
+  border: 1px solid #A7F3D0;
+}
+
+.timeline-linked-shop-badge.ok:hover {
+  background: #D1FAE5;
+  transform: translateY(-1px);
+}
+
+.timeline-linked-shop-badge.pending {
+  background: #FFFBEB;
+  color: #92400E;
+  border: 1px solid #FDE68A;
+}
+
+.timeline-linked-shop-badge.pending:hover {
+  background: #FEF3C7;
+  transform: translateY(-1px);
+}
+
+.timeline-linked-shop-badge .shop-tag {
+  font-size: 0.7rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.btn-sm-add-shop {
+  background: #F1F5F9;
+  border: 1px dashed #94A3B8;
+  color: #475569;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: var(--transition);
+}
+
+.btn-sm-add-shop:hover {
+  background: #E2E8F0;
+  color: var(--navy-royal);
+  border-color: var(--gold-dark);
+}
+
+.badge-shopping-activity {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E40AF;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.badge-shopping-activity:hover {
+  background: #DBEAFE;
+  transform: translateY(-1px);
+}

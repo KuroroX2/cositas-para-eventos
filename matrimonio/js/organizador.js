@@ -143,7 +143,16 @@ function updateNextTableNumberInput() {
 }
 
 function getCoordsForTableNumber(tableNumber) {
-  if (tableNumber === 1) return { x: 450, y: 50 }; // Novios al centro frente al escenario
+  if (tableNumber === 1) {
+    const canvas = document.getElementById('floorplanCanvas');
+    const canvasWidth = canvas ? (canvas.clientWidth || 1050) : 1050;
+    const novios = (tables && tables.length > 0) ? (tables.find(isNoviosTable) || tables.find(t => t.number === 1) || tables[0]) : null;
+    const shape = novios ? getTableShape(novios) : 'rectangular';
+    const w = (shape === 'rectangular')
+      ? Math.max(200, ((novios ? novios.capacity : 2) || 2) * 75 + 40)
+      : (shape === 'square' ? 130 : 136);
+    return { x: Math.round((canvasWidth - w) / 2), y: 50 };
+  }
   const slot = Math.max(0, tableNumber - 2);
   const col = slot % 3;
   const row = Math.floor(slot / 3);
@@ -152,7 +161,7 @@ function getCoordsForTableNumber(tableNumber) {
 }
 
 function getDefaultTableCoords(idx, total) {
-  if (idx === 0) return { x: 450, y: 50 };
+  if (idx === 0) return getCoordsForTableNumber(1);
   return getCoordsForTableNumber(idx + 1);
 }
 
@@ -528,7 +537,12 @@ function loadData() {
 
   const savedTimeline = localStorage.getItem(STORAGE_KEY_TIMELINE);
   if (savedTimeline) {
-    timeline = JSON.parse(savedTimeline);
+    try {
+      timeline = JSON.parse(savedTimeline);
+    } catch(e) {
+      console.error('Error parsing timeline:', e);
+      timeline = [];
+    }
   } else {
     timeline = [
       {
@@ -687,11 +701,37 @@ function loadData() {
         id: 'shop_7',
         item: 'Cotillón Neón y Pulseras Luminosas LED',
         category: 'Fiesta',
+        activityTitle: 'Fiesta, Baile & Cotillón',
+        responsible: 'DJ & Animador',
+        responsibleStatus: 'ok',
         detail: 'Pack fiesta flúor con lentes LED y barras de luz',
         cost: '$35.000',
         status: 'pending'
       }
     ];
+  }
+
+  // Normalizar ítems de cronograma (compatibilidad con timeStart y timeEnd)
+  if (Array.isArray(timeline)) {
+    timeline.forEach(item => {
+      if (!item.timeStart && item.time) {
+        const parts = item.time.split(/[-–—]/);
+        item.timeStart = parts[0] ? parts[0].trim() : item.time;
+        item.timeEnd = parts[1] ? parts[1].trim() : '';
+      }
+      if (!item.responsibleStatus) {
+        item.responsibleStatus = 'ok';
+      }
+    });
+  }
+
+  // Normalizar compras para asegurar encargado y hito vinculado
+  if (Array.isArray(shopping)) {
+    shopping.forEach(item => {
+      if (!item.responsibleStatus) {
+        item.responsibleStatus = item.responsible ? 'ok' : 'pending';
+      }
+    });
   }
 }
 
@@ -871,9 +911,8 @@ function renderMetrics() {
   if (totalSeatedEl) totalSeatedEl.textContent = `${totalSeated} / ${totalCapacity}`;
   if (availableSeatsEl) availableSeatsEl.textContent = Math.max(0, totalCapacity - totalSeated);
 
-  const okTimeline = timeline.filter(t => t.status === 'ok').length;
   const metricTimelineEl = document.getElementById('metricTimelineProgress');
-  if (metricTimelineEl) metricTimelineEl.textContent = `${okTimeline} / ${timeline.length}`;
+  if (metricTimelineEl) metricTimelineEl.textContent = `${timeline.length} Hitos`;
 
   const okShopping = shopping.filter(s => s.status === 'ok').length;
   const metricShoppingEl = document.getElementById('metricShoppingProgress');
@@ -1522,7 +1561,14 @@ window.autoLayoutTables = function() {
   sortTablesAscending();
 
   const noviosTable = tables.find(isNoviosTable) || tables.find(t => t.number === 1) || tables[0];
-  noviosTable.posX = 450;
+  const canvas = document.getElementById('floorplanCanvas');
+  const canvasWidth = canvas ? (canvas.clientWidth || 1050) : 1050;
+  const noviosShape = getTableShape(noviosTable);
+  const noviosWidth = (noviosShape === 'rectangular')
+    ? Math.max(200, (noviosTable.capacity || 2) * 75 + 40)
+    : (noviosShape === 'square' ? 130 : 136);
+
+  noviosTable.posX = Math.round((canvasWidth - noviosWidth) / 2);
   noviosTable.posY = 50;
 
   const others = tables.filter(t => t !== noviosTable);
@@ -1999,8 +2045,83 @@ window.openAssignModal = function(tableId) {
 };
 
 /* ==========================================================================
-   9. Cronograma & Compras
+   9. Cronograma (Hitos Minuto a Minuto) & Compras Vinculadas
    ========================================================================== */
+
+function formatTimelineTime(item) {
+  if (!item) return '—';
+  const start = item.timeStart || item.time || '';
+  const end = item.timeEnd || '';
+  if (start && end) return `${start} – ${end}`;
+  if (start) return start;
+  if (end) return `Hasta ${end}`;
+  return '—';
+}
+
+function getTimelineSortKey(item) {
+  if (!item) return '99:99';
+  return (item.timeStart || item.time || '99:99').trim();
+}
+
+function populateShoppingModalActivities() {
+  const select = document.getElementById('shopLinkedActivity');
+  if (!select) return;
+  const currentVal = select.value;
+  select.innerHTML = '<option value="">— Ninguno (Compra general) —</option>';
+  timeline.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t.id;
+    const timeFormatted = formatTimelineTime(t);
+    opt.textContent = `${t.title} (${timeFormatted})`;
+    select.appendChild(opt);
+  });
+  if (currentVal) select.value = currentVal;
+}
+
+window.goToShopping = function(shopId) {
+  switchTab('pane-shopping');
+  setTimeout(() => {
+    const row = document.getElementById(`shop_row_${shopId}`);
+    if (row) {
+      row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      row.style.transition = 'background 0.5s ease';
+      row.style.background = '#FEF3C7';
+      setTimeout(() => { row.style.background = ''; }, 2000);
+    }
+  }, 120);
+};
+
+window.goToTimelineActivity = function(title) {
+  switchTab('pane-timeline');
+};
+
+window.quickAddShopForActivity = function(activityId) {
+  const act = timeline.find(t => t.id === activityId);
+  const shoppingModal = document.getElementById('shoppingModal');
+  const shopItem = document.getElementById('shopItem');
+  const shopLinked = document.getElementById('shopLinkedActivity');
+  const shopResp = document.getElementById('shopResponsible');
+  const shopRespStat = document.getElementById('shopRespStatus');
+
+  populateShoppingModalActivities();
+
+  if (shopLinked && act) {
+    shopLinked.value = act.id;
+  }
+  if (shopResp && act && act.responsible) {
+    shopResp.value = act.responsible;
+  }
+  if (shopRespStat && act && act.responsibleStatus) {
+    shopRespStat.value = act.responsibleStatus;
+  }
+  if (shopItem) {
+    shopItem.value = '';
+    setTimeout(() => shopItem.focus(), 150);
+  }
+
+  if (shoppingModal) shoppingModal.classList.add('active');
+};
+
 function renderTimeline() {
   const tbody = document.getElementById('timelineTableBody');
   if (!tbody) return;
@@ -2009,19 +2130,58 @@ function renderTimeline() {
 
   timeline.forEach((item, idx) => {
     const tr = document.createElement('tr');
-    const isOk = item.status === 'ok';
+    const timeFormatted = formatTimelineTime(item);
+    const respOk = item.responsibleStatus === 'ok';
+
+    // Compras vinculadas a este hito
+    const linkedItems = shopping.filter(s => {
+      if (s.activityId && s.activityId === item.id) return true;
+      if (s.activityTitle && isGuestNameMatch(s.activityTitle, item.title)) return true;
+      return false;
+    });
+
+    let shoppingCellHtml = '';
+    if (linkedItems.length > 0) {
+      shoppingCellHtml = linkedItems.map(s => {
+        const isShopOk = s.status === 'ok';
+        return `
+          <div class="timeline-linked-shop-badge ${isShopOk ? 'ok' : 'pending'}" onclick="goToShopping('${s.id}')" title="Clic para ver en la pestaña de compras">
+            <i class="${isShopOk ? 'ri-checkbox-circle-fill' : 'ri-time-line'}"></i>
+            <span class="shop-name">${escapeHtml(s.item)}</span>
+            <span class="shop-tag">${isShopOk ? 'Comprado' : 'Pendiente'}</span>
+          </div>
+        `;
+      }).join('');
+    } else {
+      shoppingCellHtml = `
+        <button type="button" class="btn-sm-add-shop" onclick="quickAddShopForActivity('${item.id}')" title="Agregar una compra o insumo necesario para este hito">
+          <i class="ri-add-line"></i> <span>+ Compra</span>
+        </button>
+      `;
+    }
 
     tr.innerHTML = `
-      <td><span class="time-badge"><i class="ri-time-line"></i> ${item.time}</span></td>
+      <td>
+        <span class="time-badge"><i class="ri-time-line"></i> ${escapeHtml(timeFormatted)}</span>
+      </td>
       <td>
         <strong style="color: var(--navy-royal); font-size: 0.95rem;">${escapeHtml(item.title)}</strong>
       </td>
-      <td><span style="color: var(--gold-dark); font-weight: 700;"><i class="ri-user-star-line"></i> ${escapeHtml(item.responsible)}</span></td>
-      <td style="color: var(--text-muted); font-size: 0.88rem;">${escapeHtml(item.detail)}</td>
       <td>
-        <button class="badge-status ${isOk ? 'ok' : 'pending'}" onclick="toggleTimelineStatus(${idx})" title="Clic para cambiar estado">
-          ${isOk ? '<i class="ri-check-line"></i> Listo / OK' : '<i class="ri-time-line"></i> Pendiente'}
-        </button>
+        <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
+          <span style="color: var(--gold-dark); font-weight: 700; font-size: 0.88rem;">
+            <i class="ri-user-star-line"></i> ${escapeHtml(item.responsible || 'Por definir')}
+          </span>
+          <button type="button" class="badge-status ${respOk ? 'ok' : 'pending'}" onclick="toggleTimelineRespStatus(${idx})" title="Clic para alternar si el encargado está confirmado o pendiente de buscar">
+            ${respOk ? '<i class="ri-check-line"></i> Confirmado' : '<i class="ri-search-eye-line"></i> Por Buscar'}
+          </button>
+        </div>
+      </td>
+      <td style="color: var(--text-muted); font-size: 0.88rem;">${escapeHtml(item.detail || '—')}</td>
+      <td>
+        <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start;">
+          ${shoppingCellHtml}
+        </div>
       </td>
       <td>
         <button class="btn-table-del" onclick="deleteTimelineActivity(${idx})" title="Eliminar actividad">
@@ -2034,13 +2194,16 @@ function renderTimeline() {
   });
 }
 
-window.toggleTimelineStatus = function(idx) {
-  timeline[idx].status = timeline[idx].status === 'ok' ? 'pending' : 'ok';
+window.toggleTimelineRespStatus = function(idx) {
+  if (!timeline[idx]) return;
+  timeline[idx].responsibleStatus = timeline[idx].responsibleStatus === 'ok' ? 'pending' : 'ok';
   saveData();
   renderAll();
+  showToast(`Estado del encargado actualizado a "${timeline[idx].responsibleStatus === 'ok' ? 'Confirmado' : 'Por Buscar'}"`);
 };
 
 window.deleteTimelineActivity = function(idx) {
+  if (!timeline[idx]) return;
   if (confirm(`¿Eliminar la actividad "${timeline[idx].title}"?`)) {
     timeline.splice(idx, 1);
     saveData();
@@ -2056,17 +2219,39 @@ function renderShopping() {
 
   shopping.forEach((item, idx) => {
     const tr = document.createElement('tr');
+    tr.id = `shop_row_${item.id}`;
     const isOk = item.status === 'ok';
+    const respOk = item.responsibleStatus === 'ok';
+
+    let activityBadge = '';
+    if (item.activityTitle) {
+      activityBadge = `
+        <span class="badge-shopping-activity" onclick="goToTimelineActivity('${escapeHtml(item.activityTitle)}')" title="Clic para ir al hito en el cronograma">
+          <i class="ri-calendar-event-line"></i> ${escapeHtml(item.activityTitle)}
+        </span>
+      `;
+    } else {
+      activityBadge = `<span style="color: #94A3B8; font-size: 0.82rem;">General (Todo el evento)</span>`;
+    }
 
     tr.innerHTML = `
       <td>
         <strong style="color: var(--navy-royal); font-size: 0.95rem;">${escapeHtml(item.item)}</strong>
+        ${item.detail ? `<div style="color: var(--text-muted); font-size: 0.82rem; margin-top: 3px;">${escapeHtml(item.detail)}</div>` : ''}
       </td>
-      <td><span class="time-badge" style="background: #F4EFEA; font-size: 0.78rem;">${escapeHtml(item.category)}</span></td>
-      <td style="color: var(--text-muted); font-size: 0.88rem;">${escapeHtml(item.detail)}</td>
+      <td>${activityBadge}</td>
+      <td><span class="time-badge" style="background: #F4EFEA; font-size: 0.78rem;">${escapeHtml(item.category || 'Varios')}</span></td>
+      <td>
+        <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
+          <span style="font-size: 0.85rem; font-weight: 700; color: var(--navy-royal);">${escapeHtml(item.responsible || 'Por definir')}</span>
+          <button type="button" class="badge-status ${respOk ? 'ok' : 'pending'}" onclick="toggleShoppingRespStatus(${idx})" title="Clic para cambiar estado del encargado">
+            ${respOk ? '<i class="ri-check-line"></i> Confirmado' : '<i class="ri-search-eye-line"></i> Por Buscar'}
+          </button>
+        </div>
+      </td>
       <td><strong style="color: var(--gold-dark);">${escapeHtml(item.cost || '—')}</strong></td>
       <td>
-        <button class="badge-status ${isOk ? 'ok' : 'pending'}" onclick="toggleShoppingStatus(${idx})" title="Clic para cambiar estado">
+        <button class="badge-status ${isOk ? 'ok' : 'pending'}" onclick="toggleShoppingStatus(${idx})" title="Clic para marcar si ya está comprado">
           ${isOk ? '<i class="ri-check-line"></i> Comprado / OK' : '<i class="ri-time-line"></i> Pendiente'}
         </button>
       </td>
@@ -2082,12 +2267,22 @@ function renderShopping() {
 }
 
 window.toggleShoppingStatus = function(idx) {
+  if (!shopping[idx]) return;
   shopping[idx].status = shopping[idx].status === 'ok' ? 'pending' : 'ok';
   saveData();
   renderAll();
 };
 
+window.toggleShoppingRespStatus = function(idx) {
+  if (!shopping[idx]) return;
+  shopping[idx].responsibleStatus = shopping[idx].responsibleStatus === 'ok' ? 'pending' : 'ok';
+  saveData();
+  renderAll();
+  showToast(`Estado del encargado actualizado a "${shopping[idx].responsibleStatus === 'ok' ? 'Confirmado' : 'Por Buscar'}"`);
+};
+
 window.deleteShoppingItem = function(idx) {
+  if (!shopping[idx]) return;
   if (confirm(`¿Eliminar el ítem "${shopping[idx].item}"?`)) {
     shopping.splice(idx, 1);
     saveData();
@@ -2228,8 +2423,22 @@ function setupEventListeners() {
   const activityModal = document.getElementById('activityModal');
   const formAddActivity = document.getElementById('formAddActivity');
 
+  // Checkbox toggle para compras en modal actividad
+  const actNeedsPurchase = document.getElementById('actNeedsPurchase');
+  const actPurchaseFields = document.getElementById('actPurchaseFields');
+  const actShopItem = document.getElementById('actShopItem');
+  if (actNeedsPurchase && actPurchaseFields) {
+    actNeedsPurchase.addEventListener('change', () => {
+      actPurchaseFields.style.display = actNeedsPurchase.checked ? 'block' : 'none';
+      if (actShopItem) actShopItem.required = actNeedsPurchase.checked;
+    });
+  }
+
   if (btnOpenActivityModal && activityModal) {
     btnOpenActivityModal.addEventListener('click', () => {
+      if (actNeedsPurchase) actNeedsPurchase.checked = false;
+      if (actPurchaseFields) actPurchaseFields.style.display = 'none';
+      if (actShopItem) actShopItem.required = false;
       activityModal.classList.add('active');
     });
   }
@@ -2237,28 +2446,71 @@ function setupEventListeners() {
   if (formAddActivity && activityModal) {
     formAddActivity.addEventListener('submit', (e) => {
       e.preventDefault();
-      const time = document.getElementById('actTime').value.trim();
-      const title = document.getElementById('actTitle').value.trim();
-      const responsible = document.getElementById('actResponsible').value.trim() || 'Novios / Coordinador';
-      const detail = document.getElementById('actDetail').value.trim();
-      const status = document.getElementById('actStatus').value;
+      try {
+        const timeStart = (document.getElementById('actTimeStart')?.value || '16:00').trim();
+        const timeEnd = (document.getElementById('actTimeEnd')?.value || '').trim();
+        const title = (document.getElementById('actTitle')?.value || '').trim();
+        const responsible = (document.getElementById('actResponsible')?.value || '').trim() || 'Novios / Coordinador';
+        const respStatus = (document.getElementById('actRespStatus')?.value || 'ok');
+        const detail = (document.getElementById('actDetail')?.value || '').trim();
+        const needsPurchase = document.getElementById('actNeedsPurchase')?.checked || false;
 
-      timeline.push({
-        id: 'act_' + Date.now(),
-        time: time,
-        title: title,
-        responsible: responsible,
-        detail: detail,
-        status: status
-      });
+        if (!title) {
+          alert('Por favor ingresa el nombre de la actividad o hito.');
+          return;
+        }
 
-      timeline.sort((a, b) => a.time.localeCompare(b.time));
+        const actId = 'act_' + Date.now();
+        const newActivity = {
+          id: actId,
+          timeStart: timeStart,
+          timeEnd: timeEnd,
+          title: title,
+          responsible: responsible,
+          responsibleStatus: respStatus,
+          detail: detail
+        };
 
-      formAddActivity.reset();
-      activityModal.classList.remove('active');
-      saveData();
-      renderAll();
-      showToast(`¡Actividad "${title}" agregada al cronograma!`);
+        if (needsPurchase) {
+          const shopItemVal = (document.getElementById('actShopItem')?.value || '').trim();
+          if (shopItemVal) {
+            const shopCategory = document.getElementById('actShopCategory')?.value || 'Varios';
+            const shopCost = (document.getElementById('actShopCost')?.value || '').trim();
+            const shopStatus = document.getElementById('actShopStatus')?.value || 'pending';
+            const shopId = 'shop_' + Date.now();
+
+            shopping.push({
+              id: shopId,
+              activityId: actId,
+              activityTitle: title,
+              item: shopItemVal,
+              category: shopCategory,
+              responsible: responsible,
+              responsibleStatus: respStatus,
+              detail: `Para el hito: ${title}`,
+              cost: shopCost,
+              status: shopStatus
+            });
+            newActivity.shopItemId = shopId;
+          }
+        }
+
+        timeline.push(newActivity);
+        timeline.sort((a, b) => getTimelineSortKey(a).localeCompare(getTimelineSortKey(b)));
+
+        formAddActivity.reset();
+        if (actPurchaseFields) actPurchaseFields.style.display = 'none';
+        if (actShopItem) actShopItem.required = false;
+
+        activityModal.classList.remove('active');
+        saveData();
+        renderAll();
+        populateShoppingModalActivities();
+        showToast(`¡Hito "${title}" guardado en el cronograma` + (needsPurchase ? ` y en compras!` : `!`));
+      } catch(err) {
+        console.error('Error al guardar actividad en el cronograma:', err);
+        alert('Ocurrió un error al guardar la actividad: ' + err.message);
+      }
     });
   }
 
@@ -2269,6 +2521,7 @@ function setupEventListeners() {
 
   if (btnOpenShoppingModal && shoppingModal) {
     btnOpenShoppingModal.addEventListener('click', () => {
+      populateShoppingModalActivities();
       shoppingModal.classList.add('active');
     });
   }
@@ -2276,26 +2529,44 @@ function setupEventListeners() {
   if (formAddShopping && shoppingModal) {
     formAddShopping.addEventListener('submit', (e) => {
       e.preventDefault();
-      const item = document.getElementById('shopItem').value.trim();
-      const category = document.getElementById('shopCategory').value;
-      const detail = document.getElementById('shopDetail').value.trim();
-      const cost = document.getElementById('shopCost').value.trim();
-      const status = document.getElementById('shopStatus').value;
+      try {
+        const item = (document.getElementById('shopItem')?.value || '').trim();
+        const linkedActId = document.getElementById('shopLinkedActivity')?.value || '';
+        const category = document.getElementById('shopCategory')?.value || 'Varios';
+        const responsible = (document.getElementById('shopResponsible')?.value || '').trim() || 'Novios';
+        const respStatus = document.getElementById('shopRespStatus')?.value || 'ok';
+        const detail = (document.getElementById('shopDetail')?.value || '').trim();
+        const cost = (document.getElementById('shopCost')?.value || '').trim();
+        const status = document.getElementById('shopStatus')?.value || 'pending';
 
-      shopping.push({
-        id: 'shop_' + Date.now(),
-        item: item,
-        category: category,
-        detail: detail,
-        cost: cost,
-        status: status
-      });
+        let linkedTitle = '';
+        if (linkedActId) {
+          const linkedAct = timeline.find(t => t.id === linkedActId);
+          if (linkedAct) linkedTitle = linkedAct.title;
+        }
 
-      formAddShopping.reset();
-      shoppingModal.classList.remove('active');
-      saveData();
-      renderAll();
-      showToast(`¡Ítem "${item}" agregado a compras!`);
+        shopping.push({
+          id: 'shop_' + Date.now(),
+          activityId: linkedActId,
+          activityTitle: linkedTitle,
+          item: item,
+          category: category,
+          responsible: responsible,
+          responsibleStatus: respStatus,
+          detail: detail,
+          cost: cost,
+          status: status
+        });
+
+        formAddShopping.reset();
+        shoppingModal.classList.remove('active');
+        saveData();
+        renderAll();
+        showToast(`¡Ítem "${item}" agregado a compras!`);
+      } catch(err) {
+        console.error('Error al guardar ítem de compra:', err);
+        alert('Ocurrió un error al guardar el ítem: ' + err.message);
+      }
     });
   }
 

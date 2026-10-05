@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="css/organizador.css?v=2.7">
+  <link rel="stylesheet" href="css/organizador.css?v=3.0">
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
@@ -86,8 +86,8 @@
       <div class="metric-card metric-time">
         <div class="metric-icon-box"><i class="ri-time-line"></i></div>
         <div class="metric-data">
-          <div class="num" id="metricTimelineProgress">0 / 0</div>
-          <div class="lbl">Actividades Listas</div>
+          <div class="num" id="metricTimelineProgress">0 Hitos</div>
+          <div class="lbl">Hitos del Cronograma</div>
         </div>
       </div>
 
@@ -248,6 +248,14 @@
               </div>
             </div>
 
+            <!-- Leyenda Visual de Colores de Puestos -->
+            <div class="fp-color-legend">
+              <span class="fp-legend-item"><span class="fp-legend-dot dot-green"></span> Invitado Individual</span>
+              <span class="fp-legend-item"><span class="fp-legend-dot dot-yellow"></span> Pareja Vinculada (Juntos)</span>
+              <span class="fp-legend-item"><span class="fp-legend-dot dot-gold"><i class="ri-vip-crown-2-fill"></i></span> Novios (VIP)</span>
+              <span class="fp-legend-item"><span class="fp-legend-dot dot-empty">+</span> Asiento Libre</span>
+            </div>
+
             <!-- Lienzo del Centro de Eventos -->
             <div class="floorplan-wrapper" id="floorplanWrapper">
               <!-- Lienzo Interactivo de Mesas -->
@@ -265,10 +273,10 @@
       <div class="section-top-bar">
         <div>
           <h2>Cronograma del Gran Día</h2>
-          <p>Todas las actividades planificadas con horarios, encargados y estado de cumplimiento.</p>
+          <p>Hitos del matrimonio ordenados por hora, con encargados y compras asociadas.</p>
         </div>
         <button class="btn-header btn-header-primary" id="btnOpenActivityModal">
-          <i class="ri-add-line"></i> <span>Nueva Actividad</span>
+          <i class="ri-add-line"></i> <span>Nuevo Hito / Actividad</span>
         </button>
       </div>
 
@@ -276,11 +284,11 @@
         <table class="data-table">
           <thead>
             <tr>
-              <th style="width: 120px;">Horario</th>
-              <th>Actividad / Hito</th>
-              <th style="width: 200px;">Responsable / Proveedor</th>
+              <th style="width: 140px;">Horario</th>
+              <th style="min-width: 180px;">Actividad / Hito</th>
+              <th style="width: 180px;">Encargado(a)</th>
               <th>Detalle &amp; Notas Clave</th>
-              <th style="width: 160px;">Estado</th>
+              <th style="width: 220px;">Compras / Insumos</th>
               <th style="width: 50px;"></th>
             </tr>
           </thead>
@@ -296,7 +304,7 @@
       <div class="section-top-bar">
         <div>
           <h2>Lista de Compras &amp; Cosas Necesarias</h2>
-          <p>Detalle de lo que necesitan comprar o tener listo antes y durante la boda.</p>
+          <p>Detalle de compras e insumos vinculados a los hitos del cronograma o generales del evento.</p>
         </div>
         <button class="btn-header btn-header-primary" id="btnOpenShoppingModal">
           <i class="ri-add-line"></i> <span>Agregar Ítem a Comprar</span>
@@ -308,10 +316,11 @@
           <thead>
             <tr>
               <th>Ítem / Necesidad</th>
-              <th style="width: 150px;">Categoría</th>
-              <th>Detalle / Dónde Comprar</th>
-              <th style="width: 140px;">Costo / Cantidad</th>
-              <th style="width: 180px;">Estado</th>
+              <th style="width: 190px;">Hito del Cronograma</th>
+              <th style="width: 130px;">Categoría</th>
+              <th style="width: 180px;">Encargado(a)</th>
+              <th style="width: 130px;">Costo / Cant.</th>
+              <th style="width: 140px;">¿Compra OK?</th>
               <th style="width: 50px;"></th>
             </tr>
           </thead>
@@ -343,36 +352,87 @@
 
   <!-- MODAL NUEVA ACTIVIDAD CRONOGRAMA -->
   <div class="org-modal" id="activityModal">
-    <div class="org-modal-card">
+    <div class="org-modal-card" style="max-width: 580px;">
       <button class="btn-close-modal" aria-label="Cerrar"><i class="ri-close-line"></i></button>
-      <h3 class="org-modal-title">Agregar Actividad al Cronograma</h3>
+      <h3 class="org-modal-title"><i class="ri-calendar-event-line" style="color: var(--gold-dark);"></i> Agregar Hito al Cronograma</h3>
       <form id="formAddActivity">
-        <div class="form-group-org">
-          <label for="actTime">Horario (HH:MM) *</label>
-          <input type="time" id="actTime" class="input-org" value="16:00" required>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group-org">
+            <label for="actTimeStart">Horario Desde (HH:MM) *</label>
+            <input type="time" id="actTimeStart" class="input-org" value="16:00" required>
+          </div>
+          <div class="form-group-org">
+            <label for="actTimeEnd">Horario Hasta (HH:MM)</label>
+            <input type="time" id="actTimeEnd" class="input-org" value="17:00">
+          </div>
         </div>
+
         <div class="form-group-org">
-          <label for="actTitle">Nombre de la Actividad *</label>
-          <input type="text" id="actTitle" class="input-org" placeholder="Ej.: Brindis de los Padrinos" required>
+          <label for="actTitle">Nombre del Hito o Actividad *</label>
+          <input type="text" id="actTitle" class="input-org" placeholder="Ej.: Ceremonia Civil & Votos" required>
         </div>
+
+        <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 12px;">
+          <div class="form-group-org">
+            <label for="actResponsible">Encargado o Proveedor</label>
+            <input type="text" id="actResponsible" class="input-org" placeholder="Ej.: Oficial Civil / Banquetera / Padrinos">
+          </div>
+          <div class="form-group-org">
+            <label for="actRespStatus">¿Encargado OK?</label>
+            <select id="actRespStatus" class="select-org">
+              <option value="ok" selected>✓ Confirmado / OK</option>
+              <option value="pending">⏳ Por Buscar / Pendiente</option>
+            </select>
+          </div>
+        </div>
+
         <div class="form-group-org">
-          <label for="actResponsible">Responsable o Proveedor</label>
-          <input type="text" id="actResponsible" class="input-org" placeholder="Ej.: Banquetera / DJ / Testigos">
+          <label for="actDetail">Detalle &amp; Notas Clave</label>
+          <textarea id="actDetail" class="textarea-org" rows="2" placeholder="Instrucciones, música o detalles importantes..."></textarea>
         </div>
-        <div class="form-group-org">
-          <label for="actDetail">Detalle &amp; Notas</label>
-          <textarea id="actDetail" class="textarea-org" rows="2" placeholder="Instrucciones clave, música o detalles..."></textarea>
+
+        <!-- SECCIÓN VINCULAR COMPRA / INSUMO -->
+        <div style="margin-top: 14px; padding: 12px 14px; background: #F8FAFC; border: 1px dashed #CBD5E1; border-radius: 12px;">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.88rem; font-weight: 700; color: var(--navy-royal); margin-bottom: 0;">
+            <input type="checkbox" id="actNeedsPurchase" style="width: 17px; height: 17px; accent-color: var(--gold-dark); cursor: pointer;">
+            <span>🛍️ ¿Hay que comprar algo o conseguir insumos para esta actividad?</span>
+          </label>
+
+          <div id="actPurchaseFields" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #E2E8F0;">
+            <div class="form-group-org">
+              <label for="actShopItem">¿Qué hay que comprar / encargar? *</label>
+              <input type="text" id="actShopItem" class="input-org" placeholder="Ej.: 50 Luces de bengala, pétalos de rosa, cotillón...">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div class="form-group-org">
+                <label for="actShopCategory">Categoría</label>
+                <select id="actShopCategory" class="select-org">
+                  <option value="Ceremonia">Ceremonia</option>
+                  <option value="Decoración">Decoración</option>
+                  <option value="Fiesta">Fiesta / Cotillón</option>
+                  <option value="Vestuario">Vestuario / Accesorios</option>
+                  <option value="Detalles">Detalles para Invitados</option>
+                  <option value="Varios" selected>Varios</option>
+                </select>
+              </div>
+              <div class="form-group-org">
+                <label for="actShopCost">Costo Estimado o Cantidad</label>
+                <input type="text" id="actShopCost" class="input-org" placeholder="Ej.: $25.000 / 50 un.">
+              </div>
+            </div>
+            <div class="form-group-org" style="margin-bottom: 0;">
+              <label for="actShopStatus">¿La compra ya está lista?</label>
+              <select id="actShopStatus" class="select-org">
+                <option value="pending" selected>⏳ Pendiente por Comprar</option>
+                <option value="ok">✓ Ya Comprado / OK</option>
+              </select>
+            </div>
+          </div>
         </div>
-        <div class="form-group-org">
-          <label for="actStatus">Estado Inicial</label>
-          <select id="actStatus" class="select-org">
-            <option value="pending" selected>⏳ Pendiente</option>
-            <option value="ok">✓ Listo / OK</option>
-          </select>
-        </div>
+
         <div style="margin-top: 20px;">
           <button type="submit" class="btn-org-action">
-            <i class="ri-check-line"></i> Guardar Actividad
+            <i class="ri-check-line"></i> <span>Guardar Hito en Cronograma</span>
           </button>
         </div>
       </form>
@@ -381,38 +441,60 @@
 
   <!-- MODAL NUEVA COMPRA -->
   <div class="org-modal" id="shoppingModal">
-    <div class="org-modal-card">
+    <div class="org-modal-card" style="max-width: 560px;">
       <button class="btn-close-modal" aria-label="Cerrar"><i class="ri-close-line"></i></button>
-      <h3 class="org-modal-title">Agregar Ítem de Compra / Necesidad</h3>
+      <h3 class="org-modal-title"><i class="ri-shopping-bag-3-line" style="color: var(--gold-dark);"></i> Agregar Ítem de Compra / Insumo</h3>
       <form id="formAddShopping">
         <div class="form-group-org">
           <label for="shopItem">Ítem o Cosa a Comprar *</label>
           <input type="text" id="shopItem" class="input-org" placeholder="Ej.: Luces de bengala para la noche" required>
         </div>
         <div class="form-group-org">
-          <label for="shopCategory">Categoría</label>
-          <select id="shopCategory" class="select-org">
-            <option value="Ceremonia">Ceremonia</option>
-            <option value="Decoración">Decoración</option>
-            <option value="Fiesta">Fiesta / Cotillón</option>
-            <option value="Vestuario">Vestuario / Accesorios</option>
-            <option value="Detalles">Detalles para Invitados</option>
-            <option value="Regalos">Regalos / Recuerdos</option>
-            <option value="Varios">Varios</option>
+          <label for="shopLinkedActivity">Vincular a Hito del Cronograma (Opcional)</label>
+          <select id="shopLinkedActivity" class="select-org">
+            <option value="">— Ninguno (Compra general) —</option>
+            <!-- Opciones cargadas dinámicamente -->
           </select>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group-org">
+            <label for="shopCategory">Categoría</label>
+            <select id="shopCategory" class="select-org">
+              <option value="Ceremonia">Ceremonia</option>
+              <option value="Decoración">Decoración</option>
+              <option value="Fiesta">Fiesta / Cotillón</option>
+              <option value="Vestuario">Vestuario / Accesorios</option>
+              <option value="Detalles">Detalles para Invitados</option>
+              <option value="Regalos">Regalos / Recuerdos</option>
+              <option value="Varios" selected>Varios</option>
+            </select>
+          </div>
+          <div class="form-group-org">
+            <label for="shopCost">Costo / Cantidad</label>
+            <input type="text" id="shopCost" class="input-org" placeholder="Ej.: $20.000 / 50 un.">
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px;">
+          <div class="form-group-org">
+            <label for="shopResponsible">Encargado(a)</label>
+            <input type="text" id="shopResponsible" class="input-org" placeholder="Ej.: Padrinos / Novios">
+          </div>
+          <div class="form-group-org">
+            <label for="shopRespStatus">¿Encargado OK?</label>
+            <select id="shopRespStatus" class="select-org">
+              <option value="ok" selected>✓ Confirmado</option>
+              <option value="pending">⏳ Por Buscar</option>
+            </select>
+          </div>
         </div>
         <div class="form-group-org">
           <label for="shopDetail">Detalle / Dónde Comprar</label>
-          <input type="text" id="shopDetail" class="input-org" placeholder="Ej.: Mercado Libre o tienda de novios">
+          <input type="text" id="shopDetail" class="input-org" placeholder="Ej.: Mercado Libre, tienda o encargo especial">
         </div>
         <div class="form-group-org">
-          <label for="shopCost">Costo Estimado o Cantidad</label>
-          <input type="text" id="shopCost" class="input-org" placeholder="Ej.: $20.000 / 50 unidades">
-        </div>
-        <div class="form-group-org">
-          <label for="shopStatus">Estado Inicial</label>
+          <label for="shopStatus">¿Compra Ya Realizada?</label>
           <select id="shopStatus" class="select-org">
-            <option value="pending" selected>⏳ Pendiente</option>
+            <option value="pending" selected>⏳ Pendiente por Comprar</option>
             <option value="ok">✓ Comprado / OK</option>
           </select>
         </div>
@@ -509,6 +591,6 @@
   <!-- Scripts con sincronización Supabase Cloud -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js?v=2.6"></script>
-  <script src="js/organizador.js?v=2.9"></script>
+  <script src="js/organizador.js?v=3.0"></script>
 </body>
 </html>
