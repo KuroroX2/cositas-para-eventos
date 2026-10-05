@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="css/organizador.css?v=3.4">
+  <link rel="stylesheet" href="css/organizador.css?v=3.5">
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
@@ -304,14 +304,8 @@
           </div>
         </div>
 
-        <!-- Botones de Acción de Hitos & Directorio -->
+        <!-- Botones de Acción de Hitos -->
         <div class="timeline-action-buttons">
-          <button type="button" class="btn-header" id="btnOpenResponsiblesModal" onclick="openResponsiblesModal()" style="background: #FFFFFF; color: var(--navy-royal); border: 1.5px solid rgba(212,175,55,0.4); box-shadow: var(--shadow-sm);">
-            <i class="ri-team-line" style="color: var(--gold-dark);"></i> <span>Responsables &amp; Proveedores (<span id="countResponsibles">0</span>)</span>
-          </button>
-          <button type="button" class="btn-header" id="btnToggleAllTimeline" onclick="toggleAllTimelineMilestones()" style="background: #FFFFFF; color: var(--navy-royal); border: 1.5px solid rgba(212,175,55,0.4); box-shadow: var(--shadow-sm);">
-            <i class="ri-expand-up-down-line"></i> <span id="toggleAllTimelineText">Expandir Todo</span>
-          </button>
           <button class="btn-header btn-header-primary" id="btnOpenActivityModal">
             <i class="ri-add-line"></i> <span>+ Nuevo Hito / Horario</span>
           </button>
@@ -701,6 +695,6 @@
   <!-- Scripts con sincronización Supabase Cloud -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js?v=2.6"></script>
-  <script src="js/organizador.js?v=4.2"></script>
+  <script src="js/organizador.js?v=4.3"></script>
 </body>
 </html>
