@@ -2719,7 +2719,7 @@ function initViewSwitch() {
 /* ==========================================================================
    11. Pestañas y Helpers
    ========================================================================== */
-function switchTab(targetId) {
+function switchTab(targetId, updateUrl = true) {
   const tabs = document.querySelectorAll('.org-nav-tabs .tab-btn');
   const targetPane = document.getElementById(targetId);
   const targetTabBtn = document.querySelector(`.org-nav-tabs .tab-btn[data-target="${targetId}"]`);
@@ -2730,6 +2730,21 @@ function switchTab(targetId) {
 
     targetTabBtn.classList.add('active');
     targetPane.classList.add('active');
+
+    if (updateUrl) {
+      let hashKey = 'mesas';
+      if (targetId === 'pane-timeline') hashKey = 'cronograma';
+      else if (targetId === 'pane-shopping') hashKey = 'compras';
+
+      try {
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.delete('tab');
+        newUrl.hash = hashKey;
+        window.history.replaceState(null, '', newUrl.toString());
+      } catch (e) {
+        window.location.hash = hashKey;
+      }
+    }
   }
 }
 
@@ -2737,26 +2752,26 @@ function handleTabFromUrl() {
   const hash = (window.location.hash || '').toLowerCase().replace('#', '').trim();
   const urlParams = new URLSearchParams(window.location.search);
   const tabParam = (urlParams.get('tab') || '').toLowerCase().trim();
-  const key = tabParam || hash;
+
+  // El hash del usuario siempre tiene máxima prioridad
+  const key = hash || tabParam;
 
   if (key === 'cronograma' || key === 'timeline' || key === 'pane-timeline') {
-    switchTab('pane-timeline');
+    switchTab('pane-timeline', false);
   } else if (key === 'compras' || key === 'shopping' || key === 'pane-shopping') {
-    switchTab('pane-shopping');
+    switchTab('pane-shopping', false);
   } else if (key === 'mesas' || key === 'tables' || key === 'pane-tables') {
-    switchTab('pane-tables');
+    switchTab('pane-tables', false);
   }
 }
 
 function initTabs() {
   const tabs = document.querySelectorAll('.org-nav-tabs .tab-btn');
   tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
+    tab.addEventListener('click', (e) => {
+      e.preventDefault();
       const targetId = tab.dataset.target;
-      switchTab(targetId);
-      if (targetId === 'pane-timeline') window.location.hash = 'cronograma';
-      else if (targetId === 'pane-shopping') window.location.hash = 'compras';
-      else if (targetId === 'pane-tables') window.location.hash = 'mesas';
+      switchTab(targetId, true);
     });
   });
 
