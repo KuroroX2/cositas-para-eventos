@@ -156,6 +156,23 @@
       });
     });
 
+    // Stat cards click shortcuts
+    const statCards = [
+      { sel: '.stat-card.stat-total', tab: 'admin-tab-invitations' },
+      { sel: '.stat-card.stat-yes', tab: 'admin-tab-rsvps' },
+      { sel: '.stat-card.stat-no', tab: 'admin-tab-rsvps' }
+    ];
+    statCards.forEach(({ sel, tab }) => {
+      const el = document.querySelector(sel);
+      if (el) {
+        el.style.cursor = 'pointer';
+        el.addEventListener('click', () => {
+          const btn = document.querySelector(`.admin-tab-btn[data-tab="${tab}"]`);
+          if (btn) btn.click();
+        });
+      }
+    });
+
     // Invitation Type toggle (1 or 2 persons)
     const invTypeSelect = document.getElementById('inv-type');
     const invName2Group = document.getElementById('inv-name-2-group');
@@ -242,6 +259,93 @@
     loadAdminCloudData();
   }
 
+  function normalizeAdminRsvps(rawList, invs = []) {
+    if (!Array.isArray(rawList)) return [];
+    
+    const companionsExisting = new Set();
+    rawList.forEach(r => {
+      if (r && r.isCompanionDeclined && r.name) {
+        companionsExisting.add(r.name.trim().toLowerCase());
+      }
+    });
+
+    const result = [];
+    const companionsAdded = new Set(companionsExisting);
+
+    rawList.forEach(r => {
+      if (!r) return;
+      if (r.name === '__DELETED__' || r.name === '__RESET_PENDING__' || r.name1 === '__DELETED__') return;
+
+      if (r.isCompanionDeclined) {
+        result.push(r);
+        return;
+      }
+
+      const pGuestName = (r.name || r.name1 || '').trim();
+      let compName = (r.name2 || r.originalCompanion || '').trim();
+
+      if (!compName && (r.invCode || r.id)) {
+        const inv = (invs || adminInvitations || []).find(i => i.id === (r.invCode || r.id));
+        if (inv && inv.name2) compName = inv.name2.trim();
+      }
+
+      const att1 = (r.attendance1 === true || r.attendance1 === 'si' || (r.attendance === 'si' && !r.isCompanionDeclined));
+      const att2 = (r.attendance2 === true || r.attendance2 === 'si');
+
+      const isSingleAttendance = (
+        r.isSingleAttendee === true ||
+        (compName && (
+          (att1 && !att2) ||
+          r.pasesCount === 1 ||
+          r.attendance2 === 'no' ||
+          r.attendance2 === false
+        ))
+      );
+
+      if (compName && isSingleAttendance) {
+        result.push({
+          ...r,
+          name: pGuestName,
+          name2: compName,
+          originalCompanion: compName,
+          attendance: 'si',
+          attendance1: 'si',
+          attendance2: 'no',
+          pasesCount: 1,
+          isSingleAttendee: true
+        });
+
+        const compKey = compName.toLowerCase();
+        if (!companionsAdded.has(compKey)) {
+          companionsAdded.add(compKey);
+          result.push({
+            id: (r.id ? r.id + '_comp' : 'manual_comp_' + Date.now()),
+            name: compName,
+            name2: '',
+            primaryGuest: pGuestName,
+            attendance: 'no',
+            attendance1: 'no',
+            attendance2: 'no',
+            pasesCount: 0,
+            dietary: 'ninguna',
+            dietary2: '',
+            song: '',
+            song2: '',
+            message: `Acompañante de ${pGuestName} (No asiste)`,
+            code: r.code || r.pass_code || '—',
+            invCode: r.invCode || r.invitation_id || '',
+            timestamp: r.timestamp || (r.created_at ? new Date(r.created_at).getTime() : Date.now()),
+            isCompanionDeclined: true
+          });
+        }
+      } else {
+        result.push(r);
+      }
+    });
+
+    return result;
+  }
+
   async function loadAdminCloudData() {
     // 1. Cargar caché local primero para respuesta instantánea (0ms)
     try {
@@ -253,7 +357,9 @@
         localStorage.setItem('wedding_invitations_cloud_v1', JSON.stringify(adminInvitations));
       }
       const localRsvp = localStorage.getItem('wedding_rsvps_cloud_v1');
-      if (localRsvp !== null) adminRsvps = JSON.parse(localRsvp);
+      if (localRsvp !== null) {
+        adminRsvps = normalizeAdminRsvps(JSON.parse(localRsvp), adminInvitations);
+      }
 
       const localPhotos = localStorage.getItem('eve_yimmy_wedding_album_cache_v9') || localStorage.getItem('wedding_photos_cloud_v1');
       if (localPhotos !== null) adminPhotos = JSON.parse(localPhotos);
@@ -288,22 +394,29 @@
         }
 
         if (Array.isArray(cloudRsvps)) {
-          adminRsvps = cloudRsvps.map(r => ({
-            id: r.id,
-            name: r.name1,
-            name2: r.name2,
-            attendance: (r.attendance1 || r.attendance2) ? 'si' : 'no',
-            attendance1: r.attendance1 ? 'si' : 'no',
-            attendance2: r.attendance2 ? 'si' : 'no',
-            pasesCount: (r.attendance1 ? 1 : 0) + (r.attendance2 ? 1 : 0),
-            dietary: r.dietary1,
-            dietary2: r.dietary2,
-            song: r.song_request,
-            message: r.message,
-            code: r.pass_code,
-            invCode: r.invitation_id,
-            timestamp: new Date(r.created_at).getTime()
-          }));
+          const rawMapped = cloudRsvps.map(r => {
+            const att1 = (r.attendance1 === true || r.attendance1 === 'si');
+            const att2 = (r.attendance2 === true || r.attendance2 === 'si');
+            return {
+              id: r.id,
+              name: r.name1,
+              name2: r.name2,
+              attendance: (att1 || att2) ? 'si' : 'no',
+              attendance1: att1 ? 'si' : 'no',
+              attendance2: att2 ? 'si' : 'no',
+              pasesCount: (att1 ? 1 : 0) + (att2 ? 1 : 0),
+              dietary: r.dietary1,
+              dietary2: r.dietary2,
+              song: r.song_request,
+              message: r.message,
+              code: r.pass_code,
+              invCode: r.invitation_id,
+              timestamp: new Date(r.created_at).getTime(),
+              isSingleAttendee: (att1 && !att2 && !!r.name2)
+            };
+          });
+
+          adminRsvps = normalizeAdminRsvps(rawMapped, adminInvitations);
           localStorage.setItem('wedding_rsvps_cloud_v1', JSON.stringify(adminRsvps));
           renderAdminRsvps();
           renderAdminInvitations();
@@ -393,11 +506,12 @@
 
   function getAttendanceMode(r) {
     if (!r) return 'pending';
+    if (r.isCompanionDeclined) return 'none';
     const att1 = (r.attendance1 === true || r.attendance1 === 'si' || r.attendance === 'si');
     const att2 = (r.attendance2 === true || r.attendance2 === 'si');
     if (att1 && att2) return 'both';
     if (att1 && !att2) {
-      if (r.name2 || r.pasesCount === 2 || r.pases === 2) return 'single';
+      if (r.originalCompanion || r.isSingleAttendee || r.name2 || r.pasesCount === 2 || r.pases === 2) return 'single';
       return 'both';
     }
     return 'none';
@@ -471,13 +585,13 @@
         selectOptions = `
           <option value="pending" ${currentMode === 'pending' ? 'selected' : ''}>⏳ Pendiente</option>
           <option value="both" ${currentMode === 'both' ? 'selected' : ''}>✅ Asisten (2 Pases)</option>
-          <option value="single" ${currentMode === 'single' ? 'selected' : ''}>👤 Asiste Solo 1 (Sin Acompañante)</option>
+          <option value="single" ${currentMode === 'single' ? 'selected' : ''}>👤 Asiste Solo 1 (Acomp. No Asiste)</option>
           <option value="none" ${currentMode === 'none' ? 'selected' : ''}>❌ No Asiste (0 Pases)</option>
         `;
         if (currentMode === 'both') {
           statusBadge = '<span class="badge-status status-yes">🟢 2 Pases</span>';
         } else if (currentMode === 'single') {
-          statusBadge = '<span class="badge-status" style="background: #fff3cd; color: #856404; font-weight: 700;">🟡 1 Pase (Solo)</span>';
+          statusBadge = '<span class="badge-status" style="background: #e8f5e9; color: #2e7d32; font-weight: 700; border: 1.5px solid #27ae60;">🟢 1 Asiste • 🔴 1 No Asiste</span>';
         } else if (currentMode === 'none') {
           statusBadge = '<span class="badge-status status-no">🔴 0 Pases (No Asiste)</span>';
         } else {
@@ -516,8 +630,8 @@
         ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMsg)}` 
         : `https://api.whatsapp.com/send?text=${encodeURIComponent(waMsg)}`;
 
-      const borderColor = currentMode === 'both' ? '#27ae60' : currentMode === 'single' ? '#f39c12' : currentMode === 'none' ? '#e74c3c' : '#bdc3c7';
-      const textColor = currentMode === 'both' ? '#27ae60' : currentMode === 'single' ? '#d35400' : currentMode === 'none' ? '#c0392b' : '#666';
+      const borderColor = (currentMode === 'both' || currentMode === 'single') ? '#27ae60' : currentMode === 'none' ? '#e74c3c' : '#bdc3c7';
+      const textColor = (currentMode === 'both' || currentMode === 'single') ? '#27ae60' : currentMode === 'none' ? '#c0392b' : '#666';
 
       return `
         <tr>
@@ -559,7 +673,7 @@
         const pases = parseInt(sel.getAttribute('data-pases') || '1', 10);
 
         if (newMode === 'pending') {
-          adminRsvps = adminRsvps.filter(r => r.invCode !== invId && r.name !== name1);
+          adminRsvps = adminRsvps.filter(r => r.invCode !== invId && r.name !== name1 && r.name !== name2);
           if (window.dbSupabase) await window.dbSupabase.deleteRsvpFromCloud(invId, invId, null, name1);
         } else {
           const isBoth = (newMode === 'both');
@@ -573,6 +687,7 @@
             id: existingR ? existingR.id : ('manual_' + Date.now()),
             name: name1,
             name2: name2 || '',
+            originalCompanion: name2 || '',
             pasesCount: isBoth ? pases : (isSingle ? 1 : 0),
             attendance: isNone ? 'no' : 'si',
             attendance1: (isBoth || isSingle) ? 'si' : 'no',
@@ -584,11 +699,36 @@
             message: existingR ? existingR.message : '',
             code: code,
             invCode: invId,
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            isSingleAttendee: isSingle
           };
 
-          adminRsvps = adminRsvps.filter(r => r.invCode !== invId && r.name !== name1);
+          adminRsvps = adminRsvps.filter(r => r.invCode !== invId && r.name !== name1 && r.name !== name2);
           adminRsvps.unshift(updatedR);
+
+          // Si asiste solo 1 pero la invitación tenía acompañante, registrar al acompañante como NO ASISTE
+          if (isSingle && name2) {
+            const compR = {
+              id: (existingR ? existingR.id : ('manual_' + Date.now())) + '_comp',
+              name: name2,
+              name2: '',
+              primaryGuest: name1,
+              pasesCount: 0,
+              attendance: 'no',
+              attendance1: 'no',
+              attendance2: 'no',
+              dietary: 'ninguna',
+              dietary2: '',
+              song: '',
+              song2: '',
+              message: `Acompañante de ${name1} (No asiste)`,
+              code: code || '—',
+              invCode: invId,
+              timestamp: Date.now(),
+              isCompanionDeclined: true
+            };
+            adminRsvps.push(compR);
+          }
 
           if (window.dbSupabase) {
             await window.dbSupabase.updateRsvpAttendanceManual(invId, newMode, name1, name2, pases);
@@ -648,6 +788,7 @@
   }
 
   function renderAdminRsvps() {
+    adminRsvps = normalizeAdminRsvps(adminRsvps, adminInvitations);
     const countYesEl = document.getElementById('admin-count-yes');
     const countNoEl = document.getElementById('admin-count-no');
     const tableBody = document.getElementById('admin-rsvps-tbody');
@@ -666,8 +807,19 @@
 
     const totalConfirmations = confirmedBoth.length + confirmedSingle.length;
 
+    let totalPeopleNo = 0;
+    notAttending.forEach(r => {
+      totalPeopleNo += (r.name2 && !r.isCompanionDeclined ? 2 : 1);
+    });
+
     if (countYesEl) countYesEl.innerHTML = `<strong>${totalConfirmations}</strong> reg. (<strong>${totalPeopleYes}</strong> pers.)`;
-    if (countNoEl) countNoEl.textContent = notAttending.length;
+    if (countNoEl) {
+      if (notAttending.length === 0) {
+        countNoEl.innerHTML = `<strong>0</strong>`;
+      } else {
+        countNoEl.innerHTML = `<strong>${notAttending.length}</strong> reg. (<strong>${totalPeopleNo}</strong> pers.)`;
+      }
+    }
 
     if (!tableBody) return;
 
@@ -686,34 +838,39 @@
 
     tableBody.innerHTML = sorted.map((r, index) => {
       const mode = getAttendanceMode(r);
-      const isTwoPasses = !!(r.name2);
+      const isTwoPasses = !!(r.name2 && !r.isCompanionDeclined);
       const dateStr = r.timestamp ? new Date(r.timestamp).toLocaleDateString('es-CL', {
         day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
       }) : '—';
 
       let namesShow = escapeHtml(r.name);
-      if (r.name2) {
-        if (mode === 'single') {
-          namesShow = `${escapeHtml(r.name)} <span class="badge-status" style="background: #fff3cd; color: #856404; font-size: 0.68rem; margin-left: 4px; border-radius: 50px; font-weight: 700;">(Solo)</span>`;
-        } else {
-          namesShow = `${escapeHtml(r.name)} &amp; ${escapeHtml(r.name2)}`;
-        }
+      if (r.isCompanionDeclined) {
+        namesShow = `${escapeHtml(r.name)} <span class="badge-status status-no" style="font-size: 0.68rem; margin-left: 4px; border-radius: 50px; font-weight: 700;">(No Asiste)</span><br><small style="color: #777;">Acompañante de ${escapeHtml(r.primaryGuest || '')}</small>`;
+      } else if (r.isSingleAttendee || mode === 'single') {
+        namesShow = `${escapeHtml(r.name)} <span class="badge-status status-yes" style="font-size: 0.68rem; margin-left: 4px; border-radius: 50px; font-weight: 700;">(Asiste Solo)</span>${(r.originalCompanion || r.name2) ? `<br><small style="color: #c0392b; font-weight: 600;">👥 Acomp.: ${escapeHtml(r.originalCompanion || r.name2)} (No asiste)</small>` : ''}`;
+      } else if (r.name2) {
+        namesShow = `${escapeHtml(r.name)} &amp; ${escapeHtml(r.name2)}`;
       }
 
       let pasesBadge = '';
-      if (mode === 'both') {
-        pasesBadge = `<span class="badge-status status-yes">🟢 ${isTwoPasses ? '2 Personas' : '1 Persona'}</span>`;
-      } else if (mode === 'single') {
-        pasesBadge = `<span class="badge-status" style="background: #fff3cd; color: #856404; font-weight: 700;">🟡 1 Persona (Sin Acomp.)</span>`;
-      } else {
+      if (r.isCompanionDeclined || mode === 'none') {
         pasesBadge = `<span class="badge-status status-no">🔴 0 Personas (No Asiste)</span>`;
+      } else if (mode === 'single') {
+        pasesBadge = `<span class="badge-status" style="background: #e8f5e9; color: #2e7d32; font-weight: 700; border: 1px solid #27ae60;">🟢 1 Persona (Asiste)</span>`;
+      } else if (mode === 'both') {
+        pasesBadge = `<span class="badge-status status-yes">🟢 ${isTwoPasses ? '2 Personas' : '1 Persona'}</span>`;
       }
 
       let selectOptions = '';
-      if (isTwoPasses) {
+      if (r.isCompanionDeclined) {
+        selectOptions = `
+          <option value="none" selected>❌ No Asiste (0 Pases)</option>
+          <option value="both">✅ Cambiar: Asisten Ambos</option>
+        `;
+      } else if (isTwoPasses || r.isSingleAttendee || r.originalCompanion) {
         selectOptions = `
           <option value="both" ${mode === 'both' ? 'selected' : ''}>✅ Asisten (2 Pases)</option>
-          <option value="single" ${mode === 'single' ? 'selected' : ''}>👤 Asiste Solo 1 (Sin Acompañante)</option>
+          <option value="single" ${mode === 'single' ? 'selected' : ''}>👤 Asiste Solo 1 (Acomp. No Asiste)</option>
           <option value="none" ${mode === 'none' ? 'selected' : ''}>❌ No Asiste (0 Pases)</option>
         `;
       } else {
@@ -723,8 +880,8 @@
         `;
       }
 
-      const borderColor = mode === 'both' ? '#27ae60' : mode === 'single' ? '#f39c12' : '#e74c3c';
-      const textColor = mode === 'both' ? '#27ae60' : mode === 'single' ? '#d35400' : '#c0392b';
+      const borderColor = (mode === 'both' || mode === 'single') ? '#27ae60' : '#e74c3c';
+      const textColor = (mode === 'both' || mode === 'single') ? '#27ae60' : '#c0392b';
 
       let songsDisplay = '—';
       if (r.song && r.song2) {
@@ -739,7 +896,7 @@
         <tr>
           <td style="font-weight: 700;">${index + 1}. ${namesShow}</td>
           <td class="col-status">
-            <select class="admin-rsvp-status-select" data-id="${r.id || r.code}" data-name1="${escapeHtml(r.name)}" data-name2="${escapeHtml(r.name2 || '')}" data-inv="${r.invCode || ''}" style="padding: 0.2rem 0.65rem; border-radius: 50px; font-size: 0.78rem; font-weight: 700; border: 1.5px solid ${borderColor}; color: ${textColor}; background: #FFFFFF; cursor: pointer; height: 34px; line-height: 1.4; vertical-align: middle;">
+            <select class="admin-rsvp-status-select" data-id="${r.id || r.code}" data-name1="${escapeHtml(r.name)}" data-name2="${escapeHtml(r.name2 || r.originalCompanion || '')}" data-inv="${r.invCode || ''}" style="padding: 0.2rem 0.65rem; border-radius: 50px; font-size: 0.78rem; font-weight: 700; border: 1.5px solid ${borderColor}; color: ${textColor}; background: #FFFFFF; cursor: pointer; height: 34px; line-height: 1.4; vertical-align: middle;">
               ${selectOptions}
             </select>
           </td>
@@ -779,10 +936,45 @@
           r.attendance = isNone ? 'no' : 'si';
           r.attendance1 = (isBoth || isSingle) ? 'si' : 'no';
           r.attendance2 = (isBoth && (r.name2 || name2)) ? 'si' : 'no';
-          r.pasesCount = isBoth ? (r.name2 ? 2 : 1) : (isSingle ? 1 : 0);
+          r.pasesCount = isBoth ? (r.name2 || name2 ? 2 : 1) : (isSingle ? 1 : 0);
+          r.isSingleAttendee = isSingle;
+
+          // Si cambió a single y tiene acompañante, registrar al acompañante como no asistente
+          if (isSingle && (name2 || r.name2 || r.originalCompanion)) {
+            const compName = name2 || r.name2 || r.originalCompanion;
+            r.originalCompanion = compName;
+            const existingComp = adminRsvps.find(x => x.name === compName && x.isCompanionDeclined);
+            if (!existingComp) {
+              adminRsvps.push({
+                id: (r.id || 'manual_' + Date.now()) + '_comp',
+                name: compName,
+                name2: '',
+                primaryGuest: r.name,
+                pasesCount: 0,
+                attendance: 'no',
+                attendance1: 'no',
+                attendance2: 'no',
+                dietary: 'ninguna',
+                dietary2: '',
+                song: '',
+                song2: '',
+                message: `Acompañante de ${r.name} (No asiste)`,
+                code: r.code || '—',
+                invCode: r.invCode || invId,
+                timestamp: Date.now(),
+                isCompanionDeclined: true
+              });
+            }
+          } else if (isBoth || isNone) {
+            // Remover registros de acompañante declinado
+            const compName = name2 || r.name2 || r.originalCompanion;
+            if (compName) {
+              adminRsvps = adminRsvps.filter(x => !(x.name === compName && x.isCompanionDeclined));
+            }
+          }
           
           if (window.dbSupabase) {
-            await window.dbSupabase.updateRsvpAttendanceManual(r.invCode || r.code || invId, newMode, r.name, r.name2, r.name2 ? 2 : 1);
+            await window.dbSupabase.updateRsvpAttendanceManual(r.invCode || r.code || invId, newMode, r.name, r.name2 || name2, (r.name2 || name2) ? 2 : 1);
           }
           try {
             localStorage.setItem('wedding_rsvps_cloud_v1', JSON.stringify(adminRsvps));
@@ -805,7 +997,7 @@
             if (id && r.id === id) return false;
             if (code && r.code === code) return false;
             if (invId && r.invCode === invId) return false;
-            if (name1 && r.name === name1) return false;
+            if (name1 && (r.name === name1 || r.primaryGuest === name1)) return false;
             return true;
           });
 
@@ -838,14 +1030,15 @@
     const rows = adminRsvps.map(r => {
       const mode = getAttendanceMode(r);
       let estadoTxt = 'NO ASISTE';
-      if (mode === 'both') estadoTxt = r.name2 ? 'ASISTEN (2 PASES)' : 'ASISTE (1 PASE)';
-      if (mode === 'single') estadoTxt = 'ASISTE SOLO 1 (SIN ACOMPAÑANTE)';
+      if (r.isCompanionDeclined) estadoTxt = 'NO ASISTE (ACOMPAÑANTE)';
+      else if (mode === 'both') estadoTxt = r.name2 ? 'ASISTEN (2 PASES)' : 'ASISTE (1 PASE)';
+      else if (mode === 'single') estadoTxt = 'ASISTE SOLO 1 (ACOMPAÑANTE NO ASISTE)';
 
-      const pases = mode === 'both' ? (r.name2 ? 2 : 1) : (mode === 'single' ? 1 : 0);
+      const pases = (mode === 'both') ? (r.name2 ? 2 : 1) : (mode === 'single' ? 1 : 0);
 
       return [
         `"${(r.name || '').replace(/"/g, '""')}"`,
-        `"${(r.name2 || '').replace(/"/g, '""')}"`,
+        `"${(r.name2 || (r.primaryGuest ? 'Acomp. de ' + r.primaryGuest : '')).replace(/"/g, '""')}"`,
         `"${estadoTxt}"`,
         pases,
         `"${r.code || ''}"`,

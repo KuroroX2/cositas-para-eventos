@@ -272,9 +272,17 @@
     const form = document.getElementById('rsvp-form');
     if (!form) return;
 
-    const displayName = conf.name2 ? `${conf.name} & ${conf.name2}` : conf.name;
+    const isSingle = (conf.attendance1 === 'si' && conf.attendance2 === 'no') || conf.pasesCount === 1;
+    let displayName = conf.name;
+    if (conf.name2) {
+      if (isSingle) {
+        displayName = `${conf.name} (Acomp.: ${conf.name2} - No Asiste)`;
+      } else {
+        displayName = `${conf.name} & ${conf.name2}`;
+      }
+    }
     const isYes = conf.attendance === 'si' || conf.attendance1 === 'si' || conf.attendance2 === 'si';
-    const pasesCount = conf.pasesCount || (conf.name2 ? (isYes ? 2 : 0) : (isYes ? 1 : 0));
+    const pasesCount = conf.pasesCount || (conf.name2 ? (isSingle ? 1 : (isYes ? 2 : 0)) : (isYes ? 1 : 0));
 
     if (isYes) {
       // Caso 1: Asistencia Confirmada
@@ -293,7 +301,7 @@
           <div style="background: #FFFFFF; border: 1px dashed rgba(82, 122, 80, 0.35); padding: 1.1rem 1.2rem; border-radius: 12px; margin-bottom: 1.5rem; text-align: left; font-size: 0.84rem; display: flex; flex-direction: column; gap: 0.5rem;">
             <div style="display: flex; justify-content: space-between;"><strong style="color: #4B634C;">Invitado(s):</strong> <span style="font-weight: 700; color: #243525;">${escapeHtml(displayName)}</span></div>
             <div style="display: flex; justify-content: space-between;"><strong style="color: #4B634C;">Estado:</strong> <span style="color: #27ae60; font-weight: 700;">✓ Asistencia Confirmada</span></div>
-            <div style="display: flex; justify-content: space-between;"><strong style="color: #4B634C;">Pase(s) Asignado(s):</strong> <span style="font-weight: 700;">${pasesCount > 0 ? pasesCount : (conf.name2 ? 2 : 1)} Persona${(pasesCount > 1 || conf.name2) ? 's' : ''}</span></div>
+            <div style="display: flex; justify-content: space-between;"><strong style="color: #4B634C;">Pase(s) Asignado(s):</strong> <span style="font-weight: 700;">${pasesCount} Persona${pasesCount > 1 ? 's' : ''}</span></div>
             <div style="display: flex; justify-content: space-between; border-top: 1px dashed rgba(82, 122, 80, 0.2); padding-top: 0.4rem;"><strong style="color: #527A50;">Código de Sorteo:</strong> <span class="code-mono" style="font-weight: 800; font-size: 1.05rem; color: #527A50;">${escapeHtml(conf.code || 'EY-2026')}</span></div>
           </div>
 
@@ -386,7 +394,9 @@
       const nameInput2 = document.getElementById('rsvp-name-2');
       if (nameInput2 && conf.name2) nameInput2.value = conf.name2;
 
-      const att2 = conf.attendance2 || (conf.attendance === 'si' ? 'si' : 'no');
+      const att2 = (conf.attendance2 !== undefined && conf.attendance2 !== null && conf.attendance2 !== '') 
+        ? (conf.attendance2 === true || conf.attendance2 === 'si' ? 'si' : 'no') 
+        : (conf.attendance === 'si' ? 'si' : 'no');
       const radioAtt2 = form.querySelector(`input[name="attendance_2"][value="${att2}"]`);
       if (radioAtt2) radioAtt2.checked = true;
 
@@ -419,8 +429,9 @@
     const passSongRow = document.getElementById('pass-song-row');
     const passSongVal = document.getElementById('pass-song-val');
 
-    const displayName = conf.name2 ? `${conf.name} & ${conf.name2}` : conf.name;
-    const pasesCount = conf.pasesCount || (conf.name2 ? 2 : 1);
+    const isSingle = (conf.attendance1 === 'si' && conf.attendance2 === 'no') || conf.pasesCount === 1;
+    const displayName = (conf.name2 && !isSingle) ? `${conf.name} & ${conf.name2}` : conf.name;
+    const pasesCount = conf.pasesCount || (conf.name2 ? (isSingle ? 1 : 2) : 1);
 
     if (guestNameEl) guestNameEl.textContent = displayName;
     if (passCountEl) passCountEl.textContent = `${pasesCount} Persona${pasesCount > 1 ? 's' : ''}`;

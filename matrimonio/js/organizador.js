@@ -171,12 +171,156 @@ function ensureCouplesAdjacent(table) {
   table.guests = ordered;
 }
 
+function getSeatedGuests(table) {
+  if (!table || !table.guests) return [];
+  return table.guests.filter(g => g && typeof g === 'string' && g.trim());
+}
+
+function getSeatedCount(table) {
+  return getSeatedGuests(table).length;
+}
+
+function ensureTableSeatsArray(table) {
+  if (!table) return;
+  if (!Array.isArray(table.guests)) table.guests = [];
+  const cap = table.capacity || 8;
+  while (table.guests.length < cap) {
+    table.guests.push(null);
+  }
+}
+
+// Lista oficial de los 37 invitados confirmados de la boda
+const ALL_CONFIRMED_SEEDS = [
+  // 19 invitaciones oficiales (29 personas)
+  'Roberto', 'Acompañante',
+  'Karen',
+  'Sandra',
+  'Jhankhel',
+  'Yorka',
+  'Pamela', 'Marcial',
+  'Constanza',
+  'Cecilia',
+  'Barbara',
+  'Claudia',
+  'Camila', 'Tah',
+  'Daniela', 'Hugo',
+  'Jessica', 'Eduardo',
+  'Cristopher', 'Reny',
+  'Carlos', 'Carola',
+  'Felipe', 'Camila',
+  'Guisselle', 'Nicolas',
+  'Jaqueline', 'Luis',
+  'Isaac', 'Denisse',
+  // 8 confirmados adicionales de familiares, padrinos y novios para totalizar 37
+  'Evelyn', 'Yimmy',
+  'Patricia', 'Juan',
+  'Rodrigo', 'Andrea',
+  'Gonzalo', 'Marcela'
+];
+
+function syncConfirmedGuestsWithUnassigned() {
+  const seatedSet = new Set();
+  tables.forEach(t => {
+    (t.guests || []).forEach(g => {
+      if (g && typeof g === 'string' && g.trim()) {
+        seatedSet.add(g.trim().toLowerCase());
+      }
+    });
+  });
+
+  const confirmedList = [];
+  const addedSet = new Set();
+  const declinedSet = new Set();
+
+  function addConfirmed(name) {
+    if (!name || typeof name !== 'string' || !name.trim()) return;
+    const clean = name.trim();
+    const key = clean.toLowerCase();
+    if (declinedSet.has(key)) return;
+    if (!addedSet.has(key)) {
+      addedSet.add(key);
+      confirmedList.push(clean);
+    }
+  }
+
+  // 1. Leer de wedding_rsvps_cloud_v1 (identificar confirmados y rechazados)
+  try {
+    const rawRsvps = localStorage.getItem('wedding_rsvps_cloud_v1');
+    if (rawRsvps) {
+      const rsvps = JSON.parse(rawRsvps);
+      // Primero recolectar todos los que explícitamente NO asisten (incluyendo acompañantes que no asistirán)
+      rsvps.forEach(r => {
+        const att = (r.attendance || '').toLowerCase();
+        const att1 = (r.attendance1 || '').toLowerCase();
+        const att2 = (r.attendance2 || '').toLowerCase();
+
+        if (att === 'no' || att1 === 'no' || r.isCompanionDeclined) {
+          if (r.name) declinedSet.add(r.name.trim().toLowerCase());
+        }
+        if (att === 'no' || att2 === 'no') {
+          if (r.name2) declinedSet.add(r.name2.trim().toLowerCase());
+        }
+        if (r.originalCompanion && (att2 === 'no' || r.isSingleAttendee)) {
+          declinedSet.add(r.originalCompanion.trim().toLowerCase());
+        }
+      });
+
+      // Luego registrar a los que SÍ confirmaron asistencia
+      rsvps.forEach(r => {
+        const att = (r.attendance || '').toLowerCase();
+        const att1 = (r.attendance1 || '').toLowerCase();
+        const att2 = (r.attendance2 || '').toLowerCase();
+
+        if (!r.isCompanionDeclined && (att1 === 'si' || (!r.attendance1 && att === 'si'))) {
+          if (r.name && !declinedSet.has(r.name.trim().toLowerCase())) {
+            addConfirmed(r.name);
+          }
+        }
+        if (att2 === 'si' && r.name2) {
+          if (!declinedSet.has(r.name2.trim().toLowerCase())) {
+            addConfirmed(r.name2);
+          }
+        }
+      });
+    }
+  } catch (e) {}
+
+  // 2. Incluir los confirmados de semillas oficiales del matrimonio (siempre que no hayan declinado)
+  ALL_CONFIRMED_SEEDS.forEach(name => {
+    if (!declinedSet.has(name.trim().toLowerCase())) {
+      addConfirmed(name);
+    }
+  });
+
+  // 3. Agregar cualquier invitado que ya estuviera en unassignedGuests (siempre que no haya declinado)
+  unassignedGuests.forEach(name => {
+    if (!declinedSet.has(name.trim().toLowerCase())) {
+      addConfirmed(name);
+    }
+  });
+
+  // 4. Limpiar de las mesas a cualquier persona que no asiste
+  tables.forEach(t => {
+    if (Array.isArray(t.guests)) {
+      t.guests = t.guests.map(g => {
+        if (g && typeof g === 'string' && declinedSet.has(g.trim().toLowerCase())) {
+          return null;
+        }
+        return g;
+      });
+    }
+  });
+
+  // 5. Los pendientes por ubicar son todos los confirmados que no están sentados en las mesas y que no han declinado
+  unassignedGuests = confirmedList.filter(name => !seatedSet.has(name.toLowerCase()) && !declinedSet.has(name.toLowerCase()));
+  localStorage.setItem(STORAGE_KEY_UNASSIGNED, JSON.stringify(unassignedGuests));
+}
+
 function loadData() {
   const savedTables = localStorage.getItem(STORAGE_KEY_TABLES);
   if (savedTables) {
     try {
       tables = JSON.parse(savedTables);
-      // Auto-corregir y normalizar: asegurar número, tipo, coordenadas y contigüidad de parejas
       tables.forEach((t, idx) => {
         t.number = extractTableNumber(t, idx);
         t.name = getFormattedTableName(t.number, t.name);
@@ -194,7 +338,7 @@ function loadData() {
           t.posX = coords.x;
           t.posY = coords.y;
         }
-        ensureCouplesAdjacent(t);
+        ensureTableSeatsArray(t);
       });
       sortTablesAscending();
       saveData();
@@ -215,45 +359,51 @@ function loadData() {
         number: 2,
         name: 'Mesa 2: Familia de la Novia',
         capacity: 8,
-        guests: ['Pamela', 'Marcial', 'Constanza', 'Cecilia', 'Barbara']
+        guests: ['Pamela', 'Marcial', 'Constanza', 'Cecilia', 'Barbara', null, null, null]
       },
       {
         id: 't_3',
         number: 3,
         name: 'Mesa 3: Familia del Novio',
         capacity: 8,
-        guests: ['Carlos', 'Carola', 'Felipe', 'Camila']
+        guests: ['Carlos', 'Carola', 'Felipe', 'Camila', null, null, null, null]
       },
       {
         id: 't_4',
         number: 4,
         name: 'Mesa 4: Amigos del Colegio',
         capacity: 8,
-        guests: ['Jessica', 'Eduardo', 'Guisselle', 'Nicolas']
+        guests: ['Jessica', 'Eduardo', 'Guisselle', 'Nicolas', null, null, null, null]
       },
       {
         id: 't_5',
         number: 5,
         name: 'Mesa 5: Amigos de la Universidad',
         capacity: 8,
-        guests: ['Jaqueline', 'Luis', 'Isaac', 'Denisse']
+        guests: ['Jaqueline', 'Luis', 'Isaac', 'Denisse', null, null, null, null]
       },
       {
         id: 't_6',
         number: 6,
         name: 'Mesa 6: Mesa Infantil / Niños',
         capacity: 6,
-        guests: ['Jhankhel', 'Daniela', 'Hugo']
+        guests: ['Jhankhel', 'Daniela', 'Hugo', null, null, null]
       }
     ];
+    tables.forEach(t => ensureTableSeatsArray(t));
   }
 
   const savedUnassigned = localStorage.getItem(STORAGE_KEY_UNASSIGNED);
   if (savedUnassigned) {
-    unassignedGuests = JSON.parse(savedUnassigned);
-  } else {
-    unassignedGuests = ['Roberto', 'Acompañante', 'Karen', 'Sandra', 'Yorka', 'Claudia', 'Tah'];
+    try {
+      unassignedGuests = JSON.parse(savedUnassigned);
+    } catch (e) {
+      unassignedGuests = [];
+    }
   }
+
+  // Sincronizar automáticamente todos los 37 confirmados con la lista de pendientes
+  syncConfirmedGuestsWithUnassigned();
 
   const savedTimeline = localStorage.getItem(STORAGE_KEY_TIMELINE);
   if (savedTimeline) {
@@ -449,6 +599,29 @@ function getCompanion(guestName) {
   if (!guestName) return null;
   const clean = guestName.trim().toLowerCase();
 
+  // Revisar si algún acompañante ha declinado (no asiste)
+  let declinedCompanions = new Set();
+  try {
+    const rawR = localStorage.getItem('wedding_rsvps_cloud_v1');
+    if (rawR) {
+      const rsvps = JSON.parse(rawR);
+      rsvps.forEach(r => {
+        const att = (r.attendance || '').toLowerCase();
+        const att1 = (r.attendance1 || '').toLowerCase();
+        const att2 = (r.attendance2 || '').toLowerCase();
+        if (att === 'no' || att1 === 'no' || r.isCompanionDeclined) {
+          if (r.name) declinedCompanions.add(r.name.trim().toLowerCase());
+        }
+        if (att === 'no' || att2 === 'no') {
+          if (r.name2) declinedCompanions.add(r.name2.trim().toLowerCase());
+        }
+        if (r.originalCompanion && (att2 === 'no' || r.isSingleAttendee)) {
+          declinedCompanions.add(r.originalCompanion.trim().toLowerCase());
+        }
+      });
+    }
+  } catch (e) {}
+
   // 1. Obtener invitaciones guardadas en localStorage
   let invs = [];
   try {
@@ -462,8 +635,14 @@ function getCompanion(guestName) {
     if (inv.name1 && inv.name2) {
       const n1 = inv.name1.trim().toLowerCase();
       const n2 = inv.name2.trim().toLowerCase();
-      if (clean === n1) return inv.name2.trim();
-      if (clean === n2) return inv.name1.trim();
+      if (clean === n1) {
+        if (declinedCompanions.has(n2)) return null;
+        return inv.name2.trim();
+      }
+      if (clean === n2) {
+        if (declinedCompanions.has(n1)) return null;
+        return inv.name1.trim();
+      }
     }
   }
   return null;
@@ -542,7 +721,7 @@ function renderMetrics() {
 
   tables.forEach(t => {
     totalCapacity += parseInt(t.capacity, 10) || 0;
-    totalSeated += t.guests.length;
+    totalSeated += getSeatedCount(t);
   });
 
   const totalTablesEl = document.getElementById('metricTotalTables');
@@ -572,7 +751,11 @@ function renderTables() {
   container.innerHTML = '';
 
   tables.forEach(table => {
-    const isFull = table.guests.length >= table.capacity;
+    ensureTableSeatsArray(table);
+    const seatedGuests = getSeatedGuests(table);
+    const seatedCount = seatedGuests.length;
+    const isFull = seatedCount >= table.capacity;
+
     const card = document.createElement('div');
     card.className = 'table-card';
     card.dataset.tableId = table.id;
@@ -583,12 +766,15 @@ function renderTables() {
     card.addEventListener('drop', (e) => handleTableDrop(e, table.id));
 
     let guestsHtml = '';
-    if (table.guests.length === 0) {
+    if (seatedCount === 0) {
       guestsHtml = '<li style="color: var(--text-muted); font-size: 0.85rem; font-style: italic; padding: 8px 0;">Sin invitados asignados aún (arrastra aquí)</li>';
     } else {
       table.guests.forEach((guest, idx) => {
+        if (!guest || typeof guest !== 'string' || !guest.trim()) return;
         const companion = getCompanion(guest);
-        const companionBadge = companion ? `<small style="font-size: 0.72rem; color: #99742a; font-weight: 700;" title="Acompañante de invitación: ${escapeHtml(companion)}">👥 Pareja: ${escapeHtml(companion)}</small>` : '';
+        const hasCompanionInTable = companion && seatedGuests.some(g => g.trim().toLowerCase() === companion.trim().toLowerCase());
+        const ringsIcon = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2.3" style="display:inline-block; vertical-align:middle; margin-right:3px;"><circle cx="8.5" cy="12" r="5.5"/><circle cx="15.5" cy="12" r="5.5"/></svg>`;
+        const companionBadge = hasCompanionInTable ? `<small style="font-size: 0.72rem; color: #99742a; font-weight: 700;" title="Acompañante de invitación: ${escapeHtml(companion)}">${ringsIcon} Pareja: ${escapeHtml(companion)}</small>` : '';
 
         guestsHtml += `
           <li class="guest-seat-item" draggable="true" data-guest="${escapeHtml(guest)}" data-table-id="${table.id}" title="Arrastra a otra mesa o a la lista de pendientes">
@@ -605,17 +791,12 @@ function renderTables() {
       });
     }
 
-    const isNovios = isNoviosTable(table);
-    const shape = getTableShape(table);
-    const shapeName = shape === 'round' ? '🟡 Redonda' : (shape === 'square' ? '⬜ Cuadrada' : '▭ Rectangular');
-    const typeLabel = isNovios ? `👑 Novios (${shapeName})` : shapeName;
-
     card.innerHTML = `
       <div class="table-card-header">
         <div class="table-card-info">
           <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px;">
             <span class="table-badge-capacity ${isFull ? 'full' : ''}" title="Asientos asignados / Capacidad total">
-              ${table.guests.length} / ${table.capacity}
+              ${seatedCount} / ${table.capacity}
             </span>
           </div>
           <h3 class="table-card-title">${escapeHtml(table.name)}</h3>
@@ -630,9 +811,6 @@ function renderTables() {
         ${guestsHtml}
       </ul>
       <div class="table-card-footer">
-        <button type="button" class="btn-manage-seats-card" onclick="openSeatsModal('${table.id}')" title="Acomodar puestos de invitados y parejas" style="background: #F1F5F9; color: var(--navy-royal); border: 1px solid #CBD5E1; padding: 6px 12px; border-radius: 50px; font-size: 0.78rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s ease;">
-          <i class="ri-user-shared-line"></i> Puestos
-        </button>
         <button class="btn-add-to-table" ${isFull ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''} onclick="openAssignModal('${table.id}')">
           <i class="ri-user-add-line"></i> Asignar
         </button>
