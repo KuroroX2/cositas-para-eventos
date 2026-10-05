@@ -351,7 +351,7 @@
   <div class="org-modal" id="activityModal">
     <div class="org-modal-card" style="max-width: 620px;">
       <button class="btn-close-modal" aria-label="Cerrar"><i class="ri-close-line"></i></button>
-      <h3 class="org-modal-title"><i class="ri-calendar-event-line" style="color: var(--gold-dark);"></i> Agregar Hito al Cronograma</h3>
+      <h3 class="org-modal-title"><i class="ri-calendar-event-line" style="color: var(--gold-dark);"></i> <span id="activityModalTitle">Agregar Hito al Cronograma</span></h3>
       <form id="formAddActivity">
         <!-- Bloque Horario y Nombre del Hito -->
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
@@ -452,7 +452,7 @@
 
         <div style="margin-top: 22px; padding-bottom: 8px;">
           <button type="button" class="btn-org-action" id="btnSaveMilestone" onclick="handleSaveMilestone(event)" style="width: 100%; justify-content: center; padding: 13px 20px; font-size: 0.95rem;">
-            <i class="ri-check-line"></i> <span>Guardar Hito &amp; Actividades</span>
+            <i class="ri-check-line"></i> <span id="btnSaveMilestoneText">Guardar Hito &amp; Actividades</span>
           </button>
         </div>
       </form>
@@ -463,7 +463,7 @@
   <div class="org-modal" id="shoppingModal">
     <div class="org-modal-card" style="max-width: 560px;">
       <button class="btn-close-modal" aria-label="Cerrar"><i class="ri-close-line"></i></button>
-      <h3 class="org-modal-title"><i class="ri-shopping-bag-3-line" style="color: var(--gold-dark);"></i> Agregar Ítem de Compra / Insumo</h3>
+      <h3 class="org-modal-title"><span id="shoppingModalTitle"><i class="ri-shopping-bag-3-line" style="color: var(--gold-dark);"></i> Agregar Ítem de Compra / Insumo</span></h3>
       <form id="formAddShopping">
         <div class="form-group-org">
           <label for="shopItem">Ítem o Cosa a Comprar *</label>
@@ -520,8 +520,8 @@
           </select>
         </div>
         <div style="margin-top: 22px; padding-bottom: 8px;">
-          <button type="submit" class="btn-org-action" style="width: 100%; justify-content: center; padding: 13px 20px; font-size: 0.95rem;">
-            <i class="ri-check-line"></i> <span>Guardar Ítem en Compras</span>
+          <button type="submit" class="btn-org-action" id="btnSaveShopping" style="width: 100%; justify-content: center; padding: 13px 20px; font-size: 0.95rem;">
+            <i class="ri-check-line"></i> <span id="btnSaveShoppingText">Guardar Ítem en Compras</span>
           </button>
         </div>
       </form>
@@ -612,6 +612,6 @@
   <!-- Scripts con sincronización Supabase Cloud -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js?v=2.6"></script>
-  <script src="js/organizador.js?v=3.7"></script>
+  <script src="js/organizador.js?v=3.8"></script>
 </body>
 </html>

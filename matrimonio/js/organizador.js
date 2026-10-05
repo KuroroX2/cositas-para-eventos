@@ -2583,27 +2583,60 @@ window.quickAddSubActivityToMilestone = function(milestoneId) {
   showToast(`Actividad agregada al horario de "${m.title}"`);
 };
 
+window.editingMilestoneId = null;
+
 window.editMilestone = function(milestoneId) {
   const m = timeline.find(t => t.id === milestoneId);
   if (!m) return;
-  const newTitle = prompt('Editar título del hito:', m.title);
-  if (newTitle === null) return;
-  if (!newTitle.trim()) { alert('El título no puede estar vacío'); return; }
-  m.title = newTitle.trim();
+  window.editingMilestoneId = milestoneId;
 
-  const newTimeStart = prompt('Hora de inicio (ej. 11:30):', m.timeStart || m.time || '12:00');
-  if (newTimeStart !== null) m.timeStart = newTimeStart.trim();
+  const modal = document.getElementById('activityModal');
+  const titleEl = document.getElementById('activityModalTitle');
+  const btnText = document.getElementById('btnSaveMilestoneText');
+  const container = document.getElementById('subActivitiesContainer');
 
-  const newTimeEnd = prompt('Hora de término (ej. 13:00) [opcional]:', m.timeEnd || '');
-  if (newTimeEnd !== null) m.timeEnd = newTimeEnd.trim();
+  if (titleEl) titleEl.innerHTML = `<i class="ri-edit-line" style="color: var(--gold-dark);"></i> Editar Hito: ${escapeHtml(m.title)}`;
+  if (btnText) btnText.textContent = 'Guardar Cambios del Hito';
 
-  const newDetail = prompt('Detalle / Notas clave:', m.detail || '');
-  if (newDetail !== null) m.detail = newDetail.trim();
+  const actTimeStart = document.getElementById('actTimeStart');
+  const actTimeEnd = document.getElementById('actTimeEnd');
+  const actTitle = document.getElementById('actTitle');
+  const actDetail = document.getElementById('actDetail');
 
-  timeline.sort((a, b) => getTimelineSortKey(a).localeCompare(getTimelineSortKey(b)));
-  saveData();
-  renderAll();
-  showToast(`Hito "${m.title}" actualizado con éxito`);
+  if (actTimeStart) actTimeStart.value = m.timeStart || m.time || '12:00';
+  if (actTimeEnd) actTimeEnd.value = m.timeEnd || '';
+  if (actTitle) actTitle.value = m.title || '';
+  if (actDetail) actDetail.value = m.detail || '';
+
+  if (container) {
+    container.innerHTML = '';
+    const acts = (m.activities && Array.isArray(m.activities) && m.activities.length > 0)
+      ? m.activities
+      : [{
+          id: 'sub_' + Date.now(),
+          name: m.title,
+          responsible: m.responsible || 'Novios / Coordinador',
+          responsibleStatus: m.responsibleStatus || 'ok'
+        }];
+
+    acts.forEach(a => {
+      const linkedShop = shopping.find(s => (a.shopItemId && s.id === a.shopItemId) || (s.activityId === m.id && s.item === a.shopItem));
+      const cardData = {
+        id: a.id,
+        name: a.name,
+        responsible: a.responsible,
+        responsibleStatus: a.responsibleStatus,
+        needsPurchase: a.needsPurchase || !!linkedShop,
+        shopItem: (linkedShop ? linkedShop.item : a.shopItem) || '',
+        shopCategory: (linkedShop ? linkedShop.category : a.shopCategory) || 'Decoración',
+        shopCost: (linkedShop ? linkedShop.cost : a.shopCost) || '',
+        shopStatus: (linkedShop ? linkedShop.status : a.shopStatus) || 'in_progress'
+      };
+      container.appendChild(createSubActivityCard(cardData));
+    });
+  }
+
+  if (modal) modal.classList.add('active');
 };
 
 window.deleteTimelineActivity = function(idx) {
@@ -2822,7 +2855,7 @@ function renderTimeline() {
                 tagClass = 'in_progress';
               }
               return `
-                <div class="shop-vogue-card ${tagClass}" onclick="goToShopping('${s.id}')" title="Clic para ver en la pestaña de Compras (${badgeText})">
+                <div class="shop-vogue-card ${tagClass}" onclick="event.stopPropagation(); editShoppingItem('${s.id}')" title="Clic para ver en la pestaña de Compras (${badgeText})">
                   <div style="display: flex; flex-direction: column; gap: 2px;">
                     <span class="shop-vogue-title"><i class="ri-shopping-bag-line" style="color: var(--gold-dark);"></i> ${escapeHtml(s.item)}</span>
                     <span class="shop-vogue-cost">${escapeHtml(s.category || 'General')} • ${escapeHtml(s.cost || 'Sin costo')}</span>
@@ -2855,8 +2888,8 @@ function renderTimeline() {
             </button>
           </div>
           <div class="milestone-actions-right">
-            <button type="button" class="btn-milestone-action" onclick="event.stopPropagation(); editMilestone('${item.id}')" title="Editar horario o descripción">
-              <i class="ri-edit-line"></i> Editar Horario
+            <button type="button" class="btn-milestone-action" onclick="event.stopPropagation(); editMilestone('${item.id}')" title="Editar hito y todas sus actividades">
+              <i class="ri-edit-line"></i> Editar
             </button>
             <button type="button" class="btn-milestone-del" onclick="event.stopPropagation(); deleteTimelineActivity(${idx})" title="Eliminar este hito del cronograma">
               <i class="ri-delete-bin-line"></i> Eliminar
@@ -2871,6 +2904,43 @@ function renderTimeline() {
 
   updateToggleAllButtonText();
 }
+
+window.editingShoppingId = null;
+
+window.editShoppingItem = function(shopId) {
+  const item = shopping.find(s => s.id === shopId);
+  if (!item) return;
+  window.editingShoppingId = shopId;
+
+  const modal = document.getElementById('shoppingModal');
+  const titleEl = document.getElementById('shoppingModalTitle');
+  const btnText = document.getElementById('btnSaveShoppingText');
+
+  if (titleEl) titleEl.innerHTML = `<i class="ri-edit-line" style="color: var(--gold-dark);"></i> Editar Ítem de Compra`;
+  if (btnText) btnText.textContent = 'Guardar Cambios de Compra';
+
+  populateShoppingModalActivities();
+
+  const shopItem = document.getElementById('shopItem');
+  const shopLinked = document.getElementById('shopLinkedActivity');
+  const shopCategory = document.getElementById('shopCategory');
+  const shopCost = document.getElementById('shopCost');
+  const shopResponsible = document.getElementById('shopResponsible');
+  const shopRespStatus = document.getElementById('shopRespStatus');
+  const shopDetail = document.getElementById('shopDetail');
+  const shopStatus = document.getElementById('shopStatus');
+
+  if (shopItem) shopItem.value = item.item || '';
+  if (shopLinked) shopLinked.value = item.activityId || '';
+  if (shopCategory) shopCategory.value = item.category || 'Varios';
+  if (shopCost) shopCost.value = item.cost || '';
+  if (shopResponsible) shopResponsible.value = item.responsible || '';
+  if (shopRespStatus) shopRespStatus.value = item.responsibleStatus || 'ok';
+  if (shopDetail) shopDetail.value = item.detail || '';
+  if (shopStatus) shopStatus.value = item.status || 'pending';
+
+  if (modal) modal.classList.add('active');
+};
 
 function renderShopping() {
   const tbody = document.getElementById('shoppingTableBody');
@@ -2923,8 +2993,11 @@ function renderShopping() {
           }
         })()}
       </td>
-      <td>
-        <button class="btn-table-del" onclick="deleteShoppingItem(${idx})" title="Eliminar ítem">
+      <td style="white-space: nowrap;">
+        <button type="button" class="btn-table-edit" onclick="editShoppingItem('${item.id}')" title="Editar este ítem de compra" style="background: transparent; border: none; color: var(--gold-dark); cursor: pointer; font-size: 1.05rem; padding: 4px 6px; margin-right: 4px;">
+          <i class="ri-edit-line"></i>
+        </button>
+        <button type="button" class="btn-table-del" onclick="deleteShoppingItem(${idx})" title="Eliminar ítem">
           <i class="ri-delete-bin-line"></i>
         </button>
       </td>
@@ -3121,6 +3194,12 @@ function setupEventListeners() {
 
   if (btnOpenActivityModal && activityModal) {
     btnOpenActivityModal.addEventListener('click', () => {
+      window.editingMilestoneId = null;
+      const titleEl = document.getElementById('activityModalTitle');
+      const btnText = document.getElementById('btnSaveMilestoneText');
+      if (titleEl) titleEl.innerHTML = '<i class="ri-calendar-event-line" style="color: var(--gold-dark);"></i> Agregar Hito al Cronograma';
+      if (btnText) btnText.textContent = 'Guardar Hito & Actividades';
+
       const container = document.getElementById('subActivitiesContainer');
       if (container) {
         container.innerHTML = '';
@@ -3155,7 +3234,7 @@ function setupEventListeners() {
 
       const cards = document.querySelectorAll('#subActivitiesContainer .subact-card');
       const subActivities = [];
-      const actId = 'act_' + Date.now();
+      const actId = window.editingMilestoneId || ('act_' + Date.now());
       let createdShopCount = 0;
 
       cards.forEach((card, idx) => {
@@ -3181,31 +3260,42 @@ function setupEventListeners() {
           const category = card.querySelector('.select-subact-cat')?.value || 'Varios';
           const cost = (card.querySelector('.input-subact-cost')?.value || '').trim();
           const buyStatus = card.querySelector('.select-subact-status')?.value || 'pending';
-          const shopId = 'shop_' + Date.now() + '_' + idx;
 
-          const newShopFromMilestone = {
-            id: shopId,
-            activityId: actId,
-            activityTitle: `${title}: ${name}`,
-            item: itemText,
-            category: category,
-            responsible: responsible,
-            responsibleStatus: responsibleStatus,
-            detail: `Para el hito: ${title} (${name})`,
-            cost: cost,
-            status: buyStatus
-          };
-          shopping.push(newShopFromMilestone);
+          // Actualizar compra existente vinculada o crear nueva
+          let existingShop = shopping.find(s => s.activityId === actId && (s.item === itemText || s.activityTitle?.includes(name)));
+          if (existingShop) {
+            existingShop.item = itemText;
+            existingShop.category = category;
+            existingShop.cost = cost;
+            existingShop.status = buyStatus;
+            existingShop.responsible = responsible;
+            existingShop.responsibleStatus = responsibleStatus;
+            existingShop.activityTitle = `${title}: ${name}`;
+            subAct.shopItemId = existingShop.id;
+          } else {
+            const shopId = 'shop_' + Date.now() + '_' + idx;
+            const newShopItem = {
+              id: shopId,
+              activityId: actId,
+              activityTitle: `${title}: ${name}`,
+              item: itemText,
+              category: category,
+              responsible: responsible,
+              responsibleStatus: responsibleStatus,
+              detail: `Para el hito: ${title} (${name})`,
+              cost: cost,
+              status: buyStatus
+            };
+            shopping.push(newShopItem);
+            subAct.shopItemId = shopId;
+            createdShopCount++;
 
-          // Respaldo permanente de compras personalizadas
-          try {
-            const customShop = JSON.parse(localStorage.getItem('boda_org_shopping_custom') || '[]');
-            customShop.push(newShopFromMilestone);
-            localStorage.setItem('boda_org_shopping_custom', JSON.stringify(customShop));
-          } catch(e) {}
-
-          subAct.shopItemId = shopId;
-          createdShopCount++;
+            try {
+              const customShop = JSON.parse(localStorage.getItem('boda_org_shopping_custom') || '[]');
+              customShop.push(newShopItem);
+              localStorage.setItem('boda_org_shopping_custom', JSON.stringify(customShop));
+            } catch(e) {}
+          }
         }
 
         subActivities.push(subAct);
@@ -3221,46 +3311,77 @@ function setupEventListeners() {
         });
       }
 
-      const newMilestone = {
-        id: actId,
-        time: timeStart,
-        timeStart: timeStart,
-        timeEnd: timeEnd,
-        title: title,
-        responsible: subActivities[0]?.responsible || 'Novios / Coordinador',
-        responsibleStatus: subActivities[0]?.responsibleStatus || 'ok',
-        detail: detail,
-        activities: subActivities
-      };
+      if (window.editingMilestoneId) {
+        // ACTUALIZAR HITO EXISTENTE
+        const existingM = timeline.find(t => t.id === window.editingMilestoneId);
+        if (existingM) {
+          existingM.time = timeStart;
+          existingM.timeStart = timeStart;
+          existingM.timeEnd = timeEnd;
+          existingM.title = title;
+          existingM.responsible = subActivities[0]?.responsible || 'Novios / Coordinador';
+          existingM.responsibleStatus = subActivities[0]?.responsibleStatus || 'ok';
+          existingM.detail = detail;
+          existingM.activities = subActivities;
+        }
 
-      timeline.push(newMilestone);
+        try {
+          const customSaved = JSON.parse(localStorage.getItem('boda_org_timeline_custom') || '[]');
+          const cIdx = customSaved.findIndex(c => c.id === window.editingMilestoneId);
+          if (cIdx >= 0) {
+            customSaved[cIdx] = existingM;
+            localStorage.setItem('boda_org_timeline_custom', JSON.stringify(customSaved));
+          }
+        } catch(e) {}
+
+        showToast(`¡Hito "${title}" y todas sus actividades actualizados con éxito!`);
+      } else {
+        // CREAR NUEVO HITO
+        const newMilestone = {
+          id: actId,
+          time: timeStart,
+          timeStart: timeStart,
+          timeEnd: timeEnd,
+          title: title,
+          responsible: subActivities[0]?.responsible || 'Novios / Coordinador',
+          responsibleStatus: subActivities[0]?.responsibleStatus || 'ok',
+          detail: detail,
+          activities: subActivities
+        };
+
+        timeline.push(newMilestone);
+
+        try {
+          const customSaved = JSON.parse(localStorage.getItem('boda_org_timeline_custom') || '[]');
+          customSaved.push(newMilestone);
+          localStorage.setItem('boda_org_timeline_custom', JSON.stringify(customSaved));
+        } catch(e) {}
+
+        showToast(`¡Hito "${title}" guardado en el cronograma` + (createdShopCount > 0 ? ` y ${createdShopCount} compra(s) vinculada(s)!` : `!`));
+      }
+
       timeline.sort((a, b) => getTimelineSortKey(a).localeCompare(getTimelineSortKey(b)));
-
-      // Guardar de inmediato
       saveData();
-
-      // Guardar también en respaldo para garantizar permanencia
-      try {
-        const customSaved = JSON.parse(localStorage.getItem('boda_org_timeline_custom') || '[]');
-        customSaved.push(newMilestone);
-        localStorage.setItem('boda_org_timeline_custom', JSON.stringify(customSaved));
-      } catch(e) {}
-
       renderAll();
       populateShoppingModalActivities();
+
+      // Resetear estado del modal
+      window.editingMilestoneId = null;
+      const titleEl = document.getElementById('activityModalTitle');
+      const btnText = document.getElementById('btnSaveMilestoneText');
+      if (titleEl) titleEl.innerHTML = '<i class="ri-calendar-event-line" style="color: var(--gold-dark);"></i> Agregar Hito al Cronograma';
+      if (btnText) btnText.textContent = 'Guardar Hito & Actividades';
 
       const form = document.getElementById('formAddActivity');
       if (form) form.reset();
       const activityModal = document.getElementById('activityModal');
       if (activityModal) activityModal.classList.remove('active');
 
-      showToast(`¡Hito "${title}" guardado en el cronograma` + (createdShopCount > 0 ? ` y ${createdShopCount} compra(s) vinculada(s)!` : `!`));
     } catch(err) {
       console.error('Error al guardar hito:', err);
       alert('Ocurrió un error al guardar: ' + err.message);
     }
   };
-
   if (formAddActivity) {
     formAddActivity.addEventListener('submit', window.handleSaveMilestone);
   }
@@ -3272,7 +3393,14 @@ function setupEventListeners() {
 
   if (btnOpenShoppingModal && shoppingModal) {
     btnOpenShoppingModal.addEventListener('click', () => {
+      window.editingShoppingId = null;
+      const titleEl = document.getElementById('shoppingModalTitle');
+      const btnText = document.getElementById('btnSaveShoppingText');
+      if (titleEl) titleEl.innerHTML = '<i class="ri-shopping-bag-3-line" style="color: var(--gold-dark);"></i> Agregar Ítem de Compra / Insumo';
+      if (btnText) btnText.textContent = 'Guardar Ítem en Compras';
+
       populateShoppingModalActivities();
+      if (formAddShopping) formAddShopping.reset();
       shoppingModal.classList.add('active');
     });
   }
@@ -3296,39 +3424,70 @@ function setupEventListeners() {
           if (linkedAct) linkedTitle = linkedAct.title;
         }
 
-        const newShopItem = {
-          id: 'shop_' + Date.now(),
-          activityId: linkedActId,
-          activityTitle: linkedTitle,
-          item: item,
-          category: category,
-          responsible: responsible,
-          responsibleStatus: respStatus,
-          detail: detail,
-          cost: cost,
-          status: status
-        };
-        shopping.push(newShopItem);
+        if (window.editingShoppingId) {
+          // ACTUALIZAR ÍTEM EXISTENTE
+          const existingItem = shopping.find(s => s.id === window.editingShoppingId);
+          if (existingItem) {
+            existingItem.item = item;
+            existingItem.activityId = linkedActId;
+            existingItem.activityTitle = linkedTitle;
+            existingItem.category = category;
+            existingItem.responsible = responsible;
+            existingItem.responsibleStatus = respStatus;
+            existingItem.detail = detail;
+            existingItem.cost = cost;
+            existingItem.status = status;
 
-        // Respaldo permanente de compras personalizadas
-        try {
-          const customShop = JSON.parse(localStorage.getItem('boda_org_shopping_custom') || '[]');
-          customShop.push(newShopItem);
-          localStorage.setItem('boda_org_shopping_custom', JSON.stringify(customShop));
-        } catch(e) {}
+            try {
+              const customShop = JSON.parse(localStorage.getItem('boda_org_shopping_custom') || '[]');
+              const idx = customShop.findIndex(x => x.id === window.editingShoppingId);
+              if (idx >= 0) customShop[idx] = existingItem;
+              else customShop.push(existingItem);
+              localStorage.setItem('boda_org_shopping_custom', JSON.stringify(customShop));
+            } catch(e) {}
+          }
+          showToast(`¡Ítem "${item}" actualizado con éxito!`);
+        } else {
+          // CREAR NUEVO ÍTEM
+          const newShopItem = {
+            id: 'shop_' + Date.now(),
+            activityId: linkedActId,
+            activityTitle: linkedTitle,
+            item: item,
+            category: category,
+            responsible: responsible,
+            responsibleStatus: respStatus,
+            detail: detail,
+            cost: cost,
+            status: status
+          };
+          shopping.push(newShopItem);
+
+          try {
+            const customShop = JSON.parse(localStorage.getItem('boda_org_shopping_custom') || '[]');
+            customShop.push(newShopItem);
+            localStorage.setItem('boda_org_shopping_custom', JSON.stringify(customShop));
+          } catch(e) {}
+
+          showToast(`¡Ítem "${item}" agregado a compras!`);
+        }
+
+        window.editingShoppingId = null;
+        const titleEl = document.getElementById('shoppingModalTitle');
+        const btnText = document.getElementById('btnSaveShoppingText');
+        if (titleEl) titleEl.innerHTML = '<i class="ri-shopping-bag-3-line" style="color: var(--gold-dark);"></i> Agregar Ítem de Compra / Insumo';
+        if (btnText) btnText.textContent = 'Guardar Ítem en Compras';
 
         formAddShopping.reset();
         shoppingModal.classList.remove('active');
         saveData();
         renderAll();
-        showToast(`¡Ítem "${item}" agregado a compras!`);
       } catch(err) {
         console.error('Error al guardar ítem de compra:', err);
         alert('Ocurrió un error al guardar el ítem: ' + err.message);
       }
     });
   }
-
   // Botones de cierre para todos los modales
   document.querySelectorAll('.btn-close-modal').forEach(btn => {
     btn.addEventListener('click', () => {
