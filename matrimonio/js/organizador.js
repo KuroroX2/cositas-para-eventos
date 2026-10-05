@@ -142,17 +142,41 @@ function updateNextTableNumberInput() {
   }
 }
 
+function getCoordsForTableNumber(tableNumber) {
+  if (tableNumber === 1) return { x: 450, y: 50 }; // Novios al centro frente al escenario
+  const slot = Math.max(0, tableNumber - 2);
+  const col = slot % 3;
+  const row = Math.floor(slot / 3);
+  const xs = [120, 460, 800];
+  return { x: xs[col], y: 230 + row * 250 };
+}
+
 function getDefaultTableCoords(idx, total) {
-  // Coordenadas calculadas en un lienzo de 1050 x 680 px
-  if (idx === 0) return { x: 440, y: 35 }; // Novios al centro frente al escenario
-  const i = idx - 1;
-  const col = i % 3;
-  const row = Math.floor(i / 3);
-  let x = 110;
-  if (col === 1) x = 445;
-  if (col === 2) x = 780;
-  const y = 210 + row * 220;
-  return { x, y };
+  if (idx === 0) return { x: 450, y: 50 };
+  return getCoordsForTableNumber(idx + 1);
+}
+
+function getNonCollidingCoords(preferredNum) {
+  let target = getCoordsForTableNumber(preferredNum);
+  const isOccupied = (pt) => tables.some(t => {
+    if (t.posX === undefined || t.posY === undefined) return false;
+    const dx = Math.abs(t.posX - pt.x);
+    const dy = Math.abs(t.posY - pt.y);
+    return dx < 180 && dy < 180;
+  });
+
+  if (!isOccupied(target)) {
+    return target;
+  }
+
+  // Si esa posición ya está ocupada por otra mesa, buscar el siguiente espacio libre en la cuadrícula
+  for (let s = 0; s < 30; s++) {
+    const candidate = getCoordsForTableNumber(s + 2);
+    if (!isOccupied(candidate)) {
+      return candidate;
+    }
+  }
+  return { x: target.x + 30, y: target.y + 30 };
 }
 
 function ensureCouplesAdjacent(table) {
@@ -381,17 +405,26 @@ function loadData() {
       tables.forEach((t, idx) => {
         t.number = extractTableNumber(t, idx);
         t.name = getFormattedTableName(t.number, t.name);
-        if (!t.type) {
-          if (t.id === 't_1' || (t.name && t.name.toLowerCase().includes('novio'))) {
-            t.type = 'novios';
-          } else if (t.capacity <= 4) {
-            t.type = 'square';
-          } else {
-            t.type = 'round';
+
+        // Mesa de los Novios es EXCLUSIVAMENTE la Mesa 1
+        if (t.id === 't_1' || t.number === 1) {
+          t.type = 'novios';
+          if (!t.shape) t.shape = getNoviosTableShape();
+        } else {
+          // Si por error previo se guardó otra mesa (ej: 'Familia del Novio') como novios o rectangular, restaurar
+          if (t.type === 'novios') {
+            t.type = (t.capacity <= 4) ? 'square' : 'round';
+          }
+          if (t.shape === 'rectangular' && (!t.type || t.type === 'novios')) {
+            t.shape = getGuestTablesShape();
+            t.type = getGuestTablesShape();
+          } else if (!t.type) {
+            t.type = (t.capacity <= 4) ? 'square' : 'round';
           }
         }
+
         if (t.posX === undefined || t.posY === undefined) {
-          const coords = getDefaultTableCoords(idx, tables.length);
+          const coords = getCoordsForTableNumber(t.number);
           t.posX = coords.x;
           t.posY = coords.y;
         }
@@ -940,7 +973,10 @@ const STORAGE_KEY_NOVIOS_SHAPE = 'boda_org_novios_shape_v2';
 
 function isNoviosTable(table) {
   if (!table) return false;
-  return table.id === 't_1' || table.number === 1 || (table.name && table.name.toLowerCase().includes('novio'));
+  // Solo la mesa 1 es la mesa de los novios (evitar confundir con 'Familia del Novio')
+  if (table.id === 't_1' || table.number === 1) return true;
+  const name = (table.name || '').toLowerCase();
+  return /\b(los\s+novios|mesa\s+presidencial)\b/i.test(name) && !/\bfamilia\b/i.test(name);
 }
 
 function getGuestTablesShape() {
@@ -1006,6 +1042,15 @@ function renderFloorplan() {
 
   canvas.innerHTML = '';
   updateShapeToggleButtons();
+
+  // Ajustar la altura mínima del lienzo dinámicamente si hay muchas mesas hacia abajo
+  let maxY = 680;
+  tables.forEach(t => {
+    if (t.posY !== undefined) {
+      maxY = Math.max(maxY, t.posY + 220);
+    }
+  });
+  canvas.style.minHeight = `${maxY}px`;
 
   tables.forEach((table, tableIdx) => {
     ensureTableSeatsArray(table);
@@ -1178,7 +1223,7 @@ function generateChairsForTable(table) {
 
     const rectWidth = Math.max(200, capacity * 75 + 40);
     const step = rectWidth / (capacity + 1);
-    const y = 112; // Todos en el frente / costado inferior hacia la pista de baile
+    const y = -34; // En la parte superior de la mesa, mirando hacia las otras mesas del salón
 
     for (let i = 0; i < capacity; i++) {
       const x = Math.round(step * (i + 1));
@@ -1441,20 +1486,28 @@ function initFloorplanDragging() {
 window.autoLayoutTables = function() {
   if (tables.length === 0) return;
 
-  const noviosTable = tables.find(t => t.type === 'novios') || tables[0];
-  noviosTable.posX = 440;
-  noviosTable.posY = 35;
+  sortTablesAscending();
+
+  const noviosTable = tables.find(isNoviosTable) || tables.find(t => t.number === 1) || tables[0];
+  noviosTable.posX = 450;
+  noviosTable.posY = 50;
 
   const others = tables.filter(t => t !== noviosTable);
+  others.sort((a, b) => {
+    const numA = parseInt(a.number, 10) || 0;
+    const numB = parseInt(b.number, 10) || 0;
+    return numA - numB;
+  });
+
   others.forEach((t, i) => {
-    const coords = getDefaultTableCoords(i + 1, tables.length);
+    const coords = getCoordsForTableNumber(i + 2);
     t.posX = coords.x;
     t.posY = coords.y;
   });
 
   saveData();
   renderFloorplan();
-  showToast('¡Mesas auto-alineadas armoniosamente en el salón!');
+  showToast('¡Mesas auto-alineadas organizadas por número en el salón!');
 };
 
 /* ==========================================================================
@@ -2029,13 +2082,14 @@ function setupEventListeners() {
 
       const cleanName = getCleanTableName(rawName);
       const fullName = getFormattedTableName(num, cleanName || rawName);
-      const coords = getDefaultTableCoords(tables.length, tables.length + 1);
+      const coords = getNonCollidingCoords(num);
 
       tables.push({
         id: 't_' + Date.now(),
         number: num,
         name: fullName,
         type: type,
+        shape: type,
         posX: coords.x,
         posY: coords.y,
         capacity: capacity,
