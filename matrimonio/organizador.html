@@ -288,9 +288,24 @@
         </div>
       </div>
 
-      <!-- Directorio Rápido de Responsables & Proveedores -->
-      <div class="responsibles-chips-bar" id="responsiblesChipsBar">
-        <!-- Rendered dynamically by organizador.js -->
+      <!-- Panel Compacto de Proveedores & Responsables -->
+      <div class="providers-compact-panel" id="providersCompactPanel">
+        <div class="providers-compact-top">
+          <span class="providers-compact-title">
+            <i class="ri-team-line" style="color: var(--gold-dark);"></i> Proveedores &amp; Responsables
+          </span>
+          <button type="button" class="btn-sm-add-provider" onclick="openAddResponsibleModal()" title="Agregar nuevo responsable o proveedor">
+            <i class="ri-user-add-line"></i> + Agregar
+          </button>
+        </div>
+        <div class="providers-compact-bottom">
+          <select id="selectQuickProvider" class="select-org select-quick-provider" title="Selecciona un proveedor del listado">
+            <!-- Cargado dinámicamente -->
+          </select>
+          <button type="button" class="btn-sm-edit-provider" id="btnEditSelectedProvider" onclick="editSelectedProviderFromCombobox()" title="Editar el proveedor seleccionado">
+            <i class="ri-edit-line"></i> Editar
+          </button>
+        </div>
       </div>
 
       <!-- Resumen de Métricas del Cronograma -->
@@ -578,9 +593,14 @@
             <label for="newRespPhone">Teléfono / Contacto (Opcional)</label>
             <input type="text" id="newRespPhone" class="input-org" placeholder="Ej.: +56 9 1234 5678">
           </div>
-          <button type="submit" class="btn-org-action" style="padding: 10px 18px;">
-            <i class="ri-user-add-line"></i> Agregar
-          </button>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" id="btnCancelEditResp" onclick="cancelEditResponsible()" class="btn-sm-edit-provider" style="display: none; padding: 9px 12px;">
+              Cancelar
+            </button>
+            <button type="submit" class="btn-org-action" id="btnSubmitRespForm" style="padding: 10px 18px;">
+              <i class="ri-user-add-line"></i> <span id="btnSubmitRespText">Agregar</span>
+            </button>
+          </div>
         </div>
       </form>
 
@@ -676,6 +696,6 @@
   <!-- Scripts con sincronización Supabase Cloud -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js?v=2.6"></script>
-  <script src="js/organizador.js?v=3.9"></script>
+  <script src="js/organizador.js?v=4.0"></script>
 </body>
 </html>

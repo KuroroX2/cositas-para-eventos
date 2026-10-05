@@ -566,6 +566,22 @@ function loadData() {
   // ==========================================
   const DEFAULT_EXAMPLE_TIMELINE = [
     {
+      id: 'act_todo_el_evento',
+      time: 'Todo el Evento',
+      timeStart: 'Todo el Evento',
+      timeEnd: '',
+      title: 'Todo el Evento',
+      responsible: 'Coordinador General & Novios',
+      responsibleStatus: 'ok',
+      detail: 'Servicios continuos, ambientación musical, comodidades para los invitados y coordinación general durante toda la jornada.',
+      activities: [
+        { id: 'sub_ev_1', name: 'Coordinación y supervisión general de tiempos', responsible: 'Coordinador General', responsibleStatus: 'ok' },
+        { id: 'sub_ev_2', name: 'Estación de hidratación, café y comodidades', responsible: 'Banquetera', responsibleStatus: 'ok' },
+        { id: 'sub_ev_3', name: 'Kits de emergencia y baño (damas y varones)', responsible: 'Damas de Honor', responsibleStatus: 'ok', needsPurchase: true, shopItem: 'Kit de Baño / Emergencia (Hombres y Mujeres)', shopCategory: 'Varios', shopCost: '$18.000', shopStatus: 'pending' },
+        { id: 'sub_ev_4', name: 'Marcos de fotos con Códigos QR y libro de firmas', responsible: 'Hermano del Novio', responsibleStatus: 'ok', needsPurchase: true, shopItem: 'Carteles y Marcos para Códigos QR de Fotos', shopCategory: 'Decoración', shopCost: '$15.000', shopStatus: 'pending' }
+      ]
+    },
+    {
       id: 'act_previa_maquillaje',
       time: '08:30',
       timeStart: '08:30',
@@ -801,6 +817,26 @@ function loadData() {
   }
 
   // Ordenar cronograma por hora de inicio
+    // Asegurar que el hito 'Todo el Evento' esté presente en el cronograma
+  if (Array.isArray(timeline) && !timeline.some(t => t.id === 'act_todo_el_evento' || (t.title && t.title.toLowerCase().includes('todo el evento')))) {
+    timeline.unshift({
+      id: 'act_todo_el_evento',
+      time: 'Todo el Evento',
+      timeStart: 'Todo el Evento',
+      timeEnd: '',
+      title: 'Todo el Evento',
+      responsible: 'Coordinador General & Novios',
+      responsibleStatus: 'ok',
+      detail: 'Servicios continuos, ambientación musical, comodidades para los invitados y coordinación general durante toda la jornada.',
+      activities: [
+        { id: 'sub_ev_1', name: 'Coordinación y supervisión general de tiempos', responsible: 'Coordinador General', responsibleStatus: 'ok' },
+        { id: 'sub_ev_2', name: 'Estación de hidratación, café y comodidades', responsible: 'Banquetera', responsibleStatus: 'ok' },
+        { id: 'sub_ev_3', name: 'Kits de emergencia y baño (damas y varones)', responsible: 'Damas de Honor', responsibleStatus: 'ok', needsPurchase: true, shopItem: 'Kit de Baño / Emergencia (Hombres y Mujeres)', shopCategory: 'Varios', shopCost: '$18.000', shopStatus: 'pending' },
+        { id: 'sub_ev_4', name: 'Marcos de fotos con Códigos QR y libro de firmas', responsible: 'Hermano del Novio', responsibleStatus: 'ok', needsPurchase: true, shopItem: 'Carteles y Marcos para Códigos QR de Fotos', shopCategory: 'Decoración', shopCost: '$15.000', shopStatus: 'pending' }
+      ]
+    });
+  }
+
   timeline.sort((a, b) => getTimelineSortKey(a).localeCompare(getTimelineSortKey(b)));
 
   // Carga robusta de compras y sincronización con cronograma
@@ -2295,6 +2331,10 @@ window.openAssignModal = function(tableId) {
 
 function formatTimelineTime(item) {
   if (!item) return '—';
+  const rawStart = (item.timeStart || item.time || '').trim();
+  if (rawStart.toLowerCase().includes('todo el evento') || item.id === 'act_todo_el_evento') {
+    return 'Todo el Evento';
+  }
   const start = item.timeStart || item.time || '';
   const end = item.timeEnd || '';
   if (start && end) return `${start} – ${end}`;
@@ -2305,6 +2345,10 @@ function formatTimelineTime(item) {
 
 function getTimelineSortKey(item) {
   if (!item) return '99:99';
+  const raw = (item.timeStart || item.time || '').trim().toLowerCase();
+  if (raw.includes('todo el evento') || item.id === 'act_todo_el_evento') {
+    return '00:00'; // Siempre al inicio del día
+  }
   return (item.timeStart || item.time || '99:99').trim();
 }
 
@@ -2530,6 +2574,7 @@ function getMilestoneIcon(item) {
   if (t.includes('vals') || t.includes('baile')) return 'ri-music-2-line';
   if (t.includes('fiesta') || t.includes('música') || t.includes('barra')) return 'ri-disc-line';
   if (t.includes('bajón') || t.includes('trasnoche') || t.includes('despedida') || t.includes('bengala')) return 'ri-moon-line';
+  if (t.includes('todo el evento')) return 'ri-calendar-todo-line';
   return 'ri-time-line';
 }
 
@@ -2985,10 +3030,83 @@ function saveResponsibles() {
   localStorage.setItem(STORAGE_KEY_RESPONSIBLES, JSON.stringify(responsibles));
 }
 
+window.editingResponsibleId = null;
+
+window.openAddResponsibleModal = function() {
+  window.editingResponsibleId = null;
+  const nameInput = document.getElementById('newRespName');
+  const catInput = document.getElementById('newRespCategory');
+  const phoneInput = document.getElementById('newRespPhone');
+  const btnText = document.getElementById('btnSubmitRespText');
+  const btnCancel = document.getElementById('btnCancelEditResp');
+
+  if (nameInput) nameInput.value = '';
+  if (phoneInput) phoneInput.value = '';
+  if (catInput) catInput.value = 'Proveedor';
+  if (btnText) btnText.textContent = 'Agregar';
+  if (btnCancel) btnCancel.style.display = 'none';
+
+  renderResponsibles();
+  const modal = document.getElementById('responsiblesModal');
+  if (modal) modal.classList.add('active');
+  if (nameInput) setTimeout(() => nameInput.focus(), 120);
+};
+
 window.openResponsiblesModal = function() {
   renderResponsibles();
   const modal = document.getElementById('responsiblesModal');
   if (modal) modal.classList.add('active');
+};
+
+window.editResponsible = function(id) {
+  const r = responsibles.find(x => x.id === id);
+  if (!r) return;
+  window.editingResponsibleId = id;
+
+  const modal = document.getElementById('responsiblesModal');
+  const nameInput = document.getElementById('newRespName');
+  const catInput = document.getElementById('newRespCategory');
+  const phoneInput = document.getElementById('newRespPhone');
+  const btnText = document.getElementById('btnSubmitRespText');
+  const btnCancel = document.getElementById('btnCancelEditResp');
+
+  if (nameInput) nameInput.value = r.name || '';
+  if (catInput) catInput.value = r.category || 'Proveedor';
+  if (phoneInput) phoneInput.value = r.phone || '';
+  if (btnText) btnText.textContent = 'Guardar Cambios';
+  if (btnCancel) btnCancel.style.display = 'inline-flex';
+
+  if (modal) modal.classList.add('active');
+  if (nameInput) setTimeout(() => nameInput.focus(), 120);
+};
+
+window.cancelEditResponsible = function() {
+  window.editingResponsibleId = null;
+  const nameInput = document.getElementById('newRespName');
+  const phoneInput = document.getElementById('newRespPhone');
+  const btnText = document.getElementById('btnSubmitRespText');
+  const btnCancel = document.getElementById('btnCancelEditResp');
+
+  if (nameInput) nameInput.value = '';
+  if (phoneInput) phoneInput.value = '';
+  if (btnText) btnText.textContent = 'Agregar';
+  if (btnCancel) btnCancel.style.display = 'none';
+};
+
+window.editSelectedProviderFromCombobox = function() {
+  const select = document.getElementById('selectQuickProvider');
+  if (!select) return;
+  const selVal = select.value;
+  if (!selVal) {
+    showToast('⚠️ Selecciona un proveedor del listado para editar');
+    return;
+  }
+  const r = responsibles.find(x => x.id === selVal || x.name === selVal);
+  if (r) {
+    window.editResponsible(r.id);
+  } else {
+    showToast('⚠️ Proveedor no encontrado');
+  }
 };
 
 window.ensureResponsibleExists = function(name, category = 'Proveedor') {
@@ -3018,25 +3136,61 @@ window.handleSaveResponsible = function(e) {
 
   if (!name) return;
 
-  if (responsibles.some(r => r.name.toLowerCase() === name.toLowerCase())) {
-    showToast(`El responsable "${name}" ya está registrado.`);
-    return;
+  if (window.editingResponsibleId) {
+    // ACTUALIZAR RESPONSABLE EXISTENTE
+    const r = responsibles.find(x => x.id === window.editingResponsibleId);
+    if (r) {
+      const oldName = r.name;
+      r.name = name;
+      r.category = cat;
+      r.phone = phone;
+
+      // Si cambió de nombre, sincronizar en actividades y compras que lo tenían asignado
+      if (oldName !== name) {
+        if (Array.isArray(timeline)) {
+          timeline.forEach(m => {
+            if (m.responsible === oldName) m.responsible = name;
+            if (Array.isArray(m.activities)) {
+              m.activities.forEach(a => {
+                if (a.responsible === oldName) a.responsible = name;
+              });
+            }
+          });
+        }
+        if (Array.isArray(shopping)) {
+          shopping.forEach(s => {
+            if (s.responsible === oldName) s.responsible = name;
+          });
+        }
+      }
+
+      showToast(`¡Proveedor / Responsable "${name}" actualizado con éxito!`);
+    }
+    cancelEditResponsible();
+  } else {
+    // AGREGAR NUEVO
+    if (responsibles.some(r => r.name.toLowerCase() === name.toLowerCase())) {
+      showToast(`El responsable "${name}" ya está registrado.`);
+      return;
+    }
+
+    const newResp = {
+      id: 'resp_' + Date.now(),
+      name: name,
+      category: cat,
+      phone: phone
+    };
+    responsibles.push(newResp);
+
+    if (nameInput) nameInput.value = '';
+    if (phoneInput) phoneInput.value = '';
+
+    showToast(`¡"${name}" agregado al directorio de responsables!`);
   }
 
-  responsibles.push({
-    id: 'resp_' + Date.now(),
-    name: name,
-    category: cat,
-    phone: phone
-  });
-
   saveResponsibles();
-  renderResponsibles();
-
-  if (nameInput) nameInput.value = '';
-  if (phoneInput) phoneInput.value = '';
-
-  showToast(`¡"${name}" agregado al directorio de responsables!`);
+  saveData();
+  renderAll();
 };
 
 window.deleteResponsible = function(idx) {
@@ -3058,27 +3212,21 @@ function renderResponsibles() {
     datalist.innerHTML = responsibles.map(r => `<option value="${escapeHtml(r.name)}">${escapeHtml(r.name)} (${escapeHtml(r.category)})</option>`).join('');
   }
 
-  // 3. Barra de Chips al inicio del cronograma
-  const chipsBar = document.getElementById('responsiblesChipsBar');
-  if (chipsBar) {
-    const previewResps = responsibles.slice(0, 7);
-    chipsBar.innerHTML = `
-      <span class="responsibles-chips-label"><i class="ri-team-line" style="color: var(--gold-dark);"></i> Responsables:</span>
-      ${previewResps.map(r => `
-        <span class="resp-chip" title="${escapeHtml(r.category)}">
-          <i class="ri-user-star-line" style="color: var(--gold-dark); font-size: 0.8rem;"></i>
-          <span>${escapeHtml(r.name)}</span>
-          <span class="resp-tag">${escapeHtml(r.category)}</span>
-        </span>
-      `).join('')}
-      ${responsibles.length > 7 ? `<span class="resp-chip" onclick="openResponsiblesModal()" style="cursor: pointer;">+${responsibles.length - 7} más...</span>` : ''}
-      <button type="button" class="btn-add-resp-chip" onclick="openResponsiblesModal()" title="Gestionar directorio de responsables y proveedores">
-        <i class="ri-user-add-line"></i> + Administrar
-      </button>
-    `;
+  // 3. Combobox de Proveedores en el Panel Compacto del Cronograma
+  const selectQuick = document.getElementById('selectQuickProvider');
+  if (selectQuick) {
+    const currentVal = selectQuick.value;
+    selectQuick.innerHTML = responsibles.map(r => `
+      <option value="${r.id}" ${r.id === currentVal ? 'selected' : ''}>
+        👤 ${escapeHtml(r.name)} (${escapeHtml(r.category)})
+      </option>
+    `).join('');
+    if (currentVal && responsibles.some(r => r.id === currentVal)) {
+      selectQuick.value = currentVal;
+    }
   }
 
-  // 4. Lista dentro del modal
+  // 4. Lista dentro del modal con botón de Editar y Eliminar
   const listContainer = document.getElementById('responsiblesListContainer');
   if (listContainer) {
     listContainer.innerHTML = responsibles.map((r, idx) => `
@@ -3091,9 +3239,14 @@ function renderResponsibles() {
             ${escapeHtml(r.category)} ${r.phone ? `• 📞 ${escapeHtml(r.phone)}` : ''}
           </span>
         </div>
-        <button type="button" class="btn-table-del" onclick="deleteResponsible(${idx})" title="Eliminar responsable">
-          <i class="ri-delete-bin-line"></i>
-        </button>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <button type="button" class="btn-sm-edit-provider" onclick="editResponsible('${r.id}')" title="Editar este proveedor / responsable" style="padding: 4px 10px; font-size: 0.78rem;">
+            <i class="ri-edit-line"></i> Editar
+          </button>
+          <button type="button" class="btn-table-del" onclick="deleteResponsible(${idx})" title="Eliminar responsable">
+            <i class="ri-delete-bin-line"></i>
+          </button>
+        </div>
       </div>
     `).join('');
   }
@@ -3595,7 +3748,27 @@ function setupEventListeners() {
         showToast(`¡Hito "${title}" guardado en el cronograma` + (createdShopCount > 0 ? ` y ${createdShopCount} compra(s) vinculada(s)!` : `!`));
       }
 
-      timeline.sort((a, b) => getTimelineSortKey(a).localeCompare(getTimelineSortKey(b)));
+        // Asegurar que el hito 'Todo el Evento' esté presente en el cronograma
+  if (Array.isArray(timeline) && !timeline.some(t => t.id === 'act_todo_el_evento' || (t.title && t.title.toLowerCase().includes('todo el evento')))) {
+    timeline.unshift({
+      id: 'act_todo_el_evento',
+      time: 'Todo el Evento',
+      timeStart: 'Todo el Evento',
+      timeEnd: '',
+      title: 'Todo el Evento',
+      responsible: 'Coordinador General & Novios',
+      responsibleStatus: 'ok',
+      detail: 'Servicios continuos, ambientación musical, comodidades para los invitados y coordinación general durante toda la jornada.',
+      activities: [
+        { id: 'sub_ev_1', name: 'Coordinación y supervisión general de tiempos', responsible: 'Coordinador General', responsibleStatus: 'ok' },
+        { id: 'sub_ev_2', name: 'Estación de hidratación, café y comodidades', responsible: 'Banquetera', responsibleStatus: 'ok' },
+        { id: 'sub_ev_3', name: 'Kits de emergencia y baño (damas y varones)', responsible: 'Damas de Honor', responsibleStatus: 'ok', needsPurchase: true, shopItem: 'Kit de Baño / Emergencia (Hombres y Mujeres)', shopCategory: 'Varios', shopCost: '$18.000', shopStatus: 'pending' },
+        { id: 'sub_ev_4', name: 'Marcos de fotos con Códigos QR y libro de firmas', responsible: 'Hermano del Novio', responsibleStatus: 'ok', needsPurchase: true, shopItem: 'Carteles y Marcos para Códigos QR de Fotos', shopCategory: 'Decoración', shopCost: '$15.000', shopStatus: 'pending' }
+      ]
+    });
+  }
+
+  timeline.sort((a, b) => getTimelineSortKey(a).localeCompare(getTimelineSortKey(b)));
       saveData();
       renderAll();
       populateShoppingModalActivities();
