@@ -543,7 +543,22 @@ function loadData() {
       console.error('Error parsing timeline:', e);
       timeline = [];
     }
-  } else {
+  }
+
+  // Respaldo de hitos personalizados del usuario
+  try {
+    const customSaved = JSON.parse(localStorage.getItem('boda_org_timeline_custom') || '[]');
+    if (Array.isArray(customSaved) && customSaved.length > 0) {
+      if (!timeline) timeline = [];
+      customSaved.forEach(c => {
+        if (!timeline.some(t => t.id === c.id || (t.title === c.title && t.timeStart === c.timeStart))) {
+          timeline.push(c);
+        }
+      });
+    }
+  } catch(e) {}
+
+  if (!timeline || timeline.length === 0) {
     timeline = [
       {
         id: 'act_1',
@@ -560,6 +575,29 @@ function loadData() {
         responsible: 'Equipo Fotográfico',
         detail: 'Fotos de detalles: vestido, anillos, zapatos y traje del novio',
         status: 'ok'
+      },
+      {
+        id: 'act_recepcion',
+        time: '11:30',
+        timeStart: '11:30',
+        timeEnd: '17:00',
+        title: 'Recepción',
+        responsible: 'Hermano del Novio',
+        responsibleStatus: 'ok',
+        detail: 'Recepción de invitados y montaje de bienvenida',
+        activities: [
+          {
+            id: 'sub_rec_1',
+            name: 'Instalación de Cartel de Bienvenida',
+            responsible: 'Hermano del Novio',
+            responsibleStatus: 'ok',
+            needsPurchase: true,
+            shopItem: 'Cartel de bienvenidos',
+            shopCategory: 'Decoración',
+            shopCost: '$25.000',
+            shopStatus: 'in_progress'
+          }
+        ]
       },
       {
         id: 'act_3',
@@ -649,6 +687,17 @@ function loadData() {
     shopping = JSON.parse(savedShopping);
   } else {
     shopping = [
+      {
+        id: 'shop_cartel_rec',
+        item: 'Cartel de Bienvenidos (Madera / Acrílico)',
+        activityTitle: 'Recepción: Instalación de Cartel de Bienvenida',
+        category: 'Decoración',
+        responsible: 'Hermano del Novio',
+        responsibleStatus: 'ok',
+        detail: 'Para la entrada principal de la casona',
+        cost: '$25.000',
+        status: 'in_progress'
+      },
       {
         id: 'shop_1',
         item: 'Kit de Luces de Bengala para Salida de Ceremonia',
@@ -2145,7 +2194,7 @@ function createSubActivityCard(data = {}) {
 
     <div class="form-group-org" style="margin-bottom: 10px;">
       <label>Nombre de la Actividad *</label>
-      <input type="text" class="input-org input-subact-name" placeholder="Ej.: Cartel de bienvenida / Aguas saborizadas" value="${escapeHtml(data.name || '')}" required>
+      <input type="text" class="input-org input-subact-name" placeholder="Ej.: Cartel de bienvenida / Aguas saborizadas" value="${escapeHtml(data.name || '')}">
     </div>
 
     <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; margin-bottom: 10px;">
@@ -2214,9 +2263,7 @@ window.toggleSubactPurchase = function(checkbox) {
   if (fields) {
     fields.style.display = checkbox.checked ? 'block' : 'none';
   }
-  if (itemInput) {
-    itemInput.required = checkbox.checked;
-  }
+  
   if (checkbox.checked) {
     setTimeout(() => {
       box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -2644,93 +2691,130 @@ function setupEventListeners() {
     });
   }
 
-  if (formAddActivity && activityModal) {
-    formAddActivity.addEventListener('submit', (e) => {
+  window.handleSaveMilestone = function(e) {
+    if (e) {
       e.preventDefault();
-      try {
-        const timeStart = (document.getElementById('actTimeStart')?.value || '16:00').trim();
-        const timeEnd = (document.getElementById('actTimeEnd')?.value || '').trim();
-        const title = (document.getElementById('actTitle')?.value || '').trim();
-        const detail = (document.getElementById('actDetail')?.value || '').trim();
+      e.stopPropagation();
+    }
+    try {
+      const timeStart = (document.getElementById('actTimeStart')?.value || '16:00').trim();
+      const timeEnd = (document.getElementById('actTimeEnd')?.value || '').trim();
+      const titleInput = document.getElementById('actTitle');
+      const title = (titleInput?.value || '').trim();
+      const detail = (document.getElementById('actDetail')?.value || '').trim();
 
-        if (!title) {
-          alert('Por favor ingresa el nombre del hito o momento principal.');
-          return;
+      if (!title) {
+        if (titleInput) {
+          titleInput.style.borderColor = '#DC2626';
+          titleInput.focus();
+          setTimeout(() => { titleInput.style.borderColor = ''; }, 3000);
         }
+        showToast('⚠️ Por favor escribe el nombre del hito o momento');
+        return;
+      }
 
-        const cards = document.querySelectorAll('#subActivitiesContainer .subact-card');
-        const subActivities = [];
-        const actId = 'act_' + Date.now();
-        let createdShopCount = 0;
+      const cards = document.querySelectorAll('#subActivitiesContainer .subact-card');
+      const subActivities = [];
+      const actId = 'act_' + Date.now();
+      let createdShopCount = 0;
 
-        cards.forEach((card, idx) => {
-          const name = (card.querySelector('.input-subact-name')?.value || '').trim() || `Actividad ${idx + 1}`;
-          const responsible = (card.querySelector('.input-subact-resp')?.value || '').trim() || 'Novios / Coordinador';
-          const responsibleStatus = card.querySelector('.select-subact-resp-status')?.value || 'ok';
-          const isPurchase = card.querySelector('.check-subact-purchase')?.checked || false;
+      cards.forEach((card, idx) => {
+        let name = (card.querySelector('.input-subact-name')?.value || '').trim();
+        if (!name) name = `${title} (Actividad ${idx + 1})`;
 
-          const subAct = {
-            id: 'sub_' + Date.now() + '_' + idx,
-            name: name,
-            responsible: responsible,
-            responsibleStatus: responsibleStatus,
-            needsPurchase: isPurchase
-          };
+        const responsible = (card.querySelector('.input-subact-resp')?.value || '').trim() || 'Novios / Coordinador';
+        const responsibleStatus = card.querySelector('.select-subact-resp-status')?.value || 'ok';
+        const isPurchase = card.querySelector('.check-subact-purchase')?.checked || false;
 
-          if (isPurchase) {
-            const itemText = (card.querySelector('.input-subact-item')?.value || '').trim();
-            if (itemText) {
-              const category = card.querySelector('.select-subact-cat')?.value || 'Varios';
-              const cost = (card.querySelector('.input-subact-cost')?.value || '').trim();
-              const buyStatus = card.querySelector('.select-subact-status')?.value || 'pending';
-              const shopId = 'shop_' + Date.now() + '_' + idx;
-
-              shopping.push({
-                id: shopId,
-                activityId: actId,
-                activityTitle: `${title}: ${name}`,
-                item: itemText,
-                category: category,
-                responsible: responsible,
-                responsibleStatus: responsibleStatus,
-                detail: `Para el hito: ${title} (${name})`,
-                cost: cost,
-                status: buyStatus
-              });
-
-              subAct.shopItemId = shopId;
-              createdShopCount++;
-            }
-          }
-
-          subActivities.push(subAct);
-        });
-
-        const newMilestone = {
-          id: actId,
-          timeStart: timeStart,
-          timeEnd: timeEnd,
-          title: title,
-          responsible: subActivities[0]?.responsible || 'Novios / Coordinador',
-          responsibleStatus: subActivities[0]?.responsibleStatus || 'ok',
-          detail: detail,
-          activities: subActivities
+        const subAct = {
+          id: 'sub_' + Date.now() + '_' + idx,
+          name: name,
+          responsible: responsible,
+          responsibleStatus: responsibleStatus,
+          needsPurchase: isPurchase
         };
 
-        timeline.push(newMilestone);
-        timeline.sort((a, b) => getTimelineSortKey(a).localeCompare(getTimelineSortKey(b)));
+        if (isPurchase) {
+          let itemText = (card.querySelector('.input-subact-item')?.value || '').trim();
+          if (!itemText) itemText = `Insumo para: ${name}`;
 
-        formAddActivity.reset();
-        activityModal.classList.remove('active');
-        saveData();
-        renderAll();
-        populateShoppingModalActivities();
-        showToast(`¡Hito "${title}" guardado con ${subActivities.length} actividad(es)` + (createdShopCount > 0 ? ` y ${createdShopCount} compra(s) vinculada(s)!` : `!`));
-      } catch(err) {
-        console.error('Error al guardar hito:', err);
-        alert('Ocurrió un error al guardar: ' + err.message);
+          const category = card.querySelector('.select-subact-cat')?.value || 'Varios';
+          const cost = (card.querySelector('.input-subact-cost')?.value || '').trim();
+          const buyStatus = card.querySelector('.select-subact-status')?.value || 'pending';
+          const shopId = 'shop_' + Date.now() + '_' + idx;
+
+          shopping.push({
+            id: shopId,
+            activityId: actId,
+            activityTitle: `${title}: ${name}`,
+            item: itemText,
+            category: category,
+            responsible: responsible,
+            responsibleStatus: responsibleStatus,
+            detail: `Para el hito: ${title} (${name})`,
+            cost: cost,
+            status: buyStatus
+          });
+
+          subAct.shopItemId = shopId;
+          createdShopCount++;
+        }
+
+        subActivities.push(subAct);
+      });
+
+      if (subActivities.length === 0) {
+        subActivities.push({
+          id: 'sub_' + Date.now() + '_0',
+          name: title,
+          responsible: 'Novios / Coordinador',
+          responsibleStatus: 'ok',
+          needsPurchase: false
+        });
       }
-    });
+
+      const newMilestone = {
+        id: actId,
+        time: timeStart,
+        timeStart: timeStart,
+        timeEnd: timeEnd,
+        title: title,
+        responsible: subActivities[0]?.responsible || 'Novios / Coordinador',
+        responsibleStatus: subActivities[0]?.responsibleStatus || 'ok',
+        detail: detail,
+        activities: subActivities
+      };
+
+      timeline.push(newMilestone);
+      timeline.sort((a, b) => getTimelineSortKey(a).localeCompare(getTimelineSortKey(b)));
+
+      // Guardar de inmediato
+      saveData();
+
+      // Guardar también en respaldo para garantizar permanencia
+      try {
+        const customSaved = JSON.parse(localStorage.getItem('boda_org_timeline_custom') || '[]');
+        customSaved.push(newMilestone);
+        localStorage.setItem('boda_org_timeline_custom', JSON.stringify(customSaved));
+      } catch(e) {}
+
+      renderAll();
+      populateShoppingModalActivities();
+
+      const form = document.getElementById('formAddActivity');
+      if (form) form.reset();
+      const activityModal = document.getElementById('activityModal');
+      if (activityModal) activityModal.classList.remove('active');
+
+      showToast(`¡Hito "${title}" guardado en el cronograma` + (createdShopCount > 0 ? ` y ${createdShopCount} compra(s) vinculada(s)!` : `!`));
+    } catch(err) {
+      console.error('Error al guardar hito:', err);
+      alert('Ocurrió un error al guardar: ' + err.message);
+    }
+  };
+
+  if (formAddActivity) {
+    formAddActivity.addEventListener('submit', window.handleSaveMilestone);
   }
 
   // Modal Nuevo Ítem de Compra

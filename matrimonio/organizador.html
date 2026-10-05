@@ -388,12 +388,73 @@
           </div>
 
           <div id="subActivitiesContainer">
-            <!-- Renderizado dinámicamente: Card 1, Card 2, etc. -->
+            <div class="subact-card" data-subact-id="subact_initial_0">
+              <div class="subact-card-top">
+                <span class="subact-num"><i class="ri-checkbox-circle-line"></i> Actividad 1</span>
+                <button type="button" class="btn-del-subact" title="Quitar esta actividad" onclick="removeSubActivityCard(this)">
+                  <i class="ri-delete-bin-line"></i>
+                </button>
+              </div>
+              <div class="form-group-org" style="margin-bottom: 10px;">
+                <label>Nombre de la Actividad</label>
+                <input type="text" class="input-org input-subact-name" placeholder="Ej.: Cartel de bienvenida / Aguas saborizadas">
+              </div>
+              <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; margin-bottom: 10px;">
+                <div class="form-group-org" style="margin-bottom: 0;">
+                  <label>Encargado(a)</label>
+                  <input type="text" class="input-org input-subact-resp" placeholder="Ej.: Hermano del Novio / Banquetera">
+                </div>
+                <div class="form-group-org" style="margin-bottom: 0;">
+                  <label>¿Encargado OK?</label>
+                  <select class="select-org select-subact-resp-status">
+                    <option value="ok" selected>✓ Confirmado / OK</option>
+                    <option value="pending">⏳ Por Buscar</option>
+                  </select>
+                </div>
+              </div>
+              <div class="subact-purchase-box">
+                <label class="subact-purchase-toggle">
+                  <input type="checkbox" class="check-subact-purchase" onchange="toggleSubactPurchase(this)">
+                  <span>🛍️ ¿Hay que comprar o mandar a hacer algo para esta actividad?</span>
+                </label>
+                <div class="subact-purchase-fields" style="display: none;">
+                  <div class="form-group-org" style="margin-bottom: 8px;">
+                    <label>¿Qué hay que comprar o mandar a hacer?</label>
+                    <input type="text" class="input-org input-subact-item" placeholder="Ej.: Cartel de bienvenida en acrílico">
+                  </div>
+                  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+                    <div class="form-group-org" style="margin-bottom: 0;">
+                      <label>Categoría</label>
+                      <select class="select-org select-subact-cat">
+                        <option value="Decoración" selected>Decoración</option>
+                        <option value="Ceremonia">Ceremonia</option>
+                        <option value="Fiesta">Fiesta</option>
+                        <option value="Vestuario">Vestuario</option>
+                        <option value="Detalles">Detalles</option>
+                        <option value="Varios">Varios</option>
+                      </select>
+                    </div>
+                    <div class="form-group-org" style="margin-bottom: 0;">
+                      <label>Costo Estimado</label>
+                      <input type="text" class="input-org input-subact-cost" placeholder="Ej.: $25.000">
+                    </div>
+                    <div class="form-group-org" style="margin-bottom: 0;">
+                      <label>¿Estado?</label>
+                      <select class="select-org select-subact-status">
+                        <option value="pending" selected>⏳ Pendiente</option>
+                        <option value="in_progress">🎨 Mandado a Hacer</option>
+                        <option value="ok">✓ Ya Listo</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         <div style="margin-top: 22px; padding-bottom: 8px;">
-          <button type="submit" class="btn-org-action" style="width: 100%; justify-content: center; padding: 13px 20px; font-size: 0.95rem;">
+          <button type="button" class="btn-org-action" id="btnSaveMilestone" onclick="handleSaveMilestone(event)" style="width: 100%; justify-content: center; padding: 13px 20px; font-size: 0.95rem;">
             <i class="ri-check-line"></i> <span>Guardar Hito &amp; Actividades</span>
           </button>
         </div>
@@ -554,6 +615,6 @@
   <!-- Scripts con sincronización Supabase Cloud -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js?v=2.6"></script>
-  <script src="js/organizador.js?v=3.3"></script>
+  <script src="js/organizador.js?v=3.4"></script>
 </body>
 </html>
