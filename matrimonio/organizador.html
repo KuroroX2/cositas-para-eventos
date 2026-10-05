@@ -6,6 +6,18 @@
   <title>Organizador Nupcial — Mesas, Cronograma & Compras | Cositas Para Eventos</title>
   <meta name="description" content="Panel de planificación para novios: Organización de mesas, cronograma minuto a minuto y lista de compras del matrimonio.">
 
+  <script>
+    (function() {
+      var p = window.location.pathname;
+      if (p.indexOf('/organizador') !== -1 && !p.endsWith('.html')) {
+        var targetUrl = window.location.href.replace(/\/organizador\/?(\?|#|$)/, '/organizador.html$1');
+        if (targetUrl !== window.location.href) {
+          window.location.replace(targetUrl);
+        }
+      }
+    })();
+  </script>
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,8 +26,9 @@
   <!-- Remix Icon -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
 
-  <!-- Stylesheet -->
-  <link rel="stylesheet" href="css/organizador.css">
+  <!-- Stylesheet (con soporte para rutas relativas y subcarpetas) -->
+  <link rel="stylesheet" href="css/organizador.css?v=2.3">
+  <link rel="stylesheet" href="../css/organizador.css?v=2.3">
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
@@ -497,7 +510,14 @@
   <!-- Toast Notification -->
   <div id="orgToast" class="org-toast" aria-live="polite"></div>
 
-  <!-- Script -->
-  <script src="js/organizador.js"></script>
+  <!-- Script con soporte resiliente de subcarpeta -->
+  <script src="js/organizador.js?v=2.3"></script>
+  <script>
+    if (typeof initOrganizador !== 'function') {
+      var s = document.createElement('script');
+      s.src = '../js/organizador.js?v=2.3';
+      document.body.appendChild(s);
+    }
+  </script>
 </body>
 </html>
