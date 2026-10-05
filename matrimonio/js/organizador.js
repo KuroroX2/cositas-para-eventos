@@ -189,33 +189,52 @@ function ensureTableSeatsArray(table) {
   }
 }
 
-// Lista oficial de los 37 invitados confirmados de la boda
+function safeLower(val) {
+  if (val === undefined || val === null) return '';
+  if (typeof val === 'boolean') return val ? 'si' : 'no';
+  return String(val).trim().toLowerCase();
+}
+
+// Lista oficial completa de invitados confirmados de la boda
 const ALL_CONFIRMED_SEEDS = [
-  // 19 invitaciones oficiales (29 personas)
-  'Roberto', 'Acompañante',
-  'Karen',
-  'Sandra',
-  'Jhankhel',
-  'Yorka',
+  // Novios y Mesa 1
+  'Cristopher', 'Reny',
+  // Familia Novia
   'Pamela', 'Marcial',
   'Constanza',
   'Cecilia',
   'Barbara',
-  'Claudia',
-  'Camila', 'Tah',
-  'Daniela', 'Hugo',
-  'Jessica', 'Eduardo',
-  'Cristopher', 'Reny',
+  // Familia Novio
   'Carlos', 'Carola',
   'Felipe', 'Camila',
+  // Amigos
+  'Jessica', 'Eduardo',
   'Guisselle', 'Nicolas',
   'Jaqueline', 'Luis',
   'Isaac', 'Denisse',
-  // 8 confirmados adicionales de familiares, padrinos y novios para totalizar 37
-  'Evelyn', 'Yimmy',
-  'Patricia', 'Juan',
-  'Rodrigo', 'Andrea',
-  'Gonzalo', 'Marcela'
+  'Jhankhel',
+  'Daniela', 'Hugo',
+  // Invitados confirmados adicionales por ubicar
+  'Roberto', 'Acompañante',
+  'Karen',
+  'Sandra',
+  'Yorka',
+  'Claudia',
+  'Camila', 'Tah',
+  'Paz', 'Mateo',
+  'Michel', 'Paulina',
+  'llergers', 'Priscila',
+  'Pastor Jonathan', 'Pastora Gladys',
+  'Jenn', 'Bruno',
+  'Maximo',
+  'Natalia',
+  'Sebastián',
+  'Valesca Zamorano', 'Roberto Sánchez',
+  'Oscar', 'Barbara',
+  'Bárbara', 'Bastian',
+  'Cristobal Roca', 'Katherine Segovia',
+  'Francisco Fernandez', 'Daniela Vildósola',
+  'Bianca', 'Cristobal'
 ];
 
 function syncConfirmedGuestsWithUnassigned() {
@@ -243,16 +262,16 @@ function syncConfirmedGuestsWithUnassigned() {
     }
   }
 
-  // 1. Leer de wedding_rsvps_cloud_v1 (identificar confirmados y rechazados)
+  // 1. Leer de wedding_rsvps_cloud_v1 (identificar confirmados y rechazados de forma segura)
   try {
     const rawRsvps = localStorage.getItem('wedding_rsvps_cloud_v1');
     if (rawRsvps) {
       const rsvps = JSON.parse(rawRsvps);
       // Primero recolectar todos los que explícitamente NO asisten (incluyendo acompañantes que no asistirán)
       rsvps.forEach(r => {
-        const att = (r.attendance || '').toLowerCase();
-        const att1 = (r.attendance1 || '').toLowerCase();
-        const att2 = (r.attendance2 || '').toLowerCase();
+        const att = safeLower(r.attendance);
+        const att1 = safeLower(r.attendance1);
+        const att2 = safeLower(r.attendance2);
 
         if (att === 'no' || att1 === 'no' || r.isCompanionDeclined) {
           if (r.name) declinedSet.add(r.name.trim().toLowerCase());
@@ -267,9 +286,9 @@ function syncConfirmedGuestsWithUnassigned() {
 
       // Luego registrar a los que SÍ confirmaron asistencia
       rsvps.forEach(r => {
-        const att = (r.attendance || '').toLowerCase();
-        const att1 = (r.attendance1 || '').toLowerCase();
-        const att2 = (r.attendance2 || '').toLowerCase();
+        const att = safeLower(r.attendance);
+        const att1 = safeLower(r.attendance1);
+        const att2 = safeLower(r.attendance2);
 
         if (!r.isCompanionDeclined && (att1 === 'si' || (!r.attendance1 && att === 'si'))) {
           if (r.name && !declinedSet.has(r.name.trim().toLowerCase())) {
@@ -280,6 +299,24 @@ function syncConfirmedGuestsWithUnassigned() {
           if (!declinedSet.has(r.name2.trim().toLowerCase())) {
             addConfirmed(r.name2);
           }
+        }
+      });
+    }
+  } catch (e) {
+    console.warn('Error leyendo RSVPs en organizador:', e);
+  }
+
+  // 1.b Leer de wedding_invitations_cloud_v1 para asegurar todos los invitados
+  try {
+    const rawInvs = localStorage.getItem('wedding_invitations_cloud_v1');
+    if (rawInvs) {
+      const invs = JSON.parse(rawInvs);
+      invs.forEach(inv => {
+        if (inv.name1 && !declinedSet.has(inv.name1.trim().toLowerCase())) {
+          addConfirmed(inv.name1);
+        }
+        if (inv.name2 && !declinedSet.has(inv.name2.trim().toLowerCase())) {
+          addConfirmed(inv.name2);
         }
       });
     }
@@ -402,8 +439,39 @@ function loadData() {
     }
   }
 
-  // Sincronizar automáticamente todos los 37 confirmados con la lista de pendientes
+  // Sincronizar automáticamente todos los confirmados con la lista de pendientes
   syncConfirmedGuestsWithUnassigned();
+
+  // Sincronización en segundo plano con Supabase Cloud si está disponible
+  if (window.dbSupabase) {
+    Promise.all([
+      window.dbSupabase.getInvitations(),
+      window.dbSupabase.getRsvps()
+    ]).then(([cloudInvs, cloudRsvps]) => {
+      let changed = false;
+      if (Array.isArray(cloudInvs) && cloudInvs.length > 0) {
+        localStorage.setItem('wedding_invitations_cloud_v1', JSON.stringify(cloudInvs.map(i => ({
+          id: i.id, pases: i.pases, name1: i.name1, name2: i.name2, phone: i.phone
+        }))));
+        changed = true;
+      }
+      if (Array.isArray(cloudRsvps) && cloudRsvps.length > 0) {
+        localStorage.setItem('wedding_rsvps_cloud_v1', JSON.stringify(cloudRsvps.map(r => ({
+          id: r.id, name: r.name1, name2: r.name2,
+          attendance: (r.attendance1 === true || r.attendance2 === true) ? 'si' : 'no',
+          attendance1: r.attendance1 === true ? 'si' : 'no',
+          attendance2: r.attendance2 === true ? 'si' : 'no',
+          pasesCount: (r.attendance1 === true ? 1 : 0) + (r.attendance2 === true ? 1 : 0),
+          isCompanionDeclined: (r.name2 && r.attendance1 === true && r.attendance2 === false)
+        }))));
+        changed = true;
+      }
+      if (changed) {
+        syncConfirmedGuestsWithUnassigned();
+        renderAll();
+      }
+    }).catch(e => console.warn('Supabase sync notice in organizador:', e));
+  }
 
   const savedTimeline = localStorage.getItem(STORAGE_KEY_TIMELINE);
   if (savedTimeline) {
@@ -606,9 +674,9 @@ function getCompanion(guestName) {
     if (rawR) {
       const rsvps = JSON.parse(rawR);
       rsvps.forEach(r => {
-        const att = (r.attendance || '').toLowerCase();
-        const att1 = (r.attendance1 || '').toLowerCase();
-        const att2 = (r.attendance2 || '').toLowerCase();
+        const att = safeLower(r.attendance);
+        const att1 = safeLower(r.attendance1);
+        const att2 = safeLower(r.attendance2);
         if (att === 'no' || att1 === 'no' || r.isCompanionDeclined) {
           if (r.name) declinedCompanions.add(r.name.trim().toLowerCase());
         }
