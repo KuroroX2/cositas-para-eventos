@@ -440,7 +440,7 @@ function loadData() {
         ensureTableSeatsArray(t);
       });
       sortTablesAscending();
-      saveData();
+      localStorage.setItem(STORAGE_KEY_TABLES, JSON.stringify(tables));
     } catch (e) {
       console.error('Error cargando mesas:', e);
     }
@@ -784,90 +784,157 @@ function loadData() {
   // Ordenar cronograma por hora de inicio
   timeline.sort((a, b) => getTimelineSortKey(a).localeCompare(getTimelineSortKey(b)));
 
-  const savedShopping = localStorage.getItem(STORAGE_KEY_SHOPPING);
-  if (savedShopping) {
-    shopping = JSON.parse(savedShopping);
-  } else {
-    shopping = [
-      {
-        id: 'shop_cartel_rec',
-        item: 'Cartel de Bienvenidos (Madera / Acrílico)',
-        activityTitle: 'Llegada & Momento Manta: Instalación de Cartel de Bienvenida',
-        activityId: 'act_inv_llegada',
-        category: 'Decoración',
-        responsible: 'Hermano del Novio',
-        responsibleStatus: 'ok',
-        detail: 'Para la entrada principal de la casona',
-        cost: '$25.000',
-        status: 'in_progress'
-      },
-      {
-        id: 'shop_1',
-        item: 'Kit de Luces de Bengala para Salida de Ceremonia',
-        activityTitle: 'Bajón de Tarde-Noche & Despedida: Túnel de despedida con chispas de bengala',
-        activityId: 'act_bajon_final',
-        category: 'Ceremonia',
-        detail: '100 unidades de chispas largas (45 cm) para el atardecer',
-        cost: '$25.000',
-        status: 'ok'
-      },
-      {
-        id: 'shop_2',
-        item: 'Cámaras Desechables Vintage para cada mesa',
-        activityTitle: 'Sobremesa & Fotos Instagrameables 📸✨: Activación de photo spots y cámaras vintage en mesas',
-        activityId: 'act_inv_sobremesa',
-        category: 'Detalles',
-        detail: '8 cámaras instantáneas desechables para las mesas',
-        cost: '$60.000',
-        status: 'ok'
-      },
-      {
-        id: 'shop_3',
-        item: 'Pantuflas y Chalas Cómodas para la Fiesta',
-        activityTitle: '¡Música & Fiesta!: Reparto de cotillón temático y pantuflas cómodas',
-        activityId: 'act_inv_fiesta',
-        category: 'Fiesta',
-        detail: '40 pares surtidos de tallas M y L para bailarines',
-        cost: '$45.000',
-        status: 'ok'
-      },
-      {
-        id: 'shop_4',
-        item: 'Kit de Baño / Emergencia (Hombres y Mujeres)',
-        category: 'Varios',
-        detail: 'Costurero, desodorantes, paracetamol, pañuelitos y mentas',
-        cost: '$18.000',
-        status: 'pending'
-      },
-      {
-        id: 'shop_5',
-        item: 'Carteles y Marcos para Códigos QR de Fotos',
-        category: 'Decoración',
-        detail: '6 marcos dorados de sobremesa con el link del álbum',
-        cost: '$15.000',
-        status: 'pending'
-      },
-      {
-        id: 'shop_6',
-        item: 'Bolsitas de Arroz y Pétalos de Olivo',
-        category: 'Ceremonia',
-        detail: '70 conos de papel kraft biodegradables',
-        cost: '$12.000',
-        status: 'pending'
-      },
-      {
-        id: 'shop_7',
-        item: 'Cotillón Neón y Pulseras Luminosas LED',
-        category: 'Fiesta',
-        activityTitle: 'Fiesta, Baile & Cotillón',
-        responsible: 'DJ & Animador',
-        responsibleStatus: 'ok',
-        detail: 'Pack fiesta flúor con lentes LED y barras de luz',
-        cost: '$35.000',
-        status: 'pending'
-      }
-    ];
+  // Carga robusta de compras y sincronización con cronograma
+  const DEFAULT_SHOPPING_ITEMS = [
+    {
+      id: 'shop_cartel_rec',
+      item: 'Cartel de Bienvenidos (Madera / Acrílico)',
+      activityTitle: 'Llegada & Momento Manta: Instalación de Cartel de Bienvenida',
+      activityId: 'act_inv_llegada',
+      category: 'Decoración',
+      responsible: 'Hermano del Novio',
+      responsibleStatus: 'ok',
+      detail: 'Para la entrada principal de la casona',
+      cost: '$25.000',
+      status: 'in_progress'
+    },
+    {
+      id: 'shop_1',
+      item: 'Kit de Luces de Bengala para Salida de Ceremonia',
+      activityTitle: 'Bajón de Tarde-Noche & Despedida: Túnel de despedida con chispas de bengala',
+      activityId: 'act_bajon_final',
+      category: 'Ceremonia',
+      detail: '100 unidades de chispas largas (45 cm) para el atardecer',
+      cost: '$25.000',
+      status: 'ok'
+    },
+    {
+      id: 'shop_2',
+      item: 'Cámaras Desechables Vintage para cada mesa',
+      activityTitle: 'Sobremesa & Fotos Instagrameables 📸✨: Activación de photo spots y cámaras vintage en mesas',
+      activityId: 'act_inv_sobremesa',
+      category: 'Detalles',
+      detail: '8 cámaras instantáneas desechables para las mesas',
+      cost: '$60.000',
+      status: 'ok'
+    },
+    {
+      id: 'shop_3',
+      item: 'Pantuflas y Chalas Cómodas para la Fiesta',
+      activityTitle: '¡Música & Fiesta!: Reparto de cotillón temático y pantuflas cómodas',
+      activityId: 'act_inv_fiesta',
+      category: 'Fiesta',
+      detail: '40 pares surtidos de tallas M y L para bailarines',
+      cost: '$45.000',
+      status: 'ok'
+    },
+    {
+      id: 'shop_4',
+      item: 'Kit de Baño / Emergencia (Hombres y Mujeres)',
+      category: 'Varios',
+      detail: 'Costurero, desodorantes, paracetamol, pañuelitos y mentas',
+      cost: '$18.000',
+      status: 'pending'
+    },
+    {
+      id: 'shop_5',
+      item: 'Carteles y Marcos para Códigos QR de Fotos',
+      category: 'Decoración',
+      detail: '6 marcos dorados de sobremesa con el link del álbum',
+      cost: '$15.000',
+      status: 'pending'
+    },
+    {
+      id: 'shop_6',
+      item: 'Bolsitas de Arroz y Pétalos de Olivo',
+      category: 'Ceremonia',
+      activityTitle: 'Ceremonia Civil & Religiosa: Lluvia de pétalos naturales a la salida',
+      activityId: 'act_inv_ceremonia',
+      detail: '70 conos de papel kraft biodegradables',
+      cost: '$12.000',
+      status: 'ok'
+    },
+    {
+      id: 'shop_7',
+      item: 'Cotillón Neón y Pulseras Luminosas LED',
+      category: 'Fiesta',
+      activityTitle: '¡Música & Fiesta!: Reparto de cotillón temático y pantuflas cómodas',
+      activityId: 'act_inv_fiesta',
+      responsible: 'Amigos de los Novios',
+      responsibleStatus: 'ok',
+      detail: 'Pack fiesta flúor con lentes LED y barras de luz',
+      cost: '$35.000',
+      status: 'in_progress'
+    }
+  ];
+
+  const savedShoppingV2 = localStorage.getItem('boda_org_shopping_v2');
+  const savedShoppingV1 = localStorage.getItem('boda_org_shopping');
+  let loadedShopping = null;
+
+  if (savedShoppingV2) {
+    try { loadedShopping = JSON.parse(savedShoppingV2); } catch(e) {}
   }
+  if ((!loadedShopping || loadedShopping.length === 0) && savedShoppingV1) {
+    try { loadedShopping = JSON.parse(savedShoppingV1); } catch(e) {}
+  }
+
+  // Respaldo de compras personalizadas agregadas por el usuario
+  let customSavedShopping = [];
+  try {
+    customSavedShopping = JSON.parse(localStorage.getItem('boda_org_shopping_custom') || '[]');
+  } catch(e) {}
+
+  if (loadedShopping && Array.isArray(loadedShopping) && loadedShopping.length > 0) {
+    shopping = loadedShopping;
+  } else {
+    shopping = JSON.parse(JSON.stringify(DEFAULT_SHOPPING_ITEMS));
+  }
+
+  // Reintegrar compras del respaldo personalizado si faltan
+  if (Array.isArray(customSavedShopping) && customSavedShopping.length > 0) {
+    customSavedShopping.forEach(cs => {
+      if (!shopping.some(s => s.id === cs.id || (s.item && s.item.toLowerCase() === (cs.item || '').toLowerCase()))) {
+        shopping.push(cs);
+      }
+    });
+  }
+
+  // Sincronizar compras requeridas desde las actividades del cronograma
+  if (Array.isArray(timeline)) {
+    timeline.forEach(m => {
+      if (Array.isArray(m.activities)) {
+        m.activities.forEach(a => {
+          if (a.needsPurchase && (a.shopItem || a.name)) {
+            const itemName = a.shopItem || `Insumo para: ${a.name}`;
+            const exists = shopping.some(s => 
+              (a.shopItemId && s.id === a.shopItemId) ||
+              (s.activityId === m.id && s.item && s.item.toLowerCase() === itemName.toLowerCase()) ||
+              (s.item && s.item.toLowerCase() === itemName.toLowerCase())
+            );
+            if (!exists) {
+              const newShop = {
+                id: a.shopItemId || ('shop_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4)),
+                activityId: m.id,
+                activityTitle: `${m.title}: ${a.name}`,
+                item: itemName,
+                category: a.shopCategory || 'Decoración',
+                responsible: a.responsible || m.responsible || 'Novios',
+                responsibleStatus: a.responsibleStatus || 'ok',
+                detail: `Vinculado al hito: ${m.title}`,
+                cost: a.shopCost || '',
+                status: a.shopStatus || 'in_progress'
+              };
+              shopping.push(newShop);
+            }
+          }
+        });
+      }
+    });
+  }
+
+  // Guardar compras consolidadas
+  localStorage.setItem(STORAGE_KEY_SHOPPING, JSON.stringify(shopping));
 
   // Normalizar ítems de cronograma (compatibilidad con timeStart y timeEnd)
   if (Array.isArray(timeline)) {
@@ -2461,12 +2528,17 @@ function updateToggleAllButtonText() {
 window.toggleMilestoneCard = function(id) {
   if (!window.expandedMilestones) window.expandedMilestones = new Set();
   const card = document.querySelector(`.timeline-milestone-card[data-milestone-id="${id}"]`);
+  if (!card) return;
+  const body = card.querySelector('.milestone-card-body');
+
   if (window.expandedMilestones.has(id)) {
     window.expandedMilestones.delete(id);
-    if (card) card.classList.remove('expanded');
+    card.classList.remove('expanded');
+    if (body) body.style.display = 'none';
   } else {
     window.expandedMilestones.add(id);
-    if (card) card.classList.add('expanded');
+    card.classList.add('expanded');
+    if (body) body.style.display = 'block';
   }
   updateToggleAllButtonText();
 };
@@ -2477,10 +2549,18 @@ window.toggleAllTimelineMilestones = function() {
   const shouldExpand = window.expandedMilestones.size < timeline.length;
   if (shouldExpand) {
     timeline.forEach(t => window.expandedMilestones.add(t.id));
-    allCards.forEach(c => c.classList.add('expanded'));
+    allCards.forEach(c => {
+      c.classList.add('expanded');
+      const b = c.querySelector('.milestone-card-body');
+      if (b) b.style.display = 'block';
+    });
   } else {
     window.expandedMilestones.clear();
-    allCards.forEach(c => c.classList.remove('expanded'));
+    allCards.forEach(c => {
+      c.classList.remove('expanded');
+      const b = c.querySelector('.milestone-card-body');
+      if (b) b.style.display = 'none';
+    });
   }
   updateToggleAllButtonText();
 };
@@ -3103,7 +3183,7 @@ function setupEventListeners() {
           const buyStatus = card.querySelector('.select-subact-status')?.value || 'pending';
           const shopId = 'shop_' + Date.now() + '_' + idx;
 
-          shopping.push({
+          const newShopFromMilestone = {
             id: shopId,
             activityId: actId,
             activityTitle: `${title}: ${name}`,
@@ -3114,7 +3194,15 @@ function setupEventListeners() {
             detail: `Para el hito: ${title} (${name})`,
             cost: cost,
             status: buyStatus
-          });
+          };
+          shopping.push(newShopFromMilestone);
+
+          // Respaldo permanente de compras personalizadas
+          try {
+            const customShop = JSON.parse(localStorage.getItem('boda_org_shopping_custom') || '[]');
+            customShop.push(newShopFromMilestone);
+            localStorage.setItem('boda_org_shopping_custom', JSON.stringify(customShop));
+          } catch(e) {}
 
           subAct.shopItemId = shopId;
           createdShopCount++;
@@ -3208,7 +3296,7 @@ function setupEventListeners() {
           if (linkedAct) linkedTitle = linkedAct.title;
         }
 
-        shopping.push({
+        const newShopItem = {
           id: 'shop_' + Date.now(),
           activityId: linkedActId,
           activityTitle: linkedTitle,
@@ -3219,7 +3307,15 @@ function setupEventListeners() {
           detail: detail,
           cost: cost,
           status: status
-        });
+        };
+        shopping.push(newShopItem);
+
+        // Respaldo permanente de compras personalizadas
+        try {
+          const customShop = JSON.parse(localStorage.getItem('boda_org_shopping_custom') || '[]');
+          customShop.push(newShopItem);
+          localStorage.setItem('boda_org_shopping_custom', JSON.stringify(customShop));
+        } catch(e) {}
 
         formAddShopping.reset();
         shoppingModal.classList.remove('active');

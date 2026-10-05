@@ -2373,8 +2373,25 @@ i[class^="ri-"], i[class*=" ri-"] {
 
 /* Interior del Hito (Body desplegable) */
 .milestone-card-body {
+  display: none;
   padding: 20px 24px;
   background: #FFFFFF;
+}
+
+.timeline-milestone-card.expanded .milestone-card-body {
+  display: block !important;
+  animation: slideDownMilestone 0.22s ease-out forwards;
+}
+
+@keyframes slideDownMilestone {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .milestone-context-box {
