@@ -1132,22 +1132,51 @@ function renderFloorplan() {
 }
 
 function ensureNoviosInCenterOfTable(table) {
-  if (!isNoviosTable(table) || !table.guests) return;
+  if (!isNoviosTable(table) || !table.guests || table.seatsCustom) return;
   const seated = getSeatedGuests(table);
   if (seated.length < 2) return;
 
-  const novio1 = seated[0];
-  const comp = getCompanion(novio1);
-  let compIdx = comp ? seated.findIndex(g => isGuestNameMatch(g, comp)) : 1;
-  if (compIdx === -1) compIdx = 1;
-  const novio2 = seated[compIdx];
+  // Identificar a los novios
+  let novio1 = seated.find(g => isGuestNameMatch(g, 'Cristopher') || isGuestNameMatch(g, 'Reny')) || seated[0];
+  let comp = getCompanion(novio1);
+  let novio2 = comp ? seated.find(g => isGuestNameMatch(g, comp)) : seated.find(g => !isGuestNameMatch(g, novio1));
+  if (!novio2 && seated.length > 1) {
+    novio2 = seated.find(g => !isGuestNameMatch(g, novio1));
+  }
+  if (!novio2) return;
 
-  const others = seated.filter(g => g !== novio1 && g !== novio2);
-  const leftCount = Math.floor(others.length / 2);
-  const leftGuests = others.slice(0, leftCount);
-  const rightGuests = others.slice(leftCount);
+  const others = seated.filter(g => !isGuestNameMatch(g, novio1) && !isGuestNameMatch(g, novio2));
 
-  table.guests = [...leftGuests, novio1, novio2, ...rightGuests];
+  const cap = table.capacity || 2;
+  const newGuests = new Array(cap).fill(null);
+
+  if (others.length === 0) {
+    // Solo los novios: centrados exactamente en los asientos del medio de la mesa
+    const centerStart = Math.max(0, Math.floor((cap - 2) / 2));
+    newGuests[centerStart] = novio1;
+    if (centerStart + 1 < cap) {
+      newGuests[centerStart + 1] = novio2;
+    }
+  } else {
+    // Novios e invitados adicionales: centrados simétricamente
+    const totalCount = 2 + others.length;
+    const startIdx = Math.max(0, Math.floor((cap - totalCount) / 2));
+    const leftCount = Math.floor(others.length / 2);
+    const leftOthers = others.slice(0, leftCount);
+    const rightOthers = others.slice(leftCount);
+
+    let cur = startIdx;
+    for (const g of leftOthers) {
+      if (cur < cap) newGuests[cur++] = g;
+    }
+    if (cur < cap) newGuests[cur++] = novio1;
+    if (cur < cap) newGuests[cur++] = novio2;
+    for (const g of rightOthers) {
+      if (cur < cap) newGuests[cur++] = g;
+    }
+  }
+
+  table.guests = newGuests;
   ensureTableSeatsArray(table);
 }
 
@@ -1347,6 +1376,7 @@ function handleChairDrop(targetTableId, targetSeatIndex) {
       const temp = targetTable.guests[srcSeatIdx];
       targetTable.guests[srcSeatIdx] = targetTable.guests[targetSeatIndex] || null;
       targetTable.guests[targetSeatIndex] = temp;
+      targetTable.seatsCustom = true;
       ensureTableSeatsArray(targetTable);
       saveData();
       renderAll();
@@ -1360,6 +1390,7 @@ function handleChairDrop(targetTableId, targetSeatIndex) {
     }
     const previousOccupant = targetTable.guests[targetSeatIndex];
     targetTable.guests[targetSeatIndex] = draggedGuestName;
+    targetTable.seatsCustom = true;
     if (previousOccupant && typeof previousOccupant === 'string' && previousOccupant.trim()) {
       if (!unassignedGuests.includes(previousOccupant)) {
         unassignedGuests.push(previousOccupant);
@@ -1378,6 +1409,8 @@ function handleChairDrop(targetTableId, targetSeatIndex) {
     const targetGuest = targetTable.guests[targetSeatIndex];
     srcTable.guests[srcSeatIdx] = (targetGuest && typeof targetGuest === 'string' && targetGuest.trim()) ? targetGuest : null;
     targetTable.guests[targetSeatIndex] = draggedGuestName;
+    srcTable.seatsCustom = true;
+    targetTable.seatsCustom = true;
     ensureTableSeatsArray(srcTable);
     ensureTableSeatsArray(targetTable);
 
@@ -1608,6 +1641,7 @@ window.swapCoupleSides = function(tableId, guestName) {
     const temp = table.guests[idx1];
     table.guests[idx1] = table.guests[idx2];
     table.guests[idx2] = temp;
+    table.seatsCustom = true;
 
     saveData();
     renderAll();
@@ -1649,6 +1683,7 @@ window.moveSeatItem = function(tableId, guestIndex, direction) {
     }
   }
 
+  table.seatsCustom = true;
   saveData();
   renderAll();
   if (currentSeatsModalTableId === tableId) {
