@@ -167,13 +167,17 @@ i[class^="ri-"], i[class*=" ri-"] {
 
 .btn-header-primary {
   background: var(--navy-royal);
-  color: #D4AF37;
-  border-color: #D4AF37;
+  color: #FFFFFF;
+  border: 1.5px solid var(--navy-royal);
+  box-shadow: 0 4px 12px rgba(10, 24, 40, 0.18);
 }
 
 .btn-header-primary:hover {
-  background: #D4AF37;
-  color: var(--navy-royal);
+  background: #1A365D;
+  color: #FFFFFF;
+  border-color: #1A365D;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(10, 24, 40, 0.25);
 }
 
 /* Main Container */
