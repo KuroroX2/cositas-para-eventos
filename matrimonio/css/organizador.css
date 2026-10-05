@@ -1833,18 +1833,39 @@ i[class^="ri-"], i[class*=" ri-"] {
   flex-shrink: 0;
 }
 
-.fp-legend-dot.dot-green {
-  background: #E8F5E9;
-  border: 2px solid #2E7D32;
+.fp-legend-dot.dot-male {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  border: 1.5px solid #047857;
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 0.65rem;
 }
 
-.fp-legend-dot.dot-yellow {
-  background: #FFFBEB;
-  border: 2px solid #94A3B8;
-  box-shadow: 0 0 6px rgba(148, 163, 184, 0.4);
+.fp-legend-dot.dot-female {
+  background: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%);
+  border: 1.5px solid #0E7490;
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 0.65rem;
 }
 
-.fp-legend-dot.dot-gold, .dot-platinum, .dot-vip {
+.fp-legend-dot.dot-role-i {
+  background: #334155;
+  border: 1.5px solid #64748B;
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 0.65rem;
+}
+
+.fp-legend-dot.dot-role-a {
+  background: #475569;
+  border: 1.5px solid #94A3B8;
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 0.65rem;
+}
+
+.fp-legend-dot.dot-platinum, .dot-vip {
   background: #0A1828;
   border: 2px solid #94A3B8;
   color: #94A3B8;
@@ -2869,4 +2890,137 @@ i[class^="ri-"], i[class*=" ri-"] {
   border-color: #94A3B8;
   box-shadow: 0 4px 12px rgba(148, 163, 184, 0.5);
   transform: translateY(-1px);
+}
+
+
+/* ==========================================================================
+   PUESTOS 2D SEGÚN GÉNERO Y ROL (VERDE = HOMBRE, CALIPSO = MUJER, I/A)
+   ========================================================================== */
+
+/* Hombre: Color Verde Esmeralda Vibrante */
+.fp-chair-circle.circle-male {
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+  border: 2px solid #047857 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.45) !important;
+}
+
+.fp-chair:hover .fp-chair-circle.circle-male {
+  transform: scale(1.18);
+  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.65) !important;
+}
+
+.fp-chair-name.name-male {
+  border-color: #10B981 !important;
+  color: #064E3B !important;
+  background: #ECFDF5 !important;
+  font-weight: 700;
+}
+
+/* Mujer: Color Calipso / Turquesa Cian Radiante */
+.fp-chair-circle.circle-female {
+  background: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%) !important;
+  border: 2px solid #0E7490 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 2px 8px rgba(8, 145, 178, 0.45) !important;
+}
+
+.fp-chair:hover .fp-chair-circle.circle-female {
+  transform: scale(1.18);
+  box-shadow: 0 4px 14px rgba(8, 145, 178, 0.65) !important;
+}
+
+.fp-chair-name.name-female {
+  border-color: #06B6D4 !important;
+  color: #164E63 !important;
+  background: #ECFEFF !important;
+  font-weight: 700;
+}
+
+/* Letra de Rol I (Invitado) / A (Acompañante) */
+.fp-role-letter {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.5px;
+  color: #FFFFFF;
+}
+
+/* Coronita mini para Novios */
+.fp-crown-mini {
+  position: absolute;
+  top: -8px;
+  right: -6px;
+  font-size: 0.75rem;
+  color: #CBD5E1;
+  background: #0A1828;
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Indicador de Pareja en la silla */
+.fp-chair.couple {
+  filter: drop-shadow(0 0 4px rgba(148, 163, 184, 0.5));
+}
+
+/* Leyenda del Plano 2D */
+.fp-legend-dot.dot-male {
+  background: #059669;
+  color: #FFFFFF;
+  font-weight: 900;
+  font-size: 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.fp-legend-dot.dot-female {
+  background: #0891B2;
+  color: #FFFFFF;
+  font-weight: 900;
+  font-size: 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+/* Modal de Ordenamiento de Puestos: Badges de Género y Rol */
+.seat-role-pill {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.seat-role-pill.pill-male {
+  background: #ECFDF5;
+  color: #065F46;
+  border: 1px solid #10B981;
+}
+
+.seat-role-pill.pill-female {
+  background: #ECFEFF;
+  color: #155E75;
+  border: 1px solid #06B6D4;
+}
+
+.seat-arr-num.num-male {
+  background: #059669;
+  color: #FFFFFF;
+}
+
+.seat-arr-num.num-female {
+  background: #0891B2;
+  color: #FFFFFF;
 }

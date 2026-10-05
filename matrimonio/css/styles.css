@@ -17,20 +17,20 @@
   --text-light: #F8F7F4;
   --text-light-muted: #A8A5A0;
 
-  --gold-primary: #C5A059;
-  --gold-light: #E5C378;
-  --gold-dark: #9E7B35;
-  --gold-gradient: linear-gradient(135deg, #C5A059 0%, #E8CD8C 50%, #A8833E 100%);
+  --gold-primary: #94A3B8;
+  --gold-light: #F1F5F9;
+  --gold-dark: #334155;
+  --gold-gradient: linear-gradient(135deg, #94A3B8 0%, #E2E8F0 50%, #475569 100%);
 
-  --glow-color-1: rgba(197, 160, 89, 0.08);
+  --glow-color-1: rgba(148, 163, 184, 0.08);
   --glow-color-2: rgba(229, 195, 120, 0.05);
 
   --border-hairline: 1px solid rgba(28, 27, 26, 0.12);
-  --border-gold: 1px solid rgba(197, 160, 89, 0.45);
+  --border-gold: 1px solid rgba(148, 163, 184, 0.45);
   --border-radius-card: 0px;
   --shadow-editorial: 0 8px 24px rgba(0, 0, 0, 0.05);
   --shadow-hover: 0 16px 36px rgba(0, 0, 0, 0.1);
-  --shadow-gold: 0 6px 20px rgba(197, 160, 89, 0.25);
+  --shadow-gold: 0 6px 20px rgba(148, 163, 184, 0.25);
 
   --font-serif: 'Italiana', 'Cinzel', serif;
   --font-display: 'Cinzel', serif;
@@ -53,13 +53,13 @@ body.theme-vogue {
   --text-muted: #666360;
   --text-light: #F8F7F4;
   --text-light-muted: #A8A5A0;
-  --gold-primary: #C5A059;
-  --gold-light: #E5C378;
-  --gold-dark: #9E7B35;
-  --gold-gradient: linear-gradient(135deg, #C5A059 0%, #E8CD8C 50%, #A8833E 100%);
-  --glow-color-1: rgba(197, 160, 89, 0.08);
+  --gold-primary: #94A3B8;
+  --gold-light: #F1F5F9;
+  --gold-dark: #334155;
+  --gold-gradient: linear-gradient(135deg, #94A3B8 0%, #E2E8F0 50%, #475569 100%);
+  --glow-color-1: rgba(148, 163, 184, 0.08);
   --glow-color-2: rgba(229, 195, 120, 0.05);
-  --border-gold: 1px solid rgba(197, 160, 89, 0.45);
+  --border-gold: 1px solid rgba(148, 163, 184, 0.45);
   --border-radius-card: 0px;
   --font-serif: 'Italiana', 'Cinzel', serif;
   --font-script: 'Pinyon Script', cursive;
@@ -127,13 +127,13 @@ body.theme-tradicional {
   --text-muted: #495E73;
   --text-light: #F8FAFC;
   --text-light-muted: #9BB0C7;
-  --gold-primary: #D4AF37;         /* Royal Gold Foil */
-  --gold-light: #F5E6B3;
-  --gold-dark: #A68218;
-  --gold-gradient: linear-gradient(135deg, #D4AF37 0%, #F5E6B3 50%, #A68218 100%);
-  --glow-color-1: rgba(212, 175, 55, 0.14);
+  --gold-primary: #94A3B8;         /* Royal Gold Foil */
+  --gold-light: #F1F5F9;
+  --gold-dark: #334155;
+  --gold-gradient: linear-gradient(135deg, #94A3B8 0%, #E2E8F0 50%, #334155 100%);
+  --glow-color-1: rgba(148, 163, 184, 0.14);
   --glow-color-2: rgba(10, 24, 40, 0.1);
-  --border-gold: 2px solid rgba(212, 175, 55, 0.65);
+  --border-gold: 2px solid rgba(148, 163, 184, 0.65);
   --border-radius-card: 4px;
   --font-serif: 'Cormorant Garamond', serif;
   --font-script: 'Great Vibes', cursive;
@@ -144,11 +144,11 @@ body.theme-tradicional .hero-title .title-name {
   color: #0A1828;
   font-weight: normal;
   line-height: 0.9;
-  text-shadow: 0 1px 2px rgba(212, 175, 55, 0.3);
+  text-shadow: 0 1px 2px rgba(148, 163, 184, 0.3);
 }
 body.theme-tradicional .hero-border-frame {
   background: #FFFFFF;
-  border: 3px double #D4AF37;
+  border: 3px double #94A3B8;
   box-shadow: 0 20px 50px rgba(10, 24, 40, 0.12);
   border-radius: 4px;
 }
@@ -157,7 +157,7 @@ body.theme-tradicional .picnic-card-box,
 body.theme-tradicional .lookbook-card,
 body.theme-tradicional .challenge-card,
 body.theme-tradicional .rsvp-editorial-wrapper {
-  border: 1px solid rgba(212, 175, 55, 0.45);
+  border: 1px solid rgba(148, 163, 184, 0.45);
   border-radius: 4px;
 }
 
@@ -659,7 +659,7 @@ body.theme-florido .vogue-header {
 body.theme-vogue .frame-ornament {
   width: 26px;
   height: 26px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C5A059' stroke-width='1.5'%3E%3Cpath d='M2 10V2h8M14 2h8v8M2 14v8h8M22 14v8h-8'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='1.5'%3E%3Cpath d='M2 10V2h8M14 2h8v8M2 14v8h8M22 14v8h-8'/%3E%3C/svg%3E");
   opacity: 0.85;
 }
 body.theme-vogue .hero-theme-crest {
@@ -702,7 +702,7 @@ body.theme-tradicional .frame-ornament {
   height: 75px;
   top: 4px;
   left: 4px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23D4AF37' stroke-width='2'%3E%3Cpath d='M8 8 Q 45 12 50 50 Q 12 45 8 8 Z' fill='%23F5E6B3' fill-opacity='0.3'/%3E%3Cpath d='M8 8 L 8 45 Q 25 35 35 25 Q 45 15 8 8'/%3E%3Ccircle cx='24' cy='24' r='4.5' fill='%23D4AF37'/%3E%3Cpath d='M50 8 Q 70 8 75 25' stroke-dasharray='2 3'/%3E%3Cpath d='M8 50 Q 8 70 25 75' stroke-dasharray='2 3'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Cpath d='M8 8 Q 45 12 50 50 Q 12 45 8 8 Z' fill='%23F1F5F9' fill-opacity='0.3'/%3E%3Cpath d='M8 8 L 8 45 Q 25 35 35 25 Q 45 15 8 8'/%3E%3Ccircle cx='24' cy='24' r='4.5' fill='%2394A3B8'/%3E%3Cpath d='M50 8 Q 70 8 75 25' stroke-dasharray='2 3'/%3E%3Cpath d='M8 50 Q 8 70 25 75' stroke-dasharray='2 3'/%3E%3C/svg%3E");
 }
 body.theme-tradicional .corner-tr { top: 4px; right: 4px; }
 body.theme-tradicional .corner-bl { bottom: 4px; left: 4px; }
@@ -713,7 +713,7 @@ body.theme-tradicional .hero-theme-crest {
   width: 54px;
   height: 30px;
   margin: 0 auto 0.6rem;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 30' fill='%23D4AF37'%3E%3Cpath d='M30 2 L35 12 L45 8 L40 22 L20 22 L15 8 L25 12 Z M20 25 L40 25 L40 27 L20 27 Z'/%3E%3C/svg%3E") no-repeat center;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 30' fill='%2394A3B8'%3E%3Cpath d='M30 2 L35 12 L45 8 L40 22 L20 22 L15 8 L25 12 Z M20 25 L40 25 L40 27 L20 27 Z'/%3E%3C/svg%3E") no-repeat center;
   background-size: contain;
 }
 
@@ -1001,7 +1001,7 @@ body.theme-campestre .title-divider {
 body.theme-tradicional .title-divider {
   width: 80px;
   height: 16px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 24' fill='none' stroke='%23D4AF37' stroke-width='1.5'%3E%3Cpath d='M0 12 L45 12 Q 55 4 60 12 Q 65 20 75 12 L120 12'/%3E%3Ccircle cx='60' cy='12' r='3' fill='%23D4AF37'/%3E%3C/svg%3E") no-repeat center;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 24' fill='none' stroke='%2394A3B8' stroke-width='1.5'%3E%3Cpath d='M0 12 L45 12 Q 55 4 60 12 Q 65 20 75 12 L120 12'/%3E%3Ccircle cx='60' cy='12' r='3' fill='%2394A3B8'/%3E%3C/svg%3E") no-repeat center;
   background-size: contain;
 }
 
@@ -1447,7 +1447,7 @@ body.theme-florido .title-divider {
 /* ---------- 8. SECTION: DESAFÍO DE FOTOS ---------- */
 .section-challenge {
   background: rgba(0, 0, 0, 0.02);
-  border-top: 1px solid rgba(197, 160, 89, 0.2);
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
 }
 .challenge-box {
   max-width: 860px;
@@ -1486,7 +1486,7 @@ body.theme-florido .title-divider {
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--gold-dark);
-  background: rgba(197, 160, 89, 0.12);
+  background: rgba(148, 163, 184, 0.12);
   width: 36px;
   height: 36px;
   display: flex;
@@ -1499,7 +1499,7 @@ body.theme-campestre .ch-num {
   background: rgba(82, 122, 80, 0.15);
 }
 body.theme-tradicional .ch-num {
-  background: rgba(212, 175, 55, 0.15);
+  background: rgba(148, 163, 184, 0.15);
 }
 body.theme-florido .ch-num {
   background: rgba(212, 123, 139, 0.15);
@@ -2091,7 +2091,7 @@ body.theme-florido .ch-num {
 /* ---------- 9. RSVP FORM ---------- */
 .section-rsvp {
   background: rgba(0, 0, 0, 0.02);
-  border-top: 1px solid rgba(197, 160, 89, 0.2);
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
 }
 .rsvp-editorial-wrapper {
   max-width: 740px;
@@ -2591,7 +2591,7 @@ body.theme-florido .ch-num {
   display: flex;
   align-items: center;
   gap: 1rem;
-  background: linear-gradient(135deg, rgba(82, 122, 80, 0.12) 0%, rgba(212, 175, 55, 0.15) 100%);
+  background: linear-gradient(135deg, rgba(82, 122, 80, 0.12) 0%, rgba(148, 163, 184, 0.15) 100%);
   border: 2px solid var(--border-gold);
   border-radius: var(--border-radius-card);
   padding: 1.2rem 1.4rem;
@@ -3999,7 +3999,7 @@ body.theme-florido .ch-num {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  border: 2px dashed #D4AF37;
+  border: 2px dashed #94A3B8;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition: all 0.2s ease;
   flex-shrink: 0;
@@ -4484,7 +4484,7 @@ body.theme-tradicional .wedding-hero-cinematic .wedding-hero-overlay {
 }
 
 body.theme-tradicional .wedding-hero-cinematic .wedding-tag {
-  color: #D4AF37;
+  color: #94A3B8;
   font-family: 'Great Vibes', cursive;
   font-size: clamp(2.5rem, 4.5vw, 3.6rem);
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.85);
@@ -4504,47 +4504,47 @@ body.theme-tradicional .wedding-hero-cinematic .wedding-date-location {
 
 body.theme-tradicional .wedding-hero-cinematic .countdown-unit {
   background: rgba(10, 24, 40, 0.88);
-  border: 1.5px solid rgba(212, 175, 55, 0.45);
+  border: 1.5px solid rgba(148, 163, 184, 0.45);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
 body.theme-tradicional .wedding-hero-cinematic .countdown-unit:hover {
-  border-color: #D4AF37;
-  box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+  border-color: #94A3B8;
+  box-shadow: 0 0 15px rgba(148, 163, 184, 0.4);
 }
 
 body.theme-tradicional .wedding-hero-cinematic .countdown-num {
-  color: #F5E6B3;
-  text-shadow: 0 0 16px rgba(212, 175, 55, 0.6);
+  color: #F1F5F9;
+  text-shadow: 0 0 16px rgba(148, 163, 184, 0.6);
 }
 
 body.theme-tradicional .wedding-hero-cinematic .countdown-label {
-  color: #D4AF37;
+  color: #94A3B8;
   font-weight: 800;
 }
 
 body.theme-tradicional .wedding-hero-cinematic .btn-hero-rsvp {
-  background: linear-gradient(135deg, #D4AF37 0%, #F5E6B3 50%, #A68218 100%);
+  background: linear-gradient(135deg, #94A3B8 0%, #F1F5F9 50%, #334155 100%);
   color: #0A1828;
   font-weight: 800;
-  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.45);
+  box-shadow: 0 6px 20px rgba(148, 163, 184, 0.45);
 }
 
 body.theme-tradicional .wedding-hero-cinematic .btn-hero-rsvp:hover {
-  background: #D4AF37;
+  background: #94A3B8;
   color: #FFFFFF;
-  box-shadow: 0 8px 26px rgba(212, 175, 55, 0.65);
+  box-shadow: 0 8px 26px rgba(148, 163, 184, 0.65);
 }
 
 body.theme-tradicional .wedding-hero-cinematic .btn-hero-cal {
   background: rgba(255, 255, 255, 0.12);
   color: #FFFFFF;
-  border: 1px solid rgba(212, 175, 55, 0.4);
+  border: 1px solid rgba(148, 163, 184, 0.4);
 }
 
 body.theme-tradicional .wedding-hero-cinematic .btn-hero-cal:hover {
-  background: rgba(212, 175, 55, 0.25);
-  border-color: #D4AF37;
+  background: rgba(148, 163, 184, 0.25);
+  border-color: #94A3B8;
 }
 
 
@@ -4556,9 +4556,9 @@ body.theme-tradicional .wedding-hero-cinematic .btn-hero-cal:hover {
   width: 95vw !important;
   max-height: 92vh !important;
   background: #FCFBF9 !important;
-  border: 2px solid #D4AF37 !important;
+  border: 2px solid #94A3B8 !important;
   border-radius: 20px !important;
-  box-shadow: 0 25px 70px rgba(10, 24, 40, 0.45), 0 0 30px rgba(212, 175, 55, 0.2) !important;
+  box-shadow: 0 25px 70px rgba(10, 24, 40, 0.45), 0 0 30px rgba(148, 163, 184, 0.2) !important;
   padding: 2.2rem 2.4rem !important;
   color: #1A2421 !important;
 }
@@ -4577,7 +4577,7 @@ body.theme-tradicional .wedding-hero-cinematic .btn-hero-cal:hover {
   align-items: flex-start;
   gap: 1.5rem;
   padding-bottom: 1.3rem;
-  border-bottom: 1.5px solid rgba(212, 175, 55, 0.3);
+  border-bottom: 1.5px solid rgba(148, 163, 184, 0.3);
   margin-bottom: 1.5rem;
   flex-wrap: wrap;
 }
@@ -4627,8 +4627,8 @@ body.theme-tradicional .wedding-hero-cinematic .btn-hero-cal:hover {
 
 .btn-admin-organizador-quick {
   background: linear-gradient(135deg, #0A1828, #182c44);
-  color: #D4AF37 !important;
-  border: 1px solid #D4AF37;
+  color: #94A3B8 !important;
+  border: 1px solid #94A3B8;
   padding: 0.55rem 1.1rem;
   border-radius: 30px;
   font-size: 0.82rem;
@@ -4642,10 +4642,10 @@ body.theme-tradicional .wedding-hero-cinematic .btn-hero-cal:hover {
 }
 
 .btn-admin-organizador-quick:hover {
-  background: #D4AF37;
+  background: #94A3B8;
   color: #0A1828 !important;
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(212, 175, 55, 0.35);
+  box-shadow: 0 6px 18px rgba(148, 163, 184, 0.35);
 }
 
 /* Stat Cards */
@@ -4665,7 +4665,7 @@ body.theme-tradicional .wedding-hero-cinematic .btn-hero-cal:hover {
 
 .admin-stats-grid .stat-card {
   background: #FFFFFF;
-  border: 1px solid rgba(212, 175, 55, 0.3);
+  border: 1px solid rgba(148, 163, 184, 0.3);
   border-radius: 14px;
   padding: 1rem 1.2rem;
   display: flex;
@@ -4676,8 +4676,8 @@ body.theme-tradicional .wedding-hero-cinematic .btn-hero-cal:hover {
 }
 
 .admin-stats-grid .stat-card:hover {
-  border-color: #D4AF37;
-  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.18);
+  border-color: #94A3B8;
+  box-shadow: 0 6px 20px rgba(148, 163, 184, 0.18);
   transform: translateY(-2px);
 }
 
@@ -4757,7 +4757,7 @@ body.theme-tradicional .wedding-hero-cinematic .btn-hero-cal:hover {
 
 .admin-hub-card {
   background: #FFFFFF;
-  border: 1.5px solid rgba(212, 175, 55, 0.3);
+  border: 1.5px solid rgba(148, 163, 184, 0.3);
   border-radius: 14px;
   padding: 1.1rem 1rem;
   text-align: left;
@@ -4771,10 +4771,10 @@ body.theme-tradicional .wedding-hero-cinematic .btn-hero-cal:hover {
 }
 
 .admin-hub-card:hover {
-  border-color: #D4AF37;
+  border-color: #94A3B8;
   background: #FFFDF9;
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(212, 175, 55, 0.18);
+  box-shadow: 0 8px 20px rgba(148, 163, 184, 0.18);
 }
 
 .admin-hub-card .hub-card-icon {
@@ -4827,19 +4827,19 @@ body.theme-tradicional .wedding-hero-cinematic .btn-hero-cal:hover {
 /* Tarjeta Activa (Seleccionada) */
 .admin-hub-card.active {
   background: linear-gradient(135deg, #0A1828 0%, #15293d 100%) !important;
-  border-color: #D4AF37 !important;
-  box-shadow: 0 8px 25px rgba(10, 24, 40, 0.35), 0 0 12px rgba(212, 175, 55, 0.3) !important;
+  border-color: #94A3B8 !important;
+  box-shadow: 0 8px 25px rgba(10, 24, 40, 0.35), 0 0 12px rgba(148, 163, 184, 0.3) !important;
   transform: translateY(-2px);
 }
 
 .admin-hub-card.active .hub-card-icon {
-  background: #D4AF37 !important;
+  background: #94A3B8 !important;
   color: #0A1828 !important;
-  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
+  box-shadow: 0 4px 12px rgba(148, 163, 184, 0.4);
 }
 
 .admin-hub-card.active .hub-card-step {
-  color: #F5E6B3 !important;
+  color: #F1F5F9 !important;
 }
 
 .admin-hub-card.active .hub-card-title {
@@ -4878,7 +4878,7 @@ body.theme-tradicional .wedding-hero-cinematic .btn-hero-cal:hover {
 .admin-search-wrap input {
   width: 100%;
   padding: 0.75rem 1rem 0.75rem 2.9rem;
-  border: 1.5px solid rgba(212, 175, 55, 0.4);
+  border: 1.5px solid rgba(148, 163, 184, 0.4);
   border-radius: 30px;
   background: #FFFFFF;
   font-size: 0.9rem;
@@ -4889,14 +4889,14 @@ body.theme-tradicional .wedding-hero-cinematic .btn-hero-cal:hover {
 }
 
 .admin-search-wrap input:focus {
-  border-color: #D4AF37;
-  box-shadow: 0 0 14px rgba(212, 175, 55, 0.25);
+  border-color: #94A3B8;
+  box-shadow: 0 0 14px rgba(148, 163, 184, 0.25);
 }
 
 .btn-toggle-create-form {
   background: #0A1828;
-  color: #D4AF37;
-  border: 1.5px solid #D4AF37;
+  color: #94A3B8;
+  border: 1.5px solid #94A3B8;
   padding: 0.7rem 1.4rem;
   border-radius: 30px;
   font-size: 0.85rem;
@@ -4910,16 +4910,16 @@ body.theme-tradicional .wedding-hero-cinematic .btn-hero-cal:hover {
 }
 
 .btn-toggle-create-form:hover {
-  background: #D4AF37;
+  background: #94A3B8;
   color: #0A1828;
-  box-shadow: 0 6px 18px rgba(212, 175, 55, 0.35);
+  box-shadow: 0 6px 18px rgba(148, 163, 184, 0.35);
   transform: translateY(-1px);
 }
 
 /* Tab Organizador Preview */
 .organizador-preview-wrapper {
   margin-top: 1.5rem;
-  border: 2px solid rgba(212, 175, 55, 0.4);
+  border: 2px solid rgba(148, 163, 184, 0.4);
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
@@ -4928,7 +4928,7 @@ body.theme-tradicional .wedding-hero-cinematic .btn-hero-cal:hover {
 
 .organizador-preview-header {
   background: #0A1828;
-  color: #D4AF37;
+  color: #94A3B8;
   padding: 0.8rem 1.2rem;
   display: flex;
   justify-content: space-between;
@@ -4989,8 +4989,8 @@ body.theme-tradicional .wedding-hero-cinematic .btn-hero-cal:hover {
 
 /* Banner Hero del Organizador (Tab 3) */
 .org-hub-banner {
-  background: linear-gradient(135deg, rgba(10, 24, 40, 0.04) 0%, rgba(212, 175, 55, 0.09) 100%);
-  border: 1.5px solid rgba(212, 175, 55, 0.4);
+  background: linear-gradient(135deg, rgba(10, 24, 40, 0.04) 0%, rgba(148, 163, 184, 0.09) 100%);
+  border: 1.5px solid rgba(148, 163, 184, 0.4);
   border-radius: 16px;
   padding: 1.8rem 1.6rem;
   margin-bottom: 1.6rem;
@@ -5027,7 +5027,7 @@ body.theme-tradicional .wedding-hero-cinematic .btn-hero-cal:hover {
   display: inline-flex !important;
   align-items: center !important;
   gap: 0.5rem !important;
-  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35) !important;
+  box-shadow: 0 6px 20px rgba(148, 163, 184, 0.35) !important;
 }
 
 .org-cards-grid {
@@ -5047,7 +5047,7 @@ body.theme-tradicional .wedding-hero-cinematic .btn-hero-cal:hover {
 
 .org-card-item {
   background: #FFFFFF;
-  border: 1.5px solid rgba(212, 175, 55, 0.3);
+  border: 1.5px solid rgba(148, 163, 184, 0.3);
   border-radius: 14px;
   padding: 1.6rem 1.2rem;
   text-align: center;
@@ -5063,9 +5063,9 @@ body.theme-tradicional .wedding-hero-cinematic .btn-hero-cal:hover {
 }
 
 .org-card-item:hover {
-  border-color: #D4AF37;
+  border-color: #94A3B8;
   transform: translateY(-2px);
-  box-shadow: 0 8px 22px rgba(212, 175, 55, 0.18);
+  box-shadow: 0 8px 22px rgba(148, 163, 184, 0.18);
 }
 
 .org-card-icon {
@@ -5093,8 +5093,8 @@ body.theme-tradicional .wedding-hero-cinematic .btn-hero-cal:hover {
   align-items: center;
   gap: 0.4rem;
   background: #0A1828;
-  color: #D4AF37 !important;
-  border: 1px solid #D4AF37;
+  color: #94A3B8 !important;
+  border: 1px solid #94A3B8;
   padding: 0.55rem 1.2rem;
   border-radius: 30px;
   font-size: 0.82rem;
@@ -5104,14 +5104,14 @@ body.theme-tradicional .wedding-hero-cinematic .btn-hero-cal:hover {
 }
 
 .btn-org-card-action:hover {
-  background: #D4AF37;
+  background: #94A3B8;
   color: #0A1828 !important;
-  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+  box-shadow: 0 4px 12px rgba(148, 163, 184, 0.3);
 }
 
 .org-hub-note {
   background: rgba(10, 24, 40, 0.04);
-  border: 1px dashed rgba(212, 175, 55, 0.4);
+  border: 1px dashed rgba(148, 163, 184, 0.4);
   border-radius: 12px;
   padding: 0.85rem 1.2rem;
   display: flex;

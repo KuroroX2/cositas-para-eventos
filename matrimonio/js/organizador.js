@@ -1037,6 +1037,71 @@ function renderAll() {
 /* ==========================================================================
    2. DETECCIÓN DE PAREJAS / MISMA INVITACIÓN (Acompañantes Vinculados)
    ========================================================================== */
+
+// Determinación de Rol: "I" (Invitado Principal / name1) o "A" (Acompañante / name2)
+function getGuestRoleInInvitation(guestName) {
+  if (!guestName || typeof guestName !== 'string') return 'I';
+  const clean = guestName.trim().toLowerCase();
+
+  let invs = [];
+  try {
+    const raw = localStorage.getItem('wedding_invitations_cloud_v1');
+    if (raw) invs = JSON.parse(raw);
+  } catch (e) {}
+  const allInvs = [...invs, ...DEFAULT_SEED_INVITATIONS];
+
+  for (const inv of allInvs) {
+    if (inv.name1 && isGuestNameMatch(inv.name1, clean)) {
+      return 'I';
+    }
+    if (inv.name2 && isGuestNameMatch(inv.name2, clean)) {
+      return 'A';
+    }
+  }
+  return 'I';
+}
+
+// Clasificación de Género para Colores 2D: Verde (Hombre) o Calipso (Mujer)
+function getGuestGender(guestName) {
+  if (!guestName || typeof guestName !== 'string') return 'male';
+  const clean = guestName.trim().toLowerCase();
+  const first = clean.split(' ')[0];
+
+  const femaleKnown = new Set([
+    'natalia', 'bárbara', 'barbara', 'emilia', 'gladys', 'paz', 'valesca', 'priscila',
+    'katherine', 'paulina', 'jenn', 'bianca', 'guisselle', 'denisse', 'jaqueline',
+    'karen', 'sandra', 'yorka', 'pamela', 'constanza', 'cecilia', 'claudia', 'camila',
+    'tah', 'daniela', 'jessica', 'reny', 'carola', 'maria', 'ana', 'sofia', 'lucia',
+    'valentina', 'fernanda', 'catalina', 'javiera', 'isidora', 'florencia', 'paula',
+    'carolina', 'francisca', 'loreto', 'macarena', 'monica', 'patricia', 'susana'
+  ]);
+
+  const maleKnown = new Set([
+    'bastian', 'bastián', 'maximo', 'máximo', 'jonathan', 'mateo', 'sebastián', 'sebastian',
+    'francisco', 'llergers', 'cristobal', 'cristóbal', 'michel', 'bruno', 'oscar', 'óscar',
+    'nicolas', 'nicolás', 'roberto', 'isaac', 'luis', 'jhankhel', 'marcial', 'hugo',
+    'eduardo', 'cristopher', 'carlos', 'felipe', 'juan', 'pedro', 'diego', 'ignacio',
+    'matias', 'matías', 'joaquin', 'joaquín', 'manuel', 'jorge', 'alvaro', 'álvaro',
+    'gonzalo', 'rodrigo', 'claudio', 'marcelo', 'andres', 'andrés', 'fabián', 'fabian'
+  ]);
+
+  if (clean.includes('pastora') || clean.includes('señora') || clean.includes('tía')) return 'female';
+  if (clean.includes('pastor') || clean.includes('don') || clean.includes('tío')) return 'male';
+
+  if (femaleKnown.has(first)) return 'female';
+  if (maleKnown.has(first)) return 'male';
+
+  if (anyInString(clean, ['jonathan', 'mateo', 'sebastian', 'bastian', 'maximo', 'cristobal'])) return 'male';
+  if (anyInString(clean, ['gladys', 'barbara', 'priscila', 'emilia', 'yorka', 'guisselle'])) return 'female';
+
+  if (first.endsWith('a') || first.endsWith('th') || first.endsWith('is')) return 'female';
+  return 'male';
+}
+
+function anyInString(str, substrs) {
+  return substrs.some(s => str.includes(s));
+}
+
 function getCompanion(guestName) {
   if (!guestName) return null;
   const clean = guestName.trim().toLowerCase();
@@ -1626,15 +1691,27 @@ function createChairElement(table, seatIndex, x, y) {
 
     chair.className = `fp-chair seated ${hasCompanionInTable ? 'couple' : ''} ${isNovioSeat ? 'is-novio' : ''}`;
 
+    const role = getGuestRoleInInvitation(guest); // 'I' (Invitado) o 'A' (Acompañante)
+    const gender = getGuestGender(guest); // 'male' (Verde) o 'female' (Calipso)
     const firstName = guest.split(' ')[0] || guest;
-    const initial = isNovioSeat ? '<i class="ri-vip-crown-2-fill"></i>' : guest.charAt(0).toUpperCase();
+
+    chair.className = `fp-chair seated ${hasCompanionInTable ? 'couple' : ''} ${isNovioSeat ? 'is-novio' : ''} gender-${gender} role-${role.toLowerCase()}`;
+
+    // Letra I (Invitado) o A (Acompañante) con color verde (hombre) o calipso (mujer)
+    const circleLetter = `<span class="fp-role-letter">${role}</span>`;
+    const crownMini = isNovioSeat ? '<i class="ri-vip-crown-2-fill fp-crown-mini" title="Mesa de Novios"></i>' : '';
 
     chair.innerHTML = `
-      <div class="fp-chair-circle">${initial}</div>
-      <div class="fp-chair-name" title="${escapeHtml(guest)}">${escapeHtml(firstName)}</div>
+      <div class="fp-chair-circle circle-${gender}" title="${role === 'I' ? 'Invitado Principal (I)' : 'Acompañante (A)'} • ${gender === 'male' ? 'Hombre (Verde)' : 'Mujer (Calipso)'}">
+        ${circleLetter}
+        ${crownMini}
+      </div>
+      <div class="fp-chair-name name-${gender}" title="${escapeHtml(guest)}">${escapeHtml(firstName)}</div>
     `;
 
-    const tooltipText = `Puesto ${seatIndex + 1}: ${guest}` + (hasCompanionInTable ? ` (👥 Pareja con: ${companion})` : '') + ' (Arrastra para mover de puesto)';
+    const roleText = role === 'I' ? 'Invitado Principal (I)' : 'Acompañante (A)';
+    const genderText = gender === 'male' ? 'Hombre' : 'Mujer';
+    const tooltipText = `Puesto ${seatIndex + 1}: ${guest} — ${roleText} • ${genderText}` + (hasCompanionInTable ? ` (👥 Pareja con: ${companion})` : '') + ' (Arrastra para mover de puesto)';
     chair.dataset.tooltip = tooltipText;
 
     chair.addEventListener('dragstart', (e) => {
