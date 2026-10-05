@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="css/organizador.css?v=3.1">
+  <link rel="stylesheet" href="css/organizador.css?v=3.3">
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
@@ -350,12 +350,13 @@
     </div>
   </div>
 
-  <!-- MODAL NUEVA ACTIVIDAD CRONOGRAMA -->
+  <!-- MODAL NUEVO HITO & ACTIVIDADES DEL CRONOGRAMA -->
   <div class="org-modal" id="activityModal">
-    <div class="org-modal-card" style="max-width: 580px;">
+    <div class="org-modal-card" style="max-width: 620px;">
       <button class="btn-close-modal" aria-label="Cerrar"><i class="ri-close-line"></i></button>
       <h3 class="org-modal-title"><i class="ri-calendar-event-line" style="color: var(--gold-dark);"></i> Agregar Hito al Cronograma</h3>
       <form id="formAddActivity">
+        <!-- Bloque Horario y Nombre del Hito -->
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
           <div class="form-group-org">
             <label for="actTimeStart">Horario Desde (HH:MM) *</label>
@@ -368,72 +369,32 @@
         </div>
 
         <div class="form-group-org">
-          <label for="actTitle">Nombre del Hito o Actividad *</label>
-          <input type="text" id="actTitle" class="input-org" placeholder="Ej.: Ceremonia Civil & Votos" required>
+          <label for="actTitle">Nombre del Hito o Momento Principal *</label>
+          <input type="text" id="actTitle" class="input-org" placeholder="Ej.: Recepción / Ceremonia Civil / Cena" required>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 12px;">
-          <div class="form-group-org">
-            <label for="actResponsible">Encargado o Proveedor</label>
-            <input type="text" id="actResponsible" class="input-org" placeholder="Ej.: Oficial Civil / Banquetera / Padrinos">
+        <div class="form-group-org" style="margin-bottom: 14px;">
+          <label for="actDetail">Notas o Instrucciones Clave del Hito (Opcional)</label>
+          <textarea id="actDetail" class="textarea-org" rows="2" placeholder="Instrucciones generales, música de fondo o detalles..."></textarea>
+        </div>
+
+        <!-- SECCIÓN: ACTIVIDADES DEL HITO (Una o más actividades) -->
+        <div class="milestone-act-section">
+          <div class="milestone-act-header">
+            <h4><i class="ri-list-check-3"></i> Actividades de este Hito</h4>
+            <button type="button" class="btn-add-subact" id="btnAddSubActivity">
+              <i class="ri-add-line"></i> <span>Agregar otra actividad</span>
+            </button>
           </div>
-          <div class="form-group-org">
-            <label for="actRespStatus">¿Encargado OK?</label>
-            <select id="actRespStatus" class="select-org">
-              <option value="ok" selected>✓ Confirmado / OK</option>
-              <option value="pending">⏳ Por Buscar / Pendiente</option>
-            </select>
-          </div>
-        </div>
 
-        <div class="form-group-org">
-          <label for="actDetail">Detalle &amp; Notas Clave</label>
-          <textarea id="actDetail" class="textarea-org" rows="2" placeholder="Instrucciones, música o detalles importantes..."></textarea>
-        </div>
-
-        <!-- SECCIÓN VINCULAR COMPRA / INSUMO -->
-        <div style="margin-top: 14px; padding: 12px 14px; background: #F8FAFC; border: 1px dashed #CBD5E1; border-radius: 12px;">
-          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.88rem; font-weight: 700; color: var(--navy-royal); margin-bottom: 0;">
-            <input type="checkbox" id="actNeedsPurchase" style="width: 17px; height: 17px; accent-color: var(--gold-dark); cursor: pointer;">
-            <span>🛍️ ¿Hay que comprar algo o conseguir insumos para esta actividad?</span>
-          </label>
-
-          <div id="actPurchaseFields" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #E2E8F0;">
-            <div class="form-group-org">
-              <label for="actShopItem">¿Qué hay que comprar / encargar? *</label>
-              <input type="text" id="actShopItem" class="input-org" placeholder="Ej.: 50 Luces de bengala, pétalos de rosa, cotillón...">
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-              <div class="form-group-org">
-                <label for="actShopCategory">Categoría</label>
-                <select id="actShopCategory" class="select-org">
-                  <option value="Ceremonia">Ceremonia</option>
-                  <option value="Decoración">Decoración</option>
-                  <option value="Fiesta">Fiesta / Cotillón</option>
-                  <option value="Vestuario">Vestuario / Accesorios</option>
-                  <option value="Detalles">Detalles para Invitados</option>
-                  <option value="Varios" selected>Varios</option>
-                </select>
-              </div>
-              <div class="form-group-org">
-                <label for="actShopCost">Costo Estimado o Cantidad</label>
-                <input type="text" id="actShopCost" class="input-org" placeholder="Ej.: $25.000 / 50 un.">
-              </div>
-            </div>
-            <div class="form-group-org" style="margin-bottom: 0;">
-              <label for="actShopStatus">¿Estado de la compra o insumo?</label>
-              <select id="actShopStatus" class="select-org">
-                <option value="pending" selected>⏳ Pendiente por Comprar</option>
-                <option value="in_progress">🎨 Mandado a Hacer / En Proceso</option>
-                <option value="ok">✓ Ya Comprado / Listo</option>
-              </select>
-            </div>
+          <div id="subActivitiesContainer">
+            <!-- Renderizado dinámicamente: Card 1, Card 2, etc. -->
           </div>
         </div>
 
         <div style="margin-top: 22px; padding-bottom: 8px;">
           <button type="submit" class="btn-org-action" style="width: 100%; justify-content: center; padding: 13px 20px; font-size: 0.95rem;">
-            <i class="ri-check-line"></i> <span>Guardar Hito en Cronograma</span>
+            <i class="ri-check-line"></i> <span>Guardar Hito &amp; Actividades</span>
           </button>
         </div>
       </form>
@@ -593,6 +554,6 @@
   <!-- Scripts con sincronización Supabase Cloud -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js?v=2.6"></script>
-  <script src="js/organizador.js?v=3.2"></script>
+  <script src="js/organizador.js?v=3.3"></script>
 </body>
 </html>

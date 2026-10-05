@@ -1958,3 +1958,194 @@ i[class^="ri-"], i[class*=" ri-"] {
   background: #E9D5FF;
   transform: translateY(-1px);
 }
+
+/* ==========================================================================
+   ACTIVIDADES MÚLTIPLES DENTRO DE HITOS
+   ========================================================================== */
+.milestone-act-section {
+  margin-top: 18px;
+  border-top: 1px solid #E2E8F0;
+  padding-top: 16px;
+}
+
+.milestone-act-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.milestone-act-header h4 {
+  font-size: 0.96rem;
+  color: var(--navy-royal);
+  margin: 0;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-add-subact {
+  background: #F8FAFC;
+  border: 1px dashed var(--gold-dark);
+  color: var(--gold-dark);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: var(--transition);
+}
+
+.btn-add-subact:hover {
+  background: #FFFDF9;
+  border-color: var(--navy-royal);
+  color: var(--navy-royal);
+}
+
+.subact-card {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  position: relative;
+  transition: border-color 0.2s ease;
+}
+
+.subact-card:hover {
+  border-color: rgba(212, 175, 55, 0.4);
+}
+
+.subact-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.subact-num {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--gold-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-del-subact {
+  background: none;
+  border: none;
+  color: #94A3B8;
+  cursor: pointer;
+  font-size: 0.95rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: var(--transition);
+}
+
+.btn-del-subact:hover {
+  color: #DC2626;
+  background: #FEE2E2;
+}
+
+.subact-purchase-box {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: #FFFFFF;
+  border: 1px dashed #CBD5E1;
+  border-radius: 10px;
+}
+
+.subact-purchase-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--navy-royal);
+  margin-bottom: 0;
+}
+
+.subact-purchase-toggle input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--gold-dark);
+  cursor: pointer;
+}
+
+.subact-purchase-fields {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #F1F5F9;
+}
+
+/* Timeline Subactividades en la tabla del Cronograma */
+.milestone-subacts-table {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.milestone-subact-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 10px;
+  padding: 6px 10px;
+  background: #F8FAFC;
+  border-radius: 8px;
+  border: 1px solid #E2E8F0;
+}
+
+.subact-main {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem;
+  color: var(--navy-royal);
+}
+
+.subact-resp-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+}
+
+.subact-resp-name {
+  color: var(--gold-dark);
+  font-weight: 600;
+}
+
+.badge-status-xs {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+  border: none;
+  transition: var(--transition);
+}
+
+.badge-status-xs.ok {
+  background: var(--mint-bg);
+  color: var(--mint-text);
+  border: 1px solid var(--mint-border);
+}
+
+.badge-status-xs.pending {
+  background: var(--amber-bg);
+  color: var(--amber-text);
+  border: 1px solid var(--amber-border);
+}

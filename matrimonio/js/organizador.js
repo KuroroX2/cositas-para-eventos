@@ -2122,6 +2122,135 @@ window.quickAddShopForActivity = function(activityId) {
   if (shoppingModal) shoppingModal.classList.add('active');
 };
 
+
+/* ==========================================================================
+   GESTIÓN DE ACTIVIDADES MÚLTIPLES DENTRO DE HITOS
+   ========================================================================== */
+function createSubActivityCard(data = {}) {
+  const cardId = 'subact_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+  const card = document.createElement('div');
+  card.className = 'subact-card';
+  card.dataset.subactId = cardId;
+
+  const currentCount = document.querySelectorAll('#subActivitiesContainer .subact-card').length + 1;
+  const isPurchaseChecked = !!data.needsPurchase;
+
+  card.innerHTML = `
+    <div class="subact-card-top">
+      <span class="subact-num"><i class="ri-checkbox-circle-line"></i> Actividad ${currentCount}</span>
+      <button type="button" class="btn-del-subact" title="Quitar esta actividad" onclick="removeSubActivityCard(this)">
+        <i class="ri-delete-bin-line"></i>
+      </button>
+    </div>
+
+    <div class="form-group-org" style="margin-bottom: 10px;">
+      <label>Nombre de la Actividad *</label>
+      <input type="text" class="input-org input-subact-name" placeholder="Ej.: Cartel de bienvenida / Aguas saborizadas" value="${escapeHtml(data.name || '')}" required>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; margin-bottom: 10px;">
+      <div class="form-group-org" style="margin-bottom: 0;">
+        <label>Encargado(a)</label>
+        <input type="text" class="input-org input-subact-resp" placeholder="Ej.: Hermano del Novio / Banquetera" value="${escapeHtml(data.responsible || '')}">
+      </div>
+      <div class="form-group-org" style="margin-bottom: 0;">
+        <label>¿Encargado OK?</label>
+        <select class="select-org select-subact-resp-status">
+          <option value="ok" ${data.responsibleStatus === 'ok' ? 'selected' : ''}>✓ Confirmado / OK</option>
+          <option value="pending" ${data.responsibleStatus === 'pending' ? 'selected' : ''}>⏳ Por Buscar</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Sección Compra / Mandar a hacer -->
+    <div class="subact-purchase-box">
+      <label class="subact-purchase-toggle">
+        <input type="checkbox" class="check-subact-purchase" ${isPurchaseChecked ? 'checked' : ''} onchange="toggleSubactPurchase(this)">
+        <span>🛍️ ¿Hay que comprar o mandar a hacer algo para esta actividad?</span>
+      </label>
+
+      <div class="subact-purchase-fields" style="display: ${isPurchaseChecked ? 'block' : 'none'};">
+        <div class="form-group-org" style="margin-bottom: 8px;">
+          <label>¿Qué hay que comprar o mandar a hacer? *</label>
+          <input type="text" class="input-org input-subact-item" placeholder="Ej.: Cartel de bienvenida en acrílico" value="${escapeHtml(data.shopItem || '')}">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+          <div class="form-group-org" style="margin-bottom: 0;">
+            <label>Categoría</label>
+            <select class="select-org select-subact-cat">
+              <option value="Decoración" ${data.shopCategory === 'Decoración' ? 'selected' : ''}>Decoración</option>
+              <option value="Ceremonia" ${data.shopCategory === 'Ceremonia' ? 'selected' : ''}>Ceremonia</option>
+              <option value="Fiesta" ${data.shopCategory === 'Fiesta' ? 'selected' : ''}>Fiesta</option>
+              <option value="Vestuario" ${data.shopCategory === 'Vestuario' ? 'selected' : ''}>Vestuario</option>
+              <option value="Detalles" ${data.shopCategory === 'Detalles' ? 'selected' : ''}>Detalles</option>
+              <option value="Varios" ${(!data.shopCategory || data.shopCategory === 'Varios') ? 'selected' : ''}>Varios</option>
+            </select>
+          </div>
+          <div class="form-group-org" style="margin-bottom: 0;">
+            <label>Costo Estimado</label>
+            <input type="text" class="input-org input-subact-cost" placeholder="Ej.: $25.000" value="${escapeHtml(data.shopCost || '')}">
+          </div>
+          <div class="form-group-org" style="margin-bottom: 0;">
+            <label>¿Estado?</label>
+            <select class="select-org select-subact-status">
+              <option value="pending" ${data.shopStatus === 'pending' ? 'selected' : ''}>⏳ Pendiente</option>
+              <option value="in_progress" ${data.shopStatus === 'in_progress' ? 'selected' : ''}>🎨 Mandado a Hacer</option>
+              <option value="ok" ${data.shopStatus === 'ok' ? 'selected' : ''}>✓ Ya Listo</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  return card;
+}
+
+window.toggleSubactPurchase = function(checkbox) {
+  const box = checkbox.closest('.subact-purchase-box');
+  if (!box) return;
+  const fields = box.querySelector('.subact-purchase-fields');
+  const itemInput = box.querySelector('.input-subact-item');
+  if (fields) {
+    fields.style.display = checkbox.checked ? 'block' : 'none';
+  }
+  if (itemInput) {
+    itemInput.required = checkbox.checked;
+  }
+  if (checkbox.checked) {
+    setTimeout(() => {
+      box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 60);
+  }
+};
+
+window.removeSubActivityCard = function(btn) {
+  const container = document.getElementById('subActivitiesContainer');
+  const card = btn.closest('.subact-card');
+  if (container && card) {
+    if (container.querySelectorAll('.subact-card').length <= 1) {
+      showToast('El hito debe tener al menos una actividad');
+      return;
+    }
+    card.remove();
+    // Renumerar tarjetas restantes
+    container.querySelectorAll('.subact-card').forEach((c, idx) => {
+      const numSpan = c.querySelector('.subact-num');
+      if (numSpan) numSpan.innerHTML = `<i class="ri-checkbox-circle-line"></i> Actividad ${idx + 1}`;
+    });
+  }
+};
+
+window.toggleMilestoneSubactResp = function(milestoneId, subactIdx) {
+  const m = timeline.find(t => t.id === milestoneId);
+  if (!m || !m.activities || !m.activities[subactIdx]) return;
+  const current = m.activities[subactIdx].responsibleStatus || 'ok';
+  m.activities[subactIdx].responsibleStatus = (current === 'ok') ? 'pending' : 'ok';
+  saveData();
+  renderAll();
+  showToast(`Estado del encargado actualizado a "${m.activities[subactIdx].responsibleStatus === 'ok' ? 'Confirmado' : 'Por Buscar'}"`);
+};
+
 function renderTimeline() {
   const tbody = document.getElementById('timelineTableBody');
   if (!tbody) return;
@@ -2172,14 +2301,32 @@ function renderTimeline() {
       `;
     }
 
-    tr.innerHTML = `
-      <td>
-        <span class="time-badge"><i class="ri-time-line"></i> ${escapeHtml(timeFormatted)}</span>
-      </td>
-      <td>
-        <strong style="color: var(--navy-royal); font-size: 0.95rem;">${escapeHtml(item.title)}</strong>
-      </td>
-      <td>
+    // Bloque Actividades & Encargados
+    let activitiesColHtml = '';
+    if (item.activities && Array.isArray(item.activities) && item.activities.length > 0) {
+      activitiesColHtml = `
+        <div class="milestone-subacts-table">
+          ${item.activities.map((act, actIdx) => {
+            const isSubRespOk = act.responsibleStatus === 'ok';
+            return `
+              <div class="milestone-subact-row">
+                <div class="subact-main">
+                  <i class="ri-checkbox-blank-circle-fill" style="color: var(--gold-dark); font-size: 0.45rem;"></i>
+                  <strong>${escapeHtml(act.name)}</strong>
+                </div>
+                <div class="subact-resp-box">
+                  <span class="subact-resp-name"><i class="ri-user-star-line"></i> ${escapeHtml(act.responsible || 'Por definir')}</span>
+                  <button type="button" class="badge-status-xs ${isSubRespOk ? 'ok' : 'pending'}" onclick="toggleMilestoneSubactResp('${item.id}', ${actIdx})" title="Clic para alternar si el encargado está confirmado o pendiente de buscar">
+                    ${isSubRespOk ? '✓ OK' : '⏳ Por Buscar'}
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    } else {
+      activitiesColHtml = `
         <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
           <span style="color: var(--gold-dark); font-weight: 700; font-size: 0.88rem;">
             <i class="ri-user-star-line"></i> ${escapeHtml(item.responsible || 'Por definir')}
@@ -2188,8 +2335,23 @@ function renderTimeline() {
             ${respOk ? '<i class="ri-check-line"></i> Confirmado' : '<i class="ri-search-eye-line"></i> Por Buscar'}
           </button>
         </div>
+      `;
+    }
+
+    tr.innerHTML = `
+      <td>
+        <span class="time-badge"><i class="ri-time-line"></i> ${escapeHtml(timeFormatted)}</span>
       </td>
-      <td style="color: var(--text-muted); font-size: 0.88rem;">${escapeHtml(item.detail || '—')}</td>
+      <td>
+        <strong style="color: var(--navy-royal); font-size: 1.02rem; display: block; margin-bottom: 2px;">${escapeHtml(item.title)}</strong>
+        ${item.detail ? `<div style="color: var(--text-muted); font-size: 0.82rem; line-height: 1.4;">${escapeHtml(item.detail)}</div>` : ''}
+      </td>
+      <td>
+        ${activitiesColHtml}
+      </td>
+      <td style="color: var(--text-muted); font-size: 0.88rem;">
+        ${item.detail ? escapeHtml(item.detail) : '—'}
+      </td>
       <td>
         <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start;">
           ${shoppingCellHtml}
@@ -2451,32 +2613,33 @@ function setupEventListeners() {
     });
   }
 
-  // Modal Nueva Actividad Cronograma
+  // Modal Nuevo Hito & Actividades del Cronograma
   const btnOpenActivityModal = document.getElementById('btnOpenActivityModal');
   const activityModal = document.getElementById('activityModal');
   const formAddActivity = document.getElementById('formAddActivity');
+  const btnAddSubActivity = document.getElementById('btnAddSubActivity');
 
-  // Checkbox toggle para compras en modal actividad
-  const actNeedsPurchase = document.getElementById('actNeedsPurchase');
-  const actPurchaseFields = document.getElementById('actPurchaseFields');
-  const actShopItem = document.getElementById('actShopItem');
-  if (actNeedsPurchase && actPurchaseFields) {
-    actNeedsPurchase.addEventListener('change', () => {
-      actPurchaseFields.style.display = actNeedsPurchase.checked ? 'block' : 'none';
-      if (actShopItem) actShopItem.required = actNeedsPurchase.checked;
-      if (actNeedsPurchase.checked) {
-        setTimeout(() => {
-          actPurchaseFields.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 60);
+  if (btnAddSubActivity) {
+    btnAddSubActivity.addEventListener('click', () => {
+      const container = document.getElementById('subActivitiesContainer');
+      if (container) {
+        const card = createSubActivityCard();
+        container.appendChild(card);
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        const nameInput = card.querySelector('.input-subact-name');
+        if (nameInput) setTimeout(() => nameInput.focus(), 80);
       }
     });
   }
 
   if (btnOpenActivityModal && activityModal) {
     btnOpenActivityModal.addEventListener('click', () => {
-      if (actNeedsPurchase) actNeedsPurchase.checked = false;
-      if (actPurchaseFields) actPurchaseFields.style.display = 'none';
-      if (actShopItem) actShopItem.required = false;
+      const container = document.getElementById('subActivitiesContainer');
+      if (container) {
+        container.innerHTML = '';
+        container.appendChild(createSubActivityCard());
+      }
+      if (formAddActivity) formAddActivity.reset();
       activityModal.classList.add('active');
     });
   }
@@ -2488,66 +2651,84 @@ function setupEventListeners() {
         const timeStart = (document.getElementById('actTimeStart')?.value || '16:00').trim();
         const timeEnd = (document.getElementById('actTimeEnd')?.value || '').trim();
         const title = (document.getElementById('actTitle')?.value || '').trim();
-        const responsible = (document.getElementById('actResponsible')?.value || '').trim() || 'Novios / Coordinador';
-        const respStatus = (document.getElementById('actRespStatus')?.value || 'ok');
         const detail = (document.getElementById('actDetail')?.value || '').trim();
-        const needsPurchase = document.getElementById('actNeedsPurchase')?.checked || false;
 
         if (!title) {
-          alert('Por favor ingresa el nombre de la actividad o hito.');
+          alert('Por favor ingresa el nombre del hito o momento principal.');
           return;
         }
 
+        const cards = document.querySelectorAll('#subActivitiesContainer .subact-card');
+        const subActivities = [];
         const actId = 'act_' + Date.now();
-        const newActivity = {
+        let createdShopCount = 0;
+
+        cards.forEach((card, idx) => {
+          const name = (card.querySelector('.input-subact-name')?.value || '').trim() || `Actividad ${idx + 1}`;
+          const responsible = (card.querySelector('.input-subact-resp')?.value || '').trim() || 'Novios / Coordinador';
+          const responsibleStatus = card.querySelector('.select-subact-resp-status')?.value || 'ok';
+          const isPurchase = card.querySelector('.check-subact-purchase')?.checked || false;
+
+          const subAct = {
+            id: 'sub_' + Date.now() + '_' + idx,
+            name: name,
+            responsible: responsible,
+            responsibleStatus: responsibleStatus,
+            needsPurchase: isPurchase
+          };
+
+          if (isPurchase) {
+            const itemText = (card.querySelector('.input-subact-item')?.value || '').trim();
+            if (itemText) {
+              const category = card.querySelector('.select-subact-cat')?.value || 'Varios';
+              const cost = (card.querySelector('.input-subact-cost')?.value || '').trim();
+              const buyStatus = card.querySelector('.select-subact-status')?.value || 'pending';
+              const shopId = 'shop_' + Date.now() + '_' + idx;
+
+              shopping.push({
+                id: shopId,
+                activityId: actId,
+                activityTitle: `${title}: ${name}`,
+                item: itemText,
+                category: category,
+                responsible: responsible,
+                responsibleStatus: responsibleStatus,
+                detail: `Para el hito: ${title} (${name})`,
+                cost: cost,
+                status: buyStatus
+              });
+
+              subAct.shopItemId = shopId;
+              createdShopCount++;
+            }
+          }
+
+          subActivities.push(subAct);
+        });
+
+        const newMilestone = {
           id: actId,
           timeStart: timeStart,
           timeEnd: timeEnd,
           title: title,
-          responsible: responsible,
-          responsibleStatus: respStatus,
-          detail: detail
+          responsible: subActivities[0]?.responsible || 'Novios / Coordinador',
+          responsibleStatus: subActivities[0]?.responsibleStatus || 'ok',
+          detail: detail,
+          activities: subActivities
         };
 
-        if (needsPurchase) {
-          const shopItemVal = (document.getElementById('actShopItem')?.value || '').trim();
-          if (shopItemVal) {
-            const shopCategory = document.getElementById('actShopCategory')?.value || 'Varios';
-            const shopCost = (document.getElementById('actShopCost')?.value || '').trim();
-            const shopStatus = document.getElementById('actShopStatus')?.value || 'pending';
-            const shopId = 'shop_' + Date.now();
-
-            shopping.push({
-              id: shopId,
-              activityId: actId,
-              activityTitle: title,
-              item: shopItemVal,
-              category: shopCategory,
-              responsible: responsible,
-              responsibleStatus: respStatus,
-              detail: `Para el hito: ${title}`,
-              cost: shopCost,
-              status: shopStatus
-            });
-            newActivity.shopItemId = shopId;
-          }
-        }
-
-        timeline.push(newActivity);
+        timeline.push(newMilestone);
         timeline.sort((a, b) => getTimelineSortKey(a).localeCompare(getTimelineSortKey(b)));
 
         formAddActivity.reset();
-        if (actPurchaseFields) actPurchaseFields.style.display = 'none';
-        if (actShopItem) actShopItem.required = false;
-
         activityModal.classList.remove('active');
         saveData();
         renderAll();
         populateShoppingModalActivities();
-        showToast(`¡Hito "${title}" guardado en el cronograma` + (needsPurchase ? ` y en compras!` : `!`));
+        showToast(`¡Hito "${title}" guardado con ${subActivities.length} actividad(es)` + (createdShopCount > 0 ? ` y ${createdShopCount} compra(s) vinculada(s)!` : `!`));
       } catch(err) {
-        console.error('Error al guardar actividad en el cronograma:', err);
-        alert('Ocurrió un error al guardar la actividad: ' + err.message);
+        console.error('Error al guardar hito:', err);
+        alert('Ocurrió un error al guardar: ' + err.message);
       }
     });
   }
