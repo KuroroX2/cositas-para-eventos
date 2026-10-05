@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="css/organizador.css?v=3.7">
+  <link rel="stylesheet" href="css/organizador.css?v=3.8">
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
@@ -233,7 +233,7 @@
               <div class="fp-shape-divider"></div>
 
               <div class="fp-shape-group">
-                <span class="fp-shape-label"><i class="ri-vip-crown-2-fill" style="color: #D4AF37;"></i> Mesa Novios:</span>
+                <span class="fp-shape-label"><i class="ri-vip-crown-2-fill" style="color: #94A3B8;"></i> Mesa Novios:</span>
                 <div class="fp-shape-buttons" id="groupNoviosTableShapes">
                   <button type="button" class="btn-shape-toggle" data-novios-shape="round" title="Forma redonda para la mesa de los novios">
                     <i class="ri-circle-line" style="font-size: 0.95rem;"></i> <span>Redonda</span>
@@ -252,7 +252,7 @@
             <div class="fp-color-legend">
               <span class="fp-legend-item"><span class="fp-legend-dot dot-green"></span> Invitado Individual</span>
               <span class="fp-legend-item"><span class="fp-legend-dot dot-yellow"></span> Pareja Vinculada (Juntos)</span>
-              <span class="fp-legend-item"><span class="fp-legend-dot dot-gold"><i class="ri-vip-crown-2-fill"></i></span> Novios (VIP)</span>
+              <span class="fp-legend-item"><span class="fp-legend-dot dot-platinum"><i class="ri-vip-crown-2-fill"></i></span> Novios (VIP)</span>
               <span class="fp-legend-item"><span class="fp-legend-dot dot-empty">+</span> Asiento Libre</span>
             </div>
 
@@ -288,7 +288,7 @@
         <div class="providers-compact-panel" id="providersCompactPanel">
           <div class="providers-compact-top">
             <span class="providers-compact-title">
-              <i class="ri-team-line" style="color: #D4AF37;"></i> Proveedores &amp; Responsables
+              <i class="ri-team-line" style="color: #94A3B8;"></i> Proveedores &amp; Responsables
             </span>
             <button type="button" class="btn-sm-add-provider" onclick="openAddResponsibleModal()" title="Agregar nuevo responsable o proveedor">
               <i class="ri-user-add-line"></i> + Agregar
@@ -471,7 +471,7 @@
             </div>
           </div>
           <div style="margin-top: 12px; display: flex; justify-content: flex-end;">
-            <button type="button" class="btn-add-subact" id="btnAddSubActivityBottom" style="background: #FFFDF8; border: 1.5px dashed var(--gold-primary); color: var(--gold-dark); font-weight: 700;">
+            <button type="button" class="btn-add-subact" id="btnAddSubActivityBottom" style="background: #F8FAFC; border: 1.5px dashed var(--gold-primary); color: var(--gold-dark); font-weight: 700;">
               <i class="ri-add-line"></i> <span>Agregar otra actividad</span>
             </button>
           </div>
@@ -569,7 +569,7 @@
       </p>
 
       <!-- Formulario para agregar nuevo responsable -->
-      <form id="formAddResponsible" onsubmit="handleSaveResponsible(event)" style="background: #FAF8F5; border: 1px solid rgba(212,175,55,0.25); border-radius: 12px; padding: 14px; margin-bottom: 18px;">
+      <form id="formAddResponsible" onsubmit="handleSaveResponsible(event)" style="background: #F8FAFC; border: 1px solid rgba(148, 163, 184,0.25); border-radius: 12px; padding: 14px; margin-bottom: 18px;">
         <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 10px; margin-bottom: 10px;">
           <div class="form-group-org" style="margin-bottom: 0;">
             <label for="newRespName">Nombre / Empresa *</label>
@@ -695,6 +695,6 @@
   <!-- Scripts con sincronización Supabase Cloud -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js?v=2.6"></script>
-  <script src="js/organizador.js?v=4.5"></script>
+  <script src="js/organizador.js?v=4.6"></script>
 </body>
 </html>

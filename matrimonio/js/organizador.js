@@ -1232,8 +1232,8 @@ function renderTables() {
         if (!guest || typeof guest !== 'string' || !guest.trim()) return;
         const companion = getCompanion(guest);
         const hasCompanionInTable = companion && seatedGuests.some(g => isGuestNameMatch(g, companion));
-        const ringsIcon = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2.3" style="display:inline-block; vertical-align:middle; margin-right:3px;"><circle cx="8.5" cy="12" r="5.5"/><circle cx="15.5" cy="12" r="5.5"/></svg>`;
-        const companionBadge = hasCompanionInTable ? `<small style="font-size: 0.72rem; color: #99742a; font-weight: 700;" title="Acompañante de invitación: ${escapeHtml(companion)}">${ringsIcon} Pareja: ${escapeHtml(companion)}</small>` : '';
+        const ringsIcon = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.3" style="display:inline-block; vertical-align:middle; margin-right:3px;"><circle cx="8.5" cy="12" r="5.5"/><circle cx="15.5" cy="12" r="5.5"/></svg>`;
+        const companionBadge = hasCompanionInTable ? `<small style="font-size: 0.72rem; color: #475569; font-weight: 700;" title="Acompañante de invitación: ${escapeHtml(companion)}">${ringsIcon} Pareja: ${escapeHtml(companion)}</small>` : '';
 
         guestsHtml += `
           <li class="guest-seat-item" draggable="true" data-guest="${escapeHtml(guest)}" data-table-id="${table.id}" title="Arrastra a otra mesa o a la lista de pendientes">
@@ -2038,7 +2038,7 @@ function renderUnassignedList() {
 
   unassignedGuests.forEach((guest, idx) => {
     const companion = getCompanion(guest);
-    const companionBadge = companion ? `<small style="font-size: 0.7rem; color: #99742a; font-weight: 700; display: block;">👥 Pareja: ${escapeHtml(companion)}</small>` : '';
+    const companionBadge = companion ? `<small style="font-size: 0.7rem; color: #475569; font-weight: 700; display: block;">👥 Pareja: ${escapeHtml(companion)}</small>` : '';
 
     const item = document.createElement('li');
     item.className = 'unassigned-item';
@@ -2050,7 +2050,7 @@ function renderUnassignedList() {
     item.innerHTML = `
       <div class="guest-name-pill" style="flex-direction: column; align-items: flex-start; gap: 2px;">
         <span style="display: flex; align-items: center; gap: 5px;">
-          <i class="ri-user-line" style="color: #99742a;"></i>
+          <i class="ri-user-line" style="color: #475569;"></i>
           <strong>${escapeHtml(guest)}</strong>
         </span>
         ${companionBadge}
@@ -2393,7 +2393,7 @@ window.goToTimelineActivity = function(titleOrId) {
         card.scrollIntoView({ behavior: 'smooth', block: 'center' });
         card.style.transition = 'box-shadow 0.4s ease, border-color 0.4s ease';
         card.style.borderColor = 'var(--gold-primary)';
-        card.style.boxShadow = '0 0 0 3px rgba(212, 175, 55, 0.4)';
+        card.style.boxShadow = '0 0 0 3px rgba(148, 163, 184, 0.4)';
         setTimeout(() => {
           card.style.boxShadow = '';
         }, 1800);
@@ -2788,7 +2788,7 @@ function renderTimeline() {
 
   if (timeline.length === 0) {
     container.innerHTML = `
-      <div style="background: #FFFFFF; border: 1.5px dashed rgba(212,175,55,0.4); border-radius: 16px; padding: 40px 20px; text-align: center;">
+      <div style="background: #FFFFFF; border: 1.5px dashed rgba(148, 163, 184,0.4); border-radius: 16px; padding: 40px 20px; text-align: center;">
         <i class="ri-calendar-line" style="font-size: 3rem; color: var(--gold-primary); margin-bottom: 12px; display: block;"></i>
         <h3 style="font-family: var(--font-serif); color: var(--navy-royal); margin-bottom: 6px;">No hay hitos en el cronograma</h3>
         <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 18px;">Comienza agregando el primer horario de tu gran día.</p>
@@ -2934,7 +2934,7 @@ function renderTimeline() {
             </button>
           </div>
         ` : `
-          <div style="display: flex; align-items: center; justify-content: space-between; background: #FAF9F6; border: 1px dashed rgba(212,175,55,0.3); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; background: #F8FAFC; border: 1px dashed rgba(148, 163, 184,0.3); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px;">
             <span style="font-size: 0.84rem; color: #64748B;">No hay compras asociadas a este horario.</span>
             <button type="button" class="btn-milestone-action" onclick="event.stopPropagation(); quickAddShopForActivity('${item.id}')">
               <i class="ri-add-line"></i> + Agregar Compra / Insumo
@@ -4070,7 +4070,7 @@ function initTabs() {
 function showToast(msg) {
   const toast = document.getElementById('orgToast');
   if (!toast) return;
-  toast.innerHTML = `<i class="ri-checkbox-circle-line" style="color: #D4AF37; margin-right: 6px;"></i> ${msg}`;
+  toast.innerHTML = `<i class="ri-checkbox-circle-line" style="color: #94A3B8; margin-right: 6px;"></i> ${msg}`;
   toast.classList.add('show');
   setTimeout(() => {
     toast.classList.remove('show');
