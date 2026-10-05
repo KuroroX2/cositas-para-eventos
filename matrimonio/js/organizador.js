@@ -28,15 +28,25 @@ const DEFAULT_SEED_INVITATIONS = [
   { id: "inv_mt797yfq_46ak", pases: 2, name1: "Isaac", name2: "Denisse" }
 ];
 
+function cleanGuestName(g) {
+  if (!g || typeof g !== 'string') return '';
+  return g.trim();
+}
+
+function isGuestNameMatch(a, b) {
+  if (!a || !b || typeof a !== 'string' || typeof b !== 'string') return false;
+  return a.trim().toLowerCase() === b.trim().toLowerCase();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-  initTabs();
-  loadData();
-  renderAll();
-  handleTabFromUrl();
-  setupEventListeners();
-  initDragAndDrop();
-  initViewSwitch();
-  initFloorplanDragging();
+  try { initTabs(); } catch (e) { console.error('initTabs error:', e); }
+  try { loadData(); } catch (e) { console.error('loadData error:', e); }
+  try { renderAll(); } catch (e) { console.error('renderAll error:', e); }
+  try { handleTabFromUrl(); } catch (e) { console.error('handleTabFromUrl error:', e); }
+  try { setupEventListeners(); } catch (e) { console.error('setupEventListeners error:', e); }
+  try { initDragAndDrop(); } catch (e) { console.error('initDragAndDrop error:', e); }
+  try { initViewSwitch(); } catch (e) { console.error('initViewSwitch error:', e); }
+  try { initFloorplanDragging(); } catch (e) { console.error('initFloorplanDragging error:', e); }
 });
 
 /* ==========================================================================
@@ -146,12 +156,15 @@ function getDefaultTableCoords(idx, total) {
 }
 
 function ensureCouplesAdjacent(table) {
-  if (!table || !table.guests || table.guests.length <= 2) return;
+  if (!table || !table.guests) return;
+  const seated = getSeatedGuests(table);
+  if (seated.length <= 2) return;
+
   const processed = new Set();
   const ordered = [];
 
-  for (let i = 0; i < table.guests.length; i++) {
-    const g = table.guests[i];
+  for (let i = 0; i < seated.length; i++) {
+    const g = seated[i];
     const key = g.trim().toLowerCase();
     if (processed.has(key)) continue;
 
@@ -161,14 +174,18 @@ function ensureCouplesAdjacent(table) {
     const companion = getCompanion(g);
     if (companion) {
       const compKey = companion.trim().toLowerCase();
-      const inTable = table.guests.some(x => x.trim().toLowerCase() === compKey);
+      const inTable = seated.some(x => isGuestNameMatch(x, companion));
       if (inTable && !processed.has(compKey)) {
         ordered.push(companion);
         processed.add(compKey);
       }
     }
   }
+  const cap = table.capacity || 8;
   table.guests = ordered;
+  while (table.guests.length < cap) {
+    table.guests.push(null);
+  }
 }
 
 function getSeatedGuests(table) {
@@ -273,14 +290,14 @@ function syncConfirmedGuestsWithUnassigned() {
         const att1 = safeLower(r.attendance1);
         const att2 = safeLower(r.attendance2);
 
-        if (att === 'no' || att1 === 'no' || r.isCompanionDeclined) {
+        // Si la persona principal rechaza explícitamente
+        if (att === 'no' || att1 === 'no') {
           if (r.name) declinedSet.add(r.name.trim().toLowerCase());
         }
-        if (att === 'no' || att2 === 'no') {
-          if (r.name2) declinedSet.add(r.name2.trim().toLowerCase());
-        }
-        if (r.originalCompanion && (att2 === 'no' || r.isSingleAttendee)) {
-          declinedSet.add(r.originalCompanion.trim().toLowerCase());
+        // Si el acompañante rechaza explícitamente o el flag isCompanionDeclined está activo
+        if (att === 'no' || att2 === 'no' || r.isCompanionDeclined) {
+          if (r.name2 && r.name2.trim()) declinedSet.add(r.name2.trim().toLowerCase());
+          if (r.originalCompanion && r.originalCompanion.trim()) declinedSet.add(r.originalCompanion.trim().toLowerCase());
         }
       });
 
@@ -290,12 +307,14 @@ function syncConfirmedGuestsWithUnassigned() {
         const att1 = safeLower(r.attendance1);
         const att2 = safeLower(r.attendance2);
 
-        if (!r.isCompanionDeclined && (att1 === 'si' || (!r.attendance1 && att === 'si'))) {
+        // Invitado principal asiste si att1 == 'si' o att == 'si' (y no está en declinedSet)
+        if (att1 === 'si' || (!r.attendance1 && att === 'si')) {
           if (r.name && !declinedSet.has(r.name.trim().toLowerCase())) {
             addConfirmed(r.name);
           }
         }
-        if (att2 === 'si' && r.name2) {
+        // Acompañante asiste si att2 == 'si' (y no está en declinedSet)
+        if (att2 === 'si' && r.name2 && r.name2.trim()) {
           if (!declinedSet.has(r.name2.trim().toLowerCase())) {
             addConfirmed(r.name2);
           }
@@ -324,14 +343,14 @@ function syncConfirmedGuestsWithUnassigned() {
 
   // 2. Incluir los confirmados de semillas oficiales del matrimonio (siempre que no hayan declinado)
   ALL_CONFIRMED_SEEDS.forEach(name => {
-    if (!declinedSet.has(name.trim().toLowerCase())) {
+    if (name && typeof name === 'string' && !declinedSet.has(name.trim().toLowerCase())) {
       addConfirmed(name);
     }
   });
 
   // 3. Agregar cualquier invitado que ya estuviera en unassignedGuests (siempre que no haya declinado)
   unassignedGuests.forEach(name => {
-    if (!declinedSet.has(name.trim().toLowerCase())) {
+    if (name && typeof name === 'string' && !declinedSet.has(name.trim().toLowerCase())) {
       addConfirmed(name);
     }
   });
@@ -345,6 +364,7 @@ function syncConfirmedGuestsWithUnassigned() {
         }
         return g;
       });
+      ensureTableSeatsArray(t);
     }
   });
 
@@ -717,10 +737,14 @@ function getCompanion(guestName) {
 }
 
 function removeGuestFromEverywhere(guestName) {
+  if (!guestName || typeof guestName !== 'string') return;
   const clean = guestName.trim().toLowerCase();
-  unassignedGuests = unassignedGuests.filter(g => g.trim().toLowerCase() !== clean);
+  unassignedGuests = unassignedGuests.filter(g => g && typeof g === 'string' && g.trim().toLowerCase() !== clean);
   tables.forEach(t => {
-    t.guests = t.guests.filter(g => g.trim().toLowerCase() !== clean);
+    if (Array.isArray(t.guests)) {
+      t.guests = t.guests.map(g => (g && typeof g === 'string' && g.trim().toLowerCase() === clean) ? null : g);
+      ensureTableSeatsArray(t);
+    }
   });
 }
 
@@ -732,8 +756,9 @@ function assignGuestToTable(guestName, tableId) {
   const table = tables.find(t => t.id === tableId);
   if (!table) return false;
 
+  ensureTableSeatsArray(table);
   const companion = getCompanion(guestName);
-  const companionAlreadyThere = companion && table.guests.some(g => g.trim().toLowerCase() === companion.trim().toLowerCase());
+  const companionAlreadyThere = companion && (table.guests || []).some(g => isGuestNameMatch(g, companion));
 
   let companionToMove = null;
   let neededSeats = 1;
@@ -743,15 +768,22 @@ function assignGuestToTable(guestName, tableId) {
     neededSeats = 2;
   }
 
-  const availableSeats = table.capacity - table.guests.length;
+  const seatedCount = getSeatedCount(table);
+  const availableSeats = table.capacity - seatedCount;
   if (availableSeats < 1) {
     alert(`La "${table.name}" está completa. No tiene asientos disponibles.`);
     return false;
   }
 
-  // Asignar al invitado principal
+  // Asignar al invitado principal en el primer asiento libre
   removeGuestFromEverywhere(guestName);
-  table.guests.push(guestName);
+  const emptyIdx = table.guests.findIndex(g => !g || typeof g !== 'string' || !g.trim());
+  if (emptyIdx !== -1) {
+    table.guests[emptyIdx] = guestName;
+  } else if (table.guests.length < table.capacity) {
+    table.guests.push(guestName);
+  }
+  ensureTableSeatsArray(table);
 
   let toastMessage = `¡Se asignó a ${guestName} a "${table.name}"!`;
 
@@ -759,7 +791,13 @@ function assignGuestToTable(guestName, tableId) {
   if (companionToMove) {
     if (availableSeats >= 2) {
       removeGuestFromEverywhere(companionToMove);
-      table.guests.push(companionToMove);
+      const emptyIdx2 = table.guests.findIndex(g => !g || typeof g !== 'string' || !g.trim());
+      if (emptyIdx2 !== -1) {
+        table.guests[emptyIdx2] = companionToMove;
+      } else if (table.guests.length < table.capacity) {
+        table.guests.push(companionToMove);
+      }
+      ensureTableSeatsArray(table);
       toastMessage = `¡Se asignó a ${guestName} y a su acompañante (${companionToMove}) juntos a "${table.name}"!`;
     } else {
       alert(`Se asignó a ${guestName} a la "${table.name}", pero la mesa no tiene suficiente espacio libre para su acompañante (${companionToMove}). Aumenta la capacidad de la mesa para incluirlo.`);
@@ -840,7 +878,7 @@ function renderTables() {
       table.guests.forEach((guest, idx) => {
         if (!guest || typeof guest !== 'string' || !guest.trim()) return;
         const companion = getCompanion(guest);
-        const hasCompanionInTable = companion && seatedGuests.some(g => g.trim().toLowerCase() === companion.trim().toLowerCase());
+        const hasCompanionInTable = companion && seatedGuests.some(g => isGuestNameMatch(g, companion));
         const ringsIcon = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2.3" style="display:inline-block; vertical-align:middle; margin-right:3px;"><circle cx="8.5" cy="12" r="5.5"/><circle cx="15.5" cy="12" r="5.5"/></svg>`;
         const companionBadge = hasCompanionInTable ? `<small style="font-size: 0.72rem; color: #99742a; font-weight: 700;" title="Acompañante de invitación: ${escapeHtml(companion)}">${ringsIcon} Pareja: ${escapeHtml(companion)}</small>` : '';
 
@@ -970,7 +1008,9 @@ function renderFloorplan() {
   updateShapeToggleButtons();
 
   tables.forEach((table, tableIdx) => {
-    const isFull = table.guests.length >= table.capacity;
+    ensureTableSeatsArray(table);
+    const seatedCount = getSeatedCount(table);
+    const isFull = seatedCount >= table.capacity;
     const isNovios = isNoviosTable(table);
     const shape = getTableShape(table);
     const rectWidth = Math.max(200, (table.capacity || 8) * 75 + 40);
@@ -1005,7 +1045,7 @@ function renderFloorplan() {
         ${noviosCrownTag}
         <span class="fp-table-number">Mesa ${table.number || (tableIdx + 1)}</span>
         <span class="fp-table-name" title="${escapeHtml(displayName)}">${escapeHtml(displayName)}</span>
-        <span class="fp-table-capacity ${isFull ? 'full' : ''}">${table.guests.length} / ${table.capacity}</span>
+        <span class="fp-table-capacity ${isFull ? 'full' : ''}">${seatedCount} / ${table.capacity}</span>
         <button type="button" class="fp-btn-manage-seats" onclick="openSeatsModal('${table.id}')" title="Acomodar puestos de invitados y parejas">
           <i class="ri-user-shared-line"></i> Puestos
         </button>
@@ -1047,22 +1087,23 @@ function renderFloorplan() {
 }
 
 function ensureNoviosInCenterOfTable(table) {
-  if (!isNoviosTable(table) || !table.guests || table.guests.length < 2) return;
+  if (!isNoviosTable(table) || !table.guests) return;
+  const seated = getSeatedGuests(table);
+  if (seated.length < 2) return;
 
-  const novio1 = table.guests[0];
+  const novio1 = seated[0];
   const comp = getCompanion(novio1);
-  let compIdx = comp ? table.guests.findIndex(g => g.trim().toLowerCase() === comp.trim().toLowerCase()) : 1;
+  let compIdx = comp ? seated.findIndex(g => isGuestNameMatch(g, comp)) : 1;
   if (compIdx === -1) compIdx = 1;
-  const novio2 = table.guests[compIdx];
+  const novio2 = seated[compIdx];
 
-  const others = table.guests.filter(g => g !== novio1 && g !== novio2);
-  if (others.length === 0) return;
-
+  const others = seated.filter(g => g !== novio1 && g !== novio2);
   const leftCount = Math.floor(others.length / 2);
   const leftGuests = others.slice(0, leftCount);
   const rightGuests = others.slice(leftCount);
 
   table.guests = [...leftGuests, novio1, novio2, ...rightGuests];
+  ensureTableSeatsArray(table);
 }
 
 function generateChairsForTable(table) {
@@ -1150,8 +1191,8 @@ function generateChairsForTable(table) {
 
 function createChairElement(table, seatIndex, x, y) {
   const chair = document.createElement('div');
-  const isOccupied = seatIndex < table.guests.length;
-  const guest = isOccupied ? table.guests[seatIndex] : null;
+  const guest = (table.guests && seatIndex < table.guests.length) ? table.guests[seatIndex] : null;
+  const isOccupied = !!(guest && typeof guest === 'string' && guest.trim());
   const isNovios = isNoviosTable(table);
 
   chair.style.left = `${x}px`;
@@ -1184,7 +1225,7 @@ function createChairElement(table, seatIndex, x, y) {
     chair.dataset.guest = guest;
 
     const companion = getCompanion(guest);
-    const hasCompanionInTable = companion && table.guests.some(g => g.trim().toLowerCase() === companion.trim().toLowerCase());
+    const hasCompanionInTable = companion && (table.guests || []).some(g => isGuestNameMatch(g, companion));
     
     // Si la mesa es de novios y son los dos comensales centrales o iniciales
     const isNovioSeat = isNovios && (seatIndex === 0 || seatIndex === 1 || (hasCompanionInTable && seatIndex <= 3));
@@ -1250,6 +1291,7 @@ function handleChairDrop(targetTableId, targetSeatIndex) {
 
   const targetTable = tables.find(t => t.id === targetTableId);
   if (!targetTable) return;
+  ensureTableSeatsArray(targetTable);
 
   const srcTableId = draggedSourceTableId;
   const srcSeatIdx = draggedSourceSeatIndex;
@@ -1257,16 +1299,10 @@ function handleChairDrop(targetTableId, targetSeatIndex) {
   if (srcTableId === targetTableId) {
     // Reubicación dentro de la misma mesa
     if (srcSeatIdx !== null && srcSeatIdx !== undefined && srcSeatIdx !== targetSeatIndex) {
-      if (targetSeatIndex < targetTable.guests.length) {
-        // Intercambiar de puesto entre dos comensales
-        const temp = targetTable.guests[srcSeatIdx];
-        targetTable.guests[srcSeatIdx] = targetTable.guests[targetSeatIndex];
-        targetTable.guests[targetSeatIndex] = temp;
-      } else {
-        // Mover puesto hacia el final
-        const moved = targetTable.guests.splice(srcSeatIdx, 1)[0];
-        targetTable.guests.push(moved);
-      }
+      const temp = targetTable.guests[srcSeatIdx];
+      targetTable.guests[srcSeatIdx] = targetTable.guests[targetSeatIndex] || null;
+      targetTable.guests[targetSeatIndex] = temp;
+      ensureTableSeatsArray(targetTable);
       saveData();
       renderAll();
       showToast(`¡Puesto de ${draggedGuestName} reubicado en "${targetTable.name}"!`);
@@ -1277,15 +1313,14 @@ function handleChairDrop(targetTableId, targetSeatIndex) {
     if (guestIdx !== -1) {
       unassignedGuests.splice(guestIdx, 1);
     }
-    if (targetSeatIndex < targetTable.guests.length) {
-      targetTable.guests.splice(targetSeatIndex, 0, draggedGuestName);
-      if (targetTable.guests.length > targetTable.capacity) {
-        const overflow = targetTable.guests.pop();
-        if (!unassignedGuests.includes(overflow)) unassignedGuests.push(overflow);
+    const previousOccupant = targetTable.guests[targetSeatIndex];
+    targetTable.guests[targetSeatIndex] = draggedGuestName;
+    if (previousOccupant && typeof previousOccupant === 'string' && previousOccupant.trim()) {
+      if (!unassignedGuests.includes(previousOccupant)) {
+        unassignedGuests.push(previousOccupant);
       }
-    } else {
-      targetTable.guests.push(draggedGuestName);
     }
+    ensureTableSeatsArray(targetTable);
     saveData();
     renderAll();
     showToast(`¡${draggedGuestName} asignado al puesto en "${targetTable.name}"!`);
@@ -1293,25 +1328,19 @@ function handleChairDrop(targetTableId, targetSeatIndex) {
     // Mover desde otra mesa hacia esta
     const srcTable = tables.find(t => t.id === srcTableId);
     if (!srcTable) return;
+    ensureTableSeatsArray(srcTable);
 
-    if (targetSeatIndex < targetTable.guests.length) {
-      // Asiento ocupado -> Intercambiar invitados entre ambas mesas
-      const targetGuest = targetTable.guests[targetSeatIndex];
-      srcTable.guests[srcSeatIdx] = targetGuest;
-      targetTable.guests[targetSeatIndex] = draggedGuestName;
-      saveData();
-      renderAll();
+    const targetGuest = targetTable.guests[targetSeatIndex];
+    srcTable.guests[srcSeatIdx] = (targetGuest && typeof targetGuest === 'string' && targetGuest.trim()) ? targetGuest : null;
+    targetTable.guests[targetSeatIndex] = draggedGuestName;
+    ensureTableSeatsArray(srcTable);
+    ensureTableSeatsArray(targetTable);
+
+    saveData();
+    renderAll();
+    if (targetGuest && typeof targetGuest === 'string' && targetGuest.trim()) {
       showToast(`¡Intercambiados ${draggedGuestName} y ${targetGuest} entre mesas!`);
     } else {
-      // Asiento disponible en la mesa destino
-      if (targetTable.guests.length >= targetTable.capacity) {
-        showToast(`La mesa "${targetTable.name}" ya alcanzó su capacidad máxima.`);
-        return;
-      }
-      srcTable.guests.splice(srcSeatIdx, 1);
-      targetTable.guests.push(draggedGuestName);
-      saveData();
-      renderAll();
       showToast(`¡${draggedGuestName} movido a "${targetTable.name}"!`);
     }
   }
@@ -1454,8 +1483,9 @@ function renderSeatsModalContent(table) {
   if (!container) return;
 
   container.innerHTML = '';
+  const seated = getSeatedGuests(table);
 
-  if (table.guests.length === 0) {
+  if (seated.length === 0) {
     container.innerHTML = `
       <div style="text-align: center; padding: 30px 15px; color: var(--text-muted); background: #F8FAFC; border-radius: 12px; border: 1.5px dashed #CBD5E1;">
         <i class="ri-user-unfollow-line" style="font-size: 2rem; color: #94A3B8; display: block; margin-bottom: 8px;"></i>
@@ -1466,9 +1496,9 @@ function renderSeatsModalContent(table) {
     return;
   }
 
-  table.guests.forEach((guest, idx) => {
+  seated.forEach((guest, idx) => {
     const companion = getCompanion(guest);
-    const hasCompanionInTable = companion && table.guests.some(g => g.trim().toLowerCase() === companion.trim().toLowerCase());
+    const hasCompanionInTable = companion && seated.some(g => isGuestNameMatch(g, companion));
 
     const item = document.createElement('div');
     item.className = `seat-arr-item ${hasCompanionInTable ? 'is-couple' : ''}`;
@@ -1498,7 +1528,7 @@ function renderSeatsModalContent(table) {
         <button type="button" class="btn-seat-move" onclick="moveSeatItem('${table.id}', ${idx}, -1)" ${idx === 0 ? 'disabled' : ''} title="Mover puesto hacia adelante">
           <i class="ri-arrow-up-line"></i>
         </button>
-        <button type="button" class="btn-seat-move" onclick="moveSeatItem('${table.id}', ${idx}, 1)" ${idx === table.guests.length - 1 ? 'disabled' : ''} title="Mover puesto hacia atrás">
+        <button type="button" class="btn-seat-move" onclick="moveSeatItem('${table.id}', ${idx}, 1)" ${idx === seated.length - 1 ? 'disabled' : ''} title="Mover puesto hacia atrás">
           <i class="ri-arrow-down-line"></i>
         </button>
         <button type="button" class="btn-seat-remove" onclick="removeGuestFromSeatsModal('${table.id}', ${idx})" title="Quitar de esta mesa">
@@ -1518,8 +1548,8 @@ window.swapCoupleSides = function(tableId, guestName) {
   const companion = getCompanion(guestName);
   if (!companion) return;
 
-  const idx1 = table.guests.findIndex(g => g.trim().toLowerCase() === guestName.trim().toLowerCase());
-  const idx2 = table.guests.findIndex(g => g.trim().toLowerCase() === companion.trim().toLowerCase());
+  const idx1 = table.guests.findIndex(g => isGuestNameMatch(g, guestName));
+  const idx2 = table.guests.findIndex(g => isGuestNameMatch(g, companion));
 
   if (idx1 !== -1 && idx2 !== -1) {
     const temp = table.guests[idx1];
@@ -1540,8 +1570,9 @@ window.moveSeatItem = function(tableId, guestIndex, direction) {
   if (!table || !table.guests) return;
 
   const guest = table.guests[guestIndex];
+  if (!guest) return;
   const companion = getCompanion(guest);
-  const companionIdx = companion ? table.guests.findIndex(g => g.trim().toLowerCase() === companion.trim().toLowerCase()) : -1;
+  const companionIdx = companion ? table.guests.findIndex(g => isGuestNameMatch(g, companion)) : -1;
 
   if (companionIdx !== -1 && Math.abs(guestIndex - companionIdx) === 1) {
     // Es un bloque de pareja
@@ -1716,7 +1747,8 @@ window.openPickTableModal = function(guestName) {
   listEl.innerHTML = '';
 
   tables.forEach(table => {
-    const freeSeats = table.capacity - table.guests.length;
+    const seatedCount = getSeatedCount(table);
+    const freeSeats = Math.max(0, table.capacity - seatedCount);
     const needed = companion ? 2 : 1;
     const hasSpace = freeSeats >= needed;
 
@@ -1727,7 +1759,7 @@ window.openPickTableModal = function(guestName) {
       <div class="pick-table-info">
         <span class="pick-table-name">${escapeHtml(table.name)}</span>
         <span class="pick-table-seats">
-          ${table.guests.length} / ${table.capacity} (${freeSeats} disponibles)
+          ${seatedCount} / ${table.capacity} (${freeSeats} disponibles)
         </span>
       </div>
       <button class="btn-select-table" ${hasSpace ? '' : 'disabled'} onclick="handlePickTableSelect('${escapeHtml(guestName)}', '${table.id}')">
@@ -1805,11 +1837,12 @@ window.openEditTableModal = function(tableId) {
   // Mostrar nombre limpio sin el prefijo "Mesa X: "
   nameInput.value = getCleanTableName(table.name);
 
+  const seatedCount = getSeatedCount(table);
   capInput.value = table.capacity;
-  capInput.min = Math.max(1, table.guests.length);
+  capInput.min = Math.max(1, seatedCount);
 
   if (seatsHint) {
-    seatsHint.textContent = `Actualmente hay ${table.guests.length} personas sentadas. La capacidad mínima permitida es ${table.guests.length}.`;
+    seatsHint.textContent = `Actualmente hay ${seatedCount} personas sentadas. La capacidad mínima permitida es ${seatedCount}.`;
   }
 
   modal.classList.add('active');
@@ -2031,8 +2064,9 @@ function setupEventListeners() {
       const table = tables.find(t => t.id === id);
       if (!table) return;
 
-      if (newCap < table.guests.length) {
-        alert(`La capacidad no puede ser menor a la cantidad de personas ya sentadas (${table.guests.length}).`);
+      const seatedCount = getSeatedCount(table);
+      if (newCap < seatedCount) {
+        alert(`La capacidad no puede ser menor a la cantidad de personas ya sentadas (${seatedCount}).`);
         return;
       }
 
@@ -2200,18 +2234,23 @@ function setupEventListeners() {
   initViewSwitch();
 }
 
+let viewSwitchInitialized = false;
+
 function initViewSwitch() {
   const btnCards = document.getElementById('btnViewCards');
   const btnFp = document.getElementById('btnViewFloorplan');
   const containerCards = document.getElementById('viewModeCardsContainer');
   const containerFp = document.getElementById('viewModeFloorplanContainer');
 
-  if (btnCards && btnFp && containerCards && containerFp) {
+  if (btnCards && btnFp && containerCards && containerFp && !viewSwitchInitialized) {
+    viewSwitchInitialized = true;
     btnCards.addEventListener('click', () => {
       btnCards.classList.add('active');
       btnFp.classList.remove('active');
       containerCards.style.display = 'block';
+      containerCards.classList.add('active');
       containerFp.style.display = 'none';
+      containerFp.classList.remove('active');
       renderTables();
     });
 
@@ -2219,18 +2258,22 @@ function initViewSwitch() {
       btnFp.classList.add('active');
       btnCards.classList.remove('active');
       containerCards.style.display = 'none';
+      containerCards.classList.remove('active');
       containerFp.style.display = 'block';
+      containerFp.classList.add('active');
       renderFloorplan();
     });
   }
 
   const btnAuto = document.getElementById('btnAutoLayout');
-  if (btnAuto) {
+  if (btnAuto && !btnAuto.dataset.hasListener) {
+    btnAuto.dataset.hasListener = 'true';
     btnAuto.addEventListener('click', autoLayoutTables);
   }
 
   const btnReset = document.getElementById('btnResetFloorplanZoom');
-  if (btnReset) {
+  if (btnReset && !btnReset.dataset.hasListener) {
+    btnReset.dataset.hasListener = 'true';
     btnReset.addEventListener('click', () => {
       const wrapper = document.getElementById('floorplanWrapper');
       if (wrapper) {
@@ -2241,24 +2284,31 @@ function initViewSwitch() {
 
   // Listeners para los botones de cambio de forma de mesas
   document.querySelectorAll('#groupGuestTableShapes .btn-shape-toggle').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (btn.dataset.guestShape) {
-        setAllGuestTablesShape(btn.dataset.guestShape);
-      }
-    });
+    if (!btn.dataset.hasListener) {
+      btn.dataset.hasListener = 'true';
+      btn.addEventListener('click', () => {
+        if (btn.dataset.guestShape) {
+          setAllGuestTablesShape(btn.dataset.guestShape);
+        }
+      });
+    }
   });
 
   document.querySelectorAll('#groupNoviosTableShapes .btn-shape-toggle').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (btn.dataset.noviosShape) {
-        setNoviosTableShape(btn.dataset.noviosShape);
-      }
-    });
+    if (!btn.dataset.hasListener) {
+      btn.dataset.hasListener = 'true';
+      btn.addEventListener('click', () => {
+        if (btn.dataset.noviosShape) {
+          setNoviosTableShape(btn.dataset.noviosShape);
+        }
+      });
+    }
   });
 
   // Listener para cerrar modal de puestos
   const btnCloseSeats = document.getElementById('btnCloseSeatsModal');
-  if (btnCloseSeats) {
+  if (btnCloseSeats && !btnCloseSeats.dataset.hasListener) {
+    btnCloseSeats.dataset.hasListener = 'true';
     btnCloseSeats.addEventListener('click', () => {
       const modal = document.getElementById('seatsModal');
       if (modal) modal.classList.remove('active');
