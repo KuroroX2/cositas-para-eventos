@@ -1019,6 +1019,14 @@ function loadData() {
       }
     });
   }
+
+  // Cargar y cosechar directorio de responsables/proveedores desde cronograma y compras
+  if (typeof loadResponsibles === 'function') {
+    loadResponsibles();
+  }
+  if (typeof window.harvestResponsiblesFromData === 'function') {
+    window.harvestResponsiblesFromData();
+  }
 }
 
 function saveData() {
@@ -2736,11 +2744,15 @@ window.quickAddSubActivityToMilestone = function(milestoneId) {
   const name = prompt(`Nueva actividad que va dentro de "${m.title}":`);
   if (!name || !name.trim()) return;
   const resp = prompt(`¿Quién será el encargado(a) para "${name}"?`, m.responsible || '');
+  const cleanResp = (resp || '').trim() || 'Por definir';
+  if (cleanResp && !cleanResp.toLowerCase().includes('por definir') && typeof window.ensureResponsibleExists === 'function') {
+    window.ensureResponsibleExists(cleanResp, 'Proveedor');
+  }
   if (!m.activities) m.activities = [];
   m.activities.push({
     id: 'sub_' + Date.now(),
     name: name.trim(),
-    responsible: (resp || '').trim() || 'Por definir',
+    responsible: cleanResp,
     responsibleStatus: 'ok'
   });
   saveData();
@@ -2979,7 +2991,8 @@ window.closeEditActivityModal = function() {
 };
 
 window.handleEditActRespChange = function(selectEl) {
-  const customInput = document.getElementById('editActRespCustom');
+  const customInput = document.getElementById('editActRespCustom') ||
+    (selectEl.parentElement ? selectEl.parentElement.querySelector('input[type="text"]') : null);
   if (!customInput) return;
   if (selectEl.value === '__custom__') {
     customInput.style.display = 'block';
@@ -3012,6 +3025,9 @@ window.handleSaveSingleActivity = function(e) {
     responsible = (document.getElementById('editActRespCustom')?.value || '').trim();
   }
   if (!responsible) responsible = 'Novios (Cristopher & Reny)';
+  else if (responsible !== '__custom__' && typeof window.ensureResponsibleExists === 'function') {
+    window.ensureResponsibleExists(responsible, 'Proveedor');
+  }
   const respStatus = document.getElementById('editActRespStatus')?.value || 'ok';
 
   const needsPurchase = !!document.getElementById('editActNeedsPurchase')?.checked;
@@ -3433,6 +3449,80 @@ window.editShoppingItem = function(shopId) {
 /* ==========================================================================
    DIRECTORIO DE RESPONSABLES Y PROVEEDORES
    ========================================================================== */
+window.harvestResponsiblesFromData = function() {
+  if (!Array.isArray(responsibles)) responsibles = [];
+  let added = false;
+
+  const registerIfNew = (name, category = 'Proveedor') => {
+    if (!name || typeof name !== 'string') return;
+    const clean = name.trim();
+    if (!clean || clean === '__custom__' || clean === '__new_resp__' || clean.toLowerCase() === 'novios') return;
+    const lower = clean.toLowerCase();
+    if (lower === 'por definir' || lower === 'sin asignar' || lower === 'ninguno' || lower === '— sin asignar —') return;
+
+    if (!responsibles.some(r => r.name.toLowerCase() === lower)) {
+      responsibles.push({
+        id: 'resp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        name: clean,
+        category: category || 'Proveedor',
+        phone: ''
+      });
+      added = true;
+    }
+  };
+
+  // 1. Recorrer compras activas
+  if (Array.isArray(shopping)) {
+    shopping.forEach(s => {
+      registerIfNew(s.responsible, s.category || 'Proveedor');
+    });
+  }
+
+  // 2. Recorrer cronograma e hitos
+  if (Array.isArray(timeline)) {
+    timeline.forEach(m => {
+      registerIfNew(m.responsible, 'Proveedor');
+      if (Array.isArray(m.activities)) {
+        m.activities.forEach(a => {
+          registerIfNew(a.responsible, 'Proveedor');
+        });
+      }
+    });
+  }
+
+  // 3. Recorrer localStorage por compras y cronogramas guardados previamente
+  try {
+    const customShop = JSON.parse(localStorage.getItem('boda_org_shopping_custom') || '[]');
+    if (Array.isArray(customShop)) {
+      customShop.forEach(s => registerIfNew(s.responsible, s.category || 'Proveedor'));
+    }
+  } catch(e) {}
+
+  try {
+    const v2Shop = JSON.parse(localStorage.getItem('boda_org_shopping_v2') || '[]');
+    if (Array.isArray(v2Shop)) {
+      v2Shop.forEach(s => registerIfNew(s.responsible, s.category || 'Proveedor'));
+    }
+  } catch(e) {}
+
+  try {
+    const customTime = JSON.parse(localStorage.getItem('boda_org_timeline_custom') || '[]');
+    if (Array.isArray(customTime)) {
+      customTime.forEach(m => {
+        registerIfNew(m.responsible, 'Proveedor');
+        if (Array.isArray(m.activities)) {
+          m.activities.forEach(a => registerIfNew(a.responsible, 'Proveedor'));
+        }
+      });
+    }
+  } catch(e) {}
+
+  if (added) {
+    saveResponsibles();
+    renderResponsibles();
+  }
+};
+
 function loadResponsibles() {
   const saved = localStorage.getItem(STORAGE_KEY_RESPONSIBLES);
   if (saved) {
@@ -3445,6 +3535,10 @@ function loadResponsibles() {
   if (!responsibles || responsibles.length === 0) {
     responsibles = JSON.parse(JSON.stringify(DEFAULT_RESPONSIBLES));
     localStorage.setItem(STORAGE_KEY_RESPONSIBLES, JSON.stringify(responsibles));
+  }
+  // Auto-cosechar proveedores presentes en compras y cronograma para no perder ninguno
+  if (typeof window.harvestResponsiblesFromData === 'function') {
+    window.harvestResponsiblesFromData();
   }
 }
 
@@ -3531,19 +3625,28 @@ window.editSelectedProviderFromCombobox = function() {
   }
 };
 
-window.ensureResponsibleExists = function(name, category = 'Proveedor') {
-  if (!name || !name.trim()) return;
+window.ensureResponsibleExists = function(name, category = 'Proveedor', phone = '') {
+  if (!name || typeof name !== 'string') return null;
   const clean = name.trim();
-  if (!responsibles.some(r => r.name.toLowerCase() === clean.toLowerCase())) {
-    responsibles.push({
-      id: 'resp_' + Date.now(),
+  if (!clean || clean === '__custom__' || clean === '__new_resp__' || clean.toLowerCase() === 'novios') return null;
+  const lower = clean.toLowerCase();
+  if (lower === 'por definir' || lower === 'sin asignar' || lower === 'ninguno' || lower === '— sin asignar —') return null;
+
+  if (!Array.isArray(responsibles)) responsibles = [];
+
+  let existing = responsibles.find(r => r.name.toLowerCase() === lower);
+  if (!existing) {
+    existing = {
+      id: 'resp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
       name: clean,
-      category: category,
-      phone: ''
-    });
+      category: category || 'Proveedor',
+      phone: phone || ''
+    };
+    responsibles.push(existing);
     saveResponsibles();
     renderResponsibles();
   }
+  return existing;
 };
 
 window.handleSaveResponsible = function(e) {
@@ -3597,7 +3700,7 @@ window.handleSaveResponsible = function(e) {
     }
 
     const newResp = {
-      id: 'resp_' + Date.now(),
+      id: 'resp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
       name: name,
       category: cat,
       phone: phone
@@ -3627,14 +3730,23 @@ window.deleteResponsible = function(idx) {
 // Función para poblar el desplegable de Encargados/Proveedores con todos los registrados
 window.populateResponsibleSelect = function(selectEl, currentValue) {
   if (!selectEl) return;
-  selectEl.innerHTML = '';
-
-  const cleanVal = (currentValue || '').trim();
 
   // Asegurar que la lista de proveedores esté inicializada
   if (!responsibles || responsibles.length === 0) {
     if (typeof loadResponsibles === 'function') loadResponsibles();
   }
+  if (typeof window.harvestResponsiblesFromData === 'function') {
+    window.harvestResponsiblesFromData();
+  }
+
+  const cleanVal = (currentValue || '').trim();
+
+  // Si cleanVal es un proveedor personalizado que no existía, agregarlo oficialmente al directorio
+  if (cleanVal && cleanVal !== '__custom__' && cleanVal !== '__new_resp__') {
+    window.ensureResponsibleExists(cleanVal, 'Proveedor');
+  }
+
+  selectEl.innerHTML = '';
 
   // Opción por defecto / placeholder si está vacío
   const defaultOpt = document.createElement('option');
@@ -3656,16 +3768,6 @@ window.populateResponsibleSelect = function(selectEl, currentValue) {
     selectEl.appendChild(opt);
   });
 
-  // Si el valor actual no está en la lista de proveedores, agregarlo al inicio como opción seleccionada
-  if (cleanVal && !matchFound && cleanVal !== '__custom__') {
-    const customExistingOpt = document.createElement('option');
-    customExistingOpt.value = cleanVal;
-    customExistingOpt.textContent = `👤 ${cleanVal} (Personalizado)`;
-    customExistingOpt.selected = true;
-    selectEl.insertBefore(customExistingOpt, selectEl.children[1] || null);
-    matchFound = true;
-  }
-
   // Si no se pasó valor o no hubo match, preseleccionar Novios si existe
   if (!cleanVal || !matchFound) {
     for (let i = 0; i < selectEl.options.length; i++) {
@@ -3684,8 +3786,9 @@ window.populateResponsibleSelect = function(selectEl, currentValue) {
   if (cleanVal === '__custom__') newOpt.selected = true;
   selectEl.appendChild(newOpt);
 
-  // Manejar visibilidad del campo personalizado
-  const customInput = document.getElementById('shopResponsibleCustom');
+  // Manejar visibilidad del campo personalizado dinámicamente
+  const customInput = (selectEl.parentElement ? selectEl.parentElement.querySelector('input[type="text"]') : null) ||
+    document.getElementById(selectEl.id === 'editActResp' ? 'editActRespCustom' : 'shopResponsibleCustom');
   if (customInput) {
     if (cleanVal === '__custom__' || selectEl.value === '__custom__') {
       customInput.style.display = 'block';
@@ -3697,7 +3800,8 @@ window.populateResponsibleSelect = function(selectEl, currentValue) {
 };
 
 window.handleShopResponsibleChange = function(selectEl) {
-  const customInput = document.getElementById('shopResponsibleCustom');
+  const customInput = (selectEl.parentElement ? selectEl.parentElement.querySelector('input[type="text"]') : null) ||
+    document.getElementById(selectEl.id === 'editActResp' ? 'editActRespCustom' : 'shopResponsibleCustom');
   if (!customInput) return;
   if (selectEl.value === '__custom__') {
     customInput.style.display = 'block';
@@ -3757,11 +3861,18 @@ function renderResponsibles() {
     `).join('');
   }
 
-  // 5. Refrescar el selector de compras si está presente en el DOM
+  // 5. Refrescar selectores de proveedores si están en el DOM
   const shopRespSelect = document.getElementById('shopResponsible');
   if (shopRespSelect && typeof window.populateResponsibleSelect === 'function') {
     const currentSelected = shopRespSelect.value;
     window.populateResponsibleSelect(shopRespSelect, currentSelected || 'Novios (Cristopher & Reny)');
+  }
+  const editActRespSelect = document.getElementById('editActResp');
+  if (editActRespSelect && typeof window.populateResponsibleSelect === 'function') {
+    const currentSelected = editActRespSelect.value;
+    if (currentSelected && currentSelected !== '__custom__') {
+      window.populateResponsibleSelect(editActRespSelect, currentSelected);
+    }
   }
 }
 
@@ -4451,6 +4562,9 @@ function setupEventListeners() {
         if (!name) name = `${title} (Actividad ${idx + 1})`;
 
         const responsible = (card.querySelector('.input-subact-resp')?.value || '').trim() || 'Novios / Coordinador';
+        if (responsible && !responsible.toLowerCase().includes('por definir') && typeof window.ensureResponsibleExists === 'function') {
+          window.ensureResponsibleExists(responsible, 'Proveedor');
+        }
         const responsibleStatus = card.querySelector('.select-subact-resp-status')?.value || 'ok';
         const isPurchase = card.querySelector('.check-subact-purchase')?.checked || false;
 
@@ -4652,6 +4766,9 @@ function setupEventListeners() {
           responsible = (document.getElementById('shopResponsibleCustom')?.value || '').trim();
         }
         if (!responsible) responsible = 'Novios (Cristopher & Reny)';
+        else if (responsible !== '__custom__' && typeof window.ensureResponsibleExists === 'function') {
+          window.ensureResponsibleExists(responsible, category || 'Proveedor');
+        }
         const respStatus = document.getElementById('shopRespStatus')?.value || 'ok';
         const detail = (document.getElementById('shopDetail')?.value || '').trim();
         const cost = (document.getElementById('shopCost')?.value || '').trim();
