@@ -38,6 +38,12 @@ function isGuestNameMatch(a, b) {
   return a.trim().toLowerCase() === b.trim().toLowerCase();
 }
 
+function isNovioGuest(name) {
+  if (!name || typeof name !== 'string') return false;
+  const n = name.trim().toLowerCase();
+  return n === 'cristopher' || n === 'reny' || n.startsWith('cristopher ') || n.startsWith('reny ');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   try { initTabs(); } catch (e) { console.error('initTabs error:', e); }
   try { loadData(); } catch (e) { console.error('loadData error:', e); }
@@ -1527,9 +1533,9 @@ function ensureNoviosInCenterOfTable(table) {
   if (seated.length < 2) return;
 
   // Identificar a los novios
-  let novio1 = seated.find(g => isGuestNameMatch(g, 'Cristopher') || isGuestNameMatch(g, 'Reny')) || seated[0];
+  let novio1 = seated.find(isNovioGuest) || seated[0];
   let comp = getCompanion(novio1);
-  let novio2 = comp ? seated.find(g => isGuestNameMatch(g, comp)) : seated.find(g => !isGuestNameMatch(g, novio1));
+  let novio2 = comp ? seated.find(g => isGuestNameMatch(g, comp)) : seated.find(g => isNovioGuest(g) && !isGuestNameMatch(g, novio1));
   if (!novio2 && seated.length > 1) {
     novio2 = seated.find(g => !isGuestNameMatch(g, novio1));
   }
@@ -1691,16 +1697,12 @@ function createChairElement(table, seatIndex, x, y) {
     const companion = getCompanion(guest);
     const hasCompanionInTable = companion && (table.guests || []).some(g => isGuestNameMatch(g, companion));
     
-    // Si la mesa es de novios y son los dos comensales centrales o iniciales
-    const isNovioSeat = isNovios && (seatIndex === 0 || seatIndex === 1 || (hasCompanionInTable && seatIndex <= 3));
-
-    chair.className = `fp-chair seated ${hasCompanionInTable ? 'couple' : ''} ${isNovioSeat ? 'is-novio' : ''}`;
+    // EXCLUSIVAMENTE Cristopher y Reny son los novios (nadie más por posición de silla)
+    const isNovio = isNovioGuest(guest);
 
     const role = getGuestRoleInInvitation(guest); // 'I' (Invitado) o 'A' (Acompañante)
     const gender = getGuestGender(guest); // 'male' (Verde) o 'female' (Calipso)
     const firstName = guest.split(' ')[0] || guest;
-
-    const isNovio = isGuestNameMatch(guest, 'Cristopher') || isGuestNameMatch(guest, 'Reny') || (isNovios && (seatIndex === 0 || seatIndex === 1));
 
     // Si es novio/novia, AMBOS tienen el MISMO COLOR VIP REAL (distinto a verde y calipso)
     const colorClass = isNovio ? 'novios' : gender;
