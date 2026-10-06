@@ -2867,6 +2867,7 @@ body.theme-florido .ch-num {
 }
 .admin-table {
   width: 100%;
+  min-width: 1050px;
   border-collapse: collapse;
   font-size: 0.78rem;
   text-align: left;
@@ -2888,11 +2889,18 @@ body.theme-florido .ch-num {
   background: rgba(0, 0, 0, 0.02);
 }
 .badge-status {
-  display: inline-block;
-  padding: 0.2rem 0.55rem;
-  border-radius: 12px;
-  font-size: 0.68rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 6px;
+  padding: 0.32rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.74rem;
   font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+  line-height: 1.35;
 }
 .status-yes {
   background: #d4edda;
@@ -2909,10 +2917,43 @@ body.theme-florido .ch-num {
   border-radius: 4px;
 }
 .cell-message {
-  max-width: 180px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal !important;
+  word-break: break-word !important;
+  min-width: 200px !important;
+  max-width: 360px !important;
+  line-height: 1.45 !important;
+}
+.cell-message small {
+  display: block;
+  white-space: normal !important;
+  word-break: break-word !important;
+  color: var(--text-main, #202D21);
+  font-size: 0.84rem;
+}
+.admin-table th.col-pases,
+.admin-table td.col-pases {
+  text-align: center !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+  width: 130px !important;
+  min-width: 125px !important;
+}
+.admin-table th.col-status,
+.admin-table td.col-status {
+  width: 165px !important;
+  min-width: 160px !important;
+  max-width: 180px !important;
+  vertical-align: middle !important;
+}
+.admin-inv-status-select,
+.admin-rsvp-status-select {
+  width: 100% !important;
+  min-width: 155px !important;
+  max-width: 175px !important;
+  height: 34px !important;
+  line-height: 1.4 !important;
+  box-sizing: border-box !important;
+  vertical-align: middle !important;
 }
 
 .admin-photos-grid {

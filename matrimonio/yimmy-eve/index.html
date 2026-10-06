@@ -863,9 +863,11 @@
 
           <!-- Tabla de Invitaciones Creadas -->
           <div class="admin-actions-bar" style="justify-content: space-between; align-items: center;">
-            <h4 style="font-family: var(--font-serif); font-size: 1.1rem; color: var(--text-main);">
-              <i class="ri-file-list-3-line"></i> Lista de Invitaciones Personalizadas
+            <h4 style="font-family: var(--font-serif); font-size: 1.1rem; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+              <i class="ri-file-list-3-line" style="color: #94A3B8;"></i> 
+              <span>Lista de Invitaciones &amp; Enlaces de WhatsApp</span>
             </h4>
+            <span style="font-size: 0.82rem; color: #666;" id="admin-filtered-count"></span>
           </div>
 
           <div class="admin-table-wrap">
@@ -873,10 +875,10 @@
               <thead>
                 <tr>
                   <th>Invitado(s)</th>
-                  <th>Pases</th>
-                  <th>Estado Confirmación</th>
-                  <th>Acciones</th>
-                  <th>Eliminar</th>
+                  <th class="col-pases" style="text-align: center; width: 140px;">Pases</th>
+                  <th class="col-status" style="width: 175px;">Estado</th>
+                  <th>Acciones / Link WhatsApp</th>
+                  <th style="width: 70px; text-align: center;">Eliminar</th>
                 </tr>
               </thead>
               <tbody id="admin-invitations-tbody">
@@ -886,16 +888,16 @@
           </div>
         </div>
 
-        <!-- Tab 2: Respuestas RSVP & Sorteo -->
+        <!-- Tab 2: Confirmaciones & Cupones de Sorteo -->
         <div class="admin-tab-pane" id="admin-tab-rsvps">
           <div class="admin-actions-bar">
-            <button class="btn-admin-action" id="btn-export-csv">
-              <i class="ri-file-excel-2-line"></i>
-              <span>Descargar Reporte CSV (Excel)</span>
-            </button>
-            <button class="btn-admin-action" id="btn-print-raffle">
+            <button class="btn-admin-action" id="btn-print-raffle-tickets">
               <i class="ri-ticket-2-line"></i>
-              <span>Imprimir Números para Sorteo</span>
+              <span>🎟️ Imprimir Cupones para Sorteo</span>
+            </button>
+            <button class="btn-admin-action btn-outline-action" id="btn-export-rsvps-csv">
+              <i class="ri-file-excel-line"></i>
+              <span>📥 Exportar Lista a Excel / CSV</span>
             </button>
           </div>
 
@@ -903,14 +905,15 @@
             <table class="admin-table">
               <thead>
                 <tr>
-                  <th># Ticket</th>
-                  <th>Nombre Invitado</th>
-                  <th>Asistencia</th>
-                  <th>Pases</th>
-                  <th>Menú / Dietario</th>
-                  <th>Canción Sugerida</th>
-                  <th>Mensaje</th>
-                  <th>Fecha</th>
+                  <th>Invitado(a)</th>
+                  <th class="col-status" style="width: 175px;">Estado</th>
+                  <th class="col-pases" style="text-align: center; width: 140px;">Pases</th>
+                  <th style="width: 105px; text-align: center;">Código Pase</th>
+                  <th>Menú / Dieta</th>
+                  <th>Canción</th>
+                  <th class="col-message" style="min-width: 220px;">Dedicatoria</th>
+                  <th style="width: 105px; text-align: center;">Fecha</th>
+                  <th style="width: 60px; text-align: center;">Eliminar</th>
                 </tr>
               </thead>
               <tbody id="admin-rsvps-tbody">

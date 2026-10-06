@@ -624,9 +624,9 @@
             ${idx + 1}. ${namesDisplay}
             ${inv.phone ? `<br><small style="color: #666; font-weight: normal;"><i class="ri-whatsapp-line"></i> ${escapeHtml(inv.phone)}</small>` : ''}
           </td>
-          <td>${statusBadge}</td>
-          <td>
-            <select class="admin-inv-status-select" data-id="${inv.id}" data-name1="${escapeHtml(inv.name1)}" data-name2="${escapeHtml(inv.name2 || '')}" data-pases="${inv.pases}" style="padding: 0.35rem 0.65rem; border-radius: 50px; font-size: 0.76rem; font-weight: 700; border: 1.5px solid ${borderColor}; color: ${textColor}; background: #FFFFFF; cursor: pointer;">
+          <td class="col-pases">${statusBadge}</td>
+          <td class="col-status">
+            <select class="admin-inv-status-select" data-id="${inv.id}" data-name1="${escapeHtml(inv.name1)}" data-name2="${escapeHtml(inv.name2 || '')}" data-pases="${inv.pases}" style="padding: 0.2rem 0.65rem; border-radius: 50px; font-size: 0.78rem; font-weight: 700; border: 1.5px solid ${borderColor}; color: ${textColor}; background: #FFFFFF; cursor: pointer; height: 34px; line-height: 1.4; vertical-align: middle;">
               ${selectOptions}
             </select>
           </td>
@@ -640,7 +640,7 @@
               </a>
             </div>
           </td>
-          <td>
+          <td style="text-align: center;">
             <button class="btn-del-inv" data-id="${inv.id}" title="Eliminar invitación" style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1.15rem; padding: 0.35rem; transition: transform 0.2s ease;">
               <i class="ri-delete-bin-line"></i>
             </button>
@@ -880,13 +880,13 @@
       return `
         <tr>
           <td style="font-weight: 700;">${index + 1}. ${namesShow}</td>
-          <td>
-            <select class="admin-rsvp-status-select" data-id="${r.id || r.code}" data-name1="${escapeHtml(r.name)}" data-name2="${escapeHtml(r.name2 || r.originalCompanion || '')}" data-inv="${r.invCode || ''}" style="padding: 0.35rem 0.65rem; border-radius: 50px; font-size: 0.76rem; font-weight: 700; border: 1.5px solid ${borderColor}; color: ${textColor}; background: #FFFFFF; cursor: pointer;">
+          <td class="col-status">
+            <select class="admin-rsvp-status-select" data-id="${r.id || r.code}" data-name1="${escapeHtml(r.name)}" data-name2="${escapeHtml(r.name2 || r.originalCompanion || '')}" data-inv="${r.invCode || ''}" style="padding: 0.2rem 0.65rem; border-radius: 50px; font-size: 0.78rem; font-weight: 700; border: 1.5px solid ${borderColor}; color: ${textColor}; background: #FFFFFF; cursor: pointer; height: 34px; line-height: 1.4; vertical-align: middle;">
               ${selectOptions}
             </select>
           </td>
-          <td>${pasesBadge}</td>
-          <td><strong class="code-tag">${escapeHtml(r.code || 'EY-0000')}</strong></td>
+          <td class="col-pases">${pasesBadge}</td>
+          <td style="text-align: center;"><strong class="code-tag">${escapeHtml(r.code || 'EY-0000')}</strong></td>
           <td>
             <small>${escapeHtml(r.dietary && r.dietary !== 'ninguna' ? r.dietary : 'Tradicional')}${r.dietary2 && r.dietary2 !== 'ninguna' ? ' / ' + escapeHtml(r.dietary2) : ''}</small>
           </td>
@@ -894,8 +894,8 @@
           <td class="cell-message" title="${escapeHtml(r.message || '')}">
             <small>${escapeHtml(r.message || '—')}</small>
           </td>
-          <td><small style="color: #777;">${dateStr}</small></td>
-          <td>
+          <td style="text-align: center;"><small style="color: #777;">${dateStr}</small></td>
+          <td style="text-align: center;">
             <button class="btn-del-rsvp" data-id="${r.id || ''}" data-inv="${r.invCode || ''}" data-code="${r.code || ''}" data-name1="${escapeHtml(r.name)}" title="Eliminar confirmación" style="background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1.15rem; padding: 0.35rem; transition: transform 0.2s ease;">
               <i class="ri-delete-bin-line"></i>
             </button>
