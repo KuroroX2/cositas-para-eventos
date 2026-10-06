@@ -1471,14 +1471,19 @@ function renderFloorplan() {
 
     // Superficie central de la mesa
     node.innerHTML = `
-      <div class="fp-table-surface" title="Arrastra la mesa para moverla por el salón">
+      <div class="fp-table-surface" onclick="openEditTableModal('${table.id}')" title="Haz clic al centro de la mesa para editarla (nombre, capacidad, número) o arrástrala por el salón">
         ${noviosCrownTag}
         <span class="fp-table-number">Mesa ${table.number || (tableIdx + 1)}</span>
         <span class="fp-table-name" title="${escapeHtml(displayName)}">${escapeHtml(displayName)}</span>
         <span class="fp-table-capacity ${isFull ? 'full' : ''}">${seatedCount} / ${table.capacity}</span>
-        <button type="button" class="fp-btn-manage-seats" onclick="openSeatsModal('${table.id}')" title="Acomodar puestos de invitados y parejas">
-          <i class="ri-user-shared-line"></i> Puestos
-        </button>
+        <div style="display: flex; gap: 6px; align-items: center; margin-top: 4px;">
+          <button type="button" class="fp-btn-edit-table-inline" onclick="event.stopPropagation(); openEditTableModal('${table.id}')" title="Editar mesa">
+            <i class="ri-edit-line"></i> Editar
+          </button>
+          <button type="button" class="fp-btn-manage-seats" onclick="event.stopPropagation(); openSeatsModal('${table.id}')" title="Acomodar puestos de invitados y parejas">
+            <i class="ri-user-shared-line"></i> Puestos
+          </button>
+        </div>
       </div>
     `;
 
@@ -1695,18 +1700,24 @@ function createChairElement(table, seatIndex, x, y) {
     const gender = getGuestGender(guest); // 'male' (Verde) o 'female' (Calipso)
     const firstName = guest.split(' ')[0] || guest;
 
-    chair.className = `fp-chair seated ${hasCompanionInTable ? 'couple' : ''} ${isNovioSeat ? 'is-novio' : ''} gender-${gender} role-${role.toLowerCase()}`;
+    const isNovio = isGuestNameMatch(guest, 'Cristopher') || isGuestNameMatch(guest, 'Reny') || (isNovios && (seatIndex === 0 || seatIndex === 1));
 
-    // Letra I (Invitado) o A (Acompañante) con color verde (hombre) o calipso (mujer)
+    // Si es novio/novia, AMBOS tienen el MISMO COLOR VIP REAL (distinto a verde y calipso)
+    const colorClass = isNovio ? 'novios' : gender;
+    chair.className = `fp-chair seated ${hasCompanionInTable ? 'couple' : ''} ${isNovio ? 'is-novio' : ''} color-${colorClass} role-${role.toLowerCase()}`;
+
     const circleLetter = `<span class="fp-role-letter">${role}</span>`;
-    const crownMini = isNovioSeat ? '<i class="ri-vip-crown-2-fill fp-crown-mini" title="Mesa de Novios"></i>' : '';
+    const crownMini = isNovio ? '<i class="ri-vip-crown-2-fill fp-crown-mini" title="Novios VIP"></i>' : '';
+
+    const roleTitle = isNovio ? `Novios VIP (${role === 'I' ? 'Novio I' : 'Novia A'})` : (role === 'I' ? 'Invitado Principal (I)' : 'Acompañante (A)');
+    const colorTitle = isNovio ? 'Color Especial Novios' : (gender === 'male' ? 'Hombre (Verde)' : 'Mujer (Calipso)');
 
     chair.innerHTML = `
-      <div class="fp-chair-circle circle-${gender}" title="${role === 'I' ? 'Invitado Principal (I)' : 'Acompañante (A)'} • ${gender === 'male' ? 'Hombre (Verde)' : 'Mujer (Calipso)'}">
+      <div class="fp-chair-circle circle-${colorClass}" title="${escapeHtml(guest)} — ${roleTitle} • ${colorTitle}">
         ${circleLetter}
         ${crownMini}
       </div>
-      <div class="fp-chair-name name-${gender}" title="${escapeHtml(guest)}">${escapeHtml(firstName)}</div>
+      <div class="fp-chair-name name-${colorClass}" title="${escapeHtml(guest)}">${escapeHtml(firstName)}</div>
     `;
 
     const roleText = role === 'I' ? 'Invitado Principal (I)' : 'Acompañante (A)';
@@ -3276,6 +3287,63 @@ window.deleteResponsible = function(idx) {
   saveResponsibles();
   renderResponsibles();
   showToast(`"${deleted.name}" eliminado del directorio.`);
+};
+
+
+// Función para poblar el desplegable de Encargados/Proveedores con todos los registrados
+window.populateResponsibleSelect = function(selectEl, currentValue) {
+  if (!selectEl) return;
+  selectEl.innerHTML = '';
+
+  const cleanVal = (currentValue || '').trim();
+
+  // Opción por defecto / placeholder si está vacío
+  const defaultOpt = document.createElement('option');
+  defaultOpt.value = '';
+  defaultOpt.textContent = '— Selecciona un Proveedor / Encargado —';
+  selectEl.appendChild(defaultOpt);
+
+  // Listar TODOS los proveedores y responsables registrados
+  responsibles.forEach(r => {
+    const opt = document.createElement('option');
+    opt.value = r.name;
+    opt.textContent = `👤 ${r.name} (${r.category})`;
+    if (cleanVal && r.name.toLowerCase() === cleanVal.toLowerCase()) {
+      opt.selected = true;
+    }
+    selectEl.appendChild(opt);
+  });
+
+  // Si el valor actual no está en la lista de proveedores, agregarlo al inicio como opción seleccionada
+  const exists = responsibles.some(r => r.name.toLowerCase() === cleanVal.toLowerCase());
+  if (cleanVal && !exists && cleanVal !== '__custom__') {
+    const customExistingOpt = document.createElement('option');
+    customExistingOpt.value = cleanVal;
+    customExistingOpt.textContent = `👤 ${cleanVal} (Personalizado)`;
+    customExistingOpt.selected = true;
+    selectEl.insertBefore(customExistingOpt, selectEl.children[1] || null);
+  }
+
+  // Opción para ingresar otro encargado manualmente
+  const newOpt = document.createElement('option');
+  newOpt.value = '__custom__';
+  newOpt.textContent = '➕ Escribir otro / Nuevo Encargado...';
+  selectEl.appendChild(newOpt);
+
+  // Ocultar campo personalizado inicialmente a menos que sea __custom__
+  const customInput = document.getElementById('shopResponsibleCustom');
+  if (customInput) customInput.style.display = 'none';
+};
+
+window.handleShopResponsibleChange = function(selectEl) {
+  const customInput = document.getElementById('shopResponsibleCustom');
+  if (!customInput) return;
+  if (selectEl.value === '__custom__') {
+    customInput.style.display = 'block';
+    customInput.focus();
+  } else {
+    customInput.style.display = 'none';
+  }
 };
 
 function renderResponsibles() {

@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="css/organizador.css?v=3.9">
+  <link rel="stylesheet" href="css/organizador.css?v=4.0">
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
@@ -255,7 +255,7 @@
               <span class="fp-legend-item"><span class="fp-legend-dot dot-role-i">I</span> Invitado Principal</span>
               <span class="fp-legend-item"><span class="fp-legend-dot dot-role-a">A</span> Acompañante</span>
               <span class="fp-legend-item"><span class="fp-legend-dot dot-empty"><i class="ri-add-line"></i></span> Asiento Libre</span>
-              <span class="fp-legend-item"><span class="fp-legend-dot dot-platinum"><i class="ri-vip-crown-2-fill"></i></span> Novios (VIP)</span>
+              <span class="fp-legend-item"><span class="fp-legend-dot dot-novios"><i class="ri-vip-crown-2-fill"></i></span> Novios (Color VIP Real)</span>
             </div>
 
             <!-- Lienzo del Centro de Eventos -->
@@ -525,8 +525,11 @@
         </div>
         <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px;">
           <div class="form-group-org">
-            <label for="shopResponsible">Encargado(a)</label>
-            <input type="text" id="shopResponsible" class="input-org" list="responsiblesDatalist" placeholder="Ej.: Padrinos / Novios">
+            <label for="shopResponsible">Encargado(a) / Proveedor</label>
+            <select id="shopResponsible" class="select-org" onchange="handleShopResponsibleChange(this)" title="Selecciona de la lista de proveedores o escribe uno nuevo">
+              <!-- Opciones de todos los proveedores cargadas dinámicamente -->
+            </select>
+            <input type="text" id="shopResponsibleCustom" class="input-org" style="display: none; margin-top: 6px;" placeholder="Escribe el nombre del nuevo encargado...">
           </div>
           <div class="form-group-org">
             <label for="shopRespStatus">¿Encargado OK?</label>
@@ -697,6 +700,6 @@
   <!-- Scripts con sincronización Supabase Cloud -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js?v=2.6"></script>
-  <script src="js/organizador.js?v=4.7"></script>
+  <script src="js/organizador.js?v=4.8"></script>
 </body>
 </html>

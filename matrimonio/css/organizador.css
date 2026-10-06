@@ -3024,3 +3024,71 @@ i[class^="ri-"], i[class*=" ri-"] {
   background: #0891B2;
   color: #FFFFFF;
 }
+
+
+/* ==========================================================================
+   COLOR ESPECIAL EXCLUSIVO PARA NOVIOS (AMBOS CON EL MISMO COLOR VIP)
+   ========================================================================== */
+
+/* Círculo Novios: Azul Noche Real con Borde Plata Luminosa y Corona */
+.fp-chair-circle.circle-novios {
+  background: linear-gradient(135deg, #0A1828 0%, #1E293B 100%) !important;
+  border: 2.2px solid #CBD5E1 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 0 14px rgba(10, 24, 40, 0.65), 0 0 0 2px rgba(148, 163, 184, 0.45) !important;
+}
+
+.fp-chair:hover .fp-chair-circle.circle-novios {
+  transform: scale(1.2) !important;
+  box-shadow: 0 0 20px rgba(10, 24, 40, 0.85), 0 0 0 3px #CBD5E1 !important;
+}
+
+.fp-chair-name.name-novios {
+  border-color: #CBD5E1 !important;
+  color: #FFFFFF !important;
+  background: #0A1828 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 6px rgba(10, 24, 40, 0.3) !important;
+}
+
+/* Indicador de novios en la leyenda */
+.fp-legend-dot.dot-novios {
+  background: #0A1828;
+  border: 2px solid #CBD5E1;
+  color: #CBD5E1;
+  font-size: 0.62rem;
+  box-shadow: 0 0 6px rgba(10, 24, 40, 0.4);
+}
+
+/* Botón Editar dentro de la mesa en el plano 2D */
+.fp-btn-edit-table-inline {
+  background: #0A1828;
+  color: #CBD5E1;
+  border: 1px solid #64748B;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 0.68rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  transition: var(--transition);
+}
+
+.fp-btn-edit-table-inline:hover {
+  background: #334155;
+  color: #FFFFFF;
+  border-color: #CBD5E1;
+  transform: scale(1.05);
+}
+
+/* Superficie de la mesa interactiva al hacer clic en el centro */
+.fp-table-surface {
+  cursor: pointer;
+}
+
+.fp-table-surface:hover {
+  filter: brightness(1.02);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
+}
