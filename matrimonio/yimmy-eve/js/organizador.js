@@ -67,7 +67,51 @@ let tables = [];
 let timeline = [];
 let shopping = [];
 const STORAGE_KEY_RESPONSIBLES = 'boda_org_responsibles_ye_v1';
+const STORAGE_KEY_DELETED_RESP = 'boda_org_deleted_responsibles_ye_v1';
 let responsibles = [];
+let deletedResponsibles = [];
+
+function loadDeletedResponsibles() {
+  try {
+    deletedResponsibles = JSON.parse(localStorage.getItem(STORAGE_KEY_DELETED_RESP) || '[]');
+    if (!Array.isArray(deletedResponsibles)) deletedResponsibles = [];
+  } catch(e) {
+    deletedResponsibles = [];
+  }
+}
+
+function saveDeletedResponsibles() {
+  try {
+    localStorage.setItem(STORAGE_KEY_DELETED_RESP, JSON.stringify(deletedResponsibles));
+  } catch(e) {}
+}
+
+function isResponsibleDeleted(name) {
+  if (!name || typeof name !== 'string') return false;
+  const lower = name.trim().toLowerCase();
+  if (lower === '— sin asignar —' || lower === 'sin asignar' || lower === 'ninguno') return false;
+  if (!Array.isArray(deletedResponsibles)) loadDeletedResponsibles();
+  return (deletedResponsibles || []).some(d => typeof d === 'string' && d.trim().toLowerCase() === lower);
+}
+
+function markResponsibleDeleted(name) {
+  if (!name || typeof name !== 'string') return;
+  const clean = name.trim();
+  const lower = clean.toLowerCase();
+  loadDeletedResponsibles();
+  if (!isResponsibleDeleted(clean)) {
+    deletedResponsibles.push(clean);
+    saveDeletedResponsibles();
+  }
+}
+
+function unmarkResponsibleDeleted(name) {
+  if (!name || typeof name !== 'string') return;
+  const lower = name.trim().toLowerCase();
+  loadDeletedResponsibles();
+  deletedResponsibles = (deletedResponsibles || []).filter(d => typeof d === 'string' && d.trim().toLowerCase() !== lower);
+  saveDeletedResponsibles();
+}
 
 const DEFAULT_RESPONSIBLES = [
   { id: 'resp_1', name: 'Novios (Evelyn & Yimmy)', category: 'Novios', phone: '' },
@@ -2521,7 +2565,7 @@ window.quickAddShopForActivity = function(activityId) {
   }
   if (shopResp) {
     if (typeof window.populateResponsibleSelect === 'function') {
-      window.populateResponsibleSelect(shopResp, (act && act.responsible) ? act.responsible : 'Novios (Evelyn & Yimmy)');
+      window.populateResponsibleSelect(shopResp, (act && act.responsible && !isResponsibleDeleted(act.responsible)) ? act.responsible : '');
     } else {
       shopResp.value = (act && act.responsible) ? act.responsible : '';
     }
@@ -2966,7 +3010,7 @@ window.openEditActivityModal = function(milestoneId, actKey) {
   }
 
   if (respSelect) {
-    populateResponsibleSelect(respSelect, act.responsible || m.responsible || 'Novios (Evelyn & Yimmy)');
+    populateResponsibleSelect(respSelect, (act && act.responsible && !isResponsibleDeleted(act.responsible)) ? act.responsible : ((m && m.responsible && !isResponsibleDeleted(m.responsible)) ? m.responsible : ''));
   }
   if (respStatusSelect) {
     respStatusSelect.value = act.responsibleStatus || 'ok';
@@ -3024,7 +3068,7 @@ window.handleSaveSingleActivity = function(e) {
   if (responsible === '__custom__') {
     responsible = (document.getElementById('editActRespCustom')?.value || '').trim();
   }
-  if (!responsible) responsible = 'Novios (Evelyn & Yimmy)';
+  if (!responsible) responsible = '';
   else if (responsible !== '__custom__' && typeof window.ensureResponsibleExists === 'function') {
     window.ensureResponsibleExists(responsible, 'Proveedor');
   }
@@ -3433,7 +3477,7 @@ window.editShoppingItem = function(shopId) {
   if (shopCost) shopCost.value = item.cost || '';
   if (shopResponsible) {
     if (typeof window.populateResponsibleSelect === 'function') {
-      window.populateResponsibleSelect(shopResponsible, item.responsible || 'Novios (Evelyn & Yimmy)');
+      window.populateResponsibleSelect(shopResponsible, (item && item.responsible && !isResponsibleDeleted(item.responsible)) ? item.responsible : '');
     } else {
       shopResponsible.value = item.responsible || '';
     }
@@ -3451,6 +3495,7 @@ window.editShoppingItem = function(shopId) {
    ========================================================================== */
 window.harvestResponsiblesFromData = function() {
   if (!Array.isArray(responsibles)) responsibles = [];
+  loadDeletedResponsibles();
   let added = false;
 
   const registerIfNew = (name, category = 'Proveedor') => {
@@ -3459,6 +3504,7 @@ window.harvestResponsiblesFromData = function() {
     if (!clean || clean === '__custom__' || clean === '__new_resp__' || clean.toLowerCase() === 'novios') return;
     const lower = clean.toLowerCase();
     if (lower === 'por definir' || lower === 'sin asignar' || lower === 'ninguno' || lower === '— sin asignar —') return;
+    if (isResponsibleDeleted(clean)) return; // No auto-cosechar si fue eliminado explícitamente
 
     if (!responsibles.some(r => r.name.toLowerCase() === lower)) {
       responsibles.push({
@@ -3524,6 +3570,7 @@ window.harvestResponsiblesFromData = function() {
 };
 
 function loadResponsibles() {
+  loadDeletedResponsibles();
   const saved = localStorage.getItem(STORAGE_KEY_RESPONSIBLES);
   if (saved) {
     try {
@@ -3534,7 +3581,14 @@ function loadResponsibles() {
   }
   if (!responsibles || responsibles.length === 0) {
     responsibles = JSON.parse(JSON.stringify(DEFAULT_RESPONSIBLES));
+    responsibles = responsibles.filter(r => !isResponsibleDeleted(r.name));
     localStorage.setItem(STORAGE_KEY_RESPONSIBLES, JSON.stringify(responsibles));
+  } else {
+    const prevLen = responsibles.length;
+    responsibles = responsibles.filter(r => !isResponsibleDeleted(r.name));
+    if (responsibles.length !== prevLen) {
+      saveResponsibles();
+    }
   }
   // Auto-cosechar proveedores presentes en compras y cronograma para no perder ninguno
   if (typeof window.harvestResponsiblesFromData === 'function') {
@@ -3631,6 +3685,7 @@ window.ensureResponsibleExists = function(name, category = 'Proveedor', phone = 
   if (!clean || clean === '__custom__' || clean === '__new_resp__' || clean.toLowerCase() === 'novios') return null;
   const lower = clean.toLowerCase();
   if (lower === 'por definir' || lower === 'sin asignar' || lower === 'ninguno' || lower === '— sin asignar —') return null;
+  if (isResponsibleDeleted(clean)) return null; // No crear si el usuario lo eliminó
 
   if (!Array.isArray(responsibles)) responsibles = [];
 
@@ -3719,11 +3774,63 @@ window.handleSaveResponsible = function(e) {
 };
 
 window.deleteResponsible = function(idx) {
-  if (!responsibles[idx]) return;
-  const deleted = responsibles.splice(idx, 1)[0];
+  if (!responsibles || !responsibles[idx]) return;
+  const deleted = responsibles[idx];
+  const deletedName = (deleted.name || '').trim();
+
+  // 1. Marcar como permanentemente eliminado para evitar resurrección
+  markResponsibleDeleted(deletedName);
+
+  // 2. Remover del array de responsables
+  responsibles.splice(idx, 1);
   saveResponsibles();
+
+  // 3. Resetear selectores en el DOM si tenían seleccionado este nombre
+  const shopRespSelect = document.getElementById('shopResponsible');
+  if (shopRespSelect && (shopRespSelect.value === deletedName || shopRespSelect.value === deleted.id)) {
+    shopRespSelect.value = '';
+  }
+  const editActRespSelect = document.getElementById('editActResp');
+  if (editActRespSelect && (editActRespSelect.value === deletedName || editActRespSelect.value === deleted.id)) {
+    editActRespSelect.value = '';
+  }
+
+  // 4. Limpiar de items de compras y cronograma si aún figuraban
+  let modifiedData = false;
+  if (Array.isArray(shopping)) {
+    shopping.forEach(s => {
+      if (s.responsible && s.responsible.trim().toLowerCase() === deletedName.toLowerCase()) {
+        s.responsible = '— Sin Asignar —';
+        s.respStatus = 'pending';
+        modifiedData = true;
+      }
+    });
+  }
+  if (Array.isArray(timeline)) {
+    timeline.forEach(m => {
+      if (m.responsible && m.responsible.trim().toLowerCase() === deletedName.toLowerCase()) {
+        m.responsible = '— Sin Asignar —';
+        modifiedData = true;
+      }
+      if (Array.isArray(m.activities)) {
+        m.activities.forEach(a => {
+          if (a.responsible && a.responsible.trim().toLowerCase() === deletedName.toLowerCase()) {
+            a.responsible = '— Sin Asignar —';
+            modifiedData = true;
+          }
+        });
+      }
+    });
+  }
+  if (modifiedData) {
+    saveData();
+    if (typeof renderShopping === 'function') renderShopping();
+    if (typeof renderTimeline === 'function') renderTimeline();
+  }
+
+  // 5. Renderizar lista actualizada de responsables
   renderResponsibles();
-  showToast(`"${deleted.name}" eliminado del directorio.`);
+  showToast(`"${deletedName}" eliminado permanentemente del directorio.`);
 };
 
 
@@ -3865,7 +3972,7 @@ function renderResponsibles() {
   const shopRespSelect = document.getElementById('shopResponsible');
   if (shopRespSelect && typeof window.populateResponsibleSelect === 'function') {
     const currentSelected = shopRespSelect.value;
-    window.populateResponsibleSelect(shopRespSelect, currentSelected || 'Novios (Evelyn & Yimmy)');
+    window.populateResponsibleSelect(shopRespSelect, (currentSelected && !isResponsibleDeleted(currentSelected)) ? currentSelected : '');
   }
   const editActRespSelect = document.getElementById('editActResp');
   if (editActRespSelect && typeof window.populateResponsibleSelect === 'function') {
@@ -4747,7 +4854,7 @@ function setupEventListeners() {
 
       const shopRespSelect = document.getElementById('shopResponsible');
       if (shopRespSelect && typeof window.populateResponsibleSelect === 'function') {
-        window.populateResponsibleSelect(shopRespSelect, 'Novios (Evelyn & Yimmy)');
+        window.populateResponsibleSelect(shopRespSelect, '');
       }
 
       shoppingModal.classList.add('active');
@@ -4765,7 +4872,7 @@ function setupEventListeners() {
         if (responsible === '__custom__') {
           responsible = (document.getElementById('shopResponsibleCustom')?.value || '').trim();
         }
-        if (!responsible) responsible = 'Novios (Evelyn & Yimmy)';
+        if (!responsible) responsible = '';
         else if (responsible !== '__custom__' && typeof window.ensureResponsibleExists === 'function') {
           window.ensureResponsibleExists(responsible, category || 'Proveedor');
         }
