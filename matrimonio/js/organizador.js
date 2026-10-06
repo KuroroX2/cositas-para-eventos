@@ -1022,6 +1022,9 @@ function loadData() {
 }
 
 function saveData() {
+  if (typeof syncAllShoppingToTimeline === 'function') {
+    syncAllShoppingToTimeline();
+  }
   localStorage.setItem(STORAGE_KEY_TABLES, JSON.stringify(tables));
   localStorage.setItem(STORAGE_KEY_UNASSIGNED, JSON.stringify(unassignedGuests));
   localStorage.setItem(STORAGE_KEY_TIMELINE, JSON.stringify(timeline));
@@ -1029,6 +1032,9 @@ function saveData() {
 }
 
 function renderAll() {
+  if (typeof syncAllShoppingToTimeline === 'function') {
+    syncAllShoppingToTimeline();
+  }
   sortTablesAscending();
   updateNextTableNumberInput();
   renderMetrics();
@@ -2815,15 +2821,322 @@ window.toggleMilestoneSubactResp = function(milestoneId, subactIdx) {
   if (!m || !m.activities || !m.activities[subactIdx]) return;
   const current = m.activities[subactIdx].responsibleStatus || 'ok';
   m.activities[subactIdx].responsibleStatus = (current === 'ok') ? 'pending' : 'ok';
+  
+  // Sincronizar hacia shopping si tiene compra vinculada
+  const act = m.activities[subactIdx];
+  const linkedShop = shopping.find(s => 
+    (act.shopItemId && s.id === act.shopItemId) ||
+    (s.activityId === m.id && s.item && s.item.toLowerCase() === (act.shopItem || act.name || '').toLowerCase())
+  );
+  if (linkedShop) {
+    linkedShop.responsibleStatus = m.activities[subactIdx].responsibleStatus;
+  }
+
   saveData();
   renderAll();
   showToast(`Estado del encargado: "${m.activities[subactIdx].responsibleStatus === 'ok' ? 'Confirmado' : 'Por Buscar'}"`);
 };
 
 /* ==========================================================================
+   SINCRONIZACIÓN AUTOMÁTICA COMPRAS <-> CRONOGRAMA
+   ========================================================================== */
+window.syncShoppingItemToTimeline = function(item, previousMilestoneId = null) {
+  if (!item || !Array.isArray(timeline)) return;
+
+  // 1. Si tenía un hito anterior y ahora es otro (o ninguno), quitar del hito anterior
+  if (previousMilestoneId && previousMilestoneId !== item.activityId) {
+    const oldM = timeline.find(t => t.id === previousMilestoneId);
+    if (oldM && Array.isArray(oldM.activities)) {
+      oldM.activities = oldM.activities.filter(a => !(
+        (a.shopItemId && a.shopItemId === item.id) ||
+        (a.shopItem && a.shopItem.toLowerCase() === (item.item || '').toLowerCase())
+      ));
+    }
+  }
+
+  // 2. Si está vinculada a un hito actual
+  if (item.activityId) {
+    const m = timeline.find(t => t.id === item.activityId);
+    if (m) {
+      if (!Array.isArray(m.activities)) m.activities = [];
+
+      let act = m.activities.find(a => (
+        (a.shopItemId && a.shopItemId === item.id) ||
+        (a.shopItem && a.shopItem.toLowerCase() === (item.item || '').toLowerCase()) ||
+        (a.name && a.name.toLowerCase() === (item.item || '').toLowerCase())
+      ));
+
+      if (act) {
+        act.name = item.item;
+        act.responsible = item.responsible || act.responsible || 'Novios';
+        act.responsibleStatus = item.responsibleStatus || 'ok';
+        act.needsPurchase = true;
+        act.shopItemId = item.id;
+        act.shopItem = item.item;
+        act.shopCategory = item.category || 'Varios';
+        act.shopCost = item.cost || '';
+        act.shopStatus = item.status || 'pending';
+      } else {
+        m.activities.push({
+          id: 'sub_' + item.id,
+          name: item.item,
+          responsible: item.responsible || 'Novios',
+          responsibleStatus: item.responsibleStatus || 'ok',
+          needsPurchase: true,
+          shopItemId: item.id,
+          shopItem: item.item,
+          shopCategory: item.category || 'Varios',
+          shopCost: item.cost || '',
+          shopStatus: item.status || 'pending'
+        });
+      }
+    }
+  }
+};
+
+window.syncAllShoppingToTimeline = function() {
+  if (!Array.isArray(shopping) || !Array.isArray(timeline)) return;
+  shopping.forEach(item => {
+    if (item.activityId) {
+      window.syncShoppingItemToTimeline(item);
+    }
+  });
+};
+
+/* ==========================================================================
+   MODAL PARA EDITAR ACTIVIDAD INDIVIDUAL DEL CRONOGRAMA
+   ========================================================================== */
+window.openEditActivityModal = function(milestoneId, actKey) {
+  const m = timeline.find(t => t.id === milestoneId);
+  if (!m) return;
+
+  const modal = document.getElementById('modalEditSingleActivity');
+  if (!modal) return;
+
+  const origMilestoneInput = document.getElementById('editActOriginalMilestoneId');
+  const actIdInput = document.getElementById('editActId');
+  const nameInput = document.getElementById('editActName');
+  const milestoneSelect = document.getElementById('editActMilestoneSelect');
+  const respSelect = document.getElementById('editActResp');
+  const respStatusSelect = document.getElementById('editActRespStatus');
+  const needsPurchaseCheck = document.getElementById('editActNeedsPurchase');
+  const purchaseFields = document.getElementById('editActPurchaseFields');
+  const shopItemInput = document.getElementById('editActShopItem');
+  const shopCatSelect = document.getElementById('editActShopCategory');
+  const shopCostInput = document.getElementById('editActShopCost');
+  const shopStatusSelect = document.getElementById('editActShopStatus');
+
+  const acts = m.activities || [];
+  let act = acts.find((a, i) => a.id === actKey || String(i) === String(actKey));
+  if (!act) {
+    act = {
+      id: actKey || ('sub_' + Date.now()),
+      name: m.title,
+      responsible: m.responsible || 'Novios',
+      responsibleStatus: m.responsibleStatus || 'ok'
+    };
+  }
+
+  const linkedShop = shopping.find(s => 
+    (act.shopItemId && s.id === act.shopItemId) ||
+    (s.activityId === m.id && s.item && s.item.toLowerCase() === (act.shopItem || act.name || '').toLowerCase())
+  );
+
+  if (origMilestoneInput) origMilestoneInput.value = m.id;
+  if (actIdInput) actIdInput.value = act.id || '';
+  if (nameInput) nameInput.value = act.name || '';
+
+  if (milestoneSelect) {
+    milestoneSelect.innerHTML = timeline.map(t => {
+      const timeFmt = formatTimelineTime(t);
+      return `<option value="${t.id}" ${t.id === m.id ? 'selected' : ''}>[${escapeHtml(timeFmt)}] ${escapeHtml(t.title)}</option>`;
+    }).join('');
+  }
+
+  if (respSelect) {
+    populateResponsibleSelect(respSelect, act.responsible || m.responsible || 'Novios (Cristopher & Reny)');
+  }
+  if (respStatusSelect) {
+    respStatusSelect.value = act.responsibleStatus || 'ok';
+  }
+
+  const hasPurchase = !!(act.needsPurchase || linkedShop);
+  if (needsPurchaseCheck) needsPurchaseCheck.checked = hasPurchase;
+  if (purchaseFields) purchaseFields.style.display = hasPurchase ? 'block' : 'none';
+
+  if (shopItemInput) shopItemInput.value = (linkedShop ? linkedShop.item : act.shopItem) || act.name || '';
+  if (shopCatSelect) shopCatSelect.value = (linkedShop ? linkedShop.category : act.shopCategory) || 'Decoración';
+  if (shopCostInput) shopCostInput.value = (linkedShop ? linkedShop.cost : act.shopCost) || '';
+  if (shopStatusSelect) shopStatusSelect.value = (linkedShop ? linkedShop.status : act.shopStatus) || 'pending';
+
+  modal.classList.add('active');
+  if (nameInput) setTimeout(() => nameInput.focus(), 120);
+};
+
+window.closeEditActivityModal = function() {
+  const modal = document.getElementById('modalEditSingleActivity');
+  if (modal) modal.classList.remove('active');
+};
+
+window.handleEditActRespChange = function(selectEl) {
+  const customInput = document.getElementById('editActRespCustom');
+  if (!customInput) return;
+  if (selectEl.value === '__custom__') {
+    customInput.style.display = 'block';
+    customInput.focus();
+  } else {
+    customInput.style.display = 'none';
+  }
+};
+
+window.toggleEditActPurchase = function(show) {
+  const purchaseFields = document.getElementById('editActPurchaseFields');
+  if (purchaseFields) purchaseFields.style.display = show ? 'block' : 'none';
+};
+
+window.handleSaveSingleActivity = function(e) {
+  if (e) e.preventDefault();
+
+  const origMilestoneId = document.getElementById('editActOriginalMilestoneId')?.value;
+  const targetMilestoneId = document.getElementById('editActMilestoneSelect')?.value || origMilestoneId;
+  const actId = document.getElementById('editActId')?.value;
+  const actName = (document.getElementById('editActName')?.value || '').trim();
+
+  if (!actName) {
+    alert('Por favor escribe un nombre para la actividad.');
+    return;
+  }
+
+  let responsible = (document.getElementById('editActResp')?.value || '').trim();
+  if (responsible === '__custom__') {
+    responsible = (document.getElementById('editActRespCustom')?.value || '').trim();
+  }
+  if (!responsible) responsible = 'Novios (Cristopher & Reny)';
+  const respStatus = document.getElementById('editActRespStatus')?.value || 'ok';
+
+  const needsPurchase = !!document.getElementById('editActNeedsPurchase')?.checked;
+  const shopItem = (document.getElementById('editActShopItem')?.value || '').trim() || actName;
+  const shopCategory = document.getElementById('editActShopCategory')?.value || 'Varios';
+  const shopCost = (document.getElementById('editActShopCost')?.value || '').trim();
+  const shopStatus = document.getElementById('editActShopStatus')?.value || 'pending';
+
+  const origM = timeline.find(t => t.id === origMilestoneId);
+  const targetM = timeline.find(t => t.id === targetMilestoneId);
+  if (!targetM) return;
+
+  // 1. Obtener o crear la actividad
+  let actData = null;
+  if (origM && Array.isArray(origM.activities)) {
+    const actIdx = origM.activities.findIndex(a => a.id === actId);
+    if (actIdx >= 0) {
+      actData = origM.activities[actIdx];
+      if (origMilestoneId !== targetMilestoneId) {
+        origM.activities.splice(actIdx, 1);
+      }
+    }
+  }
+
+  if (!actData) {
+    actData = { id: actId || ('sub_' + Date.now()) };
+  }
+
+  // 2. Actualizar propiedades de la actividad
+  actData.name = actName;
+  actData.responsible = responsible;
+  actData.responsibleStatus = respStatus;
+  actData.needsPurchase = needsPurchase;
+  actData.shopItem = needsPurchase ? shopItem : '';
+  actData.shopCategory = needsPurchase ? shopCategory : '';
+  actData.shopCost = needsPurchase ? shopCost : '';
+  actData.shopStatus = needsPurchase ? shopStatus : '';
+
+  // 3. Si se cambió de hito o era nueva, insertar en targetM.activities
+  if (!Array.isArray(targetM.activities)) targetM.activities = [];
+  const targetIdx = targetM.activities.findIndex(a => a.id === actData.id);
+  if (targetIdx >= 0) {
+    targetM.activities[targetIdx] = actData;
+  } else {
+    targetM.activities.push(actData);
+  }
+
+  // 4. Sincronizar con Shopping
+  let existingShop = shopping.find(s => 
+    (actData.shopItemId && s.id === actData.shopItemId) ||
+    (s.activityId === origMilestoneId && s.item && s.item.toLowerCase() === actName.toLowerCase()) ||
+    (needsPurchase && s.item && s.item.toLowerCase() === shopItem.toLowerCase())
+  );
+
+  if (needsPurchase) {
+    if (existingShop) {
+      existingShop.item = shopItem;
+      existingShop.activityId = targetMilestoneId;
+      existingShop.activityTitle = targetM.title;
+      existingShop.category = shopCategory;
+      existingShop.responsible = responsible;
+      existingShop.responsibleStatus = respStatus;
+      existingShop.cost = shopCost;
+      existingShop.status = shopStatus;
+      actData.shopItemId = existingShop.id;
+    } else {
+      const newShop = {
+        id: 'shop_' + Date.now(),
+        activityId: targetMilestoneId,
+        activityTitle: targetM.title,
+        item: shopItem,
+        category: shopCategory,
+        responsible: responsible,
+        responsibleStatus: respStatus,
+        cost: shopCost,
+        status: shopStatus,
+        detail: `Vinculado al hito: ${targetM.title}`
+      };
+      shopping.push(newShop);
+      actData.shopItemId = newShop.id;
+    }
+  } else if (existingShop) {
+    existingShop.activityId = '';
+    existingShop.activityTitle = '';
+    actData.shopItemId = '';
+  }
+
+  saveData();
+  renderAll();
+  closeEditActivityModal();
+  showToast(`¡Actividad "${actName}" actualizada con éxito!`);
+};
+
+window.handleDeleteSingleActivity = function() {
+  const origMilestoneId = document.getElementById('editActOriginalMilestoneId')?.value;
+  const actId = document.getElementById('editActId')?.value;
+  const actName = document.getElementById('editActName')?.value || 'esta actividad';
+
+  if (!confirm(`¿Eliminar la actividad "${actName}" del cronograma?`)) return;
+
+  const m = timeline.find(t => t.id === origMilestoneId);
+  if (m && Array.isArray(m.activities)) {
+    m.activities = m.activities.filter(a => a.id !== actId);
+  }
+
+  const shopItem = shopping.find(s => s.activityId === origMilestoneId && s.item && s.item.toLowerCase() === actName.toLowerCase());
+  if (shopItem) {
+    shopItem.activityId = '';
+    shopItem.activityTitle = '';
+  }
+
+  saveData();
+  renderAll();
+  closeEditActivityModal();
+  showToast(`Actividad "${actName}" eliminada.`);
+};
+
+/* ==========================================================================
    RENDER DEL CRONOGRAMA MINUTO A MINUTO (ACORDEÓN INTUITIVO VOGUE)
    ========================================================================== */
 function renderTimeline() {
+  if (typeof syncAllShoppingToTimeline === 'function') {
+    syncAllShoppingToTimeline();
+  }
+
   const container = document.getElementById('timelineCardsContainer');
   const summaryBar = document.getElementById('timelineSummaryBar');
   if (!container) return;
@@ -2952,6 +3265,9 @@ function renderTimeline() {
               <i class="ri-shopping-bag-3-line"></i> ${linkedShopItems.length} compra${linkedShopItems.length > 1 ? 's' : ''}
             </span>
           ` : ''}
+          <button type="button" class="btn-milestone-header-edit" onclick="event.stopPropagation(); editMilestone('${item.id}')" title="Editar este horario y sus actividades">
+            <i class="ri-edit-line"></i> Editar Horario
+          </button>
           <button type="button" class="milestone-chevron-btn" aria-label="Desplegar">
             <i class="ri-arrow-down-s-line"></i>
           </button>
@@ -2969,13 +3285,14 @@ function renderTimeline() {
 
         <!-- Subactividades & Encargados -->
         <div class="milestone-section-title">
-          <i class="ri-task-line" style="color: var(--gold-dark);"></i> Actividades dentro de este horario (${subActs.length}):
+          <i class="ri-task-line" style="color: var(--gold-dark);"></i> Actividades dentro de este horario (${subActs.length}) <small style="font-weight: normal; color: #64748B; font-size: 0.78rem;">(Haz clic en cualquiera para editarla)</small>:
         </div>
         <div class="milestone-subacts-grid">
           ${subActs.map((act, actIdx) => {
             const isOk = act.responsibleStatus === 'ok';
+            const actKey = act.id || String(actIdx);
             return `
-              <div class="subact-vogue-item">
+              <div class="subact-vogue-item" onclick="openEditActivityModal('${item.id}', '${actKey}')" title="Haz clic en esta actividad para editarla">
                 <div class="subact-vogue-name">
                   <i class="ri-checkbox-circle-fill"></i>
                   <span>${escapeHtml(act.name)}</span>
@@ -2984,9 +3301,14 @@ function renderTimeline() {
                   <span class="subact-vogue-resp">
                     <i class="ri-user-star-line"></i> <strong>${escapeHtml(act.responsible || 'Por definir')}</strong>
                   </span>
-                  <button type="button" class="badge-status-xs ${isOk ? 'ok' : 'pending'}" onclick="event.stopPropagation(); toggleMilestoneSubactResp('${item.id}', ${actIdx})" title="Clic para alternar si el encargado está confirmado o pendiente de buscar">
-                    ${isOk ? '✓ Confirmado' : '⏳ Por Buscar'}
-                  </button>
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <button type="button" class="badge-status-xs ${isOk ? 'ok' : 'pending'}" onclick="event.stopPropagation(); toggleMilestoneSubactResp('${item.id}', ${actIdx})" title="Clic para alternar si el encargado está confirmado o pendiente de buscar">
+                      ${isOk ? '✓ Confirmado' : '⏳ Por Buscar'}
+                    </button>
+                    <button type="button" class="btn-subact-edit-pill" onclick="event.stopPropagation(); openEditActivityModal('${item.id}', '${actKey}')" title="Editar esta actividad">
+                      <i class="ri-edit-line"></i> Editar
+                    </button>
+                  </div>
                 </div>
               </div>
             `;
@@ -3472,6 +3794,10 @@ window.quickUpdateShoppingResp = function(shopId, selectedValue) {
     }
   }
 
+  if (typeof syncShoppingItemToTimeline === 'function') {
+    syncShoppingItemToTimeline(item);
+  }
+
   saveData();
   renderAll();
 };
@@ -3480,15 +3806,23 @@ window.reassignShoppingMilestone = function(shopId, newMilestoneId) {
   const item = shopping.find(s => s.id === shopId);
   if (!item) return;
 
+  const oldMilestoneId = item.activityId;
+
   if (!newMilestoneId) {
     item.activityId = '';
     item.activityTitle = '';
+    if (typeof syncShoppingItemToTimeline === 'function') {
+      syncShoppingItemToTimeline(item, oldMilestoneId);
+    }
     showToast(`"${item.item}" marcada como Compra General.`);
   } else {
     const m = timeline.find(t => t.id === newMilestoneId);
     if (m) {
       item.activityId = m.id;
       item.activityTitle = m.title;
+      if (typeof syncShoppingItemToTimeline === 'function') {
+        syncShoppingItemToTimeline(item, oldMilestoneId);
+      }
       showToast(`"${item.item}" reasignada al hito "${m.title}".`);
     }
   }
@@ -3875,6 +4209,9 @@ window.toggleShoppingStatus = function(idx) {
     msg = `"${shopping[idx].item}" marcado como: ⏳ Pendiente por Comprar`;
   }
   shopping[idx].status = next;
+  if (typeof syncShoppingItemToTimeline === 'function') {
+    syncShoppingItemToTimeline(shopping[idx]);
+  }
   saveData();
   renderAll();
   showToast(msg);
@@ -3883,6 +4220,9 @@ window.toggleShoppingStatus = function(idx) {
 window.toggleShoppingRespStatus = function(idx) {
   if (!shopping[idx]) return;
   shopping[idx].responsibleStatus = shopping[idx].responsibleStatus === 'ok' ? 'pending' : 'ok';
+  if (typeof syncShoppingItemToTimeline === 'function') {
+    syncShoppingItemToTimeline(shopping[idx]);
+  }
   saveData();
   renderAll();
   showToast(`Estado del encargado actualizado a "${shopping[idx].responsibleStatus === 'ok' ? 'Confirmado' : 'Por Buscar'}"`);
@@ -3890,8 +4230,18 @@ window.toggleShoppingRespStatus = function(idx) {
 
 window.deleteShoppingItem = function(idx) {
   if (!shopping[idx]) return;
-  if (confirm(`¿Eliminar el ítem "${shopping[idx].item}"?`)) {
-    shopping.splice(idx, 1);
+  const item = shopping[idx];
+  if (confirm(`¿Eliminar el ítem "${item.item}"?`)) {
+    const deleted = shopping.splice(idx, 1)[0];
+    if (deleted && deleted.activityId) {
+      const m = timeline.find(t => t.id === deleted.activityId);
+      if (m && Array.isArray(m.activities)) {
+        m.activities = m.activities.filter(a => !(
+          (a.shopItemId && a.shopItemId === deleted.id) ||
+          (a.shopItem && a.shopItem.toLowerCase() === deleted.item.toLowerCase())
+        ));
+      }
+    }
     saveData();
     renderAll();
   }
@@ -4317,6 +4667,7 @@ function setupEventListeners() {
           // ACTUALIZAR ÍTEM EXISTENTE
           const existingItem = shopping.find(s => s.id === window.editingShoppingId);
           if (existingItem) {
+            const oldActId = existingItem.activityId;
             existingItem.item = item;
             existingItem.activityId = linkedActId;
             existingItem.activityTitle = linkedTitle;
@@ -4326,6 +4677,10 @@ function setupEventListeners() {
             existingItem.detail = detail;
             existingItem.cost = cost;
             existingItem.status = status;
+
+            if (typeof syncShoppingItemToTimeline === 'function') {
+              syncShoppingItemToTimeline(existingItem, oldActId);
+            }
 
             try {
               const customShop = JSON.parse(localStorage.getItem('boda_org_shopping_custom') || '[]');
@@ -4351,6 +4706,10 @@ function setupEventListeners() {
             status: status
           };
           shopping.push(newShopItem);
+
+          if (typeof syncShoppingItemToTimeline === 'function') {
+            syncShoppingItemToTimeline(newShopItem);
+          }
 
           try {
             const customShop = JSON.parse(localStorage.getItem('boda_org_shopping_custom') || '[]');

@@ -544,6 +544,100 @@
     </div>
   </div>
 
+  <!-- MODAL EDITAR ACTIVIDAD INDIVIDUAL DEL CRONOGRAMA -->
+  <div class="org-modal" id="modalEditSingleActivity">
+    <div class="org-modal-card" style="max-width: 580px;">
+      <button class="btn-close-modal" aria-label="Cerrar" onclick="closeEditActivityModal()"><i class="ri-close-line"></i></button>
+      <h3 class="org-modal-title">
+        <i class="ri-edit-line" style="color: var(--gold-dark);"></i>
+        <span>Editar Actividad del Cronograma</span>
+      </h3>
+      <form id="formEditSingleActivity" onsubmit="handleSaveSingleActivity(event)">
+        <input type="hidden" id="editActOriginalMilestoneId">
+        <input type="hidden" id="editActId">
+
+        <div class="form-group-org" style="margin-bottom: 12px;">
+          <label for="editActName">Nombre de la Actividad *</label>
+          <input type="text" id="editActName" class="input-org" placeholder="Ej.: Cartel de bienvenida / Entrada de los novios" required>
+        </div>
+
+        <div class="form-group-org" style="margin-bottom: 12px;">
+          <label for="editActMilestoneSelect">Hito / Horario del Cronograma *</label>
+          <select id="editActMilestoneSelect" class="select-org" title="Selecciona a qué horario o momento pertenece esta actividad">
+            <!-- Cargado dinámicamente con los hitos del cronograma -->
+          </select>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; margin-bottom: 12px;">
+          <div class="form-group-org" style="margin-bottom: 0;">
+            <label for="editActResp">Encargado(a) / Proveedor</label>
+            <select id="editActResp" class="select-org" onchange="handleEditActRespChange(this)">
+              <!-- Opciones de proveedores cargadas dinámicamente -->
+            </select>
+            <input type="text" id="editActRespCustom" class="input-org" style="display: none; margin-top: 6px;" placeholder="Escribe el nombre del nuevo encargado...">
+          </div>
+          <div class="form-group-org" style="margin-bottom: 0;">
+            <label for="editActRespStatus">¿Encargado OK?</label>
+            <select id="editActRespStatus" class="select-org">
+              <option value="ok" selected>✓ Confirmado</option>
+              <option value="pending">⏳ Por Buscar</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="subact-purchase-box" style="margin-top: 14px; margin-bottom: 16px; background: #F8FAFC; border: 1px solid #E2E8F0; padding: 12px; border-radius: 8px;">
+          <label class="subact-purchase-toggle" style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.88rem; cursor: pointer;">
+            <input type="checkbox" id="editActNeedsPurchase" onchange="toggleEditActPurchase(this.checked)">
+            <span>🛍️ ¿Hay que comprar o mandar a hacer algo para esta actividad?</span>
+          </label>
+          <div id="editActPurchaseFields" style="display: none; margin-top: 10px;">
+            <div class="form-group-org" style="margin-bottom: 8px;">
+              <label for="editActShopItem">¿Qué hay que comprar o mandar a hacer?</label>
+              <input type="text" id="editActShopItem" class="input-org" placeholder="Ej.: Cartel en acrílico dorado">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+              <div class="form-group-org" style="margin-bottom: 0;">
+                <label for="editActShopCategory">Categoría</label>
+                <select id="editActShopCategory" class="select-org">
+                  <option value="Decoración" selected>Decoración</option>
+                  <option value="Ceremonia">Ceremonia</option>
+                  <option value="Fiesta">Fiesta</option>
+                  <option value="Vestuario">Vestuario</option>
+                  <option value="Detalles">Detalles</option>
+                  <option value="Varios">Varios</option>
+                </select>
+              </div>
+              <div class="form-group-org" style="margin-bottom: 0;">
+                <label for="editActShopCost">Costo / Cant.</label>
+                <input type="text" id="editActShopCost" class="input-org" placeholder="Ej.: $20.000">
+              </div>
+              <div class="form-group-org" style="margin-bottom: 0;">
+                <label for="editActShopStatus">¿Estado?</label>
+                <select id="editActShopStatus" class="select-org">
+                  <option value="pending" selected>⏳ Pendiente</option>
+                  <option value="in_progress">🎨 Mandado a Hacer</option>
+                  <option value="ok">✓ Comprado / Listo</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 20px;">
+          <button type="button" class="btn-table-del" onclick="handleDeleteSingleActivity()" title="Eliminar actividad" style="color: #EF4444; display: flex; align-items: center; gap: 4px; padding: 8px 12px; border-radius: 6px; font-weight: 600; font-size: 0.85rem;">
+            <i class="ri-delete-bin-line"></i> Eliminar Actividad
+          </button>
+          <div style="display: flex; gap: 10px;">
+            <button type="button" class="btn-secondary-org" onclick="closeEditActivityModal()">Cancelar</button>
+            <button type="submit" class="btn-org-action">
+              <i class="ri-save-line"></i> Guardar Cambios
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- MODAL NUEVA COMPRA -->
   <div class="org-modal" id="shoppingModal">
     <div class="org-modal-card" style="max-width: 560px;">
@@ -768,6 +862,6 @@
   <!-- Scripts con sincronización Supabase Cloud -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js?v=2.6"></script>
-  <script src="js/organizador.js?v=5.1"></script>
+  <script src="js/organizador.js?v=5.2"></script>
 </body>
 </html>

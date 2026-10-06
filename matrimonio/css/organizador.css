@@ -2470,13 +2470,60 @@ i[class^="ri-"], i[class*=" ri-"] {
   flex-direction: column;
   justify-content: space-between;
   gap: 8px;
-  transition: var(--transition);
+  transition: all 0.18s ease;
+  cursor: pointer;
+  position: relative;
 }
 
 .subact-vogue-item:hover {
   background: #FFFFFF;
-  border-color: var(--gold-primary);
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+  border-color: #64748B;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.09);
+  transform: translateY(-2px);
+}
+
+.btn-subact-edit-pill {
+  background: #F1F5F9;
+  border: 1px solid #CBD5E1;
+  color: #334155;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  transition: all 0.15s ease;
+}
+
+.btn-subact-edit-pill:hover,
+.subact-vogue-item:hover .btn-subact-edit-pill {
+  background: #0A1828;
+  color: #FFFFFF;
+  border-color: #0A1828;
+}
+
+.btn-milestone-header-edit {
+  background: #FFFFFF;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  color: #334155;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+
+.btn-milestone-header-edit:hover {
+  background: #0A1828;
+  color: #FFFFFF;
+  border-color: #0A1828;
+  transform: scale(1.03);
 }
 
 .subact-vogue-name {
