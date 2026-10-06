@@ -9,8 +9,11 @@
   <script>
     (function() {
       var p = window.location.pathname;
-      if (p.indexOf('/yimmy-eve') !== -1 && !p.endsWith('.html') && !p.endsWith('/')) {
-        document.write('<base href="./">');
+      if (window.location.protocol === 'file:') return;
+      if (p.indexOf('/matrimonio/yimmy-eve') !== -1) {
+        document.write('<base href="/matrimonio/yimmy-eve/">');
+      } else if (p.indexOf('/yimmy-eve') !== -1) {
+        document.write('<base href="/yimmy-eve/">');
       }
     })();
   </script>

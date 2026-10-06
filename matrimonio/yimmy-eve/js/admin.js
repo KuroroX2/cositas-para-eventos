@@ -197,6 +197,42 @@
 
     const dlAllPhotosBtn = document.getElementById('btn-download-all-photos');
     if (dlAllPhotosBtn) dlAllPhotosBtn.addEventListener('click', downloadAllPhotosBulk);
+
+    // Toggle Formulario Crear Invitación
+    const toggleCreateBtn = document.getElementById('btn-toggle-create-form');
+    const closeCreateBtn = document.getElementById('btn-close-create-form');
+    const createBox = document.getElementById('create-invitation-box');
+    const toggleCreateText = document.getElementById('btn-toggle-create-text');
+
+    if (toggleCreateBtn && createBox) {
+      toggleCreateBtn.addEventListener('click', () => {
+        const isHidden = createBox.style.display === 'none' || !createBox.style.display;
+        createBox.style.display = isHidden ? 'block' : 'none';
+        if (toggleCreateText) {
+          toggleCreateText.textContent = isHidden ? '▲ Ocultar Formulario' : '+ Registrar Nuevo Invitado';
+        }
+        if (isHidden) {
+          const n1 = document.getElementById('inv-name-1');
+          if (n1) n1.focus();
+        }
+      });
+    }
+
+    if (closeCreateBtn && createBox) {
+      closeCreateBtn.addEventListener('click', () => {
+        createBox.style.display = 'none';
+        if (toggleCreateText) toggleCreateText.textContent = '+ Registrar Nuevo Invitado';
+      });
+    }
+
+    // Real-time Search Filter for Invitations
+    const searchInput = document.getElementById('admin-search-invitations');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        filterAdminInvitations(query);
+      });
+    }
   }
 
   function showLoginForm() {
@@ -479,11 +515,33 @@
     return 'none';
   }
 
+  function filterAdminInvitations(query) {
+    const tbody = document.getElementById('admin-invitations-tbody');
+    if (!tbody) return;
+    const rows = tbody.querySelectorAll('tr');
+    rows.forEach(row => {
+      const text = row.textContent.toLowerCase();
+      if (!query || text.includes(query)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+
   function renderAdminInvitations() {
     const tbody = document.getElementById('admin-invitations-tbody');
     const countInvEl = document.getElementById('admin-count-invitations');
 
-    if (countInvEl) countInvEl.textContent = adminInvitations.length;
+    let totalPeopleInv = 0;
+    adminInvitations.forEach(inv => {
+      const p = parseInt(inv.pases, 10) || (inv.name2 ? 2 : 1);
+      totalPeopleInv += p;
+    });
+
+    if (countInvEl) {
+      countInvEl.innerHTML = `<strong>${adminInvitations.length}</strong> inv. (<strong>${totalPeopleInv}</strong> pers.)`;
+    }
     if (!tbody) return;
 
     if (adminInvitations.length === 0) {

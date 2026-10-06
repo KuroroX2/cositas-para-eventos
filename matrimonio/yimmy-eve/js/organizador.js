@@ -1711,7 +1711,7 @@ function createChairElement(table, seatIndex, x, y) {
     const companion = getCompanion(guest);
     const hasCompanionInTable = companion && (table.guests || []).some(g => isGuestNameMatch(g, companion));
     
-    // EXCLUSIVAMENTE Cristopher y Reny son los novios (nadie más por posición de silla)
+    // EXCLUSIVAMENTE Evelyn y Yimmy son los novios (nadie más por posición de silla)
     const isNovio = isNovioGuest(guest);
 
     const role = getGuestRoleInInvitation(guest); // 'I' (Invitado) o 'A' (Acompañante)
