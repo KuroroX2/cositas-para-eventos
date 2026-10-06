@@ -332,17 +332,73 @@
         </button>
       </div>
 
+      <!-- Barra de Ordenamiento y Clasificación de Compras -->
+      <div class="shopping-order-bar">
+        <div class="shopping-order-left">
+          <label for="selectShoppingSort" class="shopping-order-label">
+            <i class="ri-sort-asc" style="color: var(--gold-dark); font-size: 1.15rem;"></i>
+            <span>Ordenar lista por:</span>
+          </label>
+          <select id="selectShoppingSort" class="select-org select-shopping-sort" onchange="applyShoppingSort(this.value)">
+            <option value="manual">🔀 Manual (Personalizado / Arrastrar)</option>
+            <option value="milestone">🕒 Hito del Cronograma (Cronológico)</option>
+            <option value="status_pending">⏳ Estado: Pendientes primero</option>
+            <option value="status_ok">✓ Estado: Comprados primero</option>
+            <option value="responsible">👤 Encargado(a) / Proveedor (A-Z)</option>
+            <option value="category">🏷️ Categoría (A-Z)</option>
+            <option value="name_asc">🔤 Nombre de Ítem (A-Z)</option>
+            <option value="name_desc">🔤 Nombre de Ítem (Z-A)</option>
+            <option value="cost">💰 Mayor Costo Primero</option>
+          </select>
+        </div>
+        <div class="shopping-order-hint">
+          <i class="ri-drag-move-fill" style="color: #64748B; font-size: 1.05rem;"></i>
+          <span>Arrastra las filas (⠿) o usa ▲ ▼ para reordenar libremente</span>
+        </div>
+      </div>
+
       <div class="timeline-management-card">
         <table class="data-table">
           <thead>
             <tr>
-              <th>Ítem / Necesidad</th>
-              <th style="width: 190px;">Hito del Cronograma</th>
-              <th style="width: 130px;">Categoría</th>
-              <th style="width: 180px;">Encargado(a)</th>
-              <th style="width: 130px;">Costo / Cant.</th>
-              <th style="width: 140px;">¿Compra OK?</th>
-              <th style="width: 50px;"></th>
+              <th style="width: 58px; text-align: center;" title="Arrastrar o mover de posición">#</th>
+              <th class="th-sortable" onclick="handleShoppingHeaderSort('name')" style="cursor: pointer;" title="Clic para ordenar por nombre de ítem">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                  <span>Ítem / Necesidad</span>
+                  <i class="ri-arrow-up-down-line sort-icon" id="sortIcon_name"></i>
+                </div>
+              </th>
+              <th class="th-sortable" onclick="handleShoppingHeaderSort('milestone')" style="width: 190px; cursor: pointer;" title="Clic para ordenar cronológicamente por hito">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                  <span>Hito del Cronograma</span>
+                  <i class="ri-arrow-up-down-line sort-icon" id="sortIcon_milestone"></i>
+                </div>
+              </th>
+              <th class="th-sortable" onclick="handleShoppingHeaderSort('category')" style="width: 130px; cursor: pointer;" title="Clic para ordenar por categoría">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                  <span>Categoría</span>
+                  <i class="ri-arrow-up-down-line sort-icon" id="sortIcon_category"></i>
+                </div>
+              </th>
+              <th class="th-sortable" onclick="handleShoppingHeaderSort('responsible')" style="width: 180px; cursor: pointer;" title="Clic para ordenar por encargado o proveedor">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                  <span>Encargado(a)</span>
+                  <i class="ri-arrow-up-down-line sort-icon" id="sortIcon_responsible"></i>
+                </div>
+              </th>
+              <th class="th-sortable" onclick="handleShoppingHeaderSort('cost')" style="width: 130px; cursor: pointer;" title="Clic para ordenar por costo">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                  <span>Costo / Cant.</span>
+                  <i class="ri-arrow-up-down-line sort-icon" id="sortIcon_cost"></i>
+                </div>
+              </th>
+              <th class="th-sortable" onclick="handleShoppingHeaderSort('status')" style="width: 140px; cursor: pointer;" title="Clic para ordenar por estado (Pendientes o Comprados)">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                  <span>¿Compra OK?</span>
+                  <i class="ri-arrow-up-down-line sort-icon" id="sortIcon_status"></i>
+                </div>
+              </th>
+              <th style="width: 60px;"></th>
             </tr>
           </thead>
           <tbody id="shoppingTableBody">
@@ -712,6 +768,6 @@
   <!-- Scripts con sincronización Supabase Cloud -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js?v=2.6"></script>
-  <script src="js/organizador.js?v=5.0"></script>
+  <script src="js/organizador.js?v=5.1"></script>
 </body>
 </html>

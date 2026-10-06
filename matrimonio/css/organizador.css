@@ -3092,3 +3092,168 @@ i[class^="ri-"], i[class*=" ri-"] {
   filter: brightness(1.02);
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
 }
+
+/* ==========================================================================
+   REORDENAMIENTO Y CLASIFICACIÓN DE ÍTEMS DE COMPRA
+   ========================================================================== */
+.shopping-order-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  background: #FFFFFF;
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  margin-bottom: 16px;
+}
+
+.shopping-order-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.shopping-order-label {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--navy-royal);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.select-shopping-sort {
+  width: auto;
+  min-width: 240px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  border: 1.5px solid rgba(148, 163, 184, 0.4);
+  background-color: #F8FAFC;
+  font-weight: 600;
+  color: var(--navy-royal);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.select-shopping-sort:focus,
+.select-shopping-sort:hover {
+  border-color: #64748B;
+  background-color: #FFFFFF;
+}
+
+.shopping-order-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: #64748B;
+  font-weight: 500;
+}
+
+/* Encabezados ordenables de la tabla de compras */
+.th-sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.th-sortable:hover {
+  background-color: #F1F5F9 !important;
+  color: #0F172A !important;
+}
+
+.th-sortable .sort-icon {
+  font-size: 0.95rem;
+  color: #94A3B8;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.th-sortable.sorted-asc .sort-icon,
+.th-sortable.sorted-desc .sort-icon {
+  color: #334155;
+  font-weight: 800;
+}
+
+/* Controles de arrastre y botones de mover en filas */
+.col-drag {
+  width: 58px;
+  text-align: center;
+  user-select: none;
+}
+
+.shop-drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #94A3B8;
+  font-size: 1.15rem;
+  padding: 4px;
+  border-radius: 4px;
+  cursor: grab;
+  transition: color 0.2s ease, background-color 0.2s ease, transform 0.15s ease;
+}
+
+.shop-drag-handle:hover {
+  color: #0F172A;
+  background-color: #E2E8F0;
+  transform: scale(1.1);
+}
+
+.shop-drag-handle:active {
+  cursor: grabbing;
+}
+
+.btn-shop-move {
+  background: #FFFFFF;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  color: #64748B;
+  border-radius: 3px;
+  width: 19px;
+  height: 15px;
+  font-size: 0.55rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.15s ease;
+}
+
+.btn-shop-move:hover:not(:disabled) {
+  background: #E2E8F0;
+  color: #0F172A;
+  border-color: #64748B;
+}
+
+.btn-shop-move:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+  border-color: transparent;
+  background: transparent;
+}
+
+/* Filas con Drag and Drop activo */
+.shopping-table-row {
+  transition: background-color 0.15s ease, border 0.15s ease;
+}
+
+.shopping-table-row.shopping-row-dragging {
+  opacity: 0.4 !important;
+  background-color: #EEF2F6 !important;
+}
+
+.shopping-table-row.drop-target-above {
+  border-top: 3px solid #475569 !important;
+}
+
+.shopping-table-row.drop-target-below {
+  border-bottom: 3px solid #475569 !important;
+}
+

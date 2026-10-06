@@ -3505,6 +3505,269 @@ window.reassignShoppingMilestone = function(shopId, newMilestoneId) {
   renderAll();
 };
 
+/* ==========================================================================
+   ORDENAMIENTO Y REORGANIZACIÓN DE ÍTEMS DE COMPRA
+   ========================================================================== */
+window.currentShoppingSort = 'manual';
+window.shoppingSortDirections = {
+  name: 'asc',
+  milestone: 'asc',
+  category: 'asc',
+  responsible: 'asc',
+  cost: 'desc',
+  status: 'asc'
+};
+
+function getShoppingItemTime(item) {
+  if (!item.activityId && !item.activityTitle) return '99:99';
+  const m = timeline.find(t => 
+    t.id === item.activityId || 
+    (t.title && item.activityTitle && (
+      item.activityTitle.toLowerCase().includes(t.title.toLowerCase()) || 
+      t.title.toLowerCase().includes(item.activityTitle.toLowerCase())
+    ))
+  );
+  if (m && m.timeStart) {
+    return m.timeStart.padStart(5, '0');
+  }
+  return '99:99';
+}
+
+function saveShoppingOrder(setManual = true) {
+  saveData();
+  try {
+    localStorage.setItem('boda_org_shopping_custom', JSON.stringify(shopping));
+  } catch(e) {}
+  if (setManual) {
+    window.currentShoppingSort = 'manual';
+    const sortSelect = document.getElementById('selectShoppingSort');
+    if (sortSelect) sortSelect.value = 'manual';
+  }
+}
+
+window.moveShoppingItem = function(fromIndex, delta) {
+  const toIndex = fromIndex + delta;
+  if (toIndex < 0 || toIndex >= shopping.length) return;
+
+  const item = shopping.splice(fromIndex, 1)[0];
+  shopping.splice(toIndex, 0, item);
+
+  saveShoppingOrder(true);
+  renderShopping();
+  showToast(`Ítem "${item.item}" movido de posición.`);
+};
+
+window.applyShoppingSort = function(criteria) {
+  window.currentShoppingSort = criteria;
+
+  if (criteria === 'manual') {
+    renderShopping();
+    return;
+  }
+
+  if (criteria === 'milestone') {
+    shopping.sort((a, b) => {
+      const timeA = getShoppingItemTime(a);
+      const timeB = getShoppingItemTime(b);
+      if (timeA !== timeB) return timeA.localeCompare(timeB);
+      return (a.item || '').localeCompare(b.item || '');
+    });
+  } else if (criteria === 'status_pending') {
+    const rank = { 'pending': 0, 'in_progress': 1, 'ok': 2 };
+    shopping.sort((a, b) => {
+      const rA = rank[a.status || 'pending'] ?? 1;
+      const rB = rank[b.status || 'pending'] ?? 1;
+      if (rA !== rB) return rA - rB;
+      return (a.item || '').localeCompare(b.item || '');
+    });
+  } else if (criteria === 'status_ok') {
+    const rank = { 'ok': 0, 'in_progress': 1, 'pending': 2 };
+    shopping.sort((a, b) => {
+      const rA = rank[a.status || 'pending'] ?? 1;
+      const rB = rank[b.status || 'pending'] ?? 1;
+      if (rA !== rB) return rA - rB;
+      return (a.item || '').localeCompare(b.item || '');
+    });
+  } else if (criteria === 'responsible') {
+    shopping.sort((a, b) => {
+      const respA = (a.responsible || 'Sin Asignar').trim().toLowerCase();
+      const respB = (b.responsible || 'Sin Asignar').trim().toLowerCase();
+      if (respA !== respB) return respA.localeCompare(respB);
+      return (a.item || '').localeCompare(b.item || '');
+    });
+  } else if (criteria === 'category') {
+    shopping.sort((a, b) => {
+      const catA = (a.category || 'Varios').trim().toLowerCase();
+      const catB = (b.category || 'Varios').trim().toLowerCase();
+      if (catA !== catB) return catA.localeCompare(catB);
+      return (a.item || '').localeCompare(b.item || '');
+    });
+  } else if (criteria === 'name_asc') {
+    shopping.sort((a, b) => (a.item || '').localeCompare(b.item || ''));
+  } else if (criteria === 'name_desc') {
+    shopping.sort((a, b) => (b.item || '').localeCompare(a.item || ''));
+  } else if (criteria === 'cost') {
+    shopping.sort((a, b) => {
+      const numA = parseInt((a.cost || '').replace(/\D/g, '') || '0', 10);
+      const numB = parseInt((b.cost || '').replace(/\D/g, '') || '0', 10);
+      if (numA !== numB) return numB - numA;
+      return (a.item || '').localeCompare(b.item || '');
+    });
+  }
+
+  saveShoppingOrder(false);
+  renderShopping();
+
+  const sortSelect = document.getElementById('selectShoppingSort');
+  if (sortSelect) sortSelect.value = criteria;
+
+  const names = {
+    milestone: 'Hito del Cronograma',
+    status_pending: 'Estado (Pendientes primero)',
+    status_ok: 'Estado (Comprados primero)',
+    responsible: 'Encargado(a)',
+    category: 'Categoría',
+    name_asc: 'Nombre de Ítem (A-Z)',
+    name_desc: 'Nombre de Ítem (Z-A)',
+    cost: 'Mayor Costo Primero'
+  };
+  showToast(`Lista ordenada por: ${names[criteria] || criteria}`);
+};
+
+window.handleShoppingHeaderSort = function(col) {
+  const currentDir = window.shoppingSortDirections[col] || 'asc';
+  const newDir = currentDir === 'asc' ? 'desc' : 'asc';
+  window.shoppingSortDirections[col] = newDir;
+
+  if (col === 'name') {
+    applyShoppingSort(newDir === 'asc' ? 'name_asc' : 'name_desc');
+  } else if (col === 'milestone') {
+    applyShoppingSort('milestone');
+  } else if (col === 'status') {
+    applyShoppingSort(newDir === 'asc' ? 'status_pending' : 'status_ok');
+  } else if (col === 'responsible') {
+    applyShoppingSort('responsible');
+  } else if (col === 'category') {
+    applyShoppingSort('category');
+  } else if (col === 'cost') {
+    applyShoppingSort('cost');
+  }
+};
+
+function updateShoppingHeaderSortIcons() {
+  const cols = ['name', 'milestone', 'category', 'responsible', 'cost', 'status'];
+  cols.forEach(col => {
+    const icon = document.getElementById(`sortIcon_${col}`);
+    const th = icon?.closest('.th-sortable');
+    if (!icon) return;
+
+    let isCurrent = false;
+    let isAsc = true;
+    if (col === 'name' && (window.currentShoppingSort === 'name_asc' || window.currentShoppingSort === 'name_desc')) {
+      isCurrent = true;
+      isAsc = window.currentShoppingSort === 'name_asc';
+    } else if (col === 'milestone' && window.currentShoppingSort === 'milestone') {
+      isCurrent = true;
+      isAsc = true;
+    } else if (col === 'category' && window.currentShoppingSort === 'category') {
+      isCurrent = true;
+      isAsc = true;
+    } else if (col === 'responsible' && window.currentShoppingSort === 'responsible') {
+      isCurrent = true;
+      isAsc = true;
+    } else if (col === 'cost' && window.currentShoppingSort === 'cost') {
+      isCurrent = true;
+      isAsc = false;
+    } else if (col === 'status' && (window.currentShoppingSort === 'status_pending' || window.currentShoppingSort === 'status_ok')) {
+      isCurrent = true;
+      isAsc = window.currentShoppingSort === 'status_pending';
+    }
+
+    if (th) {
+      th.classList.remove('sorted-asc', 'sorted-desc');
+    }
+
+    if (isCurrent) {
+      if (th) th.classList.add(isAsc ? 'sorted-asc' : 'sorted-desc');
+      icon.className = isAsc ? 'ri-arrow-up-line sort-icon' : 'ri-arrow-down-line sort-icon';
+      icon.style.color = '#334155';
+    } else {
+      icon.className = 'ri-arrow-up-down-line sort-icon';
+      icon.style.color = '#94A3B8';
+    }
+  });
+}
+
+let draggedShopIndex = null;
+
+function initShoppingDragAndDrop() {
+  const tbody = document.getElementById('shoppingTableBody');
+  if (!tbody) return;
+
+  const rows = tbody.querySelectorAll('tr[data-shop-index]');
+  rows.forEach(row => {
+    row.addEventListener('dragstart', (e) => {
+      if (e.target.closest('select, input, button, a')) {
+        e.preventDefault();
+        return;
+      }
+      draggedShopIndex = parseInt(row.dataset.shopIndex, 10);
+      row.classList.add('shopping-row-dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', String(draggedShopIndex));
+    });
+
+    row.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      const targetIndex = parseInt(row.dataset.shopIndex, 10);
+      if (draggedShopIndex === null || targetIndex === draggedShopIndex) return;
+
+      const rect = row.getBoundingClientRect();
+      const midY = rect.top + rect.height / 2;
+      row.classList.remove('drop-target-above', 'drop-target-below');
+      if (e.clientY < midY) {
+        row.classList.add('drop-target-above');
+      } else {
+        row.classList.add('drop-target-below');
+      }
+    });
+
+    row.addEventListener('dragleave', () => {
+      row.classList.remove('drop-target-above', 'drop-target-below');
+    });
+
+    row.addEventListener('drop', (e) => {
+      e.preventDefault();
+      row.classList.remove('drop-target-above', 'drop-target-below');
+      const targetIndex = parseInt(row.dataset.shopIndex, 10);
+      if (draggedShopIndex === null || isNaN(targetIndex) || draggedShopIndex === targetIndex) return;
+
+      const rect = row.getBoundingClientRect();
+      const midY = rect.top + rect.height / 2;
+      let insertIndex = (e.clientY < midY) ? targetIndex : targetIndex + 1;
+
+      if (draggedShopIndex < insertIndex) {
+        insertIndex--;
+      }
+
+      const moved = shopping.splice(draggedShopIndex, 1)[0];
+      shopping.splice(insertIndex, 0, moved);
+
+      draggedShopIndex = null;
+      saveShoppingOrder(true);
+      renderShopping();
+      showToast(`Ítem "${moved.item}" reubicado.`);
+    });
+
+    row.addEventListener('dragend', () => {
+      row.classList.remove('shopping-row-dragging', 'drop-target-above', 'drop-target-below');
+      draggedShopIndex = null;
+      rows.forEach(r => r.classList.remove('drop-target-above', 'drop-target-below', 'shopping-row-dragging'));
+    });
+  });
+}
+
 function renderShopping() {
   const tbody = document.getElementById('shoppingTableBody');
   if (!tbody) return;
@@ -3514,6 +3777,11 @@ function renderShopping() {
   shopping.forEach((item, idx) => {
     const tr = document.createElement('tr');
     tr.id = `shop_row_${item.id}`;
+    tr.dataset.shopIndex = idx;
+    tr.dataset.shopId = item.id;
+    tr.draggable = true;
+    tr.className = 'shopping-table-row';
+
     const isOk = item.status === 'ok';
     const respOk = item.responsibleStatus === 'ok';
 
@@ -3545,6 +3813,15 @@ function renderShopping() {
     `;
 
     tr.innerHTML = `
+      <td class="col-drag" title="Arrastra la fila para ordenar o usa ▲ ▼">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 3px;">
+          <span class="shop-drag-handle" title="Arrastrar para mover posición"><i class="ri-drag-move-fill"></i></span>
+          <div style="display: flex; flex-direction: column; gap: 1px;">
+            <button type="button" class="btn-shop-move" onclick="moveShoppingItem(${idx}, -1)" ${idx === 0 ? 'disabled' : ''} title="Subir">▲</button>
+            <button type="button" class="btn-shop-move" onclick="moveShoppingItem(${idx}, 1)" ${idx === shopping.length - 1 ? 'disabled' : ''} title="Bajar">▼</button>
+          </div>
+        </div>
+      </td>
       <td>
         <strong style="color: var(--navy-royal); font-size: 0.95rem;">${escapeHtml(item.item)}</strong>
         ${item.detail ? `<div style="color: var(--text-muted); font-size: 0.82rem; margin-top: 3px;">${escapeHtml(item.detail)}</div>` : ''}
@@ -3577,6 +3854,9 @@ function renderShopping() {
 
     tbody.appendChild(tr);
   });
+
+  initShoppingDragAndDrop();
+  updateShoppingHeaderSortIcons();
 }
 
 window.toggleShoppingStatus = function(idx) {
