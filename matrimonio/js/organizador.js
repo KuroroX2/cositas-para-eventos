@@ -2505,8 +2505,12 @@ window.quickAddShopForActivity = function(activityId) {
   if (shopLinked && act) {
     shopLinked.value = act.id;
   }
-  if (shopResp && act && act.responsible) {
-    shopResp.value = act.responsible;
+  if (shopResp) {
+    if (typeof window.populateResponsibleSelect === 'function') {
+      window.populateResponsibleSelect(shopResp, (act && act.responsible) ? act.responsible : 'Novios (Cristopher & Reny)');
+    } else {
+      shopResp.value = (act && act.responsible) ? act.responsible : '';
+    }
   }
   if (shopRespStat && act && act.responsibleStatus) {
     shopRespStat.value = act.responsibleStatus;
@@ -3089,7 +3093,13 @@ window.editShoppingItem = function(shopId) {
   if (shopLinked) shopLinked.value = item.activityId || '';
   if (shopCategory) shopCategory.value = item.category || 'Varios';
   if (shopCost) shopCost.value = item.cost || '';
-  if (shopResponsible) shopResponsible.value = item.responsible || '';
+  if (shopResponsible) {
+    if (typeof window.populateResponsibleSelect === 'function') {
+      window.populateResponsibleSelect(shopResponsible, item.responsible || 'Novios (Cristopher & Reny)');
+    } else {
+      shopResponsible.value = item.responsible || '';
+    }
+  }
   if (shopRespStatus) shopRespStatus.value = item.responsibleStatus || 'ok';
   if (shopDetail) shopDetail.value = item.detail || '';
   if (shopStatus) shopStatus.value = item.status || 'pending';
@@ -3299,42 +3309,69 @@ window.populateResponsibleSelect = function(selectEl, currentValue) {
 
   const cleanVal = (currentValue || '').trim();
 
+  // Asegurar que la lista de proveedores esté inicializada
+  if (!responsibles || responsibles.length === 0) {
+    if (typeof loadResponsibles === 'function') loadResponsibles();
+  }
+
   // Opción por defecto / placeholder si está vacío
   const defaultOpt = document.createElement('option');
   defaultOpt.value = '';
   defaultOpt.textContent = '— Selecciona un Proveedor / Encargado —';
   selectEl.appendChild(defaultOpt);
 
+  let matchFound = false;
+
   // Listar TODOS los proveedores y responsables registrados
-  responsibles.forEach(r => {
+  (responsibles || []).forEach(r => {
     const opt = document.createElement('option');
     opt.value = r.name;
     opt.textContent = `👤 ${r.name} (${r.category})`;
     if (cleanVal && r.name.toLowerCase() === cleanVal.toLowerCase()) {
       opt.selected = true;
+      matchFound = true;
     }
     selectEl.appendChild(opt);
   });
 
   // Si el valor actual no está en la lista de proveedores, agregarlo al inicio como opción seleccionada
-  const exists = responsibles.some(r => r.name.toLowerCase() === cleanVal.toLowerCase());
-  if (cleanVal && !exists && cleanVal !== '__custom__') {
+  if (cleanVal && !matchFound && cleanVal !== '__custom__') {
     const customExistingOpt = document.createElement('option');
     customExistingOpt.value = cleanVal;
     customExistingOpt.textContent = `👤 ${cleanVal} (Personalizado)`;
     customExistingOpt.selected = true;
     selectEl.insertBefore(customExistingOpt, selectEl.children[1] || null);
+    matchFound = true;
+  }
+
+  // Si no se pasó valor o no hubo match, preseleccionar Novios si existe
+  if (!cleanVal || !matchFound) {
+    for (let i = 0; i < selectEl.options.length; i++) {
+      if (selectEl.options[i].value.toLowerCase().includes('novios')) {
+        selectEl.options[i].selected = true;
+        matchFound = true;
+        break;
+      }
+    }
   }
 
   // Opción para ingresar otro encargado manualmente
   const newOpt = document.createElement('option');
   newOpt.value = '__custom__';
   newOpt.textContent = '➕ Escribir otro / Nuevo Encargado...';
+  if (cleanVal === '__custom__') newOpt.selected = true;
   selectEl.appendChild(newOpt);
 
-  // Ocultar campo personalizado inicialmente a menos que sea __custom__
+  // Manejar visibilidad del campo personalizado
   const customInput = document.getElementById('shopResponsibleCustom');
-  if (customInput) customInput.style.display = 'none';
+  if (customInput) {
+    if (cleanVal === '__custom__' || selectEl.value === '__custom__') {
+      customInput.style.display = 'block';
+    } else {
+      customInput.style.display = 'none';
+      customInput.value = '';
+    }
+  }
 };
 
 window.handleShopResponsibleChange = function(selectEl) {
@@ -3396,6 +3433,13 @@ function renderResponsibles() {
         </div>
       </div>
     `).join('');
+  }
+
+  // 5. Refrescar el selector de compras si está presente en el DOM
+  const shopRespSelect = document.getElementById('shopResponsible');
+  if (shopRespSelect && typeof window.populateResponsibleSelect === 'function') {
+    const currentSelected = shopRespSelect.value;
+    window.populateResponsibleSelect(shopRespSelect, currentSelected || 'Novios (Cristopher & Reny)');
   }
 }
 
@@ -3956,6 +4000,12 @@ function setupEventListeners() {
 
       populateShoppingModalActivities();
       if (formAddShopping) formAddShopping.reset();
+
+      const shopRespSelect = document.getElementById('shopResponsible');
+      if (shopRespSelect && typeof window.populateResponsibleSelect === 'function') {
+        window.populateResponsibleSelect(shopRespSelect, 'Novios (Cristopher & Reny)');
+      }
+
       shoppingModal.classList.add('active');
     });
   }
@@ -3967,7 +4017,11 @@ function setupEventListeners() {
         const item = (document.getElementById('shopItem')?.value || '').trim();
         const linkedActId = document.getElementById('shopLinkedActivity')?.value || '';
         const category = document.getElementById('shopCategory')?.value || 'Varios';
-        const responsible = (document.getElementById('shopResponsible')?.value || '').trim() || 'Novios';
+        let responsible = (document.getElementById('shopResponsible')?.value || '').trim();
+        if (responsible === '__custom__') {
+          responsible = (document.getElementById('shopResponsibleCustom')?.value || '').trim();
+        }
+        if (!responsible) responsible = 'Novios (Cristopher & Reny)';
         const respStatus = document.getElementById('shopRespStatus')?.value || 'ok';
         const detail = (document.getElementById('shopDetail')?.value || '').trim();
         const cost = (document.getElementById('shopCost')?.value || '').trim();
