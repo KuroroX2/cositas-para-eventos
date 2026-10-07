@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Organizador Nupcial — Laura & Nico | Cositas Para Eventos</title>
+  <meta name="description" content="Panel de planificación para novios: Organización de mesas, cronograma minuto a minuto y lista de compras del matrimonio.">
+
+    <script>
+    (function() {
+      var p = window.location.pathname;
+      if (window.location.protocol === 'file:') return;
+      if (p.indexOf('/matrimonio/laura-nico') !== -1) {
+        document.write('<base href="/matrimonio/laura-nico/">');
+      } else if (p.indexOf('/laura-nico') !== -1) {
+        document.write('<base href="/laura-nico/">');
+      }
+    })();
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400&family=Italiana&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Remix Icon -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/organizador.css?v=5.4">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="org-header">
+    <div class="org-header-inner">
+      <div class="org-brand">
+        <div class="org-monogram-badge">
+          <span class="org-monogram-initials">L &amp; N</span>
+        </div>
+        <div class="org-title-box">
+          <h1>Organizador del Matrimonio</h1>
+          <p>Laura &amp; Nico 🌸 • Mesas, Cronograma &amp; Compras</p>
+        </div>
+      </div>
+
+      <div class="org-actions">
+        <a href="index.html" class="btn-header" title="Volver a la invitación interactiva">
+          <i class="ri-arrow-left-line"></i> <span>Volver a la Invitación</span>
+        </a>
+        <button class="btn-header" id="btnPrintSummary" title="Imprimir plan de mesas y cronograma">
+          <i class="ri-printer-line"></i> <span>Imprimir Plan</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="org-container">
+
+    <!-- Metric Progress Counters -->
+    <div class="metrics-row">
+      <div class="metric-card metric-tables">
+        <div class="metric-icon-box"><i class="ri-layout-masonry-line"></i></div>
+        <div class="metric-data">
+          <div class="num" id="metricTotalTables">6</div>
+          <div class="lbl">Mesas Creadas</div>
+        </div>
+      </div>
+
+      <div class="metric-card metric-seated">
+        <div class="metric-icon-box"><i class="ri-user-heart-line"></i></div>
+        <div class="metric-data">
+          <div class="num" id="metricTotalSeated">0 / 0</div>
+          <div class="lbl">Invitados Asignados</div>
+        </div>
+      </div>
+
+      <div class="metric-card metric-seats">
+        <div class="metric-icon-box"><i class="ri-vip-crown-line"></i></div>
+        <div class="metric-data">
+          <div class="num" id="metricAvailableSeats">0</div>
+          <div class="lbl">Asientos Libres</div>
+        </div>
+      </div>
+
+      <div class="metric-card metric-time">
+        <div class="metric-icon-box"><i class="ri-time-line"></i></div>
+        <div class="metric-data">
+          <div class="num" id="metricTimelineProgress">0 Hitos</div>
+          <div class="lbl">Hitos del Cronograma</div>
+        </div>
+      </div>
+
+      <div class="metric-card metric-shop">
+        <div class="metric-icon-box"><i class="ri-shopping-bag-line"></i></div>
+        <div class="metric-data">
+          <div class="num" id="metricShoppingProgress">0 / 0</div>
+          <div class="lbl">Compras Listas</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="org-nav-tabs">
+      <button class="tab-btn active" data-target="pane-tables">
+        <i class="ri-layout-grid-line"></i> <span>1. Organización de Mesas</span>
+      </button>
+      <button class="tab-btn" data-target="pane-timeline">
+        <i class="ri-calendar-line"></i> <span>2. Cronograma Minuto a Minuto</span>
+      </button>
+      <button class="tab-btn" data-target="pane-shopping">
+        <i class="ri-shopping-bag-line"></i> <span>3. Cosas por Comprar &amp; Pendientes</span>
+      </button>
+    </nav>
+
+    <!-- PANE 1: ORGANIZACIÓN DE MESAS -->
+    <section class="org-pane active" id="pane-tables">
+      <div class="section-top-bar" style="flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between;">
+        <div>
+          <h2>Distribución y Ubicación de Invitados</h2>
+          <p>Organiza a tus invitados por afinidad o familia. Todo cambio se guarda automáticamente.</p>
+        </div>
+
+        <!-- Conmutador de Vistas: Tarjetas vs Plano del Salón -->
+        <div class="view-switch-box">
+          <button type="button" class="view-switch-btn active" id="btnViewCards" data-view="cards" title="Vista clásica de tarjetas con lista de invitados">
+            <i class="ri-layout-grid-line"></i> <span>Vista Tarjetas</span>
+          </button>
+          <button type="button" class="view-switch-btn" id="btnViewFloorplan" data-view="floorplan" title="Plano 2D interactivo con distribución y puestos del salón">
+            <i class="ri-compasses-2-line"></i> <span>Plano del Salón 2D</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="tables-layout">
+        <!-- Sidebar A LA IZQUIERDA: Panel de Creación & Banco de Invitados -->
+        <aside class="tables-sidebar">
+          
+          <!-- Card Crear Nueva Mesa (Estilo Panel de Control) -->
+          <div class="side-card side-card-create">
+            <h3 class="side-card-title"><i class="ri-layout-masonry-line" style="color: var(--gold-dark);"></i> Crear Nueva Mesa</h3>
+            <p class="side-card-desc">Define el número, nombre, tipo y capacidad:</p>
+            <form id="formAddTable">
+              <div class="form-group-org">
+                <label for="newTableNumber">Número de Mesa *</label>
+                <select id="newTableNumber" class="select-org" required>
+                  <!-- Opciones cargadas dinámicamente con números disponibles -->
+                </select>
+              </div>
+              <div class="form-group-org">
+                <label for="newTableName">Nombre de la Mesa *</label>
+                <input type="text" id="newTableName" class="input-org" placeholder="Ej.: Familia Novia / Primos" required>
+              </div>
+              <div class="form-group-org">
+                <label for="newTableCapacity">Capacidad Máxima *</label>
+                <select id="newTableCapacity" class="select-org">
+                  <option value="2">2 Personas (Mesa íntima)</option>
+                  <option value="4">4 Personas</option>
+                  <option value="6">6 Personas</option>
+                  <option value="8" selected>8 Personas (Estándar)</option>
+                  <option value="10">10 Personas</option>
+                  <option value="12">12 Personas</option>
+                </select>
+              </div>
+              <button type="submit" class="btn-org-action">
+                <i class="ri-add-line"></i> <span>Agregar Mesa</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Card Invitados por Asignar (Banco de Invitados) -->
+          <div class="side-card side-card-unassigned">
+            <h3 class="side-card-title"><i class="ri-user-heart-line" style="color: var(--gold-dark);"></i> Invitados por Ubicar</h3>
+            <p class="side-card-desc">Invitados confirmados que aún no tienen mesa asignada:</p>
+            
+            <form id="formAddUnassigned" style="display: flex; gap: 8px; margin-bottom: 14px;">
+              <input type="text" id="newGuestName" class="input-org" placeholder="Añadir invitado rápido..." required style="padding: 9px 12px; font-size: 0.85rem;">
+              <button type="submit" class="btn-quick-add" title="Agregar invitado a la lista de pendientes">
+                <i class="ri-add-line"></i>
+              </button>
+            </form>
+
+            <ul class="unassigned-list" id="unassignedList">
+              <!-- Rendered dynamically by organizador.js -->
+            </ul>
+          </div>
+        </aside>
+
+        <!-- Tables Display Area (A LA DERECHA) -->
+        <div class="tables-main-area">
+          <!-- MODO 1: VISTA TARJETAS / LISTA (EXISTENTE) -->
+          <div id="viewModeCardsContainer" class="view-mode-container active">
+            <div class="tables-main-header">
+              <h3 class="tables-main-title"><i class="ri-restaurant-line"></i> Mesas del Salón</h3>
+              <span class="tables-main-hint">Usa "Asignar Invitado" o "Puestos" en cada mesa para ubicar a las personas.</span>
+            </div>
+            <div class="tables-grid" id="tablesGrid">
+              <!-- Rendered dynamically by organizador.js -->
+            </div>
+          </div>
+
+          <!-- MODO 2: PLANO DEL SALÓN 2D INTERACTIVO (NUEVO) -->
+          <div id="viewModeFloorplanContainer" class="view-mode-container" style="display: none;">
+            <div class="floorplan-toolbar">
+              <div class="floorplan-title-block">
+                <h3 class="tables-main-title"><i class="ri-compasses-2-line" style="color: var(--gold-dark);"></i> Plano de Ubicación en el Salón</h3>
+                <span class="tables-main-hint">Arrastra y suelta las mesas para ubicarlas en el centro de eventos. Haz clic en "Puestos" para organizar los asientos.</span>
+              </div>
+              <div class="floorplan-actions">
+                <button type="button" class="btn-fp-action" id="btnAutoLayout" title="Ordenar mesas automáticamente en una distribución armónica en el salón">
+                  <i class="ri-magic-line"></i> <span>Auto-Alinear</span>
+                </button>
+                <button type="button" class="btn-fp-action" id="btnResetFloorplanZoom" title="Centrar el plano">
+                  <i class="ri-focus-3-line"></i> <span>Centrar</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Panel de Selección de Formas de Mesa dentro del Plano 2D -->
+            <div class="floorplan-shape-panel">
+              <div class="fp-shape-group">
+                <span class="fp-shape-label"><i class="ri-community-line"></i> Mesas de Invitados:</span>
+                <div class="fp-shape-buttons" id="groupGuestTableShapes">
+                  <button type="button" class="btn-shape-toggle active" data-guest-shape="round" title="Cambiar todas las mesas de invitados a redondas">
+                    <i class="ri-circle-line" style="font-size: 0.95rem;"></i> <span>Redondas</span>
+                  </button>
+                  <button type="button" class="btn-shape-toggle" data-guest-shape="square" title="Cambiar todas las mesas de invitados a cuadradas">
+                    <i class="ri-checkbox-blank-line" style="font-size: 0.95rem;"></i> <span>Cuadradas</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="fp-shape-divider"></div>
+
+              <div class="fp-shape-group">
+                <span class="fp-shape-label"><i class="ri-vip-crown-2-fill" style="color: #94A3B8;"></i> Mesa Novios:</span>
+                <div class="fp-shape-buttons" id="groupNoviosTableShapes">
+                  <button type="button" class="btn-shape-toggle" data-novios-shape="round" title="Forma redonda para la mesa de los novios">
+                    <i class="ri-circle-line" style="font-size: 0.95rem;"></i> <span>Redonda</span>
+                  </button>
+                  <button type="button" class="btn-shape-toggle" data-novios-shape="square" title="Forma cuadrada para la mesa de los novios">
+                    <i class="ri-checkbox-blank-line" style="font-size: 0.95rem;"></i> <span>Cuadrada</span>
+                  </button>
+                  <button type="button" class="btn-shape-toggle active" data-novios-shape="rectangular" title="Forma rectangular para la mesa de los novios">
+                    <i class="ri-rectangle-line" style="font-size: 0.95rem;"></i> <span>Rectangular</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Leyenda Visual de Colores de Puestos (Género y Rol) -->
+            <div class="fp-color-legend">
+              <span class="fp-legend-item"><span class="fp-legend-dot dot-male">I</span> Hombre (Verde)</span>
+              <span class="fp-legend-item"><span class="fp-legend-dot dot-female">A</span> Mujer (Calipso)</span>
+              <span class="fp-legend-item"><span class="fp-legend-dot dot-role-i">I</span> Invitado Principal</span>
+              <span class="fp-legend-item"><span class="fp-legend-dot dot-role-a">A</span> Acompañante</span>
+              <span class="fp-legend-item"><span class="fp-legend-dot dot-empty"><i class="ri-add-line"></i></span> Asiento Libre</span>
+              <span class="fp-legend-item"><span class="fp-legend-dot dot-novios"><i class="ri-vip-crown-2-fill"></i></span> Novios (Color VIP Real)</span>
+            </div>
+
+            <!-- Lienzo del Centro de Eventos -->
+            <div class="floorplan-wrapper" id="floorplanWrapper">
+              <!-- Lienzo Interactivo de Mesas -->
+              <div class="floorplan-canvas" id="floorplanCanvas">
+                <!-- Mesas y puestos renderizados dinámicamente por organizador.js -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANE 2: CRONOGRAMA MINUTO A MINUTO -->
+    <section class="org-pane" id="pane-timeline">
+      <div class="section-top-bar" style="margin-bottom: 20px;">
+        <div>
+          <h2>Cronograma del Gran Día</h2>
+          <p>Hitos en orden cronológico. Haz clic en cualquier horario para ver todas las actividades, encargados y compras que van dentro.</p>
+        </div>
+      </div>
+
+      <!-- Resumen de Métricas del Cronograma -->
+      <div class="timeline-summary-bar" id="timelineSummaryBar">
+        <!-- Rendered dynamically by organizador.js -->
+      </div>
+
+      <!-- Barra de Acciones y Proveedores DEBAJO del Resumen de Hitos -->
+      <div class="timeline-controls-bar">
+        <!-- Panel Compacto de Proveedores & Responsables -->
+        <div class="providers-compact-panel" id="providersCompactPanel">
+          <div class="providers-compact-top">
+            <span class="providers-compact-title">
+              <i class="ri-team-line" style="color: #94A3B8;"></i> Proveedores &amp; Responsables
+            </span>
+            <button type="button" class="btn-sm-add-provider" onclick="openAddResponsibleModal()" title="Agregar nuevo responsable o proveedor">
+              <i class="ri-user-add-line"></i> + Agregar
+            </button>
+          </div>
+          <div class="providers-compact-bottom">
+            <select id="selectQuickProvider" class="select-org select-quick-provider" title="Selecciona un proveedor del listado">
+              <!-- Cargado dinámicamente -->
+            </select>
+            <button type="button" class="btn-sm-edit-provider" id="btnEditSelectedProvider" onclick="editSelectedProviderFromCombobox()" title="Editar el proveedor seleccionado">
+              <i class="ri-edit-line"></i> Editar
+            </button>
+          </div>
+        </div>
+
+        <!-- Botones de Acción de Hitos -->
+        <div class="timeline-action-buttons">
+          <button class="btn-header btn-header-primary" id="btnOpenActivityModal">
+            <i class="ri-add-line"></i> <span>Nuevo Hito / Horario</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Contenedor Interactivo de Hitos (Cards / Acordeón) -->
+      <div class="timeline-cards-container" id="timelineCardsContainer">
+        <!-- Rendered dynamically by organizador.js -->
+      </div>
+    </section>
+
+    <!-- PANE 3: COSAS POR COMPRAR & PENDIENTES -->
+    <section class="org-pane" id="pane-shopping">
+      <div class="section-top-bar">
+        <div>
+          <h2>Lista de Compras &amp; Cosas Necesarias</h2>
+          <p>Detalle de compras e insumos vinculados a los hitos del cronograma o generales del evento.</p>
+        </div>
+        <button class="btn-header btn-header-primary" id="btnOpenShoppingModal">
+          <i class="ri-add-line"></i> <span>Agregar Ítem a Comprar</span>
+        </button>
+      </div>
+
+      <!-- Barra de Ordenamiento y Clasificación de Compras -->
+      <div class="shopping-order-bar">
+        <div class="shopping-order-left">
+          <label for="selectShoppingSort" class="shopping-order-label">
+            <i class="ri-sort-asc" style="color: var(--gold-dark); font-size: 1.15rem;"></i>
+            <span>Ordenar lista por:</span>
+          </label>
+          <select id="selectShoppingSort" class="select-org select-shopping-sort" onchange="applyShoppingSort(this.value)">
+            <option value="manual">🔀 Manual (Personalizado / Arrastrar)</option>
+            <option value="milestone">🕒 Hito del Cronograma (Cronológico)</option>
+            <option value="status_pending">⏳ Estado: Pendientes primero</option>
+            <option value="status_ok">✓ Estado: Comprados primero</option>
+            <option value="responsible">👤 Encargado(a) / Proveedor (A-Z)</option>
+            <option value="category">🏷️ Categoría (A-Z)</option>
+            <option value="name_asc">🔤 Nombre de Ítem (A-Z)</option>
+            <option value="name_desc">🔤 Nombre de Ítem (Z-A)</option>
+            <option value="cost">💰 Mayor Costo Primero</option>
+          </select>
+        </div>
+        <div class="shopping-order-hint">
+          <i class="ri-drag-move-fill" style="color: #64748B; font-size: 1.05rem;"></i>
+          <span>Arrastra las filas (⠿) o usa ▲ ▼ para reordenar libremente</span>
+        </div>
+      </div>
+
+      <div class="timeline-management-card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width: 58px; text-align: center;" title="Arrastrar o mover de posición">#</th>
+              <th class="th-sortable" onclick="handleShoppingHeaderSort('name')" style="cursor: pointer;" title="Clic para ordenar por nombre de ítem">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                  <span>Ítem / Necesidad</span>
+                  <i class="ri-arrow-up-down-line sort-icon" id="sortIcon_name"></i>
+                </div>
+              </th>
+              <th class="th-sortable" onclick="handleShoppingHeaderSort('milestone')" style="width: 190px; cursor: pointer;" title="Clic para ordenar cronológicamente por hito">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                  <span>Hito del Cronograma</span>
+                  <i class="ri-arrow-up-down-line sort-icon" id="sortIcon_milestone"></i>
+                </div>
+              </th>
+              <th class="th-sortable" onclick="handleShoppingHeaderSort('category')" style="width: 130px; cursor: pointer;" title="Clic para ordenar por categoría">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                  <span>Categoría</span>
+                  <i class="ri-arrow-up-down-line sort-icon" id="sortIcon_category"></i>
+                </div>
+              </th>
+              <th class="th-sortable" onclick="handleShoppingHeaderSort('responsible')" style="width: 180px; cursor: pointer;" title="Clic para ordenar por encargado o proveedor">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                  <span>Encargado(a)</span>
+                  <i class="ri-arrow-up-down-line sort-icon" id="sortIcon_responsible"></i>
+                </div>
+              </th>
+              <th class="th-sortable" onclick="handleShoppingHeaderSort('cost')" style="width: 130px; cursor: pointer;" title="Clic para ordenar por costo">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                  <span>Costo / Cant.</span>
+                  <i class="ri-arrow-up-down-line sort-icon" id="sortIcon_cost"></i>
+                </div>
+              </th>
+              <th class="th-sortable" onclick="handleShoppingHeaderSort('status')" style="width: 140px; cursor: pointer;" title="Clic para ordenar por estado (Pendientes o Comprados)">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                  <span>¿Compra OK?</span>
+                  <i class="ri-arrow-up-down-line sort-icon" id="sortIcon_status"></i>
+                </div>
+              </th>
+              <th style="width: 60px;"></th>
+            </tr>
+          </thead>
+          <tbody id="shoppingTableBody">
+            <!-- Rendered dynamically by organizador.js -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL ASIGNAR INVITADO A MESA -->
+  <div class="org-modal" id="assignModal">
+    <div class="org-modal-card">
+      <button class="btn-close-modal" aria-label="Cerrar"><i class="ri-close-line"></i></button>
+      <h3 class="org-modal-title">Asignar a <span id="assignModalTableTitle">Mesa</span></h3>
+      <div class="form-group-org">
+        <label for="selectAssignGuest">Selecciona un Invitado de la Lista:</label>
+        <select id="selectAssignGuest" class="select-org"></select>
+      </div>
+      <div style="margin-top: 20px;">
+        <button type="button" class="btn-org-action" id="btnConfirmAssign">
+          <i class="ri-check-line"></i> Asignar Asiento
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL NUEVO HITO & ACTIVIDADES DEL CRONOGRAMA -->
+  <div class="org-modal" id="activityModal">
+    <div class="org-modal-card" style="max-width: 620px;">
+      <button class="btn-close-modal" aria-label="Cerrar"><i class="ri-close-line"></i></button>
+      <h3 class="org-modal-title"><i class="ri-calendar-event-line" style="color: var(--gold-dark);"></i> <span id="activityModalTitle">Agregar Hito al Cronograma</span></h3>
+      <form id="formAddActivity">
+        <!-- Bloque Horario y Nombre del Hito -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group-org">
+            <label for="actTimeStart">Horario Desde (HH:MM) *</label>
+            <input type="time" id="actTimeStart" class="input-org" value="16:00" required>
+          </div>
+          <div class="form-group-org">
+            <label for="actTimeEnd">Horario Hasta (HH:MM)</label>
+            <input type="time" id="actTimeEnd" class="input-org" value="17:00">
+          </div>
+        </div>
+
+        <div class="form-group-org">
+          <label for="actTitle">Nombre del Hito o Momento Principal *</label>
+          <input type="text" id="actTitle" class="input-org" placeholder="Ej.: Recepción / Ceremonia Civil / Cena" required>
+        </div>
+
+        <div class="form-group-org" style="margin-bottom: 14px;">
+          <label for="actDetail">Notas o Instrucciones Clave del Hito (Opcional)</label>
+          <textarea id="actDetail" class="textarea-org" rows="2" placeholder="Instrucciones generales, música de fondo o detalles..."></textarea>
+        </div>
+
+        <!-- SECCIÓN: ACTIVIDADES DEL HITO (Una o más actividades) -->
+        <div class="milestone-act-section">
+          <div class="milestone-act-header">
+            <h4><i class="ri-list-check-3"></i> Actividades de este Hito</h4>
+            <button type="button" class="btn-add-subact" id="btnAddSubActivity">
+              <i class="ri-add-line"></i> <span>Agregar otra actividad</span>
+            </button>
+          </div>
+
+          <div id="subActivitiesContainer">
+            <div class="subact-card" data-subact-id="subact_initial_0">
+              <div class="subact-card-top">
+                <span class="subact-num"><i class="ri-checkbox-circle-line"></i> Actividad 1</span>
+                <button type="button" class="btn-del-subact" title="Quitar esta actividad" onclick="removeSubActivityCard(this)">
+                  <i class="ri-delete-bin-line"></i>
+                </button>
+              </div>
+              <div class="form-group-org" style="margin-bottom: 10px;">
+                <label>Nombre de la Actividad</label>
+                <input type="text" class="input-org input-subact-name" placeholder="Ej.: Cartel de bienvenida / Aguas saborizadas">
+              </div>
+              <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; margin-bottom: 10px;">
+                <div class="form-group-org" style="margin-bottom: 0;">
+                  <label>Encargado(a)</label>
+                  <input type="text" class="input-org input-subact-resp" list="responsiblesDatalist" placeholder="Ej.: Hermano del Novio / Banquetera">
+                </div>
+                <div class="form-group-org" style="margin-bottom: 0;">
+                  <label>¿Encargado OK?</label>
+                  <select class="select-org select-subact-resp-status">
+                    <option value="ok" selected>✓ Confirmado / OK</option>
+                    <option value="pending">⏳ Por Buscar</option>
+                  </select>
+                </div>
+              </div>
+              <div class="subact-purchase-box">
+                <label class="subact-purchase-toggle">
+                  <input type="checkbox" class="check-subact-purchase" onchange="toggleSubactPurchase(this)">
+                  <span>🛍️ ¿Hay que comprar o mandar a hacer algo para esta actividad?</span>
+                </label>
+                <div class="subact-purchase-fields" style="display: none;">
+                  <div class="form-group-org" style="margin-bottom: 8px;">
+                    <label>¿Qué hay que comprar o mandar a hacer?</label>
+                    <input type="text" class="input-org input-subact-item" placeholder="Ej.: Cartel de bienvenida en acrílico">
+                  </div>
+                  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+                    <div class="form-group-org" style="margin-bottom: 0;">
+                      <label>Categoría</label>
+                      <select class="select-org select-subact-cat">
+                        <option value="Decoración" selected>Decoración</option>
+                        <option value="Ceremonia">Ceremonia</option>
+                        <option value="Fiesta">Fiesta</option>
+                        <option value="Vestuario">Vestuario</option>
+                        <option value="Detalles">Detalles</option>
+                        <option value="Varios">Varios</option>
+                      </select>
+                    </div>
+                    <div class="form-group-org" style="margin-bottom: 0;">
+                      <label>Costo Estimado</label>
+                      <input type="text" class="input-org input-subact-cost" placeholder="Ej.: $25.000">
+                    </div>
+                    <div class="form-group-org" style="margin-bottom: 0;">
+                      <label>¿Estado?</label>
+                      <select class="select-org select-subact-status">
+                        <option value="pending" selected>⏳ Pendiente</option>
+                        <option value="in_progress">🎨 Mandado a Hacer</option>
+                        <option value="ok">✓ Ya Listo</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top: 12px; display: flex; justify-content: flex-end;">
+            <button type="button" class="btn-add-subact" id="btnAddSubActivityBottom" style="background: #F8FAFC; border: 1.5px dashed var(--gold-primary); color: var(--gold-dark); font-weight: 700;">
+              <i class="ri-add-line"></i> <span>Agregar otra actividad</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="modal-footer-org right-only">
+          <button type="button" class="btn-secondary-org" onclick="document.getElementById('activityModal').classList.remove('active')">
+            <i class="ri-close-line"></i> Cancelar
+          </button>
+          <button type="button" class="btn-org-action" id="btnSaveMilestone" onclick="handleSaveMilestone(event)" style="width: auto; padding: 10px 22px;">
+            <i class="ri-check-line"></i> <span id="btnSaveMilestoneText">Guardar Hito &amp; Actividades</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL EDITAR ACTIVIDAD INDIVIDUAL DEL CRONOGRAMA -->
+  <div class="org-modal" id="modalEditSingleActivity">
+    <div class="org-modal-card" style="max-width: 580px;">
+      <button class="btn-close-modal" aria-label="Cerrar" onclick="closeEditActivityModal()"><i class="ri-close-line"></i></button>
+      <h3 class="org-modal-title">
+        <i class="ri-edit-line" style="color: var(--navy-royal);"></i>
+        <span>Editar Actividad del Cronograma</span>
+      </h3>
+      <form id="formEditSingleActivity" onsubmit="handleSaveSingleActivity(event)">
+        <input type="hidden" id="editActOriginalMilestoneId">
+        <input type="hidden" id="editActId">
+
+        <div class="form-group-org" style="margin-bottom: 16px;">
+          <label for="editActName">Nombre de la Actividad *</label>
+          <input type="text" id="editActName" class="input-org" placeholder="Ej.: Cartel de bienvenida / Entrada de los novios" required>
+        </div>
+
+        <div class="form-group-org" style="margin-bottom: 16px;">
+          <label for="editActMilestoneSelect">Hito / Horario del Cronograma *</label>
+          <select id="editActMilestoneSelect" class="select-org" title="Selecciona a qué horario o momento pertenece esta actividad">
+            <!-- Cargado dinámicamente con los hitos del cronograma -->
+          </select>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 14px; margin-bottom: 16px;">
+          <div class="form-group-org" style="margin-bottom: 0;">
+            <label for="editActResp">Encargado(a) / Proveedor</label>
+            <select id="editActResp" class="select-org" onchange="handleEditActRespChange(this)">
+              <!-- Opciones de proveedores cargadas dinámicamente -->
+            </select>
+            <input type="text" id="editActRespCustom" class="input-org" style="display: none; margin-top: 8px;" placeholder="Escribe el nombre del nuevo encargado...">
+          </div>
+          <div class="form-group-org" style="margin-bottom: 0;">
+            <label for="editActRespStatus">¿Encargado OK?</label>
+            <select id="editActRespStatus" class="select-org">
+              <option value="ok" selected>✓ Confirmado</option>
+              <option value="pending">⏳ Por Buscar</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="subact-purchase-box" style="margin-top: 14px; margin-bottom: 18px; background: #F8FAFC; border: 1px solid #E2E8F0; padding: 14px 16px; border-radius: 12px;">
+          <label class="subact-purchase-toggle" style="display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.88rem; cursor: pointer; color: #334155;">
+            <input type="checkbox" id="editActNeedsPurchase" onchange="toggleEditActPurchase(this.checked)" style="accent-color: #0F172A; width: 17px; height: 17px; cursor: pointer;">
+            <span>🛍️ ¿Hay que comprar o mandar a hacer algo para esta actividad?</span>
+          </label>
+          <div id="editActPurchaseFields" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed #CBD5E1;">
+            <div class="form-group-org" style="margin-bottom: 10px;">
+              <label for="editActShopItem">¿Qué hay que comprar o mandar a hacer?</label>
+              <input type="text" id="editActShopItem" class="input-org" placeholder="Ej.: Cartel en acrílico dorado">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+              <div class="form-group-org" style="margin-bottom: 0;">
+                <label for="editActShopCategory">Categoría</label>
+                <select id="editActShopCategory" class="select-org">
+                  <option value="Decoración" selected>Decoración</option>
+                  <option value="Ceremonia">Ceremonia</option>
+                  <option value="Fiesta">Fiesta</option>
+                  <option value="Vestuario">Vestuario</option>
+                  <option value="Detalles">Detalles</option>
+                  <option value="Varios">Varios</option>
+                </select>
+              </div>
+              <div class="form-group-org" style="margin-bottom: 0;">
+                <label for="editActShopCost">Costo / Cant.</label>
+                <input type="text" id="editActShopCost" class="input-org" placeholder="Ej.: $20.000">
+              </div>
+              <div class="form-group-org" style="margin-bottom: 0;">
+                <label for="editActShopStatus">¿Estado?</label>
+                <select id="editActShopStatus" class="select-org">
+                  <option value="pending" selected>⏳ Pendiente</option>
+                  <option value="in_progress">🎨 Mandado a Hacer</option>
+                  <option value="ok">✓ Comprado / Listo</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer-org">
+          <button type="button" class="btn-modal-delete" onclick="handleDeleteSingleActivity()" title="Eliminar actividad">
+            <i class="ri-delete-bin-line"></i> Eliminar Actividad
+          </button>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <button type="button" class="btn-secondary-org" onclick="closeEditActivityModal()">
+              <i class="ri-close-line"></i> Cancelar
+            </button>
+            <button type="submit" class="btn-org-action" style="width: auto; padding: 10px 22px;">
+              <i class="ri-save-line"></i> Guardar Cambios
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL NUEVA COMPRA -->
+  <div class="org-modal" id="shoppingModal">
+    <div class="org-modal-card" style="max-width: 560px;">
+      <button class="btn-close-modal" aria-label="Cerrar"><i class="ri-close-line"></i></button>
+      <h3 class="org-modal-title"><span id="shoppingModalTitle"><i class="ri-shopping-bag-3-line" style="color: var(--gold-dark);"></i> Agregar Ítem de Compra / Insumo</span></h3>
+      <form id="formAddShopping">
+        <div class="form-group-org">
+          <label for="shopItem">Ítem o Cosa a Comprar *</label>
+          <input type="text" id="shopItem" class="input-org" placeholder="Ej.: Luces de bengala para la noche" required>
+        </div>
+        <div class="form-group-org">
+          <label for="shopLinkedActivity">Vincular a Hito del Cronograma (Opcional)</label>
+          <select id="shopLinkedActivity" class="select-org">
+            <option value="">— Ninguno (Compra general) —</option>
+            <!-- Opciones cargadas dinámicamente -->
+          </select>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group-org">
+            <label for="shopCategory">Categoría</label>
+            <select id="shopCategory" class="select-org">
+              <option value="Ceremonia">Ceremonia</option>
+              <option value="Decoración">Decoración</option>
+              <option value="Fiesta">Fiesta / Cotillón</option>
+              <option value="Vestuario">Vestuario / Accesorios</option>
+              <option value="Detalles">Detalles para Invitados</option>
+              <option value="Regalos">Regalos / Recuerdos</option>
+              <option value="Varios" selected>Varios</option>
+            </select>
+          </div>
+          <div class="form-group-org">
+            <label for="shopCost">Costo / Cantidad</label>
+            <input type="text" id="shopCost" class="input-org" placeholder="Ej.: $20.000 / 50 un.">
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px;">
+          <div class="form-group-org">
+            <label for="shopResponsible">Encargado(a) / Proveedor</label>
+            <select id="shopResponsible" class="select-org" onchange="handleShopResponsibleChange(this)" title="Selecciona de la lista de proveedores o escribe uno nuevo">
+              <option value="" selected>— Selecciona de la lista de proveedores —</option>
+              <option value="__custom__">➕ Escribir otro / Nuevo Encargado...</option>
+            </select>
+            <input type="text" id="shopResponsibleCustom" class="input-org" style="display: none; margin-top: 6px;" placeholder="Escribe el nombre del nuevo encargado...">
+          </div>
+          <div class="form-group-org">
+            <label for="shopRespStatus">¿Encargado OK?</label>
+            <select id="shopRespStatus" class="select-org">
+              <option value="ok" selected>✓ Confirmado</option>
+              <option value="pending">⏳ Por Buscar</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group-org">
+          <label for="shopDetail">Detalle / Dónde Comprar</label>
+          <input type="text" id="shopDetail" class="input-org" placeholder="Ej.: Mercado Libre, tienda o encargo especial">
+        </div>
+        <div class="form-group-org">
+          <label for="shopStatus">¿Estado de la Compra / Insumo?</label>
+          <select id="shopStatus" class="select-org">
+            <option value="pending" selected>⏳ Pendiente por Comprar</option>
+            <option value="in_progress">🎨 Mandado a Hacer / En Proceso</option>
+            <option value="ok">✓ Ya Comprado / Listo</option>
+          </select>
+        </div>
+        <div class="modal-footer-org right-only">
+          <button type="button" class="btn-secondary-org" onclick="document.getElementById('shoppingModal').classList.remove('active')">
+            <i class="ri-close-line"></i> Cancelar
+          </button>
+          <button type="submit" class="btn-org-action" id="btnSaveShopping" style="width: auto; padding: 10px 22px;">
+            <i class="ri-check-line"></i> <span id="btnSaveShoppingText">Guardar Ítem en Compras</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL EDITAR MESA (Nombre y Capacidad) -->
+    <!-- DATALIST GLOBAL DE RESPONSABLES & PROVEEDORES -->
+  <datalist id="responsiblesDatalist"></datalist>
+
+  <!-- MODAL GESTIÓN DE RESPONSABLES Y PROVEEDORES -->
+  <div class="org-modal" id="responsiblesModal">
+    <div class="org-modal-card" style="max-width: 580px;">
+      <button class="btn-close-modal" aria-label="Cerrar"><i class="ri-close-line"></i></button>
+      <h3 class="org-modal-title"><i class="ri-team-line" style="color: var(--gold-dark);"></i> Directorio de Responsables &amp; Proveedores</h3>
+      <p style="color: var(--text-muted); font-size: 0.86rem; margin-top: -6px; margin-bottom: 16px;">
+        Registra a los encargados, cortejo o proveedores para seleccionarlos al instante en cada actividad o compra.
+      </p>
+
+      <!-- Formulario para agregar nuevo responsable -->
+      <form id="formAddResponsible" onsubmit="handleSaveResponsible(event)" style="background: #F8FAFC; border: 1px solid rgba(148, 163, 184,0.25); border-radius: 12px; padding: 14px; margin-bottom: 18px;">
+        <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div class="form-group-org" style="margin-bottom: 0;">
+            <label for="newRespName">Nombre / Empresa *</label>
+            <input type="text" id="newRespName" class="input-org" placeholder="Ej.: Banquetera Los Olivos / Pamela" required>
+          </div>
+          <div class="form-group-org" style="margin-bottom: 0;">
+            <label for="newRespCategory">Rol / Categoría</label>
+            <select id="newRespCategory" class="select-org">
+              <option value="Proveedor">Proveedor / Servicio</option>
+              <option value="Familia">Familia</option>
+              <option value="Novios">Novios</option>
+              <option value="Amigos / Cortejo">Amigos / Cortejo</option>
+              <option value="Logística">Logística / Coordinación</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: flex-end;">
+          <div class="form-group-org" style="margin-bottom: 0;">
+            <label for="newRespPhone">Teléfono / Contacto (Opcional)</label>
+            <input type="text" id="newRespPhone" class="input-org" placeholder="Ej.: +56 9 1234 5678">
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" id="btnCancelEditResp" onclick="cancelEditResponsible()" class="btn-sm-edit-provider" style="display: none; padding: 9px 12px;">
+              Cancelar
+            </button>
+            <button type="submit" class="btn-org-action" id="btnSubmitRespForm" style="padding: 10px 18px;">
+              <i class="ri-user-add-line"></i> <span id="btnSubmitRespText">Agregar</span>
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Lista de responsables existentes -->
+      <div style="max-height: 280px; overflow-y: auto; padding-right: 4px;">
+        <div id="responsiblesListContainer" style="display: flex; flex-direction: column; gap: 8px;">
+          <!-- Rendered dynamically by organizador.js -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="org-modal" id="editTableModal">
+    <div class="org-modal-card">
+      <button class="btn-close-modal" aria-label="Cerrar"><i class="ri-close-line"></i></button>
+      <h3 class="org-modal-title"><i class="ri-edit-line" style="color: var(--gold-dark); font-size: 1.3rem;"></i> Editar Mesa</h3>
+      <form id="formEditTable">
+        <input type="hidden" id="editTableId">
+        <div class="form-group-org">
+          <label for="editTableNumber">Número de Mesa *</label>
+          <select id="editTableNumber" class="select-org" required>
+            <!-- Opciones cargadas dinámicamente -->
+          </select>
+        </div>
+        <div class="form-group-org">
+          <label for="editTableName">Nombre de la Mesa *</label>
+          <input type="text" id="editTableName" class="input-org" required>
+        </div>
+        <div class="form-group-org">
+          <label for="editTableCapacity">Capacidad Máxima de Asientos *</label>
+          <input type="number" id="editTableCapacity" class="input-org" min="1" max="30" required>
+          <small id="editTableCurrentSeats" style="display: block; font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;"></small>
+        </div>
+        <div class="modal-footer-org right-only">
+          <button type="button" class="btn-secondary-org" onclick="document.getElementById('editTableModal').classList.remove('active')">
+            <i class="ri-close-line"></i> Cancelar
+          </button>
+          <button type="submit" class="btn-org-action" style="width: auto; padding: 10px 22px;">
+            <i class="ri-check-line"></i> <span>Guardar Cambios</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL ELEGIR MESA PARA INVITADO (Botón Ubicar) -->
+  <div class="org-modal" id="pickTableModal">
+    <div class="org-modal-card" style="max-width: 560px;">
+      <button class="btn-close-modal" aria-label="Cerrar"><i class="ri-close-line"></i></button>
+      <div style="margin-bottom: 16px;">
+        <span class="side-card-tag tag-amber" style="margin-bottom: 6px;"><i class="ri-user-heart-line"></i> Asignación de Mesa</span>
+        <h3 class="org-modal-title" style="margin-bottom: 4px;">Ubicar a <span id="pickGuestName" style="color: var(--gold-dark);"></span></h3>
+        <div id="pickCompanionAlert" style="display: none; background: #FEF3C7; color: #92400E; border: 1px solid rgba(245, 158, 11, 0.35); padding: 9px 13px; border-radius: 10px; font-size: 0.82rem; margin-top: 10px; line-height: 1.45;">
+          <i class="ri-heart-line" style="color: #B45309;"></i> <strong>Pareja / Acompañante:</strong> <span id="pickCompanionName" style="font-weight: 700;"></span> (se asignarán automáticamente juntos en la misma mesa).
+        </div>
+      </div>
+
+      <div style="margin-bottom: 12px;">
+        <label style="font-size: 0.82rem; font-weight: 700; color: var(--navy-royal);">Selecciona la mesa a la que deseas asignarlo(s):</label>
+      </div>
+
+      <div class="pick-tables-list" id="pickTablesList">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL ORGANIZAR PUESTOS & REUBICACIÓN DE ASIENTOS CON REGLA DE PAREJAS -->
+  <div class="org-modal" id="seatsModal">
+    <div class="org-modal-card" style="max-width: 680px;">
+      <button class="btn-close-modal" aria-label="Cerrar"><i class="ri-close-line"></i></button>
+      <div style="margin-bottom: 18px;">
+        <span class="side-card-tag tag-amber" style="margin-bottom: 6px;"><i class="ri-layout-masonry-line"></i> Puestos y Ubicación</span>
+        <h3 class="org-modal-title" style="margin-bottom: 6px;"><i class="ri-user-shared-line" style="color: var(--gold-dark);"></i> Acomodar Puestos en <span id="seatsModalTableName" style="color: var(--gold-dark);"></span></h3>
+        <p style="font-size: 0.84rem; color: var(--text-muted); line-height: 1.5; margin: 0;">
+          Define quién se sienta al lado de quién moviendo los puestos. <strong>Las parejas registradas siempre van juntas una al lado de la otra</strong>, y puedes cambiar en qué lado va cada una con el botón <strong>⇄ Cambiar Lado</strong>.
+        </p>
+      </div>
+
+      <!-- Contenedor dinámico de asientos ordenados -->
+      <div class="seats-arrangement-container" id="seatsArrangementContainer">
+        <!-- Generado dinámicamente por organizador.js -->
+      </div>
+
+      <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="btn-org-action" id="btnCloseSeatsModal">
+          <i class="ri-check-line"></i> <span>Listo / Guardar Distribución</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="orgToast" class="org-toast" aria-live="polite"></div>
+
+  <!-- Scripts con sincronización Supabase Cloud -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js?v=2.6"></script>
+  <script src="js/organizador.js?v=5.4"></script>
+</body>
+</html>
