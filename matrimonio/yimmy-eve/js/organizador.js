@@ -615,193 +615,684 @@ function loadData() {
   // + Todas las actividades previas y logísticas mantenidas
   // ==========================================
   const DEFAULT_EXAMPLE_TIMELINE = [
-    {
-      id: 'act_todo_el_evento',
-      time: 'Todo el Evento',
-      timeStart: 'Todo el Evento',
-      timeEnd: '',
-      title: 'Todo el Evento',
-      responsible: 'Coordinador General & Novios',
-      responsibleStatus: 'ok',
-      detail: 'Servicios continuos, ambientación musical, comodidades para los invitados y coordinación general durante toda la jornada.',
-      activities: [
-        { id: 'sub_ev_1', name: 'Coordinación y supervisión general de tiempos', responsible: 'Coordinador General', responsibleStatus: 'ok' },
-        { id: 'sub_ev_2', name: 'Estación de hidratación, café y comodidades', responsible: 'Banquetera', responsibleStatus: 'ok' },
-        { id: 'sub_ev_3', name: 'Kits de emergencia y baño (damas y varones)', responsible: 'Damas de Honor', responsibleStatus: 'ok', needsPurchase: true, shopItem: 'Kit de Baño / Emergencia (Hombres y Mujeres)', shopCategory: 'Varios', shopCost: '$18.000', shopStatus: 'pending' },
-        { id: 'sub_ev_4', name: 'Marcos de fotos con Códigos QR y libro de firmas', responsible: 'Hermano del Novio', responsibleStatus: 'ok', needsPurchase: true, shopItem: 'Carteles y Marcos para Códigos QR de Fotos', shopCategory: 'Decoración', shopCost: '$15.000', shopStatus: 'pending' }
-      ]
-    },
-    {
-      id: 'act_previa_maquillaje',
-      time: '08:30',
-      timeStart: '08:30',
-      timeEnd: '10:30',
-      title: 'Maquillaje y Peinado de la Novia',
-      responsible: 'Estilista & Novia',
-      responsibleStatus: 'ok',
-      detail: 'Preparación y sesión de peinado en la suite de Casona Los Olivos',
-      activities: [
-        { id: 'sub_maq_1', name: 'Peinado y colocación del velo', responsible: 'Estilista', responsibleStatus: 'ok' },
-        { id: 'sub_maq_2', name: 'Maquillaje de novia y retoques madrina', responsible: 'Maquilladora', responsibleStatus: 'ok' }
-      ]
-    },
-    {
-      id: 'act_previa_decoracion',
-      time: '09:30',
-      timeStart: '09:30',
-      timeEnd: '11:00',
-      title: 'Montaje floral, mesas y mantelería',
-      responsible: 'Decoradora Floral',
-      responsibleStatus: 'ok',
-      detail: 'Revisión de mantelería, centros de mesa campestres y flores en el jardín',
-      activities: [
-        { id: 'sub_dec_1', name: 'Distribución de centros de mesa y cubertería', responsible: 'Decoradora', responsibleStatus: 'ok' },
-        { id: 'sub_dec_2', name: 'Montaje del arco nupcial campestre', responsible: 'Equipo Montaje', responsibleStatus: 'ok', needsPurchase: true, shopItem: 'Arco y Flores Campestres', shopCategory: 'Decoración', shopCost: '$45.000', shopStatus: 'ok' }
-      ]
-    },
-    {
-      id: 'act_previa_foto',
-      time: '10:00',
-      timeStart: '10:00',
-      timeEnd: '11:30',
-      title: 'Llegada del Fotógrafo (Sesión previa)',
-      responsible: 'Equipo Fotográfico',
-      responsibleStatus: 'ok',
-      detail: 'Fotos de detalles: vestido, anillos, zapatos, traje del novio y primeros retratos',
-      activities: [
-        { id: 'sub_fot_1', name: 'Fotos de detalles (anillos, zapatos, ramo)', responsible: 'Fotógrafo', responsibleStatus: 'ok' },
-        { id: 'sub_fot_2', name: 'First look íntimo de los novios', responsible: 'Fotógrafo', responsibleStatus: 'ok' }
-      ]
-    },
-    {
-      id: 'act_previa_sonido',
-      time: '10:30',
-      timeStart: '10:30',
-      timeEnd: '11:30',
-      title: 'Prueba de Sonido & Micrófonos con DJ',
-      responsible: 'DJ & Sonidista',
-      responsibleStatus: 'ok',
-      detail: 'Confirmar lista de canciones, audio campestre y micrófonos inalámbricos para votos',
-      activities: [
-        { id: 'sub_son_1', name: 'Prueba de audio y micrófono inalámbrico de ceremonia', responsible: 'DJ', responsibleStatus: 'ok' },
-        { id: 'sub_son_2', name: 'Audio ambiental acústico en zona de pasto', responsible: 'DJ', responsibleStatus: 'ok' }
-      ]
-    },
-    {
-      id: 'act_inv_llegada',
-      time: '11:30',
-      timeStart: '11:30',
-      timeEnd: '13:00',
-      title: 'Llegada & Momento Manta',
-      responsible: 'Hermano del Novio & Equipo Recepción',
-      responsibleStatus: 'ok',
-      detail: 'Instalación de mantas en el césped, aguas frescas, música acústica y cóctel previo',
-      activities: [
-        { id: 'sub_rec_cartel', name: 'Instalación de Cartel de Bienvenida', responsible: 'Hermano del Novio', responsibleStatus: 'ok', needsPurchase: true, shopItem: 'Cartel de Bienvenidos (Madera / Acrílico)', shopCategory: 'Decoración', shopCost: '$25.000', shopStatus: 'in_progress' },
-        { id: 'sub_rec_mantas', name: 'Distribución de mantas y canastas en el pasto', responsible: 'Equipo Recepción', responsibleStatus: 'ok', needsPurchase: true, shopItem: 'Mantas campestres para picnic', shopCategory: 'Mobiliario', shopCost: '$30.000', shopStatus: 'ok' },
-        { id: 'sub_rec_aguas', name: 'Dispensadores de aguas saborizadas y limonadas', responsible: 'Banquetera', responsibleStatus: 'ok' }
-      ]
-    },
-    {
-      id: 'act_inv_ceremonia',
-      time: '13:00',
-      timeStart: '13:00',
-      timeEnd: '14:15',
-      title: 'Ceremonia Civil & Religiosa',
-      responsible: 'Oficial Civil & Párroco',
-      responsibleStatus: 'ok',
-      detail: 'Matrimonio Civil y posterior bendición religiosa para sellar nuestra unión',
-      activities: [
-        { id: 'sub_cer_1', name: 'Lectura de votos y entrega de argollas', responsible: 'Novios & Padrinos', responsibleStatus: 'ok' },
-        { id: 'sub_cer_2', name: 'Firma de actas de matrimonio civil', responsible: 'Testigos', responsibleStatus: 'ok' },
-        { id: 'sub_cer_3', name: 'Lluvia de pétalos naturales a la salida', responsible: 'Damas de Honor', responsibleStatus: 'ok', needsPurchase: true, shopItem: 'Conos con pétalos naturales', shopCategory: 'Ceremonia', shopCost: '$15.000', shopStatus: 'ok' }
-      ]
-    },
-    {
-      id: 'act_coctel_fotos',
-      time: '14:15',
-      timeStart: '14:15',
-      timeEnd: '15:00',
-      title: 'Cóctel Campestre & Fotos Post-Ceremonia',
-      responsible: 'Banquetera & Fotógrafo',
-      responsibleStatus: 'ok',
-      detail: 'Aperitivos campestres y fotos grupales con novios y familias en los jardines',
-      activities: [
-        { id: 'sub_coc_1', name: 'Servicio de aperitivos campestres y cóctel de autor', responsible: 'Banquetera', responsibleStatus: 'ok' },
-        { id: 'sub_coc_2', name: 'Fotos con familiares y amigos en spots de jardines', responsible: 'Fotógrafo', responsibleStatus: 'ok' }
-      ]
-    },
-    {
-      id: 'act_inv_almuerzo',
-      time: '15:00',
-      timeStart: '15:00',
-      timeEnd: '16:30',
-      title: 'El Almuerzo',
-      responsible: 'Banquetera & Maestro de Ceremonia',
-      responsibleStatus: 'ok',
-      detail: 'Almuerzo campestre, mesa de novios, brindis de honor y compartir juntos',
-      activities: [
-        { id: 'sub_alm_1', name: 'Servicio del banquete campestre en mesas', responsible: 'Garzones & Banquetera', responsibleStatus: 'ok' },
-        { id: 'sub_alm_2', name: 'Brindis de honor con champaña y discursos', responsible: 'Padres & Padrinos', responsibleStatus: 'ok', needsPurchase: true, shopItem: 'Copas grabadas para brindis de novios', shopCategory: 'Banquete', shopCost: '$18.000', shopStatus: 'ok' }
-      ]
-    },
-    {
-      id: 'act_inv_sobremesa',
-      time: '16:30',
-      timeStart: '16:30',
-      timeEnd: '17:30',
-      title: 'Sobremesa & Fotos Instagrameables 📸✨',
-      responsible: 'Novios & Encargado de Spots',
-      responsibleStatus: 'ok',
-      detail: 'Spots decorados para Instagram, descanso en el césped, café, torta y postres',
-      activities: [
-        { id: 'sub_sob_1', name: 'Activación de photo spots y cámaras vintage en mesas', responsible: 'Encargado de Spots', responsibleStatus: 'ok', needsPurchase: true, shopItem: 'Cámaras Desechables Vintage para cada mesa', shopCategory: 'Detalles', shopCost: '$60.000', shopStatus: 'ok' },
-        { id: 'sub_sob_2', name: 'Corte de torta de novios y estación de café', responsible: 'Banquetera', responsibleStatus: 'ok' }
-      ]
-    },
-    {
-      id: 'act_vals_novios',
-      time: '17:30',
-      timeStart: '17:30',
-      timeEnd: '18:00',
-      title: 'Primer Baile de Novios (Vals)',
-      responsible: 'DJ & Novios',
-      responsibleStatus: 'ok',
-      detail: 'Vals tradicional de los novios y apertura de la pista de baile',
-      activities: [
-        { id: 'sub_vals_1', name: 'Vals de novios con iluminación cálida', responsible: 'DJ', responsibleStatus: 'ok' },
-        { id: 'sub_vals_2', name: 'Baile con padres y llamado general a la pista', responsible: 'DJ', responsibleStatus: 'ok' }
-      ]
-    },
-    {
-      id: 'act_inv_fiesta',
-      time: '18:00',
-      timeStart: '18:00',
-      timeEnd: '21:00',
-      title: '¡Música & Fiesta!',
-      responsible: 'DJ & Barman',
-      responsibleStatus: 'ok',
-      detail: 'Pista de baile encendida, cotillón festivo y barra abierta campestre',
-      activities: [
-        { id: 'sub_fie_1', name: 'Apertura de barra campestre libre', responsible: 'Barman', responsibleStatus: 'ok' },
-        { id: 'sub_fie_2', name: 'Reparto de cotillón temático y pantuflas cómodas', responsible: 'Amigos de los Novios', responsibleStatus: 'ok', needsPurchase: true, shopItem: 'Pantuflas y Chalas Cómodas para la Fiesta', shopCategory: 'Fiesta', shopCost: '$40.000', shopStatus: 'ok' }
-      ]
-    },
-    {
-      id: 'act_bajon_final',
-      time: '21:00',
-      timeStart: '21:00',
-      timeEnd: '22:00',
-      title: 'Bajón de Tarde-Noche & Despedida',
-      responsible: 'Banquetera & Hermano del Novio',
-      responsibleStatus: 'ok',
-      detail: 'Tapaditos calientes, pizzas artesanales y despedida de novios con bengalas',
-      activities: [
-        { id: 'sub_baj_1', name: 'Servicio de trasnoche con tapaditos calientes y café', responsible: 'Banquetera', responsibleStatus: 'ok' },
-        { id: 'sub_baj_2', name: 'Túnel de despedida con chispas de bengala', responsible: 'Hermano del Novio', responsibleStatus: 'ok', needsPurchase: true, shopItem: 'Kit de Luces de Bengala para Despedida', shopCategory: 'Detalles', shopCost: '$25.000', shopStatus: 'ok' }
-      ]
-    }
-  ];
+  {
+    "id": "act_todo_el_evento",
+    "time": "Todo el Evento",
+    "timeStart": "Todo el Evento",
+    "timeEnd": "",
+    "title": "Todo el Evento",
+    "responsible": "Coordinador General & Novios",
+    "responsibleStatus": "ok",
+    "detail": "Servicios continuos, ambientación musical, comodidades para los invitados y coordinación general durante toda la jornada.",
+    "activities": [
+      {
+        "id": "sub_ev_1",
+        "name": "Coordinación y supervisión general de tiempos",
+        "responsible": "Coordinador General",
+        "responsibleStatus": "ok"
+      },
+      {
+        "id": "sub_ev_2",
+        "name": "Estación de hidratación, café y comodidades",
+        "responsible": "Banquetera",
+        "responsibleStatus": "ok"
+      },
+      {
+        "id": "sub_ev_3",
+        "name": "Kit de Baño / Emergencia (Hombres y Mujeres)",
+        "responsible": "Novios",
+        "responsibleStatus": "pending",
+        "needsPurchase": true,
+        "shopItem": "Kit de Baño / Emergencia (Hombres y Mujeres)",
+        "shopCategory": "Varios",
+        "shopCost": "$18.000",
+        "shopStatus": "pending",
+        "shopItemId": "shop_4"
+      },
+      {
+        "id": "sub_shop_cartel_rec",
+        "name": "Cartel de Bienvenidos",
+        "responsible": "Mora Print",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_cartel_rec",
+        "shopItem": "Cartel de Bienvenidos",
+        "shopCategory": "Decoración",
+        "shopCost": "0",
+        "shopStatus": "pending"
+      },
+      {
+        "id": "sub_shop_5",
+        "name": "Códigos QR de Fotos y desafíos",
+        "responsible": "CositasParaEventos",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_5",
+        "shopItem": "Códigos QR de Fotos y desafíos",
+        "shopCategory": "Detalles",
+        "shopCost": "0",
+        "shopStatus": "in_progress"
+      },
+      {
+        "id": "sub_shop_1791306911057",
+        "name": "Deja tu huella",
+        "responsible": "CositasParaEventos",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_1791306911057",
+        "shopItem": "Deja tu huella",
+        "shopCategory": "Decoración",
+        "shopCost": "0",
+        "shopStatus": "in_progress"
+      },
+      {
+        "id": "sub_shop_1791307013942",
+        "name": "¡Abraza este árbol!",
+        "responsible": "CositasParaEventos",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_1791307013942",
+        "shopItem": "¡Abraza este árbol!",
+        "shopCategory": "Detalles",
+        "shopCost": "0",
+        "shopStatus": "in_progress"
+      },
+      {
+        "id": "sub_shop_1791307612314",
+        "name": "Rincón del Fumador",
+        "responsible": "CositasParaEventos",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_1791307612314",
+        "shopItem": "Rincón del Fumador",
+        "shopCategory": "Varios",
+        "shopCost": "0",
+        "shopStatus": "in_progress"
+      },
+      {
+        "id": "sub_shop_1791307777583",
+        "name": "Fotos del recuerdo",
+        "responsible": "CositasParaEventos",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_1791307777583",
+        "shopItem": "Fotos del recuerdo",
+        "shopCategory": "Regalos",
+        "shopCost": "0",
+        "shopStatus": "in_progress"
+      },
+      {
+        "id": "sub_shop_1791308113175",
+        "name": "Vale por un SHOT",
+        "responsible": "CositasParaEventos",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_1791308113175",
+        "shopItem": "Vale por un SHOT",
+        "shopCategory": "Regalos",
+        "shopCost": "0",
+        "shopStatus": "in_progress"
+      },
+      {
+        "id": "sub_shop_1791309520032",
+        "name": "Marco selfie",
+        "responsible": "Novios (Cristopher & Reny)",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_1791309520032",
+        "shopItem": "Marco selfie",
+        "shopCategory": "Regalos",
+        "shopCost": "",
+        "shopStatus": "pending"
+      }
+    ]
+  },
+  {
+    "id": "act_previa_maquillaje",
+    "time": "08:30",
+    "timeStart": "08:30",
+    "timeEnd": "10:30",
+    "title": "Maquillaje y Peinado de la Novia",
+    "responsible": "Estilista & Novia",
+    "responsibleStatus": "ok",
+    "detail": "Preparación y sesión de peinado en la suite de Casona Los Olivos",
+    "activities": [
+      {
+        "id": "sub_maq_1",
+        "name": "Peinado y colocación del velo",
+        "responsible": "Estilista",
+        "responsibleStatus": "ok"
+      },
+      {
+        "id": "sub_maq_2",
+        "name": "Maquillaje de novia y retoques madrina",
+        "responsible": "Maquilladora",
+        "responsibleStatus": "ok"
+      }
+    ]
+  },
+  {
+    "id": "act_previa_decoracion",
+    "time": "09:30",
+    "timeStart": "09:30",
+    "timeEnd": "11:00",
+    "title": "Montaje floral, mesas y mantelería",
+    "responsible": "Decoradora Floral",
+    "responsibleStatus": "ok",
+    "detail": "Revisión de mantelería, centros de mesa campestres y flores en el jardín",
+    "activities": [
+      {
+        "id": "sub_dec_1",
+        "name": "Distribución de centros de mesa y cubertería",
+        "responsible": "Decoradora",
+        "responsibleStatus": "ok"
+      },
+      {
+        "id": "sub_dec_2",
+        "name": "Arco y Flores Campestres",
+        "responsible": "Equipo Montaje",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItem": "Arco y Flores Campestres",
+        "shopCategory": "Decoración",
+        "shopCost": "$45.000",
+        "shopStatus": "ok",
+        "shopItemId": "shop_1791256698146_htbx"
+      }
+    ]
+  },
+  {
+    "id": "act_previa_foto",
+    "time": "10:00",
+    "timeStart": "10:00",
+    "timeEnd": "11:30",
+    "title": "Llegada del Fotógrafo (Sesión previa)",
+    "responsible": "Equipo Fotográfico",
+    "responsibleStatus": "ok",
+    "detail": "Fotos de detalles: vestido, anillos, zapatos, traje del novio y primeros retratos",
+    "activities": [
+      {
+        "id": "sub_fot_1",
+        "name": "Fotos de detalles (anillos, zapatos, ramo)",
+        "responsible": "Fotógrafo",
+        "responsibleStatus": "ok"
+      },
+      {
+        "id": "sub_fot_2",
+        "name": "First look íntimo de los novios",
+        "responsible": "Fotógrafo",
+        "responsibleStatus": "ok"
+      }
+    ]
+  },
+  {
+    "id": "act_previa_sonido",
+    "time": "10:30",
+    "timeStart": "10:30",
+    "timeEnd": "11:30",
+    "title": "Prueba de Sonido & Micrófonos con DJ",
+    "responsible": "DJ & Sonidista",
+    "responsibleStatus": "ok",
+    "detail": "Confirmar lista de canciones, audio campestre y micrófonos inalámbricos para votos",
+    "activities": [
+      {
+        "id": "sub_son_1",
+        "name": "Prueba de audio y micrófono inalámbrico de ceremonia",
+        "responsible": "DJ",
+        "responsibleStatus": "ok"
+      },
+      {
+        "id": "sub_son_2",
+        "name": "Audio ambiental acústico en zona de pasto",
+        "responsible": "DJ",
+        "responsibleStatus": "ok"
+      }
+    ]
+  },
+  {
+    "id": "act_inv_llegada",
+    "time": "11:30",
+    "timeStart": "11:30",
+    "timeEnd": "12:45",
+    "title": "Llegada & Momento Manta",
+    "responsible": "Equipo Recepción",
+    "responsibleStatus": "ok",
+    "detail": "Instalación de mantas en el césped, aguas frescas, música acústica y cóctel previo",
+    "activities": [
+      {
+        "id": "sub_1791228776229_1",
+        "name": "Coctel",
+        "responsible": "Banquetera",
+        "responsibleStatus": "ok",
+        "needsPurchase": false
+      },
+      {
+        "id": "sub_1791228776229_2",
+        "name": "Fotos para Instagram",
+        "responsible": "Novios / Coordinador",
+        "responsibleStatus": "ok",
+        "needsPurchase": false
+      },
+      {
+        "id": "sub_1791228776229_3",
+        "name": "Tarjeta con desafíos encuentra al invitado",
+        "responsible": "CositasParaEventos",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_1791228721584_3",
+        "shopItem": "Tarjeta con desafíos encuentra al invitado",
+        "shopCategory": "Detalles",
+        "shopCost": "0",
+        "shopStatus": "in_progress"
+      },
+      {
+        "id": "sub_1791228776229_4",
+        "name": "Lápices para encuentra al invitado",
+        "responsible": "Novios",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_1791228721584_4",
+        "shopItem": "Lápices para encuentra al invitado",
+        "shopCategory": "Detalles",
+        "shopCost": "5000",
+        "shopStatus": "ok"
+      }
+    ]
+  },
+  {
+    "id": "act_coctel_fotos",
+    "time": "12:00",
+    "timeStart": "12:00",
+    "timeEnd": "12:45",
+    "title": "Cóctel Campestre & Fotos Post-Ceremonia",
+    "responsible": "Banquetera",
+    "responsibleStatus": "ok",
+    "detail": "Aperitivos campestres y fotos grupales con novios y familias en los jardines",
+    "activities": [
+      {
+        "id": "sub_1791315311117_0",
+        "name": "Servicio de aperitivos campestres y cóctel de autor",
+        "responsible": "Banquetera",
+        "responsibleStatus": "ok",
+        "needsPurchase": false
+      },
+      {
+        "id": "sub_1791315311117_1",
+        "name": "Fotos con familiares y amigos en spots de jardines",
+        "responsible": "Fotógrafo",
+        "responsibleStatus": "ok",
+        "needsPurchase": false
+      }
+    ]
+  },
+  {
+    "id": "act_inv_ceremonia",
+    "time": "13:00",
+    "timeStart": "13:00",
+    "timeEnd": "14:30",
+    "title": "Ceremonia Civil & Religiosa",
+    "responsible": "Novios & Padrinos",
+    "responsibleStatus": "ok",
+    "detail": "Matrimonio Civil y posterior bendición religiosa para sellar nuestra unión",
+    "activities": [
+      {
+        "id": "sub_1791315257280_0",
+        "name": "Lectura de votos y entrega de argollas",
+        "responsible": "Novios & Padrinos",
+        "responsibleStatus": "ok",
+        "needsPurchase": false
+      },
+      {
+        "id": "sub_1791315257280_1",
+        "name": "Firma de actas de matrimonio civil",
+        "responsible": "Testigos",
+        "responsibleStatus": "ok",
+        "needsPurchase": false
+      },
+      {
+        "id": "sub_1791315257280_2",
+        "name": "Conos para pétalos",
+        "responsible": "CositasParaEventos",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_1791226687978_cnid",
+        "shopItem": "Conos para pétalos",
+        "shopCategory": "Ceremonia",
+        "shopCost": "0",
+        "shopStatus": "in_progress"
+      },
+      {
+        "id": "sub_1791315257280_3",
+        "name": "Petalos para Salida de Ceremonia",
+        "responsible": "Novios",
+        "responsibleStatus": "pending",
+        "needsPurchase": true,
+        "shopItemId": "shop_1",
+        "shopItem": "Petalos para Salida de Ceremonia",
+        "shopCategory": "Ceremonia",
+        "shopCost": "$25.000",
+        "shopStatus": "pending"
+      },
+      {
+        "id": "sub_1791315257280_5",
+        "name": "Sobre con pañuelo-bebes-itinerario",
+        "responsible": "CositasParaEventos",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_1791315014779",
+        "shopItem": "Sobre con pañuelo-bebes-itinerario",
+        "shopCategory": "Decoración",
+        "shopCost": "0",
+        "shopStatus": "in_progress"
+      },
+      {
+        "id": "sub_shop_1791307974595",
+        "name": "Foto Boric",
+        "responsible": "CositasParaEventos",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_1791307974595",
+        "shopItem": "Foto Boric",
+        "shopCategory": "Ceremonia",
+        "shopCost": "0",
+        "shopStatus": "in_progress"
+      }
+    ]
+  },
+  {
+    "id": "act_inv_almuerzo",
+    "time": "14:30",
+    "timeStart": "14:30",
+    "timeEnd": "15:30",
+    "title": "El Almuerzo",
+    "responsible": "Garzones & Banquetera",
+    "responsibleStatus": "ok",
+    "detail": "Almuerzo campestre, mesa de novios, brindis de honor y compartir juntos",
+    "activities": [
+      {
+        "id": "sub_1791315375413_0",
+        "name": "Servicio del banquete campestre en mesas",
+        "responsible": "Garzones & Banquetera",
+        "responsibleStatus": "ok",
+        "needsPurchase": false
+      },
+      {
+        "id": "sub_1791315375413_1",
+        "name": "Copas grabadas para brindis de novios",
+        "responsible": "Padres & Padrinos",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_1791226687978_rda0",
+        "shopItem": "Copas grabadas para brindis de novios",
+        "shopCategory": "Decoración",
+        "shopCost": "$18.000",
+        "shopStatus": "ok"
+      },
+      {
+        "id": "sub_1791315375413_2",
+        "name": "Números de Mesas",
+        "responsible": "CositasParaEventos",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_1791255835237",
+        "shopItem": "Números de Mesas",
+        "shopCategory": "Decoración",
+        "shopCost": "0",
+        "shopStatus": "in_progress"
+      },
+      {
+        "id": "sub_1791315375413_3",
+        "name": "¿Quién tiene al novi@?",
+        "responsible": "CositasParaEventos",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_1791292539480",
+        "shopItem": "¿Quién tiene al novi@?",
+        "shopCategory": "Detalles",
+        "shopCost": "0",
+        "shopStatus": "in_progress"
+      },
+      {
+        "id": "sub_1791315375413_4",
+        "name": "Cartel Busca tu mesa",
+        "responsible": "Mora Print",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_1791308312825",
+        "shopItem": "Cartel Busca tu mesa",
+        "shopCategory": "Decoración",
+        "shopCost": "",
+        "shopStatus": "pending"
+      },
+      {
+        "id": "sub_1791315375413_5",
+        "name": "Galletas de la suerte",
+        "responsible": "CositasParaEventos",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_1791314701289",
+        "shopItem": "Galletas de la suerte",
+        "shopCategory": "Decoración",
+        "shopCost": "0",
+        "shopStatus": "in_progress"
+      },
+      {
+        "id": "sub_1791315375413_6",
+        "name": "Desafío Fotos Memes - Wisin y Yandel",
+        "responsible": "CositasParaEventos",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_1791314897639",
+        "shopItem": "Desafío Fotos Memes - Wisin y Yandel",
+        "shopCategory": "Decoración",
+        "shopCost": "0",
+        "shopStatus": "in_progress"
+      },
+      {
+        "id": "sub_1791315375413_7",
+        "name": "Nombre de invitado en mesa con desafío",
+        "responsible": "CositasParaEventos",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_1791315126025",
+        "shopItem": "Nombre de invitado en mesa con desafío",
+        "shopCategory": "Decoración",
+        "shopCost": "0",
+        "shopStatus": "in_progress"
+      }
+    ]
+  },
+  {
+    "id": "act_inv_sobremesa",
+    "time": "15:30",
+    "timeStart": "15:30",
+    "timeEnd": "16:30",
+    "title": "Sobremesa & Fotos Instagrameables 📸✨",
+    "responsible": "Banquetera",
+    "responsibleStatus": "ok",
+    "detail": "Spots decorados para Instagram, descanso en el césped, café, torta y postres",
+    "activities": [
+      {
+        "id": "sub_1791315851792_0",
+        "name": "Coctel N°2",
+        "responsible": "Banquetera",
+        "responsibleStatus": "ok",
+        "needsPurchase": false
+      },
+      {
+        "id": "sub_1791315851792_1",
+        "name": "Imprimir Código Pases",
+        "responsible": "CositasParaEventos",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_1791315851792_1",
+        "shopItem": "Imprimir Código Pases",
+        "shopCategory": "Detalles",
+        "shopCost": "0",
+        "shopStatus": "in_progress"
+      }
+    ]
+  },
+  {
+    "id": "act_inv_fiesta",
+    "time": "18:00",
+    "timeStart": "18:00",
+    "timeEnd": "21:00",
+    "title": "¡Música & Fiesta!",
+    "responsible": "DJ & Barman",
+    "responsibleStatus": "ok",
+    "detail": "Pista de baile encendida, cotillón festivo y barra abierta campestre",
+    "activities": [
+      {
+        "id": "sub_fie_1",
+        "name": "Apertura de barra campestre libre",
+        "responsible": "Barman",
+        "responsibleStatus": "ok"
+      },
+      {
+        "id": "sub_shop_1791255663393",
+        "name": "Cartel reglas de la fiesta",
+        "responsible": "CositasParaEventos",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_1791255663393",
+        "shopItem": "Cartel reglas de la fiesta",
+        "shopCategory": "Decoración",
+        "shopCost": "0",
+        "shopStatus": "ok"
+      },
+      {
+        "id": "sub_shop_7",
+        "name": "Cotillón",
+        "responsible": "Novios",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_7",
+        "shopItem": "Cotillón",
+        "shopCategory": "Fiesta",
+        "shopCost": "$35.000",
+        "shopStatus": "pending"
+      },
+      {
+        "id": "sub_shop_1791307879923",
+        "name": "Bar Love",
+        "responsible": "CositasParaEventos",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_1791307879923",
+        "shopItem": "Bar Love",
+        "shopCategory": "Decoración",
+        "shopCost": "0",
+        "shopStatus": "in_progress"
+      },
+      {
+        "id": "sub_shop_1791314939588",
+        "name": "Desafíos de videos",
+        "responsible": "CositasParaEventos",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_1791314939588",
+        "shopItem": "Desafíos de videos",
+        "shopCategory": "Regalos",
+        "shopCost": "0",
+        "shopStatus": "in_progress"
+      }
+    ]
+  },
+  {
+    "id": "act_1791316363484",
+    "time": "18:00",
+    "timeStart": "18:00",
+    "timeEnd": "18:30",
+    "title": "Hito Liga",
+    "responsible": "Novios (Cristopher & Reny)",
+    "responsibleStatus": "ok",
+    "detail": "cofre con una botella y cerrado con candado de número (15670)",
+    "activities": [
+      {
+        "id": "sub_1791316363484_0",
+        "name": "cofre",
+        "responsible": "Novios (Cristopher & Reny)",
+        "responsibleStatus": "ok",
+        "needsPurchase": false
+      },
+      {
+        "id": "sub_1791316363484_1",
+        "name": "Insumo para: Candados",
+        "responsible": "CositasParaEventos",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_1791316363484_1",
+        "shopItem": "Insumo para: Candados",
+        "shopCategory": "Varios",
+        "shopCost": "",
+        "shopStatus": "pending"
+      }
+    ]
+  },
+  {
+    "id": "act_1791316494356",
+    "time": "18:30",
+    "timeStart": "18:30",
+    "timeEnd": "19:00",
+    "title": "Hito Ramo",
+    "responsible": "CositasParaEventos",
+    "responsibleStatus": "ok",
+    "detail": "Cofre con un ramo dentro",
+    "activities": [
+      {
+        "id": "sub_1791316494356_0",
+        "name": "Descubrir clave de candado",
+        "responsible": "CositasParaEventos",
+        "responsibleStatus": "ok",
+        "needsPurchase": true,
+        "shopItemId": "shop_1791316494356_0",
+        "shopItem": "Descubrir clave de candado",
+        "shopCategory": "Detalles",
+        "shopCost": "0",
+        "shopStatus": "in_progress"
+      }
+    ]
+  },
+  {
+    "id": "act_1791316652494",
+    "time": "20:00",
+    "timeStart": "20:00",
+    "timeEnd": "20:15",
+    "title": "Premio Fotos",
+    "responsible": "Novios / Coordinador",
+    "responsibleStatus": "ok",
+    "detail": "",
+    "activities": [
+      {
+        "id": "sub_1791316845275_0",
+        "name": "Premio Fotos (Actividad 1)",
+        "responsible": "Novios / Coordinador",
+        "responsibleStatus": "ok",
+        "needsPurchase": false
+      }
+    ]
+  },
+  {
+    "id": "act_bajon_final",
+    "time": "20:30",
+    "timeStart": "20:30",
+    "timeEnd": "20:45",
+    "title": "Bajón de Tarde-Noche & Despedida",
+    "responsible": "Banquetera",
+    "responsibleStatus": "ok",
+    "detail": "Tapaditos calientes, pizzas artesanales y despedida de novios",
+    "activities": [
+      {
+        "id": "sub_1791316103985_0",
+        "name": "Servicio de trasnoche con tapaditos calientes y café",
+        "responsible": "Banquetera",
+        "responsibleStatus": "ok",
+        "needsPurchase": false
+      }
+    ]
+  }
+];
 
   // Carga inteligente de cronograma y migración
   const savedTimelineV3 = localStorage.getItem('boda_org_timeline_v3');
@@ -838,14 +1329,16 @@ function loadData() {
     }
   } catch(e) {}
 
-  // Si no hay v3 o se detecta cronograma antiguo vespertino (con ceremonia a las 17:00), actualizar al de la invitación
-  const hasOldEveningSchedule = parsedTimeline && parsedTimeline.some(item => 
-    item.id === 'act_6' || item.time === '17:00' || item.title === 'Ceremonia Civil & Votos Simbólicos' || item.title === 'Entrada Triunfal al Salón & Banquete'
-  );
+  // Sincronización garantizada del cronograma oficial completo (8 actividades en El Almuerzo)
+  const TIMELINE_SCHEMA_VERSION = 'boda_org_timeline_ye_v4_complete';
+  const currentAlmuerzo = Array.isArray(parsedTimeline) ? parsedTimeline.find(item => item.id === 'act_inv_almuerzo' || (item.title && item.title.toLowerCase().includes('almuerzo'))) : null;
+  const isOutdatedTimeline = !parsedTimeline || parsedTimeline.length < 12 || !currentAlmuerzo || !currentAlmuerzo.activities || currentAlmuerzo.activities.length < 8;
+  const needsSchemaUpgrade = localStorage.getItem('boda_org_timeline_ye_version') !== TIMELINE_SCHEMA_VERSION;
 
-  if (!savedTimelineV3 || hasOldEveningSchedule || !parsedTimeline || parsedTimeline.length === 0) {
+  if (isOutdatedTimeline || needsSchemaUpgrade) {
+    console.log('[Sincronización] Actualizando cronograma a versión oficial con 8 actividades en El Almuerzo y 15 hitos.');
     timeline = JSON.parse(JSON.stringify(DEFAULT_EXAMPLE_TIMELINE));
-    // Conservar hitos personalizados del usuario
+    // Conservar cualquier hito extra que el usuario haya agregado
     if (customUserItems.length > 0) {
       customUserItems.forEach(c => {
         if (!timeline.some(t => t.id === c.id || (t.title === c.title && t.timeStart === c.timeStart))) {
@@ -853,8 +1346,9 @@ function loadData() {
         }
       });
     }
-    // Guardar en v3
     localStorage.setItem(STORAGE_KEY_TIMELINE, JSON.stringify(timeline));
+    localStorage.setItem('boda_org_timeline_v3', JSON.stringify(timeline));
+    localStorage.setItem('boda_org_timeline_ye_version', TIMELINE_SCHEMA_VERSION);
   } else {
     timeline = parsedTimeline;
     if (customUserItems.length > 0) {
@@ -891,89 +1385,369 @@ function loadData() {
 
   // Carga robusta de compras y sincronización con cronograma
   const DEFAULT_SHOPPING_ITEMS = [
-    {
-      id: 'shop_cartel_rec',
-      item: 'Cartel de Bienvenidos (Madera / Acrílico)',
-      activityTitle: 'Llegada & Momento Manta: Instalación de Cartel de Bienvenida',
-      activityId: 'act_inv_llegada',
-      category: 'Decoración',
-      responsible: 'Hermano del Novio',
-      responsibleStatus: 'ok',
-      detail: 'Para la entrada principal de la casona',
-      cost: '$25.000',
-      status: 'in_progress'
-    },
-    {
-      id: 'shop_1',
-      item: 'Kit de Luces de Bengala para Salida de Ceremonia',
-      activityTitle: 'Bajón de Tarde-Noche & Despedida: Túnel de despedida con chispas de bengala',
-      activityId: 'act_bajon_final',
-      category: 'Ceremonia',
-      detail: '100 unidades de chispas largas (45 cm) para el atardecer',
-      cost: '$25.000',
-      status: 'ok'
-    },
-    {
-      id: 'shop_2',
-      item: 'Cámaras Desechables Vintage para cada mesa',
-      activityTitle: 'Sobremesa & Fotos Instagrameables 📸✨: Activación de photo spots y cámaras vintage en mesas',
-      activityId: 'act_inv_sobremesa',
-      category: 'Detalles',
-      detail: '8 cámaras instantáneas desechables para las mesas',
-      cost: '$60.000',
-      status: 'ok'
-    },
-    {
-      id: 'shop_3',
-      item: 'Pantuflas y Chalas Cómodas para la Fiesta',
-      activityTitle: '¡Música & Fiesta!: Reparto de cotillón temático y pantuflas cómodas',
-      activityId: 'act_inv_fiesta',
-      category: 'Fiesta',
-      detail: '40 pares surtidos de tallas M y L para bailarines',
-      cost: '$45.000',
-      status: 'ok'
-    },
-    {
-      id: 'shop_4',
-      item: 'Kit de Baño / Emergencia (Hombres y Mujeres)',
-      category: 'Varios',
-      detail: 'Costurero, desodorantes, paracetamol, pañuelitos y mentas',
-      cost: '$18.000',
-      status: 'pending'
-    },
-    {
-      id: 'shop_5',
-      item: 'Carteles y Marcos para Códigos QR de Fotos',
-      category: 'Decoración',
-      detail: '6 marcos dorados de sobremesa con el link del álbum',
-      cost: '$15.000',
-      status: 'pending'
-    },
-    {
-      id: 'shop_6',
-      item: 'Bolsitas de Arroz y Pétalos de Olivo',
-      category: 'Ceremonia',
-      activityTitle: 'Ceremonia Civil & Religiosa: Lluvia de pétalos naturales a la salida',
-      activityId: 'act_inv_ceremonia',
-      detail: '70 conos de papel kraft biodegradables',
-      cost: '$12.000',
-      status: 'ok'
-    },
-    {
-      id: 'shop_7',
-      item: 'Cotillón Neón y Pulseras Luminosas LED',
-      category: 'Fiesta',
-      activityTitle: '¡Música & Fiesta!: Reparto de cotillón temático y pantuflas cómodas',
-      activityId: 'act_inv_fiesta',
-      responsible: 'Amigos de los Novios',
-      responsibleStatus: 'ok',
-      detail: 'Pack fiesta flúor con lentes LED y barras de luz',
-      cost: '$35.000',
-      status: 'in_progress'
-    }
-  ];
+  {
+    "id": "shop_1791256698146_htbx",
+    "activityId": "act_previa_decoracion",
+    "activityTitle": "Montaje floral, mesas y mantelería: Montaje del arco nupcial campestre",
+    "item": "Arco y Flores Campestres",
+    "category": "Decoración",
+    "responsible": "Equipo Montaje",
+    "responsibleStatus": "ok",
+    "detail": "Vinculado al hito: Montaje floral, mesas y mantelería",
+    "cost": "$45.000",
+    "status": "ok"
+  },
+  {
+    "id": "shop_1791228721584_4",
+    "activityId": "act_inv_llegada",
+    "activityTitle": "Llegada & Momento Manta",
+    "item": "Lápices para encuentra al invitado",
+    "category": "Detalles",
+    "responsible": "Novios",
+    "responsibleStatus": "ok",
+    "detail": "Para el hito: Llegada & Momento Manta (Compra Lápices)",
+    "cost": "5000",
+    "status": "ok"
+  },
+  {
+    "id": "shop_1791228721584_3",
+    "activityId": "act_inv_llegada",
+    "activityTitle": "Llegada & Momento Manta",
+    "item": "Tarjeta con desafíos encuentra al invitado",
+    "category": "Detalles",
+    "responsible": "CositasParaEventos",
+    "responsibleStatus": "ok",
+    "detail": "Para el hito: Llegada & Momento Manta (Encuentra el Invitado)",
+    "cost": "0",
+    "status": "in_progress"
+  },
+  {
+    "id": "shop_1791226687978_cnid",
+    "activityId": "act_inv_ceremonia",
+    "activityTitle": "Ceremonia Civil & Religiosa: Conos para pétalos",
+    "item": "Conos para pétalos",
+    "category": "Ceremonia",
+    "responsible": "CositasParaEventos",
+    "responsibleStatus": "ok",
+    "detail": "Vinculado al hito: Ceremonia Civil & Religiosa",
+    "cost": "0",
+    "status": "in_progress"
+  },
+  {
+    "id": "shop_1791307974595",
+    "activityId": "act_inv_ceremonia",
+    "activityTitle": "Ceremonia Civil & Religiosa: Foto Boric",
+    "item": "Foto Boric",
+    "category": "Ceremonia",
+    "responsible": "CositasParaEventos",
+    "responsibleStatus": "ok",
+    "detail": "1 cuadro con foto",
+    "cost": "0",
+    "status": "in_progress"
+  },
+  {
+    "id": "shop_1",
+    "item": "Petalos para Salida de Ceremonia",
+    "activityTitle": "Ceremonia Civil & Religiosa: Petalos para Salida de Ceremonia",
+    "activityId": "act_inv_ceremonia",
+    "category": "Ceremonia",
+    "detail": "",
+    "cost": "$25.000",
+    "status": "pending",
+    "responsibleStatus": "pending",
+    "responsible": "Novios"
+  },
+  {
+    "id": "shop_1791315014779",
+    "activityId": "act_inv_ceremonia",
+    "activityTitle": "Ceremonia Civil & Religiosa: Sobre con pañuelo-bebes-itinerario",
+    "item": "Sobre con pañuelo-bebes-itinerario",
+    "category": "Decoración",
+    "responsible": "CositasParaEventos",
+    "responsibleStatus": "ok",
+    "detail": "",
+    "cost": "0",
+    "status": "in_progress"
+  },
+  {
+    "id": "shop_1791292539480",
+    "activityId": "act_inv_almuerzo",
+    "activityTitle": "El Almuerzo: ¿Quién tiene al novi@?",
+    "item": "¿Quién tiene al novi@?",
+    "category": "Detalles",
+    "responsible": "CositasParaEventos",
+    "responsibleStatus": "ok",
+    "detail": "3 novios y 3 novias reales ?",
+    "cost": "0",
+    "status": "in_progress"
+  },
+  {
+    "id": "shop_1791308312825",
+    "activityId": "act_inv_almuerzo",
+    "activityTitle": "El Almuerzo: Cartel Busca tu mesa",
+    "item": "Cartel Busca tu mesa",
+    "category": "Decoración",
+    "responsible": "Mora Print",
+    "responsibleStatus": "ok",
+    "detail": "",
+    "cost": "",
+    "status": "pending"
+  },
+  {
+    "id": "shop_1791226687978_rda0",
+    "activityId": "act_inv_almuerzo",
+    "activityTitle": "El Almuerzo: Copas grabadas para brindis de novios",
+    "item": "Copas grabadas para brindis de novios",
+    "category": "Decoración",
+    "responsible": "Padres & Padrinos",
+    "responsibleStatus": "ok",
+    "detail": "Vinculado al hito: El Almuerzo",
+    "cost": "$18.000",
+    "status": "ok"
+  },
+  {
+    "id": "shop_1791314897639",
+    "activityId": "act_inv_almuerzo",
+    "activityTitle": "El Almuerzo: Desafío Fotos Memes - Wisin y Yandel",
+    "item": "Desafío Fotos Memes - Wisin y Yandel",
+    "category": "Decoración",
+    "responsible": "CositasParaEventos",
+    "responsibleStatus": "ok",
+    "detail": "",
+    "cost": "0",
+    "status": "in_progress"
+  },
+  {
+    "id": "shop_1791314701289",
+    "activityId": "act_inv_almuerzo",
+    "activityTitle": "El Almuerzo: Galletas de la suerte",
+    "item": "Galletas de la suerte",
+    "category": "Decoración",
+    "responsible": "CositasParaEventos",
+    "responsibleStatus": "ok",
+    "detail": "33 galletas con el numero de mesa y una frase de la suerte",
+    "cost": "0",
+    "status": "in_progress"
+  },
+  {
+    "id": "shop_1791315126025",
+    "activityId": "act_inv_almuerzo",
+    "activityTitle": "El Almuerzo: Nombre de invitado en mesa con desafío",
+    "item": "Nombre de invitado en mesa con desafío",
+    "category": "Decoración",
+    "responsible": "CositasParaEventos",
+    "responsibleStatus": "ok",
+    "detail": "",
+    "cost": "0",
+    "status": "in_progress"
+  },
+  {
+    "id": "shop_1791255835237",
+    "activityId": "act_inv_almuerzo",
+    "activityTitle": "El Almuerzo: Números de Mesas",
+    "item": "Números de Mesas",
+    "category": "Decoración",
+    "responsible": "CositasParaEventos",
+    "responsibleStatus": "ok",
+    "detail": "",
+    "cost": "0",
+    "status": "in_progress"
+  },
+  {
+    "id": "shop_1791315851792_1",
+    "activityId": "act_inv_sobremesa",
+    "activityTitle": "Sobremesa & Fotos Instagrameables 📸✨: Sorteo Código Invitación",
+    "item": "Imprimir Código Pases",
+    "category": "Detalles",
+    "responsible": "CositasParaEventos",
+    "responsibleStatus": "ok",
+    "detail": "Para el hito: Sobremesa & Fotos Instagrameables 📸✨ (Sorteo Código Invitación)",
+    "cost": "0",
+    "status": "in_progress"
+  },
+  {
+    "id": "shop_1791307879923",
+    "activityId": "act_inv_fiesta",
+    "activityTitle": "¡Música & Fiesta!",
+    "item": "Bar Love",
+    "category": "Decoración",
+    "responsible": "CositasParaEventos",
+    "responsibleStatus": "ok",
+    "detail": "1 cuadro con lista de tragos",
+    "cost": "0",
+    "status": "in_progress"
+  },
+  {
+    "id": "shop_1791255663393",
+    "activityId": "act_inv_fiesta",
+    "activityTitle": "¡Música & Fiesta!",
+    "item": "Cartel reglas de la fiesta",
+    "category": "Decoración",
+    "responsible": "CositasParaEventos",
+    "responsibleStatus": "ok",
+    "detail": "",
+    "cost": "0",
+    "status": "ok"
+  },
+  {
+    "id": "shop_7",
+    "item": "Cotillón",
+    "category": "Fiesta",
+    "activityTitle": "¡Música & Fiesta!",
+    "activityId": "act_inv_fiesta",
+    "responsible": "Novios",
+    "responsibleStatus": "ok",
+    "detail": "Pack fiesta",
+    "cost": "$35.000",
+    "status": "pending"
+  },
+  {
+    "id": "shop_1791314939588",
+    "activityId": "act_inv_fiesta",
+    "activityTitle": "¡Música & Fiesta!",
+    "item": "Desafíos de videos",
+    "category": "Regalos",
+    "responsible": "CositasParaEventos",
+    "responsibleStatus": "ok",
+    "detail": "",
+    "cost": "0",
+    "status": "in_progress"
+  },
+  {
+    "id": "shop_1791316363484_1",
+    "activityId": "act_1791316363484",
+    "activityTitle": "Hito Liga: Candados",
+    "item": "Insumo para: Candados",
+    "category": "Varios",
+    "responsible": "CositasParaEventos",
+    "responsibleStatus": "ok",
+    "detail": "Para el hito: Hito Liga (Candados)",
+    "cost": "",
+    "status": "pending"
+  },
+  {
+    "id": "shop_1791316494356_0",
+    "activityId": "act_1791316494356",
+    "activityTitle": "Hito Ramo: Candado",
+    "item": "Descubrir clave de candado",
+    "category": "Detalles",
+    "responsible": "CositasParaEventos",
+    "responsibleStatus": "ok",
+    "detail": "Para el hito: Hito Ramo (Candado)",
+    "cost": "0",
+    "status": "in_progress"
+  },
+  {
+    "id": "shop_1791307013942",
+    "activityId": "act_todo_el_evento",
+    "activityTitle": "Todo el Evento",
+    "item": "¡Abraza este árbol!",
+    "category": "Detalles",
+    "responsible": "CositasParaEventos",
+    "responsibleStatus": "ok",
+    "detail": "2 hojas para que la gente abrece un árbol",
+    "cost": "0",
+    "status": "in_progress"
+  },
+  {
+    "id": "shop_cartel_rec",
+    "item": "Cartel de Bienvenidos",
+    "activityTitle": "Todo el Evento",
+    "activityId": "act_todo_el_evento",
+    "category": "Decoración",
+    "responsible": "Mora Print",
+    "responsibleStatus": "ok",
+    "detail": "Para la entrada principal de la casona",
+    "cost": "0",
+    "status": "pending"
+  },
+  {
+    "id": "shop_5",
+    "item": "Códigos QR de Fotos y desafíos",
+    "category": "Detalles",
+    "detail": "",
+    "cost": "0",
+    "status": "in_progress",
+    "responsibleStatus": "ok",
+    "activityId": "act_todo_el_evento",
+    "activityTitle": "Todo el Evento",
+    "responsible": "CositasParaEventos"
+  },
+  {
+    "id": "shop_1791306911057",
+    "activityId": "act_todo_el_evento",
+    "activityTitle": "Todo el Evento",
+    "item": "Deja tu huella",
+    "category": "Decoración",
+    "responsible": "CositasParaEventos",
+    "responsibleStatus": "ok",
+    "detail": "son 2 hojas, uno para poner la huella y otro que explica que hacer",
+    "cost": "0",
+    "status": "in_progress"
+  },
+  {
+    "id": "shop_1791307777583",
+    "activityId": "act_todo_el_evento",
+    "activityTitle": "Todo el Evento",
+    "item": "Fotos del recuerdo",
+    "category": "Regalos",
+    "responsible": "CositasParaEventos",
+    "responsibleStatus": "ok",
+    "detail": "1 cuadro con instrucciones",
+    "cost": "0",
+    "status": "in_progress"
+  },
+  {
+    "id": "shop_4",
+    "item": "Kit de Baño / Emergencia (Hombres y Mujeres)",
+    "category": "Varios",
+    "detail": "Costurero, desodorantes, paracetamol, pañuelitos y mentas",
+    "cost": "$18.000",
+    "status": "pending",
+    "responsibleStatus": "pending",
+    "activityId": "act_todo_el_evento",
+    "activityTitle": "Todo el Evento",
+    "responsible": "Novios"
+  },
+  {
+    "id": "shop_1791309520032",
+    "activityId": "act_todo_el_evento",
+    "activityTitle": "Todo el Evento",
+    "item": "Marco selfie",
+    "category": "Regalos",
+    "responsible": "Novios (Cristopher & Reny)",
+    "responsibleStatus": "ok",
+    "detail": "",
+    "cost": "",
+    "status": "pending"
+  },
+  {
+    "id": "shop_1791307612314",
+    "activityId": "act_todo_el_evento",
+    "activityTitle": "Todo el Evento",
+    "item": "Rincón del Fumador",
+    "category": "Varios",
+    "responsible": "CositasParaEventos",
+    "responsibleStatus": "ok",
+    "detail": "1 hoja grosor mediano",
+    "cost": "0",
+    "status": "in_progress"
+  },
+  {
+    "id": "shop_1791308113175",
+    "activityId": "act_todo_el_evento",
+    "activityTitle": "Todo el Evento",
+    "item": "Vale por un SHOT",
+    "category": "Regalos",
+    "responsible": "CositasParaEventos",
+    "responsibleStatus": "ok",
+    "detail": "cuantos vales imprimir?",
+    "cost": "0",
+    "status": "in_progress"
+  }
+];
 
-  const savedShoppingV2 = localStorage.getItem('boda_org_shopping_v2');
+    const savedShoppingV2 = localStorage.getItem('boda_org_shopping_v2');
   const savedShoppingV1 = localStorage.getItem('boda_org_shopping');
   let loadedShopping = null;
 
@@ -990,10 +1764,18 @@ function loadData() {
     customSavedShopping = JSON.parse(localStorage.getItem('boda_org_shopping_custom_ye') || '[]');
   } catch(e) {}
 
-  if (loadedShopping && Array.isArray(loadedShopping) && loadedShopping.length > 0) {
-    shopping = loadedShopping;
-  } else {
+  const SHOPPING_SCHEMA_VERSION = 'boda_org_shopping_ye_v4_complete';
+  const isOutdatedShopping = !loadedShopping || loadedShopping.length < 25;
+  const needsShopUpgrade = localStorage.getItem('boda_org_shopping_ye_version') !== SHOPPING_SCHEMA_VERSION;
+
+  if (isOutdatedShopping || needsShopUpgrade) {
+    console.log('[Sincronización] Actualizando compras a la lista completa oficial (30 insumos y encargos).');
     shopping = JSON.parse(JSON.stringify(DEFAULT_SHOPPING_ITEMS));
+    localStorage.setItem(STORAGE_KEY_SHOPPING, JSON.stringify(shopping));
+    localStorage.setItem('boda_org_shopping_v2', JSON.stringify(shopping));
+    localStorage.setItem('boda_org_shopping_ye_version', SHOPPING_SCHEMA_VERSION);
+  } else {
+    shopping = loadedShopping;
   }
 
   // Reintegrar compras del respaldo personalizado si faltan
