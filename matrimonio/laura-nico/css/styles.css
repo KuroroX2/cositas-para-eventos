@@ -4952,3 +4952,189 @@ body.theme-florido .ch-num {
   color: #375436;
   margin-top: 1rem;
 }
+
+
+/* ==========================================================================
+   HERO CINEMATOGRÁFICO PANORÁMICO (EXACTO A LA DEMO DE COSITAS PARA EVENTOS)
+   ========================================================================== */
+.wedding-hero-cinematic {
+  position: relative;
+  min-height: 88vh;
+  background-size: cover;
+  background-position: center 25%;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: flex-end;
+  padding: 110px 30px 65px;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .wedding-hero-cinematic {
+    min-height: 94vh;
+    padding: 130px 60px 75px;
+  }
+}
+
+.wedding-hero-cinematic .wedding-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, #101624 14%, rgba(16, 22, 36, 0.62) 58%, rgba(16, 22, 36, 0.28) 100%);
+  z-index: 1;
+}
+
+.wedding-hero-cinematic .wedding-hero-text {
+  position: relative;
+  z-index: 2;
+  max-width: 900px;
+}
+
+.wedding-hero-cinematic .hero-hanko-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.wedding-hero-cinematic .wedding-tag {
+  font-family: var(--font-script), 'Great Vibes', 'Alex Brush', cursive;
+  font-size: clamp(2.2rem, 4.2vw, 3.4rem);
+  color: #F8BBD0;
+  margin-bottom: 2px;
+  line-height: 1.1;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.85);
+}
+
+.wedding-hero-cinematic .wedding-names {
+  font-family: 'Shippori Mincho', 'Noto Serif JP', var(--font-serif), serif;
+  font-size: clamp(3.2rem, 7.2vw, 5.8rem);
+  font-weight: 700;
+  line-height: 1.05;
+  margin-bottom: 12px;
+  color: #FFFFFF;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.85);
+  letter-spacing: -0.5px;
+}
+
+.wedding-hero-cinematic .wedding-date-location {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: #E2E8F0;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  font-weight: 600;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+  margin-bottom: 16px;
+}
+
+.wedding-hero-cinematic .wedding-verse {
+  font-size: 0.96rem;
+  color: #F1F5F9;
+  line-height: 1.55;
+  max-width: 680px;
+  margin-bottom: 24px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
+  font-style: italic;
+}
+
+.wedding-hero-cinematic .wedding-verse .hero-kanji-sub {
+  display: block;
+  font-size: 0.84rem;
+  color: #F8BBD0;
+  font-style: normal;
+  letter-spacing: 0.1em;
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+.wedding-hero-cinematic .countdown-box {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.wedding-hero-cinematic .countdown-unit {
+  background: rgba(18, 24, 38, 0.84);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(248, 187, 208, 0.28);
+  border-radius: 14px;
+  padding: 12px 18px;
+  min-width: 82px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.wedding-hero-cinematic .countdown-unit:hover {
+  transform: translateY(-3px);
+  border-color: #D47285;
+}
+
+.wedding-hero-cinematic .countdown-num {
+  font-family: var(--font-display), 'Cinzel', serif;
+  font-size: clamp(1.8rem, 3.2vw, 2.5rem);
+  font-weight: 800;
+  color: #FACC15;
+  line-height: 1;
+  text-shadow: 0 0 14px rgba(250, 204, 21, 0.45);
+}
+
+.wedding-hero-cinematic .countdown-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  color: #CBD5E1;
+  letter-spacing: 1.5px;
+  margin-top: 6px;
+  font-weight: 700;
+}
+
+.wedding-hero-cinematic .hero-action-row {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.wedding-hero-cinematic .btn-hero-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.wedding-hero-cinematic .btn-hero-rsvp {
+  background: linear-gradient(135deg, #E91E63 0%, #D81B60 100%);
+  color: #FFFFFF;
+  border: none;
+  box-shadow: 0 4px 18px rgba(233, 30, 99, 0.45);
+}
+
+.wedding-hero-cinematic .btn-hero-rsvp:hover {
+  background: linear-gradient(135deg, #F06292 0%, #C2185B 100%);
+  color: #FFFFFF;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(233, 30, 99, 0.55);
+}
+
+.wedding-hero-cinematic .btn-hero-cal {
+  background: rgba(255, 255, 255, 0.16);
+  color: #FFFFFF;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.wedding-hero-cinematic .btn-hero-cal:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: #FFFFFF;
+  transform: translateY(-2px);
+}

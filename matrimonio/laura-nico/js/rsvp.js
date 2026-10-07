@@ -144,10 +144,10 @@
     const drawerItem = document.getElementById('drawer-item-rsvp');
 
     if (!name1) {
-      // Visita genérica / pública: Ocultar completamente la sección y enlaces de confirmación
-      if (rsvpSection) rsvpSection.style.display = 'none';
-      if (navLink) navLink.style.display = 'none';
-      if (drawerItem) drawerItem.style.display = 'none';
+      // Visita genérica / directa: Mantener visible la sección y los enlaces de RSVP
+      if (rsvpSection) rsvpSection.style.display = 'block';
+      if (navLink) navLink.style.display = 'inline-flex';
+      if (drawerItem) drawerItem.style.display = 'block';
       return;
     }
 
