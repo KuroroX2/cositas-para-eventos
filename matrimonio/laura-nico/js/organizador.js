@@ -3299,10 +3299,10 @@ function renderTimeline() {
                   <span>${escapeHtml(act.name)}</span>
                 </div>
                 <div class="subact-vogue-meta">
-                  <span class="subact-vogue-resp">
+                  <span class="subact-vogue-resp" title="${escapeHtml(act.responsible || 'Por definir')}">
                     <i class="ri-user-star-line"></i> <strong>${escapeHtml(act.responsible || 'Por definir')}</strong>
                   </span>
-                  <div style="display: flex; align-items: center; gap: 6px;">
+                  <div class="subact-vogue-actions">
                     <button type="button" class="badge-status-xs ${isOk ? 'ok' : 'pending'}" onclick="event.stopPropagation(); toggleMilestoneSubactResp('${item.id}', ${actIdx})" title="Clic para alternar si el encargado está confirmado o pendiente de buscar">
                       ${isOk ? '✓ Confirmado' : '⏳ Por Buscar'}
                     </button>

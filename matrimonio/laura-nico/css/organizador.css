@@ -2461,7 +2461,7 @@ i[class^="ri-"], i[class*=" ri-"] {
 /* Grilla de Subactividades */
 .milestone-subacts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 12px;
   margin-bottom: 18px;
 }
@@ -2478,20 +2478,110 @@ i[class^="ri-"], i[class*=" ri-"] {
   transition: all 0.18s ease;
   cursor: pointer;
   position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 .subact-vogue-item:hover {
   background: #FFFFFF;
-  border-color: #4B634C;
+  border-color: #64748B;
   box-shadow: 0 4px 14px rgba(15, 23, 42, 0.09);
   transform: translateY(-2px);
 }
 
+.subact-vogue-name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--navy-royal);
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.subact-vogue-name i {
+  color: var(--gold-dark);
+  font-size: 0.9rem;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.subact-vogue-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.06);
+  font-size: 0.8rem;
+  width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.subact-vogue-resp {
+  color: #64748B;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
+.subact-vogue-resp strong {
+  color: var(--gold-dark);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 135px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.subact-vogue-actions,
+.subact-vogue-meta > div {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.badge-status-xs {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 7px;
+  border-radius: var(--radius-pill);
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+  border: none;
+  transition: var(--transition);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.badge-status-xs.ok {
+  background: var(--mint-bg);
+  color: var(--mint-text);
+  border: 1px solid var(--mint-border);
+}
+
+.badge-status-xs.pending {
+  background: var(--amber-bg);
+  color: var(--amber-text);
+  border: 1px solid var(--amber-border);
+}
+
 .btn-subact-edit-pill {
-  background: #FAF8F5;
-  border: 1px solid #C5A059;
+  background: #F1F5F9;
+  border: 1px solid #CBD5E1;
   color: #334155;
-  padding: 3px 8px;
+  padding: 3px 7px;
   border-radius: var(--radius-pill);
   font-size: 0.72rem;
   font-weight: 700;
@@ -2500,13 +2590,15 @@ i[class^="ri-"], i[class*=" ri-"] {
   align-items: center;
   gap: 3px;
   transition: all 0.15s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .btn-subact-edit-pill:hover,
 .subact-vogue-item:hover .btn-subact-edit-pill {
-  background: #203120;
+  background: #881337;
   color: #FFFFFF;
-  border-color: #203120;
+  border-color: #881337;
 }
 
 .btn-milestone-header-edit {
