@@ -6,27 +6,7 @@
  */
 
 // 19 Parejas oficiales iniciales migradas desde la demo
-const DEFAULT_SEED_INVITATIONS = [
-  { id: "inv_mt8t3dh4_mdcy", pases: 2, name1: "Roberto", name2: "Acompañante" },
-  { id: "inv_mt7agi0j_r812", pases: 1, name1: "Karen", name2: "" },
-  { id: "inv_mt7agb8r_yhi2", pases: 1, name1: "Sandra", name2: "" },
-  { id: "inv_mt7ag1bu_s3mf", pases: 1, name1: "Jhankhel", name2: "" },
-  { id: "inv_mt7afpe6_kfg4", pases: 1, name1: "Yorka", name2: "" },
-  { id: "inv_mt7afe11_3wr0", pases: 2, name1: "Pamela", name2: "Marcial" },
-  { id: "inv_mt7af2wd_bc93", pases: 1, name1: "Constanza", name2: "" },
-  { id: "inv_mt7aerri_0o4h", pases: 1, name1: "Cecilia", name2: "" },
-  { id: "inv_mt7aefqb_ewjp", pases: 1, name1: "Barbara", name2: "" },
-  { id: "inv_mt7ae4tr_3c2o", pases: 1, name1: "Claudia", name2: "" },
-  { id: "inv_mt7ado96_pjjz", pases: 2, name1: "Camila", name2: "Tah" },
-  { id: "inv_mt7ad2wi_m84w", pases: 2, name1: "Daniela", name2: "Hugo" },
-  { id: "inv_mt7acqee_bjth", pases: 2, name1: "Jessica", name2: "Eduardo" },
-  { id: "inv_mt7ac5s2_2ko9", pases: 2, name1: "Cristopher", name2: "Reny" },
-  { id: "inv_mt7abo4o_ixxm", pases: 2, name1: "Carlos", name2: "Carola" },
-  { id: "inv_mt79v1i5_fj7j", pases: 2, name1: "Felipe", name2: "Camila" },
-  { id: "inv_mt79ukht_iqcm", pases: 2, name1: "Guisselle", name2: "Nicolas" },
-  { id: "inv_mt79u2qe_of3f", pases: 2, name1: "Jaqueline", name2: "Luis" },
-  { id: "inv_mt797yfq_46ak", pases: 2, name1: "Isaac", name2: "Denisse" }
-];
+const DEFAULT_SEED_INVITATIONS = [];
 
 function cleanGuestName(g) {
   if (!g || typeof g !== 'string') return '';
@@ -314,46 +294,7 @@ function safeLower(val) {
 }
 
 // Lista oficial completa de invitados confirmados de la boda
-const ALL_CONFIRMED_SEEDS = [
-  // Novios y Mesa 1
-  'Laura', 'Nico',
-  // Familia Novia
-  'Pamela', 'Marcial',
-  'Constanza',
-  'Cecilia',
-  'Barbara',
-  // Familia Novio
-  'Carlos', 'Carola',
-  'Felipe', 'Camila',
-  // Amigos
-  'Jessica', 'Eduardo',
-  'Guisselle', 'Nicolas',
-  'Jaqueline', 'Luis',
-  'Isaac', 'Denisse',
-  'Jhankhel',
-  'Daniela', 'Hugo',
-  // Invitados confirmados adicionales por ubicar
-  'Roberto', 'Acompañante',
-  'Karen',
-  'Sandra',
-  'Yorka',
-  'Claudia',
-  'Camila', 'Tah',
-  'Paz', 'Mateo',
-  'Michel', 'Paulina',
-  'llergers', 'Priscila',
-  'Pastor Jonathan', 'Pastora Gladys',
-  'Jenn', 'Bruno',
-  'Maximo',
-  'Natalia',
-  'Sebastián',
-  'Valesca Zamorano', 'Roberto Sánchez',
-  'Oscar', 'Barbara',
-  'Bárbara', 'Bastian',
-  'Cristobal Roca', 'Katherine Segovia',
-  'Francisco Fernandez', 'Daniela Vildósola',
-  'Bianca', 'Cristobal'
-];
+const ALL_CONFIRMED_SEEDS = [];
 
 function syncConfirmedGuestsWithUnassigned() {
   const seatedSet = new Set();
@@ -514,48 +455,48 @@ function loadData() {
       console.error('Error cargando mesas:', e);
     }
   } else {
-    tables = [
+        tables = [
       {
         id: 't_1',
         number: 1,
         name: 'Mesa 1: Mesa de Honor (Laura & Nico)',
         capacity: 2,
-        guests: ['Laura', 'Nico']
+        guests: [null, null]
       },
       {
         id: 't_2',
         number: 2,
-        name: 'Mesa 2: Familia de la Novia (Sakura)',
+        name: 'Mesa 2: Familia (Sakura)',
         capacity: 8,
-        guests: ['Pamela', 'Marcial', 'Constanza', 'Cecilia', 'Barbara', null, null, null]
+        guests: [null, null, null, null, null, null, null, null]
       },
       {
         id: 't_3',
         number: 3,
-        name: 'Mesa 3: Familia del Novio (Bonsái)',
+        name: 'Mesa 3: Familia (Bonsái)',
         capacity: 8,
-        guests: ['Carlos', 'Carola', 'Felipe', 'Camila', null, null, null, null]
+        guests: [null, null, null, null, null, null, null, null]
       },
       {
         id: 't_4',
         number: 4,
-        name: 'Mesa 4: Amigos Universidad (Kyoto)',
+        name: 'Mesa 4: Amigos (Kioto)',
         capacity: 8,
-        guests: ['Jessica', 'Eduardo', 'Guisselle', 'Nicolas', null, null, null, null]
+        guests: [null, null, null, null, null, null, null, null]
       },
       {
         id: 't_5',
         number: 5,
-        name: 'Mesa 5: Amigos del Novio (Tokyo)',
+        name: 'Mesa 5: Amigos (Tokyo)',
         capacity: 8,
-        guests: ['Jaqueline', 'Luis', 'Isaac', 'Denisse', null, null, null, null]
+        guests: [null, null, null, null, null, null, null, null]
       },
       {
         id: 't_6',
         number: 6,
-        name: 'Mesa 6: Amigos de la Novia (Osaka)',
+        name: 'Mesa 6: Amigos (Osaka)',
         capacity: 6,
-        guests: ['Jhankhel', 'Daniela', 'Hugo', null, null, null]
+        guests: [null, null, null, null, null, null]
       }
     ];
     tables.forEach(t => ensureTableSeatsArray(t));
@@ -581,13 +522,13 @@ function loadData() {
     ]).then(([cloudInvs, cloudRsvps]) => {
       let changed = false;
       if (Array.isArray(cloudInvs) && cloudInvs.length > 0) {
-        localStorage.setItem('wedding_invitations_cloud_v1', JSON.stringify(cloudInvs.map(i => ({
+        localStorage.setItem('wedding_invitations_laura_nico_v1', JSON.stringify(cloudInvs.map(i => ({
           id: i.id, pases: i.pases, name1: i.name1, name2: i.name2, phone: i.phone
         }))));
         changed = true;
       }
       if (Array.isArray(cloudRsvps) && cloudRsvps.length > 0) {
-        localStorage.setItem('wedding_rsvps_cloud_v1', JSON.stringify(cloudRsvps.map(r => ({
+        localStorage.setItem('wedding_rsvps_laura_nico_v1', JSON.stringify(cloudRsvps.map(r => ({
           id: r.id, name: r.name1, name2: r.name2,
           attendance: (r.attendance1 === true || r.attendance2 === true) ? 'si' : 'no',
           attendance1: r.attendance1 === true ? 'si' : 'no',

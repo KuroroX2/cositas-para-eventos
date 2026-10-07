@@ -8,27 +8,7 @@
   const ADMIN_PIN = 'sakura'; // Clave de acceso principal
 
   // 19 Invitaciones oficiales iniciales preparadas para el evento
-  const DEFAULT_SEED_INVITATIONS = [
-    { id: "inv_mt8t3dh4_mdcy", pases: 2, name1: "Roberto", name2: "Acompañante", phone: "+56 9 9411 6173", createdAt: 1787670893560 },
-    { id: "inv_mt7agi0j_r812", pases: 1, name1: "Karen", name2: "", phone: "+56 9 6483 3883", createdAt: 1787579127091 },
-    { id: "inv_mt7agb8r_yhi2", pases: 1, name1: "Sandra", name2: "", phone: "+56 9 9057 6025", createdAt: 1787579118315 },
-    { id: "inv_mt7ag1bu_s3mf", pases: 1, name1: "Jhankhel", name2: "", phone: "+56 9 8142 5746", createdAt: 1787579105466 },
-    { id: "inv_mt7afpe6_kfg4", pases: 1, name1: "Yorka", name2: "", phone: "+1 (514) 570-0368", createdAt: 1787579089998 },
-    { id: "inv_mt7afe11_3wr0", pases: 2, name1: "Pamela", name2: "Marcial", phone: "+56 9 9352 5595", createdAt: 1787579075269 },
-    { id: "inv_mt7af2wd_bc93", pases: 1, name1: "Constanza", name2: "", phone: "+56 9 5003 1547", createdAt: 1787579060845 },
-    { id: "inv_mt7aerri_0o4h", pases: 1, name1: "Cecilia", name2: "", phone: "+56 9 5778 7316", createdAt: 1787579046414 },
-    { id: "inv_mt7aefqb_ewjp", pases: 1, name1: "Barbara", name2: "", phone: "+56 9 8982 8672", createdAt: 1787579030819 },
-    { id: "inv_mt7ae4tr_3c2o", pases: 1, name1: "Claudia", name2: "", phone: "+56 9 7850 6319", createdAt: 1787579016687 },
-    { id: "inv_mt7ado96_pjjz", pases: 2, name1: "Camila", name2: "Tah", phone: "+61 451 471 901", createdAt: 1787578995210 },
-    { id: "inv_mt7ad2wi_m84w", pases: 2, name1: "Daniela", name2: "Hugo", phone: "+56 9 6210 8586", createdAt: 1787578967538 },
-    { id: "inv_mt7acqee_bjth", pases: 2, name1: "Jessica", name2: "Eduardo", phone: "+56 9 5524 3357", createdAt: 1787578951334 },
-    { id: "inv_mt7ac5s2_2ko9", pases: 2, name1: "Cristopher", name2: "Reny", phone: "+56 9 9138 1368", createdAt: 1787578924610 },
-    { id: "inv_mt7abo4o_ixxm", pases: 2, name1: "Carlos", name2: "Carola", phone: "+56 9 2197 6137", createdAt: 1787578901736 },
-    { id: "inv_mt79v1i5_fj7j", pases: 2, name1: "Felipe", name2: "Camila", phone: "+56 9 9588 8834", createdAt: 1787578125917 },
-    { id: "inv_mt79ukht_iqcm", pases: 2, name1: "Guisselle", name2: "Nicolas", phone: "+56 9 3269 8863", createdAt: 1787578103873 },
-    { id: "inv_mt79u2qe_of3f", pases: 2, name1: "Jaqueline", name2: "Luis", phone: "+56 9 8612 9593", createdAt: 1787578080854 },
-    { id: "inv_mt797yfq_46ak", pases: 2, name1: "Isaac", name2: "Denisse", phone: "+56 9 6169 7185", createdAt: 1787577048854 }
-  ];
+  const DEFAULT_SEED_INVITATIONS = [];
 
   let adminRsvps = [];
   let adminInvitations = [];
@@ -40,7 +20,44 @@
     initAdminModal();
   }
 
+  
+  // Función global para abrir el panel desde cualquier botón o enlace
+  window.openAdminModal = function() {
+    const modal = document.getElementById('admin-modal');
+    const drawer = document.getElementById('mobile-drawer');
+    if (drawer) drawer.classList.remove('active');
+
+    if (sessionStorage.getItem('novios_logged_in') === 'true') {
+      showDashboard();
+    } else {
+      showLoginForm();
+    }
+    if (modal) {
+      modal.classList.add('active');
+      modal.style.display = 'flex';
+    }
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.closeAdminModal = function() {
+    const modal = document.getElementById('admin-modal');
+    if (modal) {
+      modal.classList.remove('active');
+      modal.style.display = 'none';
+    }
+    document.body.style.overflow = '';
+  };
+
   function initAdminModal() {
+    // Delegated click listener para cualquier botón de administración
+    document.addEventListener('click', function(e) {
+      const target = e.target.closest('#btn-open-admin, #btn-navbar-admin, #btn-drawer-admin, .nav-btn-admin, .drawer-admin-btn, .btn-admin-access');
+      if (target) {
+        e.preventDefault();
+        window.openAdminModal();
+      }
+    });
+
     const openBtns = [
       document.getElementById('btn-open-admin'),
       document.getElementById('btn-navbar-admin'),
@@ -106,7 +123,7 @@
         const pin = (pinInput ? pinInput.value : '').trim().toLowerCase();
         const errEl = document.getElementById('admin-login-error');
 
-        if (pin === ADMIN_PIN || pin === 'pastox' || pin === 'lauranico' || pin === '17102026' || pin === '2026') {
+        if (pin === ADMIN_PIN || pin === 'pastox' || pin === 'lauranico' || pin === '17102026' || pin === '2026' || pin === 'laura' || pin === 'nico') {
           sessionStorage.setItem('novios_logged_in', 'true');
           if (errEl) errEl.style.display = 'none';
           showDashboard();
@@ -114,6 +131,7 @@
           if (errEl) {
             errEl.textContent = 'Clave incorrecta. Recuerda que la clave de los novios es "sakura" (o "pastox").';
             errEl.style.display = 'block';
+          }
         }
       });
     }
@@ -346,19 +364,19 @@
   async function loadAdminCloudData() {
     // 1. Cargar caché local primero para respuesta instantánea (0ms)
     try {
-      const localInv = localStorage.getItem('wedding_invitations_cloud_v1');
+      const localInv = localStorage.getItem('wedding_invitations_laura_nico_v1');
       if (localInv !== null) {
         adminInvitations = JSON.parse(localInv);
       } else {
         adminInvitations = [...DEFAULT_SEED_INVITATIONS];
-        localStorage.setItem('wedding_invitations_cloud_v1', JSON.stringify(adminInvitations));
+        localStorage.setItem('wedding_invitations_laura_nico_v1', JSON.stringify(adminInvitations));
       }
-      const localRsvp = localStorage.getItem('wedding_rsvps_cloud_v1');
+      const localRsvp = localStorage.getItem('wedding_rsvps_laura_nico_v1');
       if (localRsvp !== null) {
         adminRsvps = normalizeAdminRsvps(JSON.parse(localRsvp), adminInvitations);
       }
 
-      const localPhotos = localStorage.getItem('laura_nico_wedding_album_cache_v1') || localStorage.getItem('wedding_photos_cloud_v1');
+      const localPhotos = localStorage.getItem('laura_nico_wedding_album_cache_v1') || localStorage.getItem('wedding_photos_laura_nico_v1');
       if (localPhotos !== null) adminPhotos = JSON.parse(localPhotos);
     } catch (e) {
       adminInvitations = [...DEFAULT_SEED_INVITATIONS];
@@ -386,7 +404,7 @@
             phone: i.phone,
             createdAt: new Date(i.created_at).getTime()
           }));
-          localStorage.setItem('wedding_invitations_cloud_v1', JSON.stringify(adminInvitations));
+          localStorage.setItem('wedding_invitations_laura_nico_v1', JSON.stringify(adminInvitations));
           renderAdminInvitations();
         }
 
@@ -960,7 +978,7 @@
             await window.dbSupabase.updateRsvpAttendanceManual(r.invCode || r.code || invId, newMode, r.name, r.name2, r.name2 ? 2 : 1);
           }
           try {
-            localStorage.setItem('wedding_rsvps_cloud_v1', JSON.stringify(adminRsvps));
+            localStorage.setItem('wedding_rsvps_laura_nico_v1', JSON.stringify(adminRsvps));
           } catch (e) {}
           renderAdminRsvps();
           renderAdminInvitations();

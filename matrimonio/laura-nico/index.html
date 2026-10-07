@@ -56,7 +56,7 @@
         <a href="#dresscode" class="nav-item">Dress Code</a>
         <a href="#regalos" class="nav-item">Shugi-Bukuro (Regalos)</a>
         <a href="#rsvp" class="nav-item" id="nav-link-rsvp" style="display: none;">Confirmación</a>
-        <button class="nav-btn-admin" id="btn-navbar-admin" title="Panel exclusivo para los novios">
+        <button class="nav-btn-admin" id="btn-navbar-admin" onclick="if(window.openAdminModal) window.openAdminModal(); return false;" title="Panel exclusivo para los novios">
           <i class="ri-lock-line"></i> Acceso Novios
         </button>
       </nav>
@@ -85,7 +85,7 @@
       <li><a href="#regalos" class="drawer-link">Shugi-Bukuro (Lista de Regalos) 🎁</a></li>
       <li id="drawer-item-rsvp" style="display: none;"><a href="#rsvp" class="drawer-link">Confirmar Asistencia (RSVP)</a></li>
       <li>
-        <button class="drawer-admin-btn" id="btn-drawer-admin">
+        <button class="drawer-admin-btn" id="btn-drawer-admin" onclick="if(window.openAdminModal) window.openAdminModal(); return false;">
           <i class="ri-lock-line"></i> 💍 Acceso Novios (Administración)
         </button>
       </li>
@@ -584,7 +584,7 @@
       <p class="footer-quote">“一期一会 — Ichi-go Ichi-e • Para Siempre Unidos”</p>
       <div class="footer-credits">
         <p>Jardín Botánico &amp; Casona Sakura • Pirque, Santiago</p>
-        <button class="btn-admin-access" id="btn-open-admin" title="Acceso exclusivo para los novios">
+        <button class="btn-admin-access" id="btn-open-admin" onclick="if(window.openAdminModal) window.openAdminModal(); return false;" title="Acceso exclusivo para los novios">
           <i class="ri-lock-line"></i> Acceso Novios (Administración)
         </button>
       </div>
