@@ -5141,3 +5141,770 @@ body.theme-florido .ch-num {
   border-color: #FFFFFF;
   transform: translateY(-2px);
 }
+
+
+/* ==========================================================================
+   SUPER-RESPONSIVE MOBILE ENGINE (SMARTPHONES & TABLETS <= 768px)
+   Garantiza 0 desbordamiento horizontal, fuentes legibles y toques ergonomicos
+   ========================================================================== */
+
+@media screen and (max-width: 768px) {
+  /* 1. Global Viewport & Container constraints */
+  html, body {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    position: relative !important;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box !important;
+  }
+
+  .container, .content-container, .wrapper, .main-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+    box-sizing: border-box !important;
+  }
+
+  section, .section-editorial {
+    padding: 50px 0 !important;
+    width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  .section-header {
+    margin-bottom: 28px !important;
+    padding: 0 10px !important;
+  }
+
+  .section-title {
+    font-size: clamp(1.85rem, 6.5vw, 2.35rem) !important;
+    line-height: 1.2 !important;
+  }
+
+  .section-subtitle {
+    font-size: 0.92rem !important;
+    line-height: 1.5 !important;
+    margin-top: 6px !important;
+  }
+
+  /* 2. Hero Section (Cristopher & Reny / Laura & Nico / Yimmy & Eve) */
+  .wedding-hero-cinematic {
+    min-height: 82vh !important;
+    padding: 80px 14px 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-attachment: scroll !important;
+  }
+
+  .wedding-hero-text {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 0 4px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  .wedding-tag {
+    font-size: 0.8rem !important;
+    letter-spacing: 2px !important;
+    padding: 5px 14px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .wedding-names {
+    font-size: clamp(2.05rem, 8vw, 2.85rem) !important;
+    line-height: 1.15 !important;
+    margin-bottom: 12px !important;
+    word-break: break-word !important;
+    text-align: center !important;
+  }
+
+  .wedding-date-location {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 6px !important;
+    font-size: 0.92rem !important;
+    margin-bottom: 18px !important;
+    text-align: center !important;
+  }
+
+  .wedding-date-location span {
+    display: inline-block !important;
+    text-align: center !important;
+  }
+
+  .wedding-verse {
+    font-size: 0.88rem !important;
+    line-height: 1.5 !important;
+    max-width: 95% !important;
+    margin: 0 auto 18px auto !important;
+    padding: 0 8px !important;
+  }
+
+  .hero-kanji-sub {
+    font-size: 0.78rem !important;
+    margin-top: 6px !important;
+    display: block !important;
+  }
+
+  .hero-hanko-wrap {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .jp-hanko-seal {
+    width: 38px !important;
+    height: 38px !important;
+    font-size: 1rem !important;
+  }
+
+  /* Hero Yimmy & Eve specific */
+  .hero-cover {
+    min-height: auto !important;
+    padding: 70px 12px 35px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .hero-border-frame {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 1.6rem 1rem 1.4rem !important;
+    border-radius: 16px !important;
+    margin: 0 !important;
+  }
+
+  .frame-ornament {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .hero-kicker {
+    font-size: 0.72rem !important;
+    letter-spacing: 0.12em !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .hero-title {
+    font-size: clamp(2.2rem, 8.5vw, 3rem) !important;
+    line-height: 1.1 !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .hero-title .title-name {
+    font-size: 1.15em !important;
+    display: inline-block !important;
+  }
+
+  .hero-title .title-amp {
+    font-size: 0.85em !important;
+    margin: 0 4px !important;
+  }
+
+  .hero-biblical-verse {
+    font-size: 0.85rem !important;
+    line-height: 1.45 !important;
+    padding: 0 4px !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .hero-image-showcase {
+    margin: 1.2rem auto !important;
+    max-width: 100% !important;
+  }
+
+  .hero-photo {
+    max-height: 270px !important;
+    width: 100% !important;
+    object-fit: cover !important;
+  }
+
+  /* Countdown across all sites */
+  .countdown-box {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 6px !important;
+    width: 100% !important;
+    max-width: 350px !important;
+    margin: 0 auto 20px auto !important;
+    padding: 0 !important;
+  }
+
+  .countdown-unit {
+    min-width: 0 !important;
+    width: 100% !important;
+    padding: 9px 3px !important;
+    border-radius: 10px !important;
+    box-sizing: border-box !important;
+  }
+
+  .countdown-num {
+    font-size: 1.35rem !important;
+    line-height: 1 !important;
+  }
+
+  .countdown-label {
+    font-size: 0.6rem !important;
+    letter-spacing: 0.5px !important;
+    margin-top: 4px !important;
+  }
+
+  .countdown-editorial {
+    margin: 1.2rem 0 !important;
+    padding: 0.75rem 0.2rem !important;
+    width: 100% !important;
+  }
+
+  .countdown-grid {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 3px !important;
+    width: 100% !important;
+  }
+
+  .cd-cell {
+    min-width: 0 !important;
+    flex: 1 !important;
+    max-width: 65px !important;
+    padding: 6px 2px !important;
+  }
+
+  .cd-num {
+    font-size: 1.35rem !important;
+    line-height: 1 !important;
+  }
+
+  .cd-txt {
+    font-size: 0.56rem !important;
+    letter-spacing: 0.05em !important;
+  }
+
+  .cd-colon {
+    font-size: 1.1rem !important;
+    margin: 0 1px !important;
+    padding-bottom: 4px !important;
+  }
+
+  /* Hero Buttons across all sites */
+  .hero-action-row, .hero-actions, .hero-cal-buttons {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 320px !important;
+    margin: 0 auto !important;
+    gap: 9px !important;
+  }
+
+  .btn-hero-action, .btn-hero-rsvp, .btn-hero-cal,
+  .btn-vogue-secondary, .hero-cal-buttons button {
+    width: 100% !important;
+    min-height: 48px !important;
+    padding: 12px 16px !important;
+    font-size: 0.92rem !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    border-radius: 999px !important;
+    text-align: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+
+  /* 3. Section: Fecha & Lugar */
+  .venue-editorial-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+    width: 100% !important;
+  }
+
+  .venue-card-cinematic, .venue-card {
+    padding: 1.4rem 1.1rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .venue-card-img-wrap img, .venue-img, .venue-image-editorial img {
+    height: 210px !important;
+    max-height: 230px !important;
+    width: 100% !important;
+    object-fit: cover !important;
+    border-radius: 12px !important;
+  }
+
+  .card-calendar-actions, .venue-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 8px !important;
+    margin-top: 14px !important;
+  }
+
+  .btn-card-cal, .btn-venue-action, .btn-directions {
+    width: 100% !important;
+    min-height: 46px !important;
+    justify-content: center !important;
+    padding: 10px 14px !important;
+    box-sizing: border-box !important;
+    font-size: 0.88rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+
+  /* 4. Section: Itinerario / Timeline */
+  .timeline-vogue {
+    max-width: 100% !important;
+    padding: 0 4px !important;
+    margin: 0 auto !important;
+  }
+
+  .timeline-item-vogue {
+    padding: 12px 14px !important;
+    gap: 12px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .timeline-time-col {
+    min-width: 60px !important;
+    font-size: 0.88rem !important;
+  }
+
+  .timeline-icon-wrap {
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 1.1rem !important;
+    flex-shrink: 0 !important;
+  }
+
+  .timeline-content-col h3 {
+    font-size: 1rem !important;
+  }
+
+  .timeline-content-col p {
+    font-size: 0.84rem !important;
+  }
+
+  /* 5. Section: Pasto / Picnic / Sakura */
+  .picnic-card-box, .sakura-card-box {
+    grid-template-columns: 1fr !important;
+    padding: 1.4rem 1.1rem !important;
+    gap: 1.4rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .picnic-img-side img, .sakura-img-side img, .picnic-photo {
+    height: 230px !important;
+    max-height: 250px !important;
+    width: 100% !important;
+    object-fit: cover !important;
+    border-radius: 12px !important;
+  }
+
+  .picnic-heading {
+    font-size: 1.55rem !important;
+    text-align: center !important;
+  }
+
+  .picnic-p {
+    font-size: 0.9rem !important;
+    line-height: 1.5 !important;
+    text-align: center !important;
+  }
+
+  .picnic-tips {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    padding-left: 0 !important;
+  }
+
+  /* 6. Section: Dresscode */
+  .lookbook-grid, .dresscode-grid {
+    grid-template-columns: 1fr !important;
+    gap: 18px !important;
+    width: 100% !important;
+  }
+
+  .lookbook-card, .dresscode-card {
+    padding: 1.4rem 1.1rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .lookbook-card img, .dresscode-card img, .lookbook-photo {
+    height: 310px !important;
+    max-height: 340px !important;
+    width: 100% !important;
+    object-fit: cover !important;
+    border-radius: 12px !important;
+  }
+
+  .palette-chips {
+    justify-content: center !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+  }
+
+  .color-chip {
+    width: 38px !important;
+    height: 38px !important;
+  }
+
+  /* 7. Section: Regalos */
+  .registry-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .registry-card, .gift-card {
+    padding: 1.4rem 1.1rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .bank-details-box {
+    padding: 12px 10px !important;
+    font-size: 0.85rem !important;
+  }
+
+  .btn-copy-account, .registry-card button {
+    width: 100% !important;
+    min-height: 46px !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+
+  /* 8. Section: Nosotros / Love Story */
+  .love-story-card {
+    grid-template-columns: 1fr !important;
+    padding: 1.4rem 1.1rem !important;
+    gap: 1.4rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .love-story-img-wrap img, .love-story-img {
+    height: 270px !important;
+    max-height: 300px !important;
+    width: 100% !important;
+    object-fit: cover !important;
+    border-radius: 12px !important;
+  }
+
+  .love-story-text-side h2 {
+    font-size: 1.6rem !important;
+    text-align: center !important;
+  }
+
+  .love-story-text-side p {
+    font-size: 0.9rem !important;
+    line-height: 1.55 !important;
+  }
+
+  /* 9. Section: RSVP */
+  .rsvp-editorial-wrapper {
+    padding: 1.4rem 1rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .rsvp-header-box {
+    margin-bottom: 20px !important;
+  }
+
+  .rsvp-title {
+    font-size: 1.75rem !important;
+  }
+
+  .rsvp-lead {
+    font-size: 0.9rem !important;
+    line-height: 1.5 !important;
+  }
+
+  .rsvp-form-grid, .rsvp-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    width: 100% !important;
+  }
+
+  .form-group-full, .form-group {
+    width: 100% !important;
+    margin-bottom: 12px !important;
+  }
+
+  .form-input, .form-select, .form-textarea,
+  input[type="text"], input[type="email"], input[type="tel"], select, textarea {
+    width: 100% !important;
+    min-height: 48px !important;
+    font-size: 16px !important;
+    padding: 10px 14px !important;
+    box-sizing: border-box !important;
+  }
+
+  .btn-submit-rsvp, #btnSubmitRsvp {
+    width: 100% !important;
+    min-height: 52px !important;
+    font-size: 1rem !important;
+    padding: 14px 20px !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+
+  /* 10. Modals: Digital Pass */
+  .modal-pass-card, .pass-card-vogue {
+    width: 95vw !important;
+    max-width: 390px !important;
+    margin: 10px auto !important;
+    padding: 1.4rem 1rem !important;
+    max-height: 92vh !important;
+    overflow-y: auto !important;
+    box-sizing: border-box !important;
+  }
+
+  .pass-qr-box {
+    margin: 14px auto !important;
+    max-width: 190px !important;
+  }
+
+  .pass-qr-box img, .pass-qr-box svg, .pass-qr-box canvas {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  .pass-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 9px !important;
+  }
+
+  .btn-pass-action {
+    width: 100% !important;
+    min-height: 46px !important;
+    justify-content: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+
+  /* 11. Modals: Acceso Novios (Admin Modal) */
+  .modal-admin-card {
+    width: 96vw !important;
+    max-width: 96vw !important;
+    margin: 10px auto !important;
+    padding: 1.2rem 0.8rem !important;
+    max-height: 92vh !important;
+    overflow-y: auto !important;
+    box-sizing: border-box !important;
+    border-radius: 14px !important;
+  }
+
+  .admin-top-bar {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+    margin-bottom: 14px !important;
+    padding-bottom: 10px !important;
+  }
+
+  .admin-title-area {
+    width: 100% !important;
+  }
+
+  .admin-dashboard-title {
+    font-size: 1.25rem !important;
+  }
+
+  .admin-top-actions {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  .admin-nav-hub {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .admin-hub-card {
+    padding: 10px 8px !important;
+    min-height: 68px !important;
+    border-radius: 10px !important;
+  }
+
+  .hub-icon-wrap {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 1rem !important;
+    margin-bottom: 4px !important;
+  }
+
+  .hub-card-title {
+    font-size: 0.78rem !important;
+  }
+
+  .hub-card-badge {
+    font-size: 0.65rem !important;
+  }
+
+  .admin-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .admin-stat-card {
+    padding: 10px 8px !important;
+  }
+
+  .admin-stat-number {
+    font-size: 1.35rem !important;
+  }
+
+  .admin-stat-label {
+    font-size: 0.7rem !important;
+  }
+
+  .admin-toolbar {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .admin-search-wrap {
+    width: 100% !important;
+  }
+
+  .admin-actions-bar {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    width: 100% !important;
+  }
+
+  .btn-admin-action {
+    flex: 1 1 auto !important;
+    min-height: 42px !important;
+    justify-content: center !important;
+    font-size: 0.82rem !important;
+    padding: 8px 12px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+
+  .admin-table-wrap, .admin-table-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    display: block !important;
+    margin-bottom: 14px !important;
+    border-radius: 8px !important;
+  }
+
+  .admin-table {
+    min-width: 720px !important;
+    font-size: 0.8rem !important;
+  }
+
+  .admin-table th, .admin-table td {
+    padding: 8px 10px !important;
+  }
+
+  /* Admin login screen in modal */
+  .admin-login-box {
+    padding: 1.6rem 1rem !important;
+    width: 100% !important;
+    max-width: 360px !important;
+    margin: 20px auto !important;
+  }
+
+  .admin-pin-wrapper input {
+    font-size: 1.25rem !important;
+    letter-spacing: 4px !important;
+  }
+
+  /* 12. Floating buttons (Music & Acceso Novios) */
+  .audio-pill, .music-player-pill, .music-btn-floating {
+    bottom: 14px !important;
+    right: 14px !important;
+    z-index: 99 !important;
+    padding: 8px 12px !important;
+    font-size: 0.8rem !important;
+  }
+
+  .btn-admin-access {
+    bottom: 14px !important;
+    left: 14px !important;
+    z-index: 99 !important;
+    padding: 8px 12px !important;
+    font-size: 0.8rem !important;
+  }
+
+  /* Footer */
+  .footer-editorial {
+    padding: 40px 14px 75px !important;
+    text-align: center !important;
+  }
+
+  .footer-names {
+    font-size: 1.6rem !important;
+  }
+}
+
+/* Extra micro screens (iPhone SE, Galaxy A, screens <= 400px) */
+@media screen and (max-width: 400px) {
+  .wedding-names {
+    font-size: 1.95rem !important;
+  }
+
+  .countdown-box {
+    gap: 4px !important;
+  }
+
+  .countdown-unit {
+    padding: 8px 2px !important;
+  }
+
+  .countdown-num {
+    font-size: 1.2rem !important;
+  }
+
+  .countdown-label {
+    font-size: 0.55rem !important;
+  }
+
+  .admin-nav-hub {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
