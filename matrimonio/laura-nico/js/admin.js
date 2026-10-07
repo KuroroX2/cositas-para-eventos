@@ -5,6 +5,27 @@
  */
 
 (function() {
+
+  // Purga única para asegurar que laura-nico empiece con 0 datos reales
+  try {
+    const PURGE_KEY = 'laura_nico_clean_zero_v2';
+    if (!localStorage.getItem(PURGE_KEY)) {
+      localStorage.removeItem('wedding_invitations_laura_nico_v2');
+      localStorage.removeItem('wedding_rsvps_laura_nico_v2');
+      localStorage.removeItem('wedding_photos_laura_nico_v2');
+      localStorage.removeItem('wedding_invitations_cloud_v1');
+      localStorage.removeItem('wedding_rsvps_cloud_v1');
+      localStorage.removeItem('wedding_photos_cloud_v1');
+      localStorage.removeItem('wedding_photos_laura_nico_v2');
+      localStorage.removeItem('boda_org_tables_laura_nico_v1');
+      localStorage.removeItem('boda_org_unassigned_laura_nico_v1');
+      localStorage.setItem('wedding_invitations_laura_nico_v2', '[]');
+      localStorage.setItem('wedding_rsvps_laura_nico_v2', '[]');
+      localStorage.setItem('wedding_photos_laura_nico_v2', '[]');
+      localStorage.setItem(PURGE_KEY, 'true');
+    }
+  } catch(e) {}
+
   const ADMIN_PIN = 'sakura'; // Clave de acceso principal
 
   // 19 Invitaciones oficiales iniciales preparadas para el evento
@@ -364,19 +385,19 @@
   async function loadAdminCloudData() {
     // 1. Cargar caché local primero para respuesta instantánea (0ms)
     try {
-      const localInv = localStorage.getItem('wedding_invitations_laura_nico_v1');
+      const localInv = localStorage.getItem('wedding_invitations_laura_nico_v2');
       if (localInv !== null) {
         adminInvitations = JSON.parse(localInv);
       } else {
         adminInvitations = [...DEFAULT_SEED_INVITATIONS];
-        localStorage.setItem('wedding_invitations_laura_nico_v1', JSON.stringify(adminInvitations));
+        localStorage.setItem('wedding_invitations_laura_nico_v2', JSON.stringify(adminInvitations));
       }
-      const localRsvp = localStorage.getItem('wedding_rsvps_laura_nico_v1');
+      const localRsvp = localStorage.getItem('wedding_rsvps_laura_nico_v2');
       if (localRsvp !== null) {
         adminRsvps = normalizeAdminRsvps(JSON.parse(localRsvp), adminInvitations);
       }
 
-      const localPhotos = localStorage.getItem('laura_nico_wedding_album_cache_v1') || localStorage.getItem('wedding_photos_laura_nico_v1');
+      const localPhotos = localStorage.getItem('wedding_photos_laura_nico_v2') || localStorage.getItem('wedding_photos_laura_nico_v2');
       if (localPhotos !== null) adminPhotos = JSON.parse(localPhotos);
     } catch (e) {
       adminInvitations = [...DEFAULT_SEED_INVITATIONS];
@@ -404,7 +425,7 @@
             phone: i.phone,
             createdAt: new Date(i.created_at).getTime()
           }));
-          localStorage.setItem('wedding_invitations_laura_nico_v1', JSON.stringify(adminInvitations));
+          localStorage.setItem('wedding_invitations_laura_nico_v2', JSON.stringify(adminInvitations));
           renderAdminInvitations();
         }
 
@@ -432,7 +453,7 @@
           });
 
           adminRsvps = normalizeAdminRsvps(rawMapped, adminInvitations);
-          localStorage.setItem('wedding_rsvps_laura_nico_v1', JSON.stringify(adminRsvps));
+          localStorage.setItem('wedding_rsvps_laura_nico_v2', JSON.stringify(adminRsvps));
           renderAdminRsvps();
           renderAdminInvitations();
         }
@@ -449,7 +470,7 @@
             comments: p.comments || [],
             timestamp: p.created_at ? new Date(p.created_at).getTime() : Date.now()
           }));
-          localStorage.setItem('laura_nico_wedding_album_cache_v1', JSON.stringify(adminPhotos));
+          localStorage.setItem('wedding_photos_laura_nico_v2', JSON.stringify(adminPhotos));
           renderAdminPhotos();
         }
       } catch (e) {
@@ -490,7 +511,7 @@
     adminInvitations.unshift(newInvitation);
 
     try {
-      localStorage.setItem('wedding_invitations_laura_nico_v1', JSON.stringify(adminInvitations));
+      localStorage.setItem('wedding_invitations_laura_nico_v2', JSON.stringify(adminInvitations));
     } catch (err) {}
 
     // Save to Supabase Cloud in background
@@ -738,7 +759,7 @@
         }
 
         try {
-          localStorage.setItem('wedding_rsvps_laura_nico_v1', JSON.stringify(adminRsvps));
+          localStorage.setItem('wedding_rsvps_laura_nico_v2', JSON.stringify(adminRsvps));
         } catch (e) {}
 
         renderAdminInvitations();
@@ -774,8 +795,8 @@
           }
 
           try {
-            localStorage.setItem('wedding_invitations_laura_nico_v1', JSON.stringify(adminInvitations));
-            localStorage.setItem('wedding_rsvps_laura_nico_v1', JSON.stringify(adminRsvps));
+            localStorage.setItem('wedding_invitations_laura_nico_v2', JSON.stringify(adminInvitations));
+            localStorage.setItem('wedding_rsvps_laura_nico_v2', JSON.stringify(adminRsvps));
           } catch (e) {}
           renderAdminInvitations();
           renderAdminRsvps();
@@ -978,7 +999,7 @@
             await window.dbSupabase.updateRsvpAttendanceManual(r.invCode || r.code || invId, newMode, r.name, r.name2, r.name2 ? 2 : 1);
           }
           try {
-            localStorage.setItem('wedding_rsvps_laura_nico_v1', JSON.stringify(adminRsvps));
+            localStorage.setItem('wedding_rsvps_laura_nico_v2', JSON.stringify(adminRsvps));
           } catch (e) {}
           renderAdminRsvps();
           renderAdminInvitations();
@@ -1011,7 +1032,7 @@
           }
 
           try {
-            localStorage.setItem('wedding_rsvps_laura_nico_v1', JSON.stringify(adminRsvps));
+            localStorage.setItem('wedding_rsvps_laura_nico_v2', JSON.stringify(adminRsvps));
           } catch (e) {}
 
           renderAdminRsvps();

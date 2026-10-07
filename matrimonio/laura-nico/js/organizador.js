@@ -38,10 +38,10 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ==========================================================================
    1. Datos Iniciales & Persistencia
    ========================================================================== */
-const STORAGE_KEY_TABLES = 'boda_org_tables_laura_nico_v1';
+const STORAGE_KEY_TABLES = 'boda_org_tables_laura_nico_v2';
 const STORAGE_KEY_TIMELINE = 'boda_org_timeline_laura_nico_v1';
 const STORAGE_KEY_SHOPPING = 'boda_org_shopping_laura_nico_v1';
-const STORAGE_KEY_UNASSIGNED = 'boda_org_unassigned_laura_nico_v1';
+const STORAGE_KEY_UNASSIGNED = 'boda_org_unassigned_laura_nico_v2';
 
 let tables = [];
 let timeline = [];
@@ -321,9 +321,9 @@ function syncConfirmedGuestsWithUnassigned() {
     }
   }
 
-  // 1. Leer de wedding_rsvps_laura_nico_v1 (identificar confirmados y rechazados de forma segura)
+  // 1. Leer de wedding_rsvps_laura_nico_v2 (identificar confirmados y rechazados de forma segura)
   try {
-    const rawRsvps = localStorage.getItem('wedding_rsvps_laura_nico_v1');
+    const rawRsvps = localStorage.getItem('wedding_rsvps_laura_nico_v2');
     if (rawRsvps) {
       const rsvps = JSON.parse(rawRsvps);
       // Primero recolectar todos los que explícitamente NO asisten (incluyendo acompañantes que no asistirán)
@@ -367,9 +367,9 @@ function syncConfirmedGuestsWithUnassigned() {
     console.warn('Error leyendo RSVPs en organizador:', e);
   }
 
-  // 1.b Leer de wedding_invitations_laura_nico_v1 para asegurar todos los invitados
+  // 1.b Leer de wedding_invitations_laura_nico_v2 para asegurar todos los invitados
   try {
-    const rawInvs = localStorage.getItem('wedding_invitations_laura_nico_v1');
+    const rawInvs = localStorage.getItem('wedding_invitations_laura_nico_v2');
     if (rawInvs) {
       const invs = JSON.parse(rawInvs);
       invs.forEach(inv => {
@@ -522,13 +522,13 @@ function loadData() {
     ]).then(([cloudInvs, cloudRsvps]) => {
       let changed = false;
       if (Array.isArray(cloudInvs) && cloudInvs.length > 0) {
-        localStorage.setItem('wedding_invitations_laura_nico_v1', JSON.stringify(cloudInvs.map(i => ({
+        localStorage.setItem('wedding_invitations_laura_nico_v2', JSON.stringify(cloudInvs.map(i => ({
           id: i.id, pases: i.pases, name1: i.name1, name2: i.name2, phone: i.phone
         }))));
         changed = true;
       }
       if (Array.isArray(cloudRsvps) && cloudRsvps.length > 0) {
-        localStorage.setItem('wedding_rsvps_laura_nico_v1', JSON.stringify(cloudRsvps.map(r => ({
+        localStorage.setItem('wedding_rsvps_laura_nico_v2', JSON.stringify(cloudRsvps.map(r => ({
           id: r.id, name: r.name1, name2: r.name2,
           attendance: (r.attendance1 === true || r.attendance2 === true) ? 'si' : 'no',
           attendance1: r.attendance1 === true ? 'si' : 'no',

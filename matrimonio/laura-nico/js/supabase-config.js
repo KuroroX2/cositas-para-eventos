@@ -31,11 +31,15 @@ window.dbSupabase = {
       const { data, error } = await client
         .from('invitations')
         .select('*')
+        .eq('event_slug', 'laura-y-nico')
         .order('created_at', { ascending: true });
       if (error) throw error;
 
       // Filtrar únicamente si la invitación fue explícitamente borrada con lápida de invitación
-      const { data: allRsvps } = await client.from('rsvps').select('*').order('created_at', { ascending: false });
+      const { data: allRsvps } = await client.from('rsvps')
+        .select('*')
+        .eq('event_slug', 'laura-y-nico')
+        .order('created_at', { ascending: false });
       const deletedInvIds = new Set();
       if (allRsvps) {
         allRsvps.forEach(r => {
@@ -85,6 +89,7 @@ window.dbSupabase = {
       const { data, error } = await client
         .from('rsvps')
         .select('*')
+        .eq('event_slug', 'laura-y-nico')
         .order('created_at', { ascending: false });
       if (error) throw error;
 
@@ -256,6 +261,7 @@ window.dbSupabase = {
       const { data, error } = await client
         .from('photos')
         .select('*')
+        .eq('event_slug', 'laura-y-nico')
         .order('created_at', { ascending: false });
       if (error) throw error;
       return data || [];

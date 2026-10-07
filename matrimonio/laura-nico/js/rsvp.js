@@ -214,7 +214,7 @@
   async function checkAlreadyConfirmedStatus() {
     let rsvps = [];
     try {
-      const stored = localStorage.getItem('wedding_rsvps_laura_nico_v1');
+      const stored = localStorage.getItem('wedding_rsvps_laura_nico_v2');
       if (stored) rsvps = JSON.parse(stored);
     } catch (e) {}
 
@@ -237,7 +237,7 @@
             code: r.pass_code,
             invCode: r.invitation_id
           }));
-          localStorage.setItem('wedding_rsvps_laura_nico_v1', JSON.stringify(rsvps));
+          localStorage.setItem('wedding_rsvps_laura_nico_v2', JSON.stringify(rsvps));
         }
       } catch (e) {
         console.warn('Supabase fetch notice:', e);
@@ -552,11 +552,11 @@
 
     // 1. Save locally
     try {
-      let stored = JSON.parse(localStorage.getItem('wedding_rsvps_laura_nico_v1') || '[]');
+      let stored = JSON.parse(localStorage.getItem('wedding_rsvps_laura_nico_v2') || '[]');
       // Filter out any previous match
       stored = stored.filter(r => r.code !== reservationCode && r.name !== name1);
       stored.unshift(newRsvp);
-      localStorage.setItem('wedding_rsvps_laura_nico_v1', JSON.stringify(stored));
+      localStorage.setItem('wedding_rsvps_laura_nico_v2', JSON.stringify(stored));
       localStorage.setItem('wedding_guest_name_laura_nico', displayName);
       localStorage.setItem('wedding_confirmed_generic_code_laura_nico', reservationCode);
     } catch (err) {}
