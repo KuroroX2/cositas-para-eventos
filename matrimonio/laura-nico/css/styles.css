@@ -4960,8 +4960,9 @@ body.theme-florido .ch-num {
 .wedding-hero-cinematic {
   position: relative;
   min-height: 88vh;
+  background-image: url('../assets/images/hero_couple_mobile.jpg');
   background-size: cover;
-  background-position: center 25%;
+  background-position: center 20%;
   background-repeat: no-repeat;
   display: flex;
   align-items: flex-end;
@@ -4972,6 +4973,8 @@ body.theme-florido .ch-num {
 @media (min-width: 768px) {
   .wedding-hero-cinematic {
     min-height: 94vh;
+    background-image: url('../assets/images/hero_couple_landscape.jpg');
+    background-position: center center;
     padding: 130px 60px 75px;
   }
 }
