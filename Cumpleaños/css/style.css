@@ -1,35 +1,34 @@
-﻿/* ==========================================================================
-   Cumpleaños Dominga N°1 - Estilo Sirenita Pastel
-   Paleta: Lila, Calipso Suave, Rosa Concha, Nácar y Destellos Dorados
+/* ==========================================================================
+   Cumpleaños Dominga N°1 - Edición Marina Mágica & Toque Halloween Elegante
+   Paleta: Océano Mágico Nocturno, Sirena Lila, Calipso Bioluminiscente & Ámbar Calabaza
    ========================================================================== */
 
 :root {
-  --color-primary: #8b68db;
-  --color-primary-dark: #6e46c7;
-  --color-primary-light: #ede7fc;
-  --color-teal: #2db3b8;
-  --color-teal-light: #e0f9f8;
-  --color-pink: #f77098;
-  --color-pink-light: #ffe8ee;
-  --color-gold: #ffb703;
-  --color-text-dark: #2c2544;
-  --color-text-muted: #6b6382;
-  --color-bg-base: #f7f5fd;
-  --color-card-bg: rgba(255, 255, 255, 0.92);
-  --color-card-border: rgba(139, 104, 219, 0.18);
+  --color-bg-deep: #090615;
+  --color-bg-surface: #120e24;
+  --color-bg-card: rgba(22, 16, 46, 0.75);
+  --color-bg-card-hover: rgba(30, 22, 62, 0.85);
   
-  --shadow-soft: 0 10px 30px rgba(139, 104, 219, 0.1);
-  --shadow-hover: 0 16px 40px rgba(139, 104, 219, 0.18);
-  --shadow-float: 0 20px 50px rgba(45, 179, 184, 0.2);
+  --color-teal: #2dd4bf;
+  --color-teal-glow: rgba(45, 212, 191, 0.4);
+  --color-purple: #a855f7;
+  --color-purple-light: #c084fc;
+  --color-purple-glow: rgba(168, 85, 247, 0.35);
+  --color-amber: #f59e0b;
+  --color-amber-glow: rgba(245, 158, 11, 0.4);
+  --color-pink: #f472b6;
   
-  --radius-sm: 12px;
-  --radius-md: 20px;
-  --radius-lg: 32px;
-  --radius-full: 9999px;
+  --color-text-main: #f8fafc;
+  --color-text-muted: #94a3b8;
+  --color-text-dim: #64748b;
   
+  --border-glass: rgba(168, 85, 247, 0.22);
+  --border-glass-hover: rgba(45, 212, 191, 0.45);
+  
+  --font-hero: 'Cinzel', 'Playfair Display', serif;
   --font-title: 'Comfortaa', 'Fredoka', cursive, sans-serif;
   --font-body: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-script: 'Pacifico', cursive;
+  --font-script: 'Cormorant Garamond', serif;
 }
 
 *, *::before, *::after {
@@ -45,13 +44,13 @@ html {
 
 body {
   font-family: var(--font-body);
-  color: var(--color-text-dark);
-  background-color: var(--color-bg-base);
+  color: var(--color-text-main);
+  background-color: var(--color-bg-deep);
   background-image: 
-    radial-gradient(circle at 10% 20%, rgba(224, 249, 248, 0.8) 0%, transparent 40%),
-    radial-gradient(circle at 90% 10%, rgba(255, 232, 238, 0.8) 0%, transparent 40%),
-    radial-gradient(circle at 50% 50%, rgba(237, 231, 252, 0.6) 0%, transparent 60%),
-    radial-gradient(circle at 80% 85%, rgba(224, 249, 248, 0.7) 0%, transparent 45%);
+    radial-gradient(circle at 15% 15%, rgba(168, 85, 247, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 85% 25%, rgba(45, 212, 191, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 50% 60%, rgba(245, 158, 11, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 85%, rgba(168, 85, 247, 0.15) 0%, transparent 50%);
   background-attachment: fixed;
   line-height: 1.6;
   min-height: 100vh;
@@ -60,7 +59,7 @@ body {
 }
 
 /* ==========================================================================
-   Burbujas Flotantes de Fondo
+   Burbujas Bioluminiscentes de Fondo
    ========================================================================== */
 .bubbles-bg {
   position: fixed;
@@ -76,11 +75,11 @@ body {
 .bubble {
   position: absolute;
   bottom: -60px;
-  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.85), rgba(224, 249, 248, 0.4) 60%, rgba(139, 104, 219, 0.3) 100%);
+  background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.8), rgba(45, 212, 191, 0.3) 50%, rgba(168, 85, 247, 0.25) 100%);
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.6), 0 4px 12px rgba(139, 104, 219, 0.15);
-  animation: floatUp 14s infinite linear;
+  border: 1px solid rgba(45, 212, 191, 0.4);
+  box-shadow: 0 0 15px rgba(45, 212, 191, 0.3), inset 0 0 10px rgba(255, 255, 255, 0.5);
+  animation: floatUp 15s infinite linear;
 }
 
 .bubble::after {
@@ -92,50 +91,43 @@ body {
   height: 25%;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.9);
+  filter: blur(0.5px);
 }
 
-.bubble:nth-child(1) { left: 10%; width: 40px; height: 40px; animation-duration: 12s; animation-delay: 0s; }
-.bubble:nth-child(2) { left: 25%; width: 25px; height: 25px; animation-duration: 16s; animation-delay: 2s; }
-.bubble:nth-child(3) { left: 45%; width: 50px; height: 50px; animation-duration: 18s; animation-delay: 4s; }
-.bubble:nth-child(4) { left: 70%; width: 35px; height: 35px; animation-duration: 14s; animation-delay: 1s; }
-.bubble:nth-child(5) { left: 85%; width: 20px; height: 20px; animation-duration: 13s; animation-delay: 5s; }
-.bubble:nth-child(6) { left: 95%; width: 45px; height: 45px; animation-duration: 17s; animation-delay: 3s; }
+.bubble:nth-child(1) { left: 8%; width: 45px; height: 45px; animation-duration: 14s; animation-delay: 0s; }
+.bubble:nth-child(2) { left: 24%; width: 28px; height: 28px; animation-duration: 18s; animation-delay: 2s; }
+.bubble:nth-child(3) { left: 46%; width: 52px; height: 52px; animation-duration: 19s; animation-delay: 4s; }
+.bubble:nth-child(4) { left: 68%; width: 34px; height: 34px; animation-duration: 15s; animation-delay: 1s; }
+.bubble:nth-child(5) { left: 86%; width: 22px; height: 22px; animation-duration: 13s; animation-delay: 5s; }
+.bubble:nth-child(6) { left: 94%; width: 42px; height: 42px; animation-duration: 17s; animation-delay: 3s; }
 
 @keyframes floatUp {
-  0% {
-    transform: translateY(0) rotate(0deg);
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.8;
-  }
-  90% {
-    opacity: 0.8;
-  }
-  100% {
-    transform: translateY(-110vh) rotate(360deg);
-    opacity: 0;
-  }
+  0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.75; }
+  90% { opacity: 0.75; }
+  100% { transform: translateY(-115vh) rotate(360deg); opacity: 0; }
 }
 
 /* ==========================================================================
-   Barra Superior / Header
+   Header / Navbar Translúcida
    ========================================================================== */
 .main-header {
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 100;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--color-card-border);
-  box-shadow: 0 4px 20px rgba(139, 104, 219, 0.08);
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: rgba(9, 6, 21, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(168, 85, 247, 0.18);
+  transition: all 0.3s ease;
 }
 
 .header-container {
-  max-width: 1100px;
+  max-width: 1250px;
   margin: 0 auto;
-  padding: 0.85rem 1.5rem;
+  padding: 0.9rem 1.75rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -144,37 +136,37 @@ body {
 .logo-badge {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.75rem;
   text-decoration: none;
-  color: var(--color-text-dark);
 }
 
 .logo-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-teal-light), var(--color-primary-light));
-  border: 2px solid var(--color-primary);
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(45, 212, 191, 0.2), rgba(168, 85, 247, 0.3));
+  border: 1.5px solid var(--color-teal);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.35rem;
-  box-shadow: 0 3px 10px rgba(139, 104, 219, 0.2);
+  box-shadow: 0 0 15px var(--color-teal-glow);
 }
 
 .logo-text h1 {
   font-family: var(--font-title);
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--color-primary-dark);
+  color: #fff;
   line-height: 1.1;
+  letter-spacing: 0.5px;
 }
 
 .logo-text span {
   font-size: 0.75rem;
   color: var(--color-teal);
   font-weight: 600;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
   text-transform: uppercase;
 }
 
@@ -188,134 +180,388 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius-full);
+  padding: 0.5rem 1.15rem;
+  border-radius: 999px;
   font-size: 0.88rem;
   font-weight: 600;
   text-decoration: none;
   transition: all 0.25s ease;
-  border: 1px solid transparent;
 }
 
 .nav-btn-link {
   color: var(--color-text-muted);
 }
 .nav-btn-link:hover {
-  color: var(--color-primary);
-  background: var(--color-primary-light);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .nav-btn-rsvp {
-  background: linear-gradient(135deg, var(--color-teal), #239ba0);
-  color: #fff;
-  box-shadow: 0 4px 14px rgba(45, 179, 184, 0.35);
+  background: linear-gradient(135deg, var(--color-teal), #0d9488);
+  color: #042f2e;
+  font-weight: 700;
+  box-shadow: 0 0 20px rgba(45, 212, 191, 0.35);
 }
 .nav-btn-rsvp:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(45, 179, 184, 0.45);
+  box-shadow: 0 0 28px rgba(45, 212, 191, 0.55);
 }
 
 .nav-btn-admin {
-  background: var(--color-primary-light);
-  color: var(--color-primary-dark);
-  border-color: rgba(139, 104, 219, 0.25);
+  background: rgba(168, 85, 247, 0.15);
+  color: var(--color-purple-light);
+  border: 1px solid rgba(168, 85, 247, 0.3);
 }
 .nav-btn-admin:hover {
-  background: var(--color-primary);
+  background: var(--color-purple);
   color: #fff;
-  transform: translateY(-2px);
+  box-shadow: 0 0 20px var(--color-purple-glow);
 }
 
 /* ==========================================================================
-   Contenedor Principal
+   HERO CINEMATOGRÁFICO DE ANCHO COMPLETO (TIPO BANNER MATRIMONIOS)
    ========================================================================== */
-.site-content {
+.cumple-hero-cinematic {
   position: relative;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 120px 20px 70px;
+  background-image: url('../assets/images/banner_sirena_halloween.jpg');
+  background-size: cover;
+  background-position: center 30%;
+  background-attachment: fixed;
+  overflow: hidden;
+}
+
+.cumple-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(9, 6, 21, 0.5) 0%,
+    rgba(9, 6, 21, 0.35) 40%,
+    rgba(9, 6, 21, 0.8) 80%,
+    var(--color-bg-deep) 100%
+  );
   z-index: 1;
+}
+
+.cumple-hero-content {
+  position: relative;
+  z-index: 2;
   max-width: 900px;
   margin: 0 auto;
-  padding: 2rem 1.25rem 5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* ==========================================================================
-   Hero Section: Cumpleaños Sirenita
-   ========================================================================== */
-.hero-card {
-  background: var(--color-card-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-card-border);
-  box-shadow: var(--shadow-soft);
-  padding: 2.75rem 2rem 2.25rem;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 2.5rem;
+/* Badge Superior */
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 1.4rem;
+  background: rgba(18, 14, 36, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(245, 158, 11, 0.5);
+  border-radius: 999px;
+  color: var(--color-amber);
+  font-family: var(--font-title);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 0 25px var(--color-amber-glow);
+  animation: glowPulse 3s infinite ease-in-out;
 }
 
-.hero-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 8px;
-  background: linear-gradient(90deg, #7ce5df, #b197fc, #f77098, #ffc078, #7ce5df);
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 18px rgba(245, 158, 11, 0.3); }
+  50% { box-shadow: 0 0 32px rgba(245, 158, 11, 0.65); }
 }
 
-.badge-pill {
+/* Nombres y Título Principal */
+.hero-names {
+  font-family: var(--font-hero);
+  font-size: clamp(3.2rem, 7.5vw, 5.8rem);
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 1.5px;
+  line-height: 1.05;
+  margin-bottom: 0.25rem;
+  text-shadow: 0 4px 30px rgba(0, 0, 0, 0.85), 0 0 40px rgba(168, 85, 247, 0.4);
+  background: linear-gradient(135deg, #ffffff 40%, #e9d5ff 70%, #5eead4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-subtitle-theme {
+  font-family: var(--font-title);
+  font-size: clamp(1.2rem, 2.8vw, 1.85rem);
+  color: var(--color-teal);
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-shadow: 0 2px 20px rgba(45, 212, 191, 0.6);
+  letter-spacing: 0.5px;
+}
+
+.hero-halloween-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.45rem 1.25rem;
-  background: linear-gradient(135deg, var(--color-primary-light), var(--color-pink-light));
-  color: var(--color-primary-dark);
-  border: 1px solid rgba(139, 104, 219, 0.25);
-  border-radius: var(--radius-full);
-  font-size: 0.95rem;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fde68a;
+  padding: 0.5rem 1.35rem;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(8px);
+}
+
+/* Coordenadas en Hero */
+.hero-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  font-size: 1.05rem;
+  color: #e2e8f0;
+  margin-bottom: 2.25rem;
+}
+
+.hero-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(18, 14, 36, 0.65);
+  backdrop-filter: blur(10px);
+  padding: 0.45rem 1.15rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* ==========================================================================
+   Reloj Cuenta Regresiva de Lujo
+   ========================================================================== */
+.countdown-box-cinematic {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  width: 100%;
+  max-width: 580px;
+  margin: 0 auto 2.5rem;
+}
+
+.countdown-unit {
+  background: rgba(15, 11, 32, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1.5px solid rgba(168, 85, 247, 0.35);
+  border-radius: 18px;
+  padding: 1.15rem 0.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(168, 85, 247, 0.1);
+  transition: all 0.3s ease;
+}
+
+.countdown-unit:hover {
+  border-color: var(--color-teal);
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px rgba(45, 212, 191, 0.25);
+}
+
+.countdown-num {
+  font-family: var(--font-hero);
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+  text-shadow: 0 0 20px var(--color-teal-glow);
+}
+
+.countdown-label {
+  font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 2px 10px rgba(139, 104, 219, 0.12);
+  letter-spacing: 1.5px;
+  color: var(--color-teal);
+  margin-top: 0.35rem;
 }
 
-/* Foto de la Cumpleañera */
-.baby-photo-wrapper {
+/* Botones de Acción del Hero */
+.hero-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn-hero {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.85rem;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-hero-primary {
+  background: linear-gradient(135deg, var(--color-teal) 0%, #0d9488 100%);
+  color: #042f2e;
+  border: none;
+  box-shadow: 0 0 25px rgba(45, 212, 191, 0.5);
+}
+
+.btn-hero-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 35px rgba(45, 212, 191, 0.7);
+  background: linear-gradient(135deg, #5eead4 0%, var(--color-teal) 100%);
+}
+
+.btn-hero-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+}
+
+.btn-hero-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #fff;
+  transform: translateY(-3px);
+}
+
+/* Indicador de Scroll */
+.hero-scroll-down {
+  margin-top: 2.5rem;
+  color: var(--color-text-muted);
+  font-size: 1.5rem;
+  animation: bounceDown 2s infinite;
+  text-decoration: none;
+}
+
+@keyframes bounceDown {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(8px); }
+  60% { transform: translateY(4px); }
+}
+
+/* ==========================================================================
+   Contenido Principal & Secciones
+   ========================================================================== */
+.site-content {
   position: relative;
-  width: 220px;
-  height: 220px;
-  margin: 0 auto 1.75rem;
+  z-index: 10;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 6rem;
 }
 
-.photo-halo {
+.section-header-modern {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.section-tag-modern {
+  display: inline-block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--color-teal);
+  margin-bottom: 0.5rem;
+}
+
+.section-title-modern {
+  font-family: var(--font-hero);
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.15;
+  margin-bottom: 0.5rem;
+}
+
+.section-subtitle-modern {
+  color: var(--color-text-muted);
+  font-size: 1.05rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ==========================================================================
+   Sección: La Cumpleañera (Showcase Elegante)
+   ========================================================================== */
+.birthday-girl-card {
+  background: var(--color-bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 28px;
+  border: 1px solid var(--border-glass);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(168, 85, 247, 0.15);
+  padding: 3rem 2rem;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 2.5rem;
+  align-items: center;
+  margin-bottom: 4rem;
+  position: relative;
+  overflow: hidden;
+}
+
+@media (max-width: 820px) {
+  .birthday-girl-card {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+}
+
+.baby-portrait-frame {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  margin: 0 auto;
+}
+
+.baby-portrait-halo {
   position: absolute;
-  inset: -12px;
+  inset: -14px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #7ce5df, #b197fc, #f77098);
+  background: conic-gradient(from 0deg, var(--color-teal), var(--color-purple), var(--color-amber), var(--color-teal));
+  animation: rotatePortal 14s linear infinite;
+  filter: blur(4px);
   opacity: 0.85;
-  animation: rotateHalo 12s linear infinite;
-  filter: blur(2px);
 }
 
-@keyframes rotateHalo {
+@keyframes rotatePortal {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
 
-.photo-frame {
+.baby-portrait-inner {
   position: relative;
   width: 100%;
   height: 100%;
   border-radius: 50%;
   overflow: hidden;
-  border: 5px solid #fff;
-  box-shadow: 0 10px 25px rgba(139, 104, 219, 0.25);
-  background: #fbf9ff;
+  border: 4px solid #fff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+  background: #000;
 }
 
-.baby-photo {
+.baby-portrait-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -323,185 +569,123 @@ body {
   transition: transform 0.4s ease;
 }
 
-.baby-photo-wrapper:hover .baby-photo {
-  transform: scale(1.05);
+.baby-portrait-frame:hover .baby-portrait-img {
+  transform: scale(1.06);
 }
 
-.photo-badge-age {
+.baby-portrait-badge {
   position: absolute;
   bottom: 0;
-  right: 5px;
-  background: linear-gradient(135deg, var(--color-pink), #e84393);
+  right: 10px;
+  background: linear-gradient(135deg, var(--color-amber), #d97706);
   color: #fff;
   font-family: var(--font-title);
-  font-weight: 700;
-  font-size: 0.95rem;
-  padding: 0.4rem 0.85rem;
-  border-radius: var(--radius-full);
-  border: 3px solid #fff;
-  box-shadow: 0 4px 12px rgba(247, 112, 152, 0.4);
-}
-
-.hero-card h2.hero-title {
-  font-family: var(--font-title);
-  font-size: 2.4rem;
-  color: var(--color-primary-dark);
   font-weight: 800;
-  letter-spacing: -0.5px;
-  margin-bottom: 0.25rem;
+  font-size: 0.95rem;
+  padding: 0.4rem 0.95rem;
+  border-radius: 999px;
+  border: 3px solid #1a1236;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.5);
 }
 
-.hero-subtitle {
-  font-family: var(--font-script);
-  font-size: 2rem;
+.birthday-girl-info h3 {
+  font-family: var(--font-hero);
+  font-size: 2.2rem;
+  color: #fff;
+  margin-bottom: 0.35rem;
+}
+
+.birthday-girl-info .role-tag {
   color: var(--color-teal);
+  font-weight: 600;
+  font-size: 1.1rem;
+  display: block;
   margin-bottom: 1rem;
 }
 
-.hero-quote {
-  font-size: 1.15rem;
-  font-weight: 600;
-  color: var(--color-pink);
-  background: var(--color-pink-light);
-  display: inline-block;
-  padding: 0.6rem 1.5rem;
-  border-radius: var(--radius-full);
-  margin-bottom: 1.75rem;
-  border: 1px dashed rgba(247, 112, 152, 0.4);
-}
-
-/* ==========================================================================
-   Reloj Cuenta Regresiva
-   ========================================================================== */
-.countdown-box {
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(139, 104, 219, 0.15);
-  border-radius: var(--radius-md);
-  padding: 1.25rem;
-  max-width: 520px;
-  margin: 0 auto;
-}
-
-.countdown-title {
-  font-size: 0.82rem;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: var(--color-text-muted);
-  font-weight: 700;
-  margin-bottom: 0.85rem;
-}
-
-.timer-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.65rem;
-}
-
-.timer-segment {
-  background: #fff;
-  padding: 0.75rem 0.25rem;
-  border-radius: var(--radius-sm);
-  border: 1px solid rgba(139, 104, 219, 0.12);
-  box-shadow: 0 4px 10px rgba(139, 104, 219, 0.06);
-}
-
-.timer-number {
-  font-family: var(--font-title);
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: var(--color-primary);
-  line-height: 1;
-}
-
-.timer-label {
-  font-size: 0.72rem;
-  color: var(--color-text-muted);
-  font-weight: 600;
-  text-transform: uppercase;
-  margin-top: 0.25rem;
-}
-
-/* ==========================================================================
-   Sección: Video Invitación & Afiche
-   ========================================================================== */
-.section-title {
-  text-align: center;
+.birthday-girl-info p {
+  color: #cbd5e1;
+  font-size: 1.05rem;
+  line-height: 1.7;
   margin-bottom: 1.5rem;
 }
 
-.section-title h3 {
-  font-family: var(--font-title);
-  font-size: 1.75rem;
-  color: var(--color-text-dark);
-  font-weight: 700;
-}
-
-.section-title p {
-  color: var(--color-text-muted);
+.halloween-highlight-box {
+  background: rgba(245, 158, 11, 0.1);
+  border-left: 4px solid var(--color-amber);
+  border-radius: 0 12px 12px 0;
+  padding: 0.85rem 1.25rem;
+  color: #fde68a;
   font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
 }
 
-.media-cards-grid {
+/* ==========================================================================
+   Video Invitación & Tarjeta Oficial (Cinema Lounge)
+   ========================================================================== */
+.media-lounge-grid {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: 1.5rem;
-  margin-bottom: 2.5rem;
+  grid-template-columns: 1.25fr 0.75fr;
+  gap: 2rem;
+  margin-bottom: 4rem;
 }
 
-@media (max-width: 768px) {
-  .media-cards-grid {
+@media (max-width: 860px) {
+  .media-lounge-grid {
     grid-template-columns: 1fr;
   }
 }
 
-.video-card, .poster-card {
-  background: var(--color-card-bg);
-  backdrop-filter: blur(14px);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-card-border);
-  box-shadow: var(--shadow-soft);
+.cinema-card, .poster-lounge-card {
+  background: var(--color-bg-card);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  border: 1px solid var(--border-glass);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4);
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
-.video-card-header, .poster-card-header {
-  padding: 1rem 1.25rem;
+.cinema-card-header, .poster-lounge-header {
+  padding: 1.15rem 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(139, 104, 219, 0.1);
-  background: rgba(255, 255, 255, 0.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
 }
 
-.video-card-header h4, .poster-card-header h4 {
+.cinema-card-header h4, .poster-lounge-header h4 {
   font-family: var(--font-title);
-  font-size: 1.05rem;
-  color: var(--color-primary-dark);
+  font-size: 1.1rem;
+  color: #fff;
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.video-wrapper {
+.video-cinema-viewport {
   position: relative;
   width: 100%;
   aspect-ratio: 9 / 16;
-  max-height: 480px;
+  max-height: 520px;
   background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.video-wrapper video {
+.video-cinema-viewport video {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
-.poster-wrapper {
-  padding: 1rem;
+.poster-lounge-body {
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -509,334 +693,320 @@ body {
   height: 100%;
 }
 
-.poster-img {
+.poster-lounge-img {
   max-width: 100%;
   max-height: 440px;
-  border-radius: var(--radius-sm);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
   cursor: pointer;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-.poster-img:hover {
+.poster-lounge-img:hover {
   transform: scale(1.02);
+  box-shadow: 0 15px 40px rgba(168, 85, 247, 0.3);
 }
 
-.btn-zoom-poster {
-  margin-top: 0.75rem;
-  font-size: 0.85rem;
-  color: var(--color-primary);
-  background: none;
-  border: none;
-  cursor: pointer;
+.btn-open-zoom {
+  margin-top: 1rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 0.55rem 1.25rem;
+  border-radius: 999px;
+  font-size: 0.88rem;
   font-weight: 600;
+  cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+}
+
+.btn-open-zoom:hover {
+  background: var(--color-purple);
+  border-color: var(--color-purple);
 }
 
 /* ==========================================================================
-   Tarjetas de Detalles (Fecha, Hora, Lugar, Disfraz)
+   Tarjetas de Detalles (Fecha, Hora, Recinto, Disfraz)
    ========================================================================== */
-.details-grid {
+.details-lounge-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.25rem;
-  margin-bottom: 2.5rem;
+  gap: 1.5rem;
+  margin-bottom: 4rem;
 }
 
-.detail-card {
-  background: var(--color-card-bg);
-  backdrop-filter: blur(14px);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-card-border);
-  box-shadow: var(--shadow-soft);
-  padding: 1.5rem;
+.detail-lounge-card {
+  background: var(--color-bg-card);
+  backdrop-filter: blur(18px);
+  border-radius: 20px;
+  border: 1px solid var(--border-glass);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+  padding: 2rem 1.5rem;
   text-align: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s ease, border-color 0.3s ease;
   position: relative;
   overflow: hidden;
 }
 
-.detail-card:hover {
+.detail-lounge-card:hover {
   transform: translateY(-4px);
-  box-shadow: var(--shadow-hover);
+  border-color: var(--border-glass-hover);
 }
 
-.detail-icon-circle {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  margin: 0 auto 1rem;
+.detail-icon-portal {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  margin: 0 auto 1.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.75rem;
+  font-size: 1.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-.detail-card.card-date .detail-icon-circle {
-  background: var(--color-primary-light);
-  color: var(--color-primary);
+.detail-lounge-card.c-date .detail-icon-portal {
+  background: rgba(168, 85, 247, 0.15);
+  color: var(--color-purple-light);
+  box-shadow: 0 0 20px var(--color-purple-glow);
 }
 
-.detail-card.card-time .detail-icon-circle {
-  background: var(--color-teal-light);
+.detail-lounge-card.c-time .detail-icon-portal {
+  background: rgba(45, 212, 191, 0.15);
   color: var(--color-teal);
+  box-shadow: 0 0 20px var(--color-teal-glow);
 }
 
-.detail-card.card-place .detail-icon-circle {
-  background: var(--color-pink-light);
+.detail-lounge-card.c-place .detail-icon-portal {
+  background: rgba(244, 114, 182, 0.15);
   color: var(--color-pink);
+  box-shadow: 0 0 20px rgba(244, 114, 182, 0.3);
 }
 
-.detail-card.card-dress .detail-icon-circle {
-  background: #fef3c7;
-  color: #d97706;
+.detail-lounge-card.c-dress .detail-icon-portal {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--color-amber);
+  box-shadow: 0 0 20px var(--color-amber-glow);
 }
 
-.detail-card h4 {
+.detail-lounge-card h4 {
   font-family: var(--font-title);
-  font-size: 1.1rem;
-  color: var(--color-text-dark);
+  font-size: 1.15rem;
+  color: #fff;
   margin-bottom: 0.4rem;
 }
 
-.detail-card p.detail-main {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--color-primary-dark);
+.detail-lounge-card .main-val {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--color-teal);
   margin-bottom: 0.25rem;
 }
 
-.detail-card p.detail-sub {
-  font-size: 0.88rem;
+.detail-lounge-card .sub-val {
+  font-size: 0.9rem;
   color: var(--color-text-muted);
 }
 
-.btn-map {
+.btn-open-map {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  margin-top: 0.85rem;
-  padding: 0.45rem 1rem;
-  border-radius: var(--radius-full);
-  background: var(--color-pink);
+  margin-top: 1rem;
+  padding: 0.5rem 1.25rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--color-pink), #db2777);
   color: #fff;
   text-decoration: none;
-  font-size: 0.85rem;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(247, 112, 152, 0.3);
+  font-size: 0.88rem;
+  font-weight: 700;
+  box-shadow: 0 4px 15px rgba(244, 114, 182, 0.4);
   transition: all 0.2s ease;
 }
 
-.btn-map:hover {
-  background: #e84393;
-  transform: scale(1.03);
+.btn-open-map:hover {
+  transform: scale(1.04);
 }
 
 /* ==========================================================================
-   Formulario de Confirmación (RSVP)
+   Formulario de Confirmación RSVP Elegante
    ========================================================================== */
-.rsvp-card {
-  background: var(--color-card-bg);
-  backdrop-filter: blur(16px);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-card-border);
-  box-shadow: var(--shadow-soft);
-  padding: 2.5rem 2rem;
-  margin-bottom: 2.5rem;
+.rsvp-lounge-card {
+  background: var(--color-bg-card);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: 28px;
+  border: 1px solid var(--border-glass);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.55), 0 0 35px rgba(168, 85, 247, 0.15);
+  padding: 3rem 2.25rem;
+  margin-bottom: 4rem;
   position: relative;
 }
 
-.rsvp-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.rsvp-header h3 {
-  font-family: var(--font-title);
-  font-size: 1.9rem;
-  color: var(--color-primary-dark);
-  margin-bottom: 0.35rem;
-}
-
-.rsvp-header p {
-  color: var(--color-text-muted);
-  font-size: 0.95rem;
-}
-
-.rsvp-form {
+.rsvp-form-grid {
   display: flex;
   flex-direction: column;
-  gap: 1.35rem;
+  gap: 1.5rem;
 }
 
-.form-group {
+.input-group {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.45rem;
 }
 
-.form-group label {
+.input-group label {
   font-size: 0.92rem;
   font-weight: 700;
-  color: var(--color-text-dark);
+  color: #e2e8f0;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
 }
 
-.form-input, .form-select, .form-textarea {
+.lounge-input, .lounge-select, .lounge-textarea {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.85rem 1.15rem;
   font-family: var(--font-body);
-  font-size: 0.95rem;
-  border: 1.5px solid rgba(139, 104, 219, 0.25);
-  border-radius: var(--radius-sm);
-  background: #fff;
-  color: var(--color-text-dark);
+  font-size: 0.98rem;
+  border: 1.5px solid rgba(168, 85, 247, 0.25);
+  border-radius: 12px;
+  background: rgba(15, 11, 32, 0.8);
+  color: #fff;
   transition: all 0.2s ease;
   outline: none;
 }
 
-.form-input:focus, .form-select:focus, .form-textarea:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(139, 104, 219, 0.15);
+.lounge-input:focus, .lounge-select:focus, .lounge-textarea:focus {
+  border-color: var(--color-teal);
+  box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.2);
+  background: rgba(15, 11, 32, 0.95);
 }
 
-.form-row {
+.input-row-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.25rem;
 }
 
-@media (max-width: 600px) {
-  .form-row {
+@media (max-width: 640px) {
+  .input-row-2 {
     grid-template-columns: 1fr;
   }
 }
 
-/* Opciones de Asistencia (Pills interactivas) */
-.attendance-options {
+/* Opciones de Asistencia Interactiva */
+.rsvp-options-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
-  margin-top: 0.25rem;
 }
 
-.attendance-option {
+.rsvp-option-label {
   position: relative;
   display: block;
   cursor: pointer;
 }
 
-.attendance-option input[type="radio"] {
+.rsvp-option-label input[type="radio"] {
   position: absolute;
   opacity: 0;
   pointer-events: none;
 }
 
-.attendance-box {
-  padding: 1rem;
-  border-radius: var(--radius-sm);
-  border: 2px solid rgba(139, 104, 219, 0.2);
-  background: #fff;
+.rsvp-pill-box {
+  padding: 1.25rem 1rem;
+  border-radius: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  background: rgba(15, 11, 32, 0.6);
   text-align: center;
   transition: all 0.25s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.4rem;
 }
 
-.attendance-option input[type="radio"]:checked + .attendance-box.opt-yes {
+.rsvp-option-label input[type="radio"]:checked + .rsvp-pill-box.opt-yes {
   border-color: var(--color-teal);
-  background: var(--color-teal-light);
-  box-shadow: 0 4px 15px rgba(45, 179, 184, 0.25);
+  background: rgba(45, 212, 191, 0.12);
+  box-shadow: 0 0 25px rgba(45, 212, 191, 0.3);
 }
 
-.attendance-option input[type="radio"]:checked + .attendance-box.opt-no {
+.rsvp-option-label input[type="radio"]:checked + .rsvp-pill-box.opt-no {
   border-color: #f87171;
-  background: #fef2f2;
-  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.12);
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.3);
 }
 
-.attendance-emoji {
-  font-size: 1.75rem;
+.rsvp-emoji {
+  font-size: 2rem;
 }
 
-.attendance-text {
+.rsvp-text {
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 1.05rem;
 }
 
-/* Botón de Envío */
-.btn-submit-rsvp {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+/* Botón Submit */
+.btn-submit-lounge {
+  background: linear-gradient(135deg, var(--color-teal) 0%, var(--color-purple) 100%);
   color: #fff;
   font-family: var(--font-title);
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 700;
-  padding: 1rem 2rem;
+  padding: 1.15rem 2rem;
   border: none;
-  border-radius: var(--radius-full);
+  border-radius: 999px;
   cursor: pointer;
-  box-shadow: 0 6px 20px rgba(139, 104, 219, 0.35);
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.4);
   transition: all 0.25s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.65rem;
+  gap: 0.75rem;
   margin-top: 0.5rem;
 }
 
-.btn-submit-rsvp:hover {
+.btn-submit-lounge:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(139, 104, 219, 0.45);
+  box-shadow: 0 0 45px rgba(45, 212, 191, 0.6);
 }
 
-/* Estado de Éxito */
-.rsvp-success-card {
+/* Success Card */
+.rsvp-success-lounge {
   display: none;
   text-align: center;
-  padding: 2.5rem 1.5rem;
+  padding: 2.5rem 1rem;
 }
 
-.rsvp-success-icon {
-  font-size: 3.5rem;
+.rsvp-success-lounge .big-icon {
+  font-size: 4rem;
   color: var(--color-teal);
   margin-bottom: 1rem;
-  animation: bounce 1s ease;
 }
 
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
-}
-
-.rsvp-success-title {
-  font-family: var(--font-title);
-  font-size: 1.8rem;
-  color: var(--color-primary-dark);
-  margin-bottom: 0.5rem;
-}
-
-.btn-whatsapp-rsvp {
+.btn-whatsapp-lounge {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
   background: #25d366;
   color: #fff;
-  padding: 0.85rem 1.75rem;
-  border-radius: var(--radius-full);
+  padding: 0.95rem 2rem;
+  border-radius: 999px;
   font-weight: 700;
+  font-size: 1.05rem;
   text-decoration: none;
-  margin-top: 1.25rem;
-  box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+  margin-top: 1.5rem;
+  box-shadow: 0 4px 25px rgba(37, 211, 102, 0.4);
   transition: all 0.2s ease;
 }
 
-.btn-whatsapp-rsvp:hover {
+.btn-whatsapp-lounge:hover {
   background: #1eb855;
   transform: translateY(-2px);
 }
@@ -846,10 +1016,9 @@ body {
    ========================================================================== */
 .main-footer {
   text-align: center;
-  padding: 2.5rem 1rem;
-  border-top: 1px solid var(--color-card-border);
-  background: rgba(255, 255, 255, 0.7);
-  margin-top: 2rem;
+  padding: 3rem 1.5rem;
+  border-top: 1px solid rgba(168, 85, 247, 0.15);
+  background: rgba(9, 6, 21, 0.85);
   position: relative;
   z-index: 10;
 }
@@ -860,73 +1029,79 @@ body {
 }
 
 .footer-logo {
-  font-family: var(--font-script);
-  font-size: 1.8rem;
-  color: var(--color-primary);
+  font-family: var(--font-hero);
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
   margin-bottom: 0.5rem;
+  letter-spacing: 1px;
 }
 
 .footer-text {
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   color: var(--color-text-muted);
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
 }
 
-.footer-admin-link {
+.footer-admin-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 0.88rem;
-  color: var(--color-text-muted);
+  gap: 0.5rem;
+  padding: 0.55rem 1.35rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(168, 85, 247, 0.25);
+  color: var(--color-purple-light);
   text-decoration: none;
-  padding: 0.5rem 1.25rem;
-  border-radius: var(--radius-full);
-  background: #fff;
-  border: 1px solid rgba(139, 104, 219, 0.2);
+  font-size: 0.88rem;
+  font-weight: 600;
   transition: all 0.2s ease;
 }
 
-.footer-admin-link:hover {
-  color: var(--color-primary);
-  border-color: var(--color-primary);
-  background: var(--color-primary-light);
+.footer-admin-btn:hover {
+  background: var(--color-purple);
+  color: #fff;
 }
 
 /* ==========================================================================
-   Modal para Afiche Grande
+   Modal para Ver Afiche Completo
    ========================================================================== */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(44, 37, 68, 0.75);
-  backdrop-filter: blur(8px);
-  z-index: 1000;
+  background: rgba(4, 2, 10, 0.85);
+  backdrop-filter: blur(12px);
+  z-index: 2000;
   display: none;
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
 }
 
-.modal-content {
-  background: #fff;
-  border-radius: var(--radius-md);
-  max-width: 500px;
+.modal-content-glass {
+  background: #140f2b;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 20px;
+  max-width: 520px;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  box-shadow: 0 25px 60px rgba(0,0,0,0.7);
   text-align: center;
-  padding: 1.5rem;
+  padding: 1.75rem;
 }
 
-.modal-close {
+.modal-close-btn {
   position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 1.8rem;
+  top: 12px;
+  right: 18px;
+  font-size: 2rem;
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--color-text-muted);
+  color: #94a3b8;
+}
+.modal-close-btn:hover {
+  color: #fff;
 }
