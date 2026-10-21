@@ -1,6 +1,15 @@
 ﻿<!DOCTYPE html>
 <html lang="es">
 <head>
+  <script>
+    (function() {
+      var p = window.location.pathname;
+      if (p.indexOf('/organizador') !== -1 && !p.endsWith('.html')) {
+        document.write('<base href="../">');
+      }
+    })();
+  </script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Organizador del Cumpleaños N°1 — Dominique | Cositas Para Eventos</title>

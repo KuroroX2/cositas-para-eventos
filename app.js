@@ -20,7 +20,7 @@ function initCategoryFilters() {
     tab.addEventListener('click', (e) => {
       const selectedCat = tab.getAttribute('data-category');
       if (selectedCat === 'cumpleanos') {
-        window.location.href = 'Cumpleaños/index.html';
+        window.location.href = 'cumpleanos/index.html';
         return;
       }
       tabs.forEach(t => t.classList.remove('active'));

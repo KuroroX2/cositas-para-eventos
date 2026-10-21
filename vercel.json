@@ -15,56 +15,36 @@
       "destination": "/matrimonio/yimmy-eve/fotos/:path*"
     },
     {
-      "source": "/organizador-cumple",
-      "destination": "/Cumpleaños/organizador.html"
-    },
-    {
-      "source": "/organizador.html",
-      "destination": "/Cumpleaños/organizador.html"
-    },
-    {
-      "source": "/organizador",
-      "destination": "/Cumpleaños/organizador.html"
-    },
-    {
-      "source": "/cumpleanos/organizador.html",
-      "destination": "/Cumpleaños/organizador.html"
-    },
-    {
-      "source": "/cumpleanos/organizador",
-      "destination": "/Cumpleaños/organizador.html"
-    },
-    {
-      "source": "/cumpleaños/organizador.html",
-      "destination": "/Cumpleaños/organizador.html"
-    },
-    {
-      "source": "/cumpleaños/organizador",
-      "destination": "/Cumpleaños/organizador.html"
-    },
-    {
       "source": "/cumpleanos",
-      "destination": "/Cumpleaños/index.html"
+      "destination": "/cumpleanos/index.html"
     },
     {
       "source": "/cumpleanos/",
-      "destination": "/Cumpleaños/index.html"
+      "destination": "/cumpleanos/index.html"
     },
     {
-      "source": "/cumpleanos/:path*",
-      "destination": "/Cumpleaños/:path*"
+      "source": "/cumpleanos/organizador",
+      "destination": "/cumpleanos/organizador/index.html"
     },
     {
-      "source": "/cumpleaños",
-      "destination": "/Cumpleaños/index.html"
+      "source": "/cumpleanos/organizador/",
+      "destination": "/cumpleanos/organizador/index.html"
     },
     {
-      "source": "/cumpleaños/",
-      "destination": "/Cumpleaños/index.html"
+      "source": "/cumpleanos/organizador.html",
+      "destination": "/cumpleanos/organizador/index.html"
     },
     {
-      "source": "/cumpleaños/:path*",
-      "destination": "/Cumpleaños/:path*"
+      "source": "/organizador",
+      "destination": "/cumpleanos/organizador/index.html"
+    },
+    {
+      "source": "/organizador/",
+      "destination": "/cumpleanos/organizador/index.html"
+    },
+    {
+      "source": "/organizador.html",
+      "destination": "/cumpleanos/organizador/index.html"
     }
   ]
 }
