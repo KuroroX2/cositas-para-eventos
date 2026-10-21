@@ -3,6 +3,30 @@
   "cleanUrls": true,
   "rewrites": [
     {
+      "source": "/cumpleanos/organizador/css/:path*",
+      "destination": "/cumpleanos/css/:path*"
+    },
+    {
+      "source": "/cumpleanos/organizador/js/:path*",
+      "destination": "/cumpleanos/js/:path*"
+    },
+    {
+      "source": "/cumpleanos/organizador/assets/:path*",
+      "destination": "/cumpleanos/assets/:path*"
+    },
+    {
+      "source": "/organizador/css/:path*",
+      "destination": "/cumpleanos/css/:path*"
+    },
+    {
+      "source": "/organizador/js/:path*",
+      "destination": "/cumpleanos/js/:path*"
+    },
+    {
+      "source": "/organizador/assets/:path*",
+      "destination": "/cumpleanos/assets/:path*"
+    },
+    {
       "source": "/fotos",
       "destination": "/matrimonio/yimmy-eve/fotos/index.html"
     },
