@@ -13,6 +13,22 @@
     {
       "source": "/fotos/:path*",
       "destination": "/matrimonio/yimmy-eve/fotos/:path*"
+    },
+    {
+      "source": "/cumpleanos",
+      "destination": "/Cumpleaños/index.html"
+    },
+    {
+      "source": "/cumpleanos/:path*",
+      "destination": "/Cumpleaños/:path*"
+    },
+    {
+      "source": "/cumpleaños",
+      "destination": "/Cumpleaños/index.html"
+    },
+    {
+      "source": "/cumpleaños/:path*",
+      "destination": "/Cumpleaños/:path*"
     }
   ]
 }

@@ -17,11 +17,14 @@ function initCategoryFilters() {
   const cards = document.querySelectorAll('.feature-card');
 
   tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
+    tab.addEventListener('click', (e) => {
+      const selectedCat = tab.getAttribute('data-category');
+      if (selectedCat === 'cumpleanos') {
+        window.location.href = 'Cumpleaños/index.html';
+        return;
+      }
       tabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
-
-      const selectedCat = tab.getAttribute('data-category');
 
       cards.forEach(card => {
         const itemCats = card.getAttribute('data-cat') || '';
