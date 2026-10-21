@@ -80,7 +80,7 @@ const INITIAL_DATA = {
     { id: "c-1", categoria: "Decoración", item: "Arco orgánico de globos tonos pastel (lila, celeste, rosa, perlado)", cantidad: "1 set grande", estado: "encargado", costo: 38000, notas: "Para backdrop de fotos" },
     { id: "c-2", categoria: "Decoración", item: "Fondo telón Sirenita + luces microled", cantidad: "1 unidad", estado: "comprado", costo: 22000, notas: "Medidas 2x2m" },
     { id: "c-3", categoria: "Juegos", item: "Piñata forma Número 1 / Cola de sirena", cantidad: "1 piñata + dulces", estado: "comprado", costo: 28000, notas: "Rellena de dulces no duros y confeti" },
-    { id: "c-4", categoria: "Sorpresitas", item: "Bolsitas de recuerdos temáticas con regalitos", cantidad: "25 bolsitas", estado: "pendiente", costo: 25000, notas: "Burbujeros, stickers y juguetitos marinos" },
+    { id: "c-4", categoria: "Recuerdos", item: "Bolsitas de recuerdos temáticas con regalitos", cantidad: "25 bolsitas", estado: "pendiente", costo: 25000, notas: "Burbujeros, stickers y juguetitos marinos" },
     { id: "c-5", categoria: "Vajilla", item: "Platos, vasos, servilletas y cubiertos ecológicos pastel", cantidad: "3 paquetes c/u", estado: "comprado", costo: 16000, notas: "Diseño sirena con destellos" },
     { id: "c-6", categoria: "Cotillón", item: "Cintillos de sirena, antifaces y bonetes de fiesta", cantidad: "30 unidades", estado: "comprado", costo: 18000, notas: "Para repartir a la llegada" }
   ],
@@ -88,9 +88,9 @@ const INITIAL_DATA = {
     { id: "cr-1", hora: "15:00", titulo: "Bienvenida & Recepción", descripcion: "Llegada de invitados con sus mejores disfraces, entrega de cintillos y fotos de bienvenida." },
     { id: "cr-2", hora: "15:45", titulo: "Apertura Cóctel & Candy Bar", descripcion: "Degustación de tapaditos, empanaditas, jugos naturales y cupcakes temáticos." },
     { id: "cr-3", hora: "16:30", titulo: "Juegos & Ronda Infantil", descripcion: "Bailes entretenidos, concurso de disfraces y juegos adaptados para los peques." },
-    { id: "cr-4", hora: "17:30", titulo: "La Gran Piñata Marina", descripcion: "Momento esperado de romper la piñata de sirena llena de premios y sorpresas." },
+    { id: "cr-4", hora: "17:30", titulo: "La Gran Piñata Marina", descripcion: "Momento esperado de romper la piñata de sirena llena de premios y dulces." },
     { id: "cr-5", hora: "18:15", titulo: "Cumpleaños Feliz & Torta", descripcion: "Canto de cumpleaños a Dominique, apagar la velita N°1 y corte de la torta." },
-    { id: "cr-6", hora: "19:00", titulo: "Fotos de Despedida & Sorpresitas", descripcion: "Agradecimientos, entrega de bolsitas de recuerdos y cierre del evento." }
+    { id: "cr-6", hora: "19:00", titulo: "Fotos de Despedida & Recuerdos", descripcion: "Agradecimientos, cierre del evento." }
   ]
 };
 
