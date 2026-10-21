@@ -1,4 +1,4 @@
-﻿/**
+/**
  * store.js - Sistema de datos y persistencia compartido para el Cumpleaños
  * Conecta la invitación (index.html) y el panel del organizador (organizador.html)
  */

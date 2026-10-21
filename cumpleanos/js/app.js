@@ -1,4 +1,4 @@
-﻿/**
+/**
  * app.js - Lógica interactiva para la Invitación de Cumpleaños
  */
 
