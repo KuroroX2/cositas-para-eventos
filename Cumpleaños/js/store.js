@@ -7,7 +7,7 @@ const STORAGE_KEY = 'cumple_domi_data_v1';
 
 const INITIAL_DATA = {
   evento: {
-    nombreCumpleanera: "Dominga",
+    nombreCumpleanera: "Dominique",
     edad: "1 añito",
     titulo: "Mi Cumpleaños N°1",
     fecha: "2026-10-31",
@@ -89,7 +89,7 @@ const INITIAL_DATA = {
     { id: "cr-2", hora: "15:45", titulo: "Apertura Cóctel & Candy Bar", descripcion: "Degustación de tapaditos, empanaditas, jugos naturales y cupcakes temáticos." },
     { id: "cr-3", hora: "16:30", titulo: "Juegos & Ronda Infantil", descripcion: "Bailes entretenidos, concurso de disfraces y juegos adaptados para los peques." },
     { id: "cr-4", hora: "17:30", titulo: "La Gran Piñata Marina", descripcion: "Momento esperado de romper la piñata de sirena llena de premios y sorpresas." },
-    { id: "cr-5", hora: "18:15", titulo: "Cumpleaños Feliz & Torta", descripcion: "Canto de cumpleaños a Dominga, apagar la velita N°1 y corte de la torta." },
+    { id: "cr-5", hora: "18:15", titulo: "Cumpleaños Feliz & Torta", descripcion: "Canto de cumpleaños a Dominique, apagar la velita N°1 y corte de la torta." },
     { id: "cr-6", hora: "19:00", titulo: "Fotos de Despedida & Sorpresitas", descripcion: "Agradecimientos, entrega de bolsitas de recuerdos y cierre del evento." }
   ]
 };

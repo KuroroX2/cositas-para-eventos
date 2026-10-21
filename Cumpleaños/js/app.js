@@ -133,7 +133,7 @@ function initRsvpForm() {
 
     // Armar enlace de WhatsApp para los papás
     const eventData = window.cumpleStore ? window.cumpleStore.getData().evento : {};
-    let waMsg = `¡Hola! Vengo a confirmar asistencia para el cumpleaños de ${eventData.nombreCumpleanera || 'Dominga'} (31 de Octubre, 15:00 hrs).\n\n`;
+    let waMsg = `¡Hola! Vengo a confirmar asistencia para el cumpleaños de ${eventData.nombreCumpleanera || 'Dominique'} (31 de Octubre, 15:00 hrs).\n\n`;
     waMsg += `👤 *Nombre:* ${nombre}\n`;
     waMsg += `✨ *¿Asistirá?:* ${asistira ? '¡Sí, con mucho gusto! 🎉' : 'No podré asistir 😢'}\n`;
     if (asistira) {
