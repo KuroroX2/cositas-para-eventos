@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Cumpleaños N°1 — Dominique | Bajo el Mar &amp; Halloween</title>
+  <meta name="description" content="Invitación cinematográfica al Primer Cumpleaños de Dominique. Fiesta Marina con toque de Halloween. 31 de Octubre a las 15:00 hrs en Club Valle del Sol, Puente Alto.">
+
+  <!-- Google Fonts: Cinzel, Comfortaa, Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Comfortaa:wght@600;700&family=Outfit:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,800;1,400&display=swap" rel="stylesheet">
+
+  <!-- Remix Icon -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
+
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="css/style.css?v=2.0">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎃🧜‍♀️</text></svg>">
+</head>
+<body>
+
+  <!-- Fondo de Burbujas Mágicas -->
+  <div class="bubbles-bg" aria-hidden="true">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+  </div>
+
+  <!-- Barra de Navegación Translúcida -->
+  <header class="main-header">
+    <div class="header-container">
+      <a href="index.html" class="logo-badge">
+        <div class="logo-icon">🧜‍♀️</div>
+        <div class="logo-text">
+          <h1>Dominique N°1</h1>
+          <span>Bajo el Mar &bull; Halloween</span>
+        </div>
+      </a>
+
+      <nav class="nav-links">
+        <a href="#cumpleanera" class="nav-btn nav-btn-link"><i class="ri-user-heart-line"></i> Cumpleañera</a>
+        <a href="#video-invitacion" class="nav-btn nav-btn-link"><i class="ri-movie-line"></i> Video</a>
+        <a href="#detalles" class="nav-btn nav-btn-link"><i class="ri-calendar-event-line"></i> Cuándo y Dónde</a>
+        <a href="#confirmar" class="nav-btn nav-btn-rsvp"><i class="ri-check-line"></i> Confirmar</a>
+        <a href="organizador.html" class="nav-btn nav-btn-admin btn-to-organizador" title="Panel de gestión para los papás">
+          <i class="ri-settings-4-line"></i> <span>Organizador</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ====================================================================
+       HERO CINEMATOGRÁFICO DE ANCHO COMPLETO (BANNER SUPERIOR ESTILO MATRIMONIOS)
+       ==================================================================== -->
+  <header class="cumple-hero-cinematic" id="hero">
+    <div class="cumple-hero-overlay"></div>
+
+    <div class="cumple-hero-content">
+      <!-- Tag / Badge Superior -->
+      <div class="hero-tag" style="margin-bottom: 0.85rem;">
+        <i class="ri-sparkling-fill" style="color: var(--color-amber);"></i>
+        <span>¡Mi Primera Vuelta al Sol! &bull; 31 de Octubre</span>
+      </div>
+
+      <!-- Título Principal Despejado y Elegante -->
+      <h1 class="hero-names" style="margin-bottom: 0.35rem; font-size: clamp(3rem, 6.5vw, 5.2rem);">Dominique</h1>
+      <div class="hero-subtitle-theme" style="margin-bottom: 1.25rem; font-size: clamp(1.15rem, 2.2vw, 1.6rem);">Mi Cumpleaños N°1 &bull; Bajo el Mar</div>
+
+      <div class="hero-halloween-badge" style="margin-bottom: 1.5rem; text-align: left;">
+        <span>🎭 ¡Ven con tu mejor disfraz de Halloween o Marino! 🎃</span>
+      </div>
+
+      <!-- Coordenadas Rápidas Limpias -->
+      <div class="hero-meta-row" style="margin-bottom: 1.75rem; justify-content: flex-start;">
+        <div class="hero-meta-item">
+          <i class="ri-calendar-fill" style="color: var(--color-teal);"></i>
+          <span>Viernes, 31 de Octubre &bull; 15:00 hrs</span>
+        </div>
+        <div class="hero-meta-item">
+          <i class="ri-map-pin-fill" style="color: var(--color-pink);"></i>
+          <span>Club Valle del Sol, Puente Alto</span>
+        </div>
+      </div>
+
+      <!-- Reloj Cuenta Regresiva de Lujo -->
+      <div class="countdown-box-cinematic">
+        <div class="countdown-unit">
+          <div class="countdown-num" id="timerDays">00</div>
+          <div class="countdown-label">Días</div>
+        </div>
+        <div class="countdown-unit">
+          <div class="countdown-num" id="timerHours">00</div>
+          <div class="countdown-label">Horas</div>
+        </div>
+        <div class="countdown-unit">
+          <div class="countdown-num" id="timerMinutes">00</div>
+          <div class="countdown-label">Min</div>
+        </div>
+        <div class="countdown-unit">
+          <div class="countdown-num" id="timerSeconds">00</div>
+          <div class="countdown-label">Seg</div>
+        </div>
+      </div>
+
+      <!-- Botones de Acción del Hero -->
+      <div class="hero-action-row">
+        <a href="#confirmar" class="btn-hero btn-hero-primary">
+          <i class="ri-mail-check-line"></i> Confirmar Asistencia
+        </a>
+        <a href="#video-invitacion" class="btn-hero btn-hero-secondary">
+          <i class="ri-play-circle-line"></i> Ver Video
+        </a>
+        <button type="button" class="btn-hero btn-hero-secondary" id="btnGoogleCalHero">
+          <i class="ri-google-fill"></i> Google Calendar
+        </button>
+        <button type="button" class="btn-hero btn-hero-secondary" id="btnAppleCalHero">
+          <i class="ri-apple-fill"></i> iPhone / Apple (.ics)
+        </button>
+      </div>
+
+      <a href="#cumpleanera" class="hero-scroll-down" aria-label="Ir a la sección de la cumpleañera">
+        <i class="ri-arrow-down-s-line"></i>
+      </a>
+    </div>
+  </header>
+
+  <!-- Contenido Principal -->
+  <main class="site-content">
+
+    <!-- ====================================================================
+         SECCIÓN: LA CUMPLEAÑERA (SHOWCASE ELEGANTE CON PORTAL MÁGICO)
+         ==================================================================== -->
+    <section class="birthday-girl-card" id="cumpleanera" style="scroll-margin-top: 6rem;">
+      <div class="baby-portrait-frame">
+        <div class="baby-portrait-halo"></div>
+        <div class="baby-portrait-inner">
+          <img src="assets/images/foto_domi_primer_halloween.jpg" alt="Dominique, la cumpleañera" class="baby-portrait-img">
+        </div>
+        <div class="baby-portrait-badge">
+          ★ 1 Añito
+        </div>
+      </div>
+
+      <div class="birthday-girl-info">
+        <span class="role-tag">🧜‍♀️ Dominique en su Primer Halloween</span>
+        <h3>Nuestra Querida Domi</h3>
+        <p>
+          Ha pasado un año entero lleno de sonrisas, descubrimientos y amor infinito. Hoy celebramos la primera vuelta al sol de Dominique en un mundo mágico donde el océano y los misterios de Halloween se unen en una fiesta inolvidable.
+        </p>
+        <div class="halloween-highlight-box">
+          <i class="ri-magic-line" style="font-size: 1.4rem; color: var(--color-amber);"></i>
+          <span>
+            <strong>Temática Especial:</strong> Disfrázate de sirenita, criatura marina, pirata o con tu disfraz favorito de Halloween. ¡Habrá música, juegos y premios al mejor disfraz!
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SECCIÓN: VIDEO INVITACIÓN & AFICHE (CINEMA LOUNGE)
+         ==================================================================== -->
+    <section id="video-invitacion" style="scroll-margin-top: 6rem;">
+      <div class="section-header-modern">
+        <span class="section-tag-modern">Video &amp; Tarjeta Oficial</span>
+        <h2 class="section-title-modern">Nuestra Invitación Especial</h2>
+        <p class="section-subtitle-modern">Dale play al video oficial o explora la tarjeta digital ilustrada</p>
+      </div>
+
+      <div class="media-lounge-grid">
+        <!-- Reproductor de Video -->
+        <div class="cinema-card">
+          <div class="cinema-card-header">
+            <h4><i class="ri-film-line" style="color: var(--color-teal);"></i> Video Invitación Oficial</h4>
+            <span style="font-size: 0.8rem; color: var(--color-teal);"><i class="ri-volume-up-line"></i> Con audio activado</span>
+          </div>
+          <div class="video-cinema-viewport">
+            <video id="invitationVideo" controls playsinline preload="metadata">
+              <source src="invitacion-cumple-domi.mp4" type="video/mp4">
+              Tu navegador no soporta la reproducción de video.
+            </video>
+          </div>
+        </div>
+
+        <!-- Tarjeta del Afiche -->
+        <div class="poster-lounge-card">
+          <div class="poster-lounge-header">
+            <h4><i class="ri-image-2-line" style="color: var(--color-purple-light);"></i> Tarjeta Digital</h4>
+          </div>
+          <div class="poster-lounge-body">
+            <img src="assets/images/afiche_invitacion.png" alt="Afiche Invitación Sirenita" class="poster-lounge-img" id="btnOpenPosterModal">
+            <button type="button" class="btn-open-zoom" id="btnZoomPoster">
+              <i class="ri-zoom-in-line"></i> Toca para ver en grande
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SECCIÓN: COORDENADAS Y DETALLES
+         ==================================================================== -->
+    <section id="detalles" style="scroll-margin-top: 6rem;">
+      <div class="section-header-modern">
+        <span class="section-tag-modern">Detalles del Evento</span>
+        <h2 class="section-title-modern">¿Cuándo y Dónde?</h2>
+        <p class="section-subtitle-modern">Todos los detalles para acompañar a Dominique en su gran fiesta</p>
+      </div>
+
+      <div class="details-lounge-grid">
+        <!-- Fecha -->
+        <div class="detail-lounge-card c-date">
+          <div class="detail-icon-portal"><i class="ri-calendar-event-line"></i></div>
+          <h4>Fecha</h4>
+          <div class="main-val">31 de Octubre</div>
+          <div class="sub-val">¡Día de brujitas y magia marina!</div>
+        </div>
+
+        <!-- Hora -->
+        <div class="detail-lounge-card c-time">
+          <div class="detail-icon-portal"><i class="ri-time-line"></i></div>
+          <h4>Hora de Inicio</h4>
+          <div class="main-val">15:00 Horas</div>
+          <div class="sub-val">¡Te esperamos para celebrar juntos!</div>
+        </div>
+
+        <!-- Lugar -->
+        <div class="detail-lounge-card c-place">
+          <div class="detail-icon-portal"><i class="ri-map-pin-2-line"></i></div>
+          <h4>Lugar</h4>
+          <div class="main-val">Club Valle del Sol</div>
+          <div class="sub-val">Senecio 4593, Puente Alto</div>
+          <a href="https://maps.google.com/?q=Senecio+4593,+Puente+Alto" target="_blank" rel="noopener" class="btn-open-map">
+            <i class="ri-navigation-fill"></i> Abrir en Google Maps
+          </a>
+        </div>
+
+        <!-- Disfraz -->
+        <div class="detail-lounge-card c-dress">
+          <div class="detail-icon-portal"><i class="ri-t-shirt-2-line"></i></div>
+          <h4>Código de Vestimenta</h4>
+          <div class="main-val">¡Con Disfraz! 🎭</div>
+          <div class="sub-val">Bajo el mar o tu disfraz favorito de Halloween</div>
+        </div>
+      </div>
+
+      <!-- Agregar al Calendario -->
+      <div style="text-align: center; margin-top: -1.5rem; margin-bottom: 3.5rem;">
+        <p style="color: var(--color-teal); font-weight: 700; margin-bottom: 0.75rem; font-size: 1rem;">
+          <i class="ri-calendar-check-line"></i> ¡Guarda la fecha en tu calendario!
+        </p>
+        <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+          <button type="button" class="btn-hero btn-hero-secondary" id="btnGoogleCal" style="padding: 0.6rem 1.4rem; font-size: 0.9rem;">
+            <i class="ri-google-fill" style="color: #ea4335;"></i> Google Calendar
+          </button>
+          <button type="button" class="btn-hero btn-hero-secondary" id="btnAppleCal" style="padding: 0.6rem 1.4rem; font-size: 0.9rem;">
+            <i class="ri-apple-fill"></i> iPhone / Apple (.ics)
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SECCIÓN: CONFIRMACIÓN DE ASISTENCIA (RSVP)
+         ==================================================================== -->
+    <section id="confirmar" style="scroll-margin-top: 6rem;">
+      <div class="rsvp-lounge-card">
+        <div class="section-header-modern" style="margin-bottom: 2rem;">
+          <span class="section-tag-modern">Confirmación de Asistencia</span>
+          <h2 class="section-title-modern">¿Nos Acompañas?</h2>
+          <p class="section-subtitle-modern">Por favor confirma tu asistencia durante esta semana 💖</p>
+        </div>
+
+        <!-- Formulario -->
+        <form id="rsvpForm" class="rsvp-form-grid">
+          <div class="input-row-2">
+            <div class="input-group">
+              <label for="rsvpNombre"><i class="ri-user-smile-line" style="color: var(--color-teal);"></i> Nombre y Apellido (o Familia) *</label>
+              <input type="text" id="rsvpNombre" class="lounge-input" placeholder="Ej: Familia Morales / Javiera Soto" required>
+            </div>
+
+            <div class="input-group">
+              <label for="rsvpTelefono"><i class="ri-whatsapp-line" style="color: #25d366;"></i> Teléfono / WhatsApp *</label>
+              <input type="tel" id="rsvpTelefono" class="lounge-input" placeholder="Ej: +56 9 1234 5678" required>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label><i class="ri-heart-pulse-line" style="color: var(--color-pink);"></i> ¿Asistirás al cumpleaños? *</label>
+            <div class="rsvp-options-grid">
+              <label class="rsvp-option-label">
+                <input type="radio" name="asistencia" value="si" checked>
+                <div class="rsvp-pill-box opt-yes">
+                  <span class="rsvp-emoji">🧜‍♀️🎉</span>
+                  <span class="rsvp-text" style="color: var(--color-teal);">¡Sí, ahí estaré con mi disfraz!</span>
+                </div>
+              </label>
+
+              <label class="rsvp-option-label">
+                <input type="radio" name="asistencia" value="no">
+                <div class="rsvp-pill-box opt-no">
+                  <span class="rsvp-emoji">🥺💌</span>
+                  <span class="rsvp-text" style="color: #f87171;">Con mucha pena no podré</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div id="attendeesSection">
+            <div class="input-row-2">
+              <div class="input-group">
+                <label for="rsvpAdultos"><i class="ri-user-line" style="color: var(--color-teal);"></i> Cantidad de Adultos</label>
+                <select id="rsvpAdultos" class="lounge-select">
+                  <option value="1">1 Adulto</option>
+                  <option value="2" selected>2 Adultos</option>
+                  <option value="3">3 Adultos</option>
+                  <option value="4">4 Adultos</option>
+                  <option value="5">5 o más Adultos</option>
+                </select>
+              </div>
+
+              <div class="input-group">
+                <label for="rsvpNinos"><i class="ri-bear-smile-line" style="color: var(--color-amber);"></i> Cantidad de Niños</label>
+                <select id="rsvpNinos" class="lounge-select">
+                  <option value="0">0 Niños</option>
+                  <option value="1" selected>1 Niño</option>
+                  <option value="2">2 Niños</option>
+                  <option value="3">3 Niños</option>
+                  <option value="4">4 o más Niños</option>
+                </select>
+              </div>
+            </div>
+
+
+          </div>
+
+          <div class="input-group">
+            <label for="rsvpDedicatoria"><i class="ri-message-3-line" style="color: var(--color-pink);"></i> Mensaje o dedicatoria para Dominique (opcional)</label>
+            <textarea id="rsvpDedicatoria" class="lounge-textarea" rows="2" placeholder="¡Escríbele un lindo saludo a la cumpleañera!"></textarea>
+          </div>
+
+          <button type="submit" class="btn-submit-lounge" id="btnSubmitRsvp">
+            <i class="ri-send-plane-fill"></i> Confirmar mi Asistencia
+          </button>
+        </form>
+
+        <!-- Mensaje de Éxito al Confirmar -->
+        <div id="rsvpSuccess" class="rsvp-success-lounge">
+          <div class="big-icon"><i class="ri-checkbox-circle-fill"></i></div>
+          <h3 id="rsvpSuccessTitle" style="font-family: var(--font-hero); font-size: 2.2rem; color: #fff; margin-bottom: 0.5rem;">
+            ¡Muchas Gracias!
+          </h3>
+          <p id="rsvpSuccessMsg" style="color: #cbd5e1; font-size: 1.1rem; max-width: 520px; margin: 0 auto;">
+            Tu confirmación ha sido registrada con éxito. ¡Estamos muy emocionados de compartir este día mágico contigo!
+          </p>
+
+          <a href="#" id="btnShareWhatsApp" target="_blank" rel="noopener" class="btn-whatsapp-lounge">
+            <i class="ri-whatsapp-line" style="font-size: 1.4rem;"></i> Enviar confirmación por WhatsApp a los Papás
+          </a>
+
+          <div style="margin-top: 1.5rem;">
+            <button type="button" id="btnResetRsvpForm" style="background: none; border: none; color: var(--color-teal); cursor: pointer; text-decoration: underline; font-weight: 600; font-size: 0.95rem;">
+              Enviar otra respuesta
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal para ver el afiche en grande -->
+  <div class="modal-overlay" id="posterModal">
+    <div class="modal-content-glass">
+      <button class="modal-close-btn" id="btnClosePosterModal">&times;</button>
+      <h4 style="font-family: var(--font-hero); color: #fff; margin-bottom: 1rem; font-size: 1.35rem;">
+        Tarjeta Oficial de Invitación
+      </h4>
+      <img src="assets/images/afiche_invitacion.png" alt="Afiche Completo" style="width: 100%; height: auto; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">
+    </div>
+  </div>
+
+  <!-- Pie de Página Elegante -->
+  <footer class="main-footer">
+    <div class="footer-content">
+      <div class="footer-logo">DOMINIQUE &bull; N°1</div>
+      <p class="footer-text">
+        Celebrando con amor y magia bajo el mar &bull; 31 de Octubre, Club Valle del Sol
+      </p>
+      <a href="organizador.html" class="footer-admin-btn btn-to-organizador">
+        <i class="ri-lock-password-line"></i> Acceso al Panel del Organizador
+      </a>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/store.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -14,6 +14,16 @@
   <!-- Remix Icon -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
 
+  <script>
+    (function() {
+      var p = window.location.pathname;
+      if (!p.endsWith('.html') && p.indexOf('/organizador') !== -1) {
+        // Redirigir a la URL canónica con .html
+        window.location.replace('organizador.html');
+      }
+    })();
+  </script>
+
   <!-- Estilos -->
   <link rel="stylesheet" href="css/organizador.css">
 

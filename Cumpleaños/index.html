@@ -49,9 +49,9 @@
       <nav class="nav-links">
         <a href="#cumpleanera" class="nav-btn nav-btn-link"><i class="ri-user-heart-line"></i> Cumpleañera</a>
         <a href="#video-invitacion" class="nav-btn nav-btn-link"><i class="ri-movie-line"></i> Video</a>
-        <a href="#detalles" class="nav-btn nav-btn-link"><i class="ri-calendar-event-line"></i> Coordenadas</a>
+        <a href="#detalles" class="nav-btn nav-btn-link"><i class="ri-calendar-event-line"></i> Cuándo y Dónde</a>
         <a href="#confirmar" class="nav-btn nav-btn-rsvp"><i class="ri-check-line"></i> Confirmar</a>
-        <a href="organizador.html" class="nav-btn nav-btn-admin" title="Panel de gestión para los papás">
+        <a href="organizador.html" class="nav-btn nav-btn-admin btn-to-organizador" title="Panel de gestión para los papás">
           <i class="ri-settings-4-line"></i> <span>Organizador</span>
         </a>
       </nav>
@@ -117,11 +117,14 @@
           <i class="ri-mail-check-line"></i> Confirmar Asistencia
         </a>
         <a href="#video-invitacion" class="btn-hero btn-hero-secondary">
-          <i class="ri-play-circle-line"></i> Ver Video Invitación
+          <i class="ri-play-circle-line"></i> Ver Video
         </a>
-        <a href="https://maps.google.com/?q=Senecio+4593,+Puente+Alto" target="_blank" rel="noopener" class="btn-hero btn-hero-secondary">
-          <i class="ri-navigation-line"></i> Cómo Llegar
-        </a>
+        <button type="button" class="btn-hero btn-hero-secondary" id="btnGoogleCalHero">
+          <i class="ri-google-fill"></i> Google Calendar
+        </button>
+        <button type="button" class="btn-hero btn-hero-secondary" id="btnAppleCalHero">
+          <i class="ri-apple-fill"></i> iPhone / Apple (.ics)
+        </button>
       </div>
 
       <a href="#cumpleanera" class="hero-scroll-down" aria-label="Ir a la sección de la cumpleañera">
@@ -167,7 +170,7 @@
          ==================================================================== -->
     <section id="video-invitacion" style="scroll-margin-top: 6rem;">
       <div class="section-header-modern">
-        <span class="section-tag-modern">Cinema Lounge</span>
+        <span class="section-tag-modern">Video &amp; Tarjeta Oficial</span>
         <h2 class="section-title-modern">Nuestra Invitación Especial</h2>
         <p class="section-subtitle-modern">Dale play al video oficial o explora la tarjeta digital ilustrada</p>
       </div>
@@ -208,8 +211,8 @@
     <section id="detalles" style="scroll-margin-top: 6rem;">
       <div class="section-header-modern">
         <span class="section-tag-modern">Detalles del Evento</span>
-        <h2 class="section-title-modern">Coordenadas de la Celebración</h2>
-        <p class="section-subtitle-modern">Todo lo que necesitas para acompañar a Domi en su gran día</p>
+        <h2 class="section-title-modern">¿Cuándo y Dónde?</h2>
+        <p class="section-subtitle-modern">Todos los detalles para acompañar a Dominique en su gran fiesta</p>
       </div>
 
       <div class="details-lounge-grid">
@@ -226,7 +229,7 @@
           <div class="detail-icon-portal"><i class="ri-time-line"></i></div>
           <h4>Hora de Inicio</h4>
           <div class="main-val">15:00 Horas</div>
-          <div class="sub-val">Puntual para no perderte las dinámicas</div>
+          <div class="sub-val">¡Te esperamos para celebrar juntos!</div>
         </div>
 
         <!-- Lugar -->
@@ -248,6 +251,21 @@
           <div class="sub-val">Bajo el mar o tu disfraz favorito de Halloween</div>
         </div>
       </div>
+
+      <!-- Agregar al Calendario -->
+      <div style="text-align: center; margin-top: -1.5rem; margin-bottom: 3.5rem;">
+        <p style="color: var(--color-teal); font-weight: 700; margin-bottom: 0.75rem; font-size: 1rem;">
+          <i class="ri-calendar-check-line"></i> ¡Guarda la fecha en tu calendario!
+        </p>
+        <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+          <button type="button" class="btn-hero btn-hero-secondary" id="btnGoogleCal" style="padding: 0.6rem 1.4rem; font-size: 0.9rem;">
+            <i class="ri-google-fill" style="color: #ea4335;"></i> Google Calendar
+          </button>
+          <button type="button" class="btn-hero btn-hero-secondary" id="btnAppleCal" style="padding: 0.6rem 1.4rem; font-size: 0.9rem;">
+            <i class="ri-apple-fill"></i> iPhone / Apple (.ics)
+          </button>
+        </div>
+      </div>
     </section>
 
     <!-- ====================================================================
@@ -258,7 +276,7 @@
         <div class="section-header-modern" style="margin-bottom: 2rem;">
           <span class="section-tag-modern">Confirmación de Asistencia</span>
           <h2 class="section-title-modern">¿Nos Acompañas?</h2>
-          <p class="section-subtitle-modern">Por favor confirma antes del evento para organizar las mesas y la comida 💖</p>
+          <p class="section-subtitle-modern">Por favor confirma tu asistencia durante esta semana 💖</p>
         </div>
 
         <!-- Formulario -->
@@ -321,17 +339,7 @@
               </div>
             </div>
 
-            <div class="input-row-2">
-              <div class="input-group">
-                <label for="rsvpDisfraz"><i class="ri-magic-line" style="color: var(--color-purple-light);"></i> ¿De qué vendrán disfrazados? (opcional)</label>
-                <input type="text" id="rsvpDisfraz" class="lounge-input" placeholder="Ej: Sirenita, Brujita, Pirata, Tiburón...">
-              </div>
 
-              <div class="input-group">
-                <label for="rsvpAlergias"><i class="ri-restaurant-line" style="color: var(--color-amber);"></i> Restricciones o alergias alimentarias</label>
-                <input type="text" id="rsvpAlergias" class="lounge-input" placeholder="Ej: Celíaco, vegetariano, sin lactosa...">
-              </div>
-            </div>
           </div>
 
           <div class="input-group">
@@ -388,7 +396,7 @@
       <p class="footer-text">
         Celebrando con amor y magia bajo el mar &bull; 31 de Octubre, Club Valle del Sol
       </p>
-      <a href="organizador.html" class="footer-admin-btn">
+      <a href="organizador.html" class="footer-admin-btn btn-to-organizador">
         <i class="ri-lock-password-line"></i> Acceso al Panel del Organizador
       </a>
     </div>
