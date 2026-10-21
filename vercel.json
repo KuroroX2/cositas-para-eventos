@@ -1,6 +1,23 @@
-{
+﻿{
   "trailingSlash": true,
   "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/organizador",
+      "destination": "/cumpleanos/organizador/",
+      "permanent": false
+    },
+    {
+      "source": "/organizador.html",
+      "destination": "/cumpleanos/organizador/",
+      "permanent": false
+    },
+    {
+      "source": "/cumpleanos/organizador.html",
+      "destination": "/cumpleanos/organizador/",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
       "source": "/fotos",
@@ -28,22 +45,6 @@
     },
     {
       "source": "/cumpleanos/organizador/",
-      "destination": "/cumpleanos/organizador/index.html"
-    },
-    {
-      "source": "/cumpleanos/organizador.html",
-      "destination": "/cumpleanos/organizador/index.html"
-    },
-    {
-      "source": "/organizador",
-      "destination": "/cumpleanos/organizador/index.html"
-    },
-    {
-      "source": "/organizador/",
-      "destination": "/cumpleanos/organizador/index.html"
-    },
-    {
-      "source": "/organizador.html",
       "destination": "/cumpleanos/organizador/index.html"
     }
   ]

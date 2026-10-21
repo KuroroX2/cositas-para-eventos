@@ -1,4 +1,4 @@
-/**
+﻿/**
  * app.js - Lógica interactiva para la Invitación de Cumpleaños
  */
 
@@ -297,12 +297,14 @@ function initOrganizadorNavLinks() {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
       const path = window.location.pathname;
-      if (path.includes('cumpleanos') || path.includes('Cumpleaños') || path.includes('Cumplea%C3%B1os')) {
+      if (path.endsWith('.html')) {
         const lastSlash = path.lastIndexOf('/');
         const base = path.substring(0, lastSlash + 1);
-        window.location.href = (base ? base : './') + 'organizador.html';
+        window.location.href = (base || './') + 'organizador/';
+      } else if (path.endsWith('/')) {
+        window.location.href = path + 'organizador/';
       } else {
-        window.location.href = 'organizador.html';
+        window.location.href = path + '/organizador/';
       }
     });
   });

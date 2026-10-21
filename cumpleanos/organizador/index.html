@@ -1,14 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <script>
-    (function() {
-      var p = window.location.pathname;
-      if (p.indexOf('/organizador') !== -1 && !p.endsWith('.html')) {
-        document.write('<base href="../">');
-      }
-    })();
-  </script>
+  
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,18 +16,10 @@
   <!-- Remix Icon -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
 
-  <script>
-    (function() {
-      var p = window.location.pathname;
-      if (!p.endsWith('.html') && p.indexOf('/organizador') !== -1) {
-        // Redirigir a la URL canónica con .html
-        window.location.replace('organizador.html');
-      }
-    })();
-  </script>
+  
 
   <!-- Estilos -->
-  <link rel="stylesheet" href="css/organizador.css">
+  <link rel="stylesheet" href="../css/organizador.css">
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
@@ -53,7 +38,7 @@
       </div>
 
       <div class="org-header-actions">
-        <a href="index.html" class="btn-org-action" title="Ver la invitación interactiva de los invitados">
+        <a href="../" class="btn-org-action" title="Ver la invitación interactiva de los invitados">
           <i class="ri-external-link-line"></i> <span>Ver Invitación</span>
         </a>
         <button type="button" class="btn-org-action" id="btnPrintOrg" title="Imprimir reporte del evento">
@@ -656,7 +641,7 @@
   </div>
 
   <!-- Scripts -->
-  <script src="js/store.js"></script>
-  <script src="js/organizador.js"></script>
+  <script src="../js/store.js"></script>
+  <script src="../js/organizador.js"></script>
 </body>
 </html>

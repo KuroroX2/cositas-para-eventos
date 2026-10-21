@@ -212,6 +212,14 @@ body {
   color: var(--color-purple-light);
   border: 1px solid rgba(168, 85, 247, 0.3);
 }
+
+.nav-btn-text-full {
+  display: inline;
+}
+.nav-btn-text-short {
+  display: none;
+}
+
 .nav-btn-admin:hover {
   background: var(--color-purple);
   color: #fff;
@@ -1132,45 +1140,112 @@ body {
     font-size: 15px;
   }
 
-  /* Header Móvil Limpio */
+  /* Header Móvil Limpio y Ultra Compacto */
   .main-header {
-    background: rgba(9, 6, 21, 0.92);
+    background: rgba(9, 6, 21, 0.96);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
   }
 
   .header-container {
-    padding: 0.65rem 1rem;
+    padding: 0.45rem 0.75rem;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.4rem;
+    box-sizing: border-box;
+  }
+
+  .logo-badge {
+    gap: 0.45rem;
+    flex-shrink: 0;
+    min-width: 0;
+    display: flex;
+    align-items: center;
   }
 
   .logo-icon {
-    width: 38px;
-    height: 38px;
-    font-size: 1.15rem;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .logo-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
   }
 
   .logo-text h1 {
-    font-size: 0.98rem;
+    font-size: 0.92rem;
+    margin: 0;
+    line-height: 1.1;
+    white-space: nowrap;
   }
 
+  /* Ocultar subtítulo en móvil para evitar que la barra se expanda a 4 líneas */
   .logo-text span {
-    font-size: 0.68rem;
+    display: none !important;
   }
 
-  /* Ocultar enlaces secundarios para evitar desborde */
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-shrink: 0;
+  }
+
+  /* Ocultar enlaces de texto para dejar sólo los dos botones principales */
   .nav-btn-link {
     display: none !important;
   }
 
   .nav-btn {
-    padding: 0.45rem 0.85rem;
-    font-size: 0.82rem;
+    padding: 0.38rem 0.62rem;
+    font-size: 0.78rem;
+    border-radius: 999px;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
   }
 
-  /* Hero Cinematográfico Móvil */
+  .nav-btn i {
+    font-size: 0.85rem;
+  }
+
+  .nav-btn-rsvp {
+    padding: 0.38rem 0.65rem;
+    font-size: 0.78rem;
+  }
+
+  .nav-btn-admin {
+    padding: 0.38rem 0.58rem;
+    font-size: 0.78rem;
+  }
+
+  .nav-btn-admin .nav-btn-text-full {
+    display: none !important;
+  }
+
+  .nav-btn-admin .nav-btn-text-short {
+    display: inline !important;
+  }
+
+  /* Hero con espacio superior perfecto: 52px de barra + 20px de respiro limpio */
   .cumple-hero-cinematic {
-    min-height: 92vh;
-    padding: 95px 14px 45px;
+    min-height: 88vh;
+    padding: 72px 14px 45px;
     justify-content: center;
     text-align: center;
     background-position: 70% center;
