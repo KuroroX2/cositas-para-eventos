@@ -5,11 +5,140 @@
 document.addEventListener('DOMContentLoaded', () => {
   initCountdown();
   initCalendar();
+  initPersonalizedInvitation();
   initRsvpForm();
   initPosterModal();
   initSmoothScroll();
   initOrganizadorNavLinks();
 });
+
+/**
+ * Detección y despliegue de Invitación Personalizada desde la URL
+ * Soporta parámetros:
+ * - fam: Nombre de la familia (ej: "Familia Gomez Perez")
+ * - nombres: Lista de integrantes (ej: "Carlos, Marcela y Lucas")
+ * - n o nombre o n1: Nombre de invitado principal
+ * - n2: Pareja / Acompañante
+ * - a o adultos: Cantidad de adultos
+ * - ni o ninos: Cantidad de niños
+ * - p o pases: Total de pases reservados
+ * - code: Código único de invitación del organizador
+ * - tipo: 'individual' | 'pareja' | 'familia'
+ */
+function initPersonalizedInvitation() {
+  const params = new URLSearchParams(window.location.search);
+  const fam = params.get('fam')?.trim() || '';
+  const n = params.get('n')?.trim() || params.get('nombre')?.trim() || '';
+  const n1 = params.get('n1')?.trim() || '';
+  const n2 = params.get('n2')?.trim() || '';
+  const nombres = params.get('nombres')?.trim() || '';
+  const code = params.get('code')?.trim() || '';
+  const tipo = params.get('tipo')?.trim() || (fam ? 'familia' : (n2 ? 'pareja' : 'individual'));
+
+  // Si no hay ningún parámetro de personalización, salir
+  if (!fam && !n && !n1 && !code && !nombres) return;
+
+  // Determinar título principal a mostrar
+  let displayTitle = '';
+  let subnamesText = '';
+
+  if (fam) {
+    displayTitle = fam;
+    if (nombres) {
+      subnamesText = `Integrantes: ${nombres}`;
+    }
+  } else if (n1 && n2) {
+    displayTitle = `${n1} & ${n2}`;
+    subnamesText = 'Esperamos contar con ustedes dos';
+  } else {
+    displayTitle = n || n1 || 'Invitado de Honor';
+  }
+
+  // Parsear pases
+  const adultosParam = parseInt(params.get('a') || params.get('adultos') || (fam ? '2' : '1'), 10);
+  const ninosParam = parseInt(params.get('ni') || params.get('ninos') || '0', 10);
+  let totalPases = parseInt(params.get('p') || params.get('pases') || '0', 10);
+  if (!totalPases || isNaN(totalPases)) {
+    totalPases = (isNaN(adultosParam) ? 1 : adultosParam) + (isNaN(ninosParam) ? 0 : ninosParam);
+  }
+
+  const pasesText = totalPases === 1 
+    ? '1 Pase Reservado' 
+    : `${totalPases} Pases Reservados (${adultosParam} Adulto${adultosParam > 1 ? 's' : ''}${ninosParam > 0 ? ` + ${ninosParam} Niño${ninosParam > 1 ? 's' : ''}` : ''})`;
+
+  // Mensaje personalizado
+  let personalMsg = '¡Tu presencia hará este día aún más mágico e inolvidable para Dominique!';
+  if (tipo === 'familia' || fam) {
+    personalMsg = '¡Familia, su presencia y cariño harán que esta primera vuelta al sol sea mágica e inolvidable!';
+  } else if (tipo === 'pareja' || (n1 && n2)) {
+    personalMsg = '¡Chicos, su compañía en esta fecha tan especial nos llenará de alegría!';
+  }
+
+  // 1. Mostrar y configurar la tarjeta VIP en el Hero
+  const vipCard = document.getElementById('vipPersonalizedCard');
+  const vipTitleEl = document.getElementById('vipGuestTitle');
+  const vipSubnamesEl = document.getElementById('vipGuestSubnames');
+  const vipPassesTextEl = document.getElementById('vipPassesText');
+  const vipMsgEl = document.getElementById('vipPersonalMsg');
+
+  if (vipCard) {
+    if (vipTitleEl) vipTitleEl.textContent = displayTitle;
+    if (vipSubnamesEl) {
+      if (subnamesText) {
+        vipSubnamesEl.textContent = subnamesText;
+        vipSubnamesEl.style.display = 'block';
+      } else {
+        vipSubnamesEl.style.display = 'none';
+      }
+    }
+    if (vipPassesTextEl) vipPassesTextEl.textContent = pasesText;
+    if (vipMsgEl) vipMsgEl.textContent = personalMsg;
+    vipCard.style.display = 'block';
+  }
+
+  // 2. Mostrar y configurar el banner VIP en la sección de confirmación (RSVP)
+  const rsvpVipBanner = document.getElementById('rsvpVipBanner');
+  const rsvpVipTitle = document.getElementById('rsvpVipTitle');
+  const rsvpVipDesc = document.getElementById('rsvpVipDesc');
+  const rsvpCodeInput = document.getElementById('rsvpInviteCode');
+
+  if (rsvpVipBanner) {
+    rsvpVipBanner.style.display = 'block';
+    if (rsvpVipTitle) rsvpVipTitle.textContent = `¡Hola, ${displayTitle}!`;
+    if (rsvpVipDesc) {
+      rsvpVipDesc.textContent = `Hemos reservado ${pasesText.toLowerCase()} para celebrar el 1er añito de Dominique. Por favor indícanos cuántos nos acompañarán.`;
+    }
+  }
+
+  // Pre-llenar campos del formulario
+  const rsvpNombreInput = document.getElementById('rsvpNombre');
+  const rsvpAdultosSelect = document.getElementById('rsvpAdultos');
+  const rsvpNinosSelect = document.getElementById('rsvpNinos');
+
+  if (rsvpNombreInput && !rsvpNombreInput.value) {
+    rsvpNombreInput.value = displayTitle;
+  }
+  if (rsvpCodeInput) {
+    rsvpCodeInput.value = code;
+  }
+  if (rsvpAdultosSelect && !isNaN(adultosParam)) {
+    const val = Math.min(Math.max(adultosParam, 1), 6);
+    rsvpAdultosSelect.value = String(val);
+  }
+  if (rsvpNinosSelect && !isNaN(ninosParam)) {
+    const val = Math.min(Math.max(ninosParam, 0), 6);
+    rsvpNinosSelect.value = String(val);
+  }
+
+  // Si existe en el store local, intentar rellenar teléfono si ya lo teníamos
+  if (window.cumpleStore && (code || displayTitle)) {
+    const existing = window.cumpleStore.findInvitado(code, displayTitle);
+    if (existing && existing.telefono) {
+      const telInput = document.getElementById('rsvpTelefono');
+      if (telInput && !telInput.value) telInput.value = existing.telefono;
+    }
+  }
+}
 
 /**
  * Cuenta regresiva dinámica hasta el evento (31 de Octubre)
@@ -152,6 +281,7 @@ function initRsvpForm() {
 
     const nombre = document.getElementById('rsvpNombre').value.trim();
     const telefono = document.getElementById('rsvpTelefono').value.trim();
+    const code = document.getElementById('rsvpInviteCode')?.value.trim() || '';
     const asistiraVal = document.querySelector('input[name="asistencia"]:checked')?.value;
     const asistira = (asistiraVal === 'si');
     const adultos = asistira ? parseInt(document.getElementById('rsvpAdultos').value, 10) : 0;
@@ -159,26 +289,41 @@ function initRsvpForm() {
     const dedicatoria = document.getElementById('rsvpDedicatoria')?.value.trim() || '';
 
     if (!nombre) {
-      alert('Por favor ingresa tu nombre');
+      alert('Por favor ingresa tu nombre o el de tu familia');
       return;
     }
 
-    // Guardar en store
+    // Guardar o actualizar en store
+    let existingGuest = null;
     if (window.cumpleStore) {
-      window.cumpleStore.addInvitado({
-        nombre,
-        telefono,
-        asistira,
-        adultos,
-        ninos,
-        disfraz: '',
-        alergias: '',
-        dedicatoria
-      });
+      existingGuest = window.cumpleStore.findInvitado(code, nombre);
+      if (existingGuest) {
+        window.cumpleStore.updateInvitado(existingGuest.id, {
+          nombre: nombre,
+          telefono: telefono || existingGuest.telefono,
+          asistira: asistira,
+          adultos: adultos,
+          ninos: ninos,
+          dedicatoria: dedicatoria || existingGuest.dedicatoria,
+          fechaConfirmacion: new Date().toISOString()
+        });
+      } else {
+        window.cumpleStore.addInvitado({
+          nombre,
+          telefono,
+          asistira,
+          adultos,
+          ninos,
+          disfraz: '',
+          alergias: '',
+          dedicatoria,
+          codigo: code
+        });
+      }
     }
 
     // Efecto de Confeti
-    if (typeof confetti === 'function') {
+    if (typeof confetti === 'function' && asistira) {
       confetti({
         particleCount: 90,
         spread: 75,
@@ -194,8 +339,11 @@ function initRsvpForm() {
     // Armar enlace de WhatsApp para los papás
     const eventData = window.cumpleStore ? window.cumpleStore.getData().evento : {};
     let waMsg = `¡Hola! Vengo a confirmar asistencia para el cumpleaños de ${eventData.nombreCumpleanera || 'Dominique'} (31 de Octubre, 15:00 hrs).\n\n`;
-    waMsg += `👤 *Nombre:* ${nombre}\n`;
-    waMsg += `✨ *¿Asistirá?:* ${asistira ? '¡Sí, con mucho gusto! 🎉' : 'No podré asistir 😢'}\n`;
+    waMsg += `👤 *Invitado / Familia:* ${nombre}\n`;
+    if (existingGuest && existingGuest.nombresIntegrantes) {
+      waMsg += `👨‍👩‍👧‍👦 *Integrantes:* ${existingGuest.nombresIntegrantes}\n`;
+    }
+    waMsg += `✨ *¿Asistirá?:* ${asistira ? '¡Sí, con mucho gusto! 🎉' : 'No podremos asistir 😢'}\n`;
     if (asistira) {
       waMsg += `👥 *Adultos:* ${adultos}\n`;
       waMsg += `👶 *Niños:* ${ninos}\n`;
@@ -219,7 +367,7 @@ function initRsvpForm() {
       if (msgEl) msgEl.innerText = `Tu confirmación para ${adultos} adulto(s) y ${ninos} niño(s) quedó guardada con éxito. ¡Dominique estará feliz de verte!`;
     } else {
       if (titleEl) titleEl.innerText = `¡Gracias por avisarnos, ${nombre}! 💌`;
-      if (msgEl) msgEl.innerText = `Lamentamos que no puedas venir, ¡pero te tendremos en nuestros corazones!`;
+      if (msgEl) msgEl.innerText = `Lamentamos que no puedan venir, ¡pero los tendremos en nuestros corazones!`;
     }
 
     // Mostrar confirmación

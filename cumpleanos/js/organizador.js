@@ -5,6 +5,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   initTabs();
   initModals();
+  initInviteGenerator();
   initSettingsForm();
   initBackupsAndPrint();
 
@@ -23,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function renderAll() {
   renderMetrics();
   renderInvitados();
+  updateGeneratorMesas();
   renderMesas();
   renderComida();
   renderCotillon();
@@ -107,6 +109,312 @@ function renderMetrics() {
  * GESTIÓN DE INVITADOS
  * ==========================================================================
  */
+/**
+ * ==========================================================================
+ * GESTIÓN Y CREACIÓN DE INVITACIONES PERSONALIZADAS
+ * ==========================================================================
+ */
+function initInviteGenerator() {
+  const form = document.getElementById('formCreatePersonalizedInvite');
+  const typeRadios = document.querySelectorAll('input[name="inviteType"]');
+  const grpIndiv = document.getElementById('grpIndividualName');
+  const grpPar1 = document.getElementById('grpParejaName1');
+  const grpPar2 = document.getElementById('grpParejaName2');
+  const grpFam = document.getElementById('grpFamiliaName');
+  const grpMembers = document.getElementById('grpFamiliaMembers');
+  const inputAdultos = document.getElementById('genAdultos');
+  const inputNinos = document.getElementById('genNinos');
+  const selectMesa = document.getElementById('genMesa');
+  const btnToggle = document.getElementById('btnToggleGenForm');
+  const btnToggleTop = document.getElementById('btnToggleGenFormTop');
+  const cardGen = document.getElementById('inviteGeneratorCard');
+
+  // Alternar vista del creador
+  function toggleGenerator() {
+    if (!cardGen) return;
+    const isHidden = cardGen.style.display === 'none';
+    cardGen.style.display = isHidden ? 'block' : 'none';
+    const textToggle = document.getElementById('textToggleGen');
+    const iconToggle = document.getElementById('iconToggleGen');
+    if (textToggle) textToggle.textContent = isHidden ? 'Ocultar Creador' : 'Mostrar Creador';
+    if (iconToggle) iconToggle.className = isHidden ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line';
+  }
+
+  btnToggle?.addEventListener('click', toggleGenerator);
+  btnToggleTop?.addEventListener('click', () => {
+    if (cardGen && cardGen.style.display === 'none') {
+      toggleGenerator();
+    }
+    cardGen?.scrollIntoView({ behavior: 'smooth' });
+    const firstInput = document.getElementById('genIndivName') || document.getElementById('genFamName');
+    firstInput?.focus();
+  });
+
+  // Cambio de tipo de invitación (Individual / Pareja / Familia)
+  typeRadios.forEach(radio => {
+    radio.addEventListener('change', () => {
+      const val = radio.value;
+      if (grpIndiv) grpIndiv.style.display = val === 'individual' ? 'block' : 'none';
+      if (grpPar1) grpPar1.style.display = val === 'pareja' ? 'block' : 'none';
+      if (grpPar2) grpPar2.style.display = val === 'pareja' ? 'block' : 'none';
+      if (grpFam) grpFam.style.display = val === 'familia' ? 'block' : 'none';
+      if (grpMembers) grpMembers.style.display = val === 'familia' ? 'block' : 'none';
+
+      if (val === 'individual') {
+        if (inputAdultos) inputAdultos.value = 1;
+        if (inputNinos) inputNinos.value = 0;
+      } else if (val === 'pareja') {
+        if (inputAdultos) inputAdultos.value = 2;
+        if (inputNinos) inputNinos.value = 0;
+      } else if (val === 'familia') {
+        if (inputAdultos) inputAdultos.value = 2;
+        if (inputNinos) inputNinos.value = 1;
+      }
+    });
+  });
+
+  // Guardar y generar invitación
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const type = document.querySelector('input[name="inviteType"]:checked')?.value || 'individual';
+    let nombreFinal = '';
+    let familia = '';
+    let integrantes = '';
+    let name1 = '';
+    let name2 = '';
+
+    if (type === 'individual') {
+      const n = document.getElementById('genIndivName')?.value.trim();
+      if (!n) {
+        alert('Por favor ingresa el nombre del invitado.');
+        return;
+      }
+      nombreFinal = n;
+    } else if (type === 'pareja') {
+      name1 = document.getElementById('genParejaName1')?.value.trim();
+      name2 = document.getElementById('genParejaName2')?.value.trim();
+      if (!name1 || !name2) {
+        alert('Por favor ingresa los nombres de ambos integrantes de la pareja.');
+        return;
+      }
+      nombreFinal = `${name1} & ${name2}`;
+    } else if (type === 'familia') {
+      familia = document.getElementById('genFamName')?.value.trim();
+      integrantes = document.getElementById('genFamMembers')?.value.trim();
+      if (!familia) {
+        alert('Por favor ingresa el nombre de la familia.');
+        return;
+      }
+      nombreFinal = familia;
+    }
+
+    const phone = document.getElementById('genPhone')?.value.trim() || '';
+    const adultos = parseInt(inputAdultos?.value, 10) || 1;
+    const ninos = parseInt(inputNinos?.value, 10) || 0;
+    const mesaId = selectMesa?.value || null;
+
+    const newInv = window.cumpleStore.addInvitado({
+      tipo: type,
+      nombre: nombreFinal,
+      familia: familia,
+      nombresIntegrantes: integrantes,
+      name1: name1,
+      name2: name2,
+      telefono: phone,
+      asistira: null, // Pendiente de confirmación
+      adultos: adultos,
+      ninos: ninos,
+      mesaId: mesaId
+    });
+
+    const url = generatePersonalizedUrl(newInv);
+
+    // Mostrar modal con los enlaces y opciones
+    showShareModal(newInv, url);
+
+    form.reset();
+    document.querySelector('input[name="inviteType"][value="individual"]').click();
+  });
+}
+
+function updateGeneratorMesas() {
+  const selectMesa = document.getElementById('genMesa');
+  if (!selectMesa || !window.cumpleStore) return;
+  const currentVal = selectMesa.value;
+  const mesas = window.cumpleStore.getMesas();
+  let html = '<option value="">-- Sin mesa asignada --</option>';
+  mesas.forEach(m => {
+    html += `<option value="${m.id}" ${m.id === currentVal ? 'selected' : ''}>Mesa ${m.numero}: ${escapeHtml(m.nombre)}</option>`;
+  });
+  selectMesa.innerHTML = html;
+}
+
+/**
+ * Genera la URL personalizada para el invitado o familia
+ */
+function generatePersonalizedUrl(inv) {
+  const loc = window.location;
+  let basePath = loc.pathname;
+
+  if (basePath.includes('/organizador/')) {
+    basePath = basePath.replace('/organizador/', '/');
+  } else if (basePath.includes('/organizador.html')) {
+    basePath = basePath.replace('/organizador.html', '/index.html');
+  } else {
+    basePath = basePath.replace(/organizador.*$/, 'index.html');
+  }
+  if (!basePath.endsWith('index.html') && !basePath.endsWith('/')) {
+    basePath += '/index.html';
+  } else if (basePath.endsWith('/')) {
+    basePath += 'index.html';
+  }
+
+  const origin = loc.origin;
+  const params = new URLSearchParams();
+
+  if (inv.tipo) params.set('tipo', inv.tipo);
+  if (inv.familia) params.set('fam', inv.familia);
+  if (inv.nombre) params.set('n', inv.nombre);
+  if (inv.nombresIntegrantes) params.set('nombres', inv.nombresIntegrantes);
+  if (inv.name1) params.set('n1', inv.name1);
+  if (inv.name2) params.set('n2', inv.name2);
+  params.set('a', inv.adultos || 1);
+  params.set('ni', inv.ninos || 0);
+  const total = (Number(inv.adultos) || 0) + (Number(inv.ninos) || 0);
+  params.set('p', total || 1);
+  if (inv.id) params.set('code', inv.id);
+
+  return `${origin}${basePath}?${params.toString()}`;
+}
+
+/**
+ * Redacta el mensaje cariñoso de WhatsApp con link
+ */
+function buildWhatsAppMessage(inv, url) {
+  const isFamily = inv.tipo === 'familia' || !!inv.familia;
+  const isCouple = inv.tipo === 'pareja' || (inv.name1 && inv.name2);
+
+  let greeting = '';
+  let pluralWait = '¡Te espero con tu mejor disfraz!';
+  if (isFamily) {
+    greeting = `¡Hola ${inv.familia || inv.nombre}! 🧜‍♀️🎃`;
+    pluralWait = '¡Los esperamos con sus mejores disfraces para compartir este día mágico!';
+  } else if (isCouple) {
+    greeting = `¡Hola ${inv.name1} y ${inv.name2}! 🧜‍♀️🎃`;
+    pluralWait = '¡Los esperamos con sus mejores disfraces!';
+  } else {
+    greeting = `¡Hola ${inv.nombre}! 🧜‍♀️🎃`;
+    pluralWait = '¡Te espero con tu mejor disfraz!';
+  }
+
+  let pasesText = '';
+  const ads = Number(inv.adultos) || 0;
+  const chs = Number(inv.ninos) || 0;
+  if (ads > 0 && chs > 0) {
+    pasesText = `Pase reservado para: ${ads} Adulto(s) y ${chs} Niño(s)`;
+  } else if (ads > 1) {
+    pasesText = `Pase reservado para: ${ads} Personas`;
+  } else {
+    pasesText = `Pase individual reservado`;
+  }
+
+  return `${greeting}
+Con muchísima emoción queremos invitarlos a celebrar el Primer Cumpleaños de Dominique ("Bajo el Mar & Halloween").
+
+📅 Sábado 31 de Octubre, 15:00 hrs
+📍 Club Valle del Sol (Senecio 4593, Puente Alto)
+🎟️ ${pasesText}
+
+Aquí tienen su invitación personalizada lista con sus pases reservados:
+👉 ${url}
+
+Por favor confírmennos su asistencia a través del link. ${pluralWait} 💖✨
+— Dominique & sus Papás`;
+}
+
+/**
+ * Modal para compartir invitación
+ */
+function showShareModal(inv, url) {
+  const modal = document.getElementById('modalShareInvite');
+  if (!modal) return;
+
+  const displayName = inv.nombre || inv.familia || 'Invitado';
+  const nameEl = document.getElementById('shareGuestName');
+  if (nameEl) nameEl.textContent = displayName;
+
+  const membersEl = document.getElementById('shareGuestMembers');
+  if (membersEl) {
+    if (inv.nombresIntegrantes) {
+      membersEl.textContent = `Integrantes: ${inv.nombresIntegrantes} (${inv.adultos || 0} adultos, ${inv.ninos || 0} niños)`;
+      membersEl.style.display = 'block';
+    } else {
+      membersEl.textContent = `Pases: ${inv.adultos || 1} adulto(s)${inv.ninos ? `, ${inv.ninos} niño(s)` : ''}`;
+      membersEl.style.display = 'block';
+    }
+  }
+
+  const urlDisplay = document.getElementById('shareUrlDisplay');
+  if (urlDisplay) urlDisplay.textContent = url;
+
+  // WhatsApp
+  const phoneDigits = (inv.telefono || '').replace(/\D/g, '');
+  const cleanPhone = phoneDigits.startsWith('9') && phoneDigits.length === 9 ? '56' + phoneDigits : phoneDigits;
+  const waMsg = buildWhatsAppMessage(inv, url);
+  const waBtn = document.getElementById('btnOpenShareWhatsApp');
+  if (waBtn) {
+    const waUrl = cleanPhone
+      ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMsg)}`
+      : `https://api.whatsapp.com/send?text=${encodeURIComponent(waMsg)}`;
+    waBtn.href = waUrl;
+  }
+
+  // Previsualizar
+  const prevBtn = document.getElementById('btnPreviewShareUrl');
+  if (prevBtn) prevBtn.href = url;
+
+  // Copiar
+  const copyBtn = document.getElementById('btnCopyShareUrl');
+  if (copyBtn) {
+    copyBtn.onclick = () => {
+      copyToClipboard(url);
+    };
+  }
+
+  modal.style.display = 'flex';
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('orgToast');
+  const toastMsg = document.getElementById('orgToastMsg');
+  if (!toast) {
+    alert(msg);
+    return;
+  }
+  if (toastMsg) toastMsg.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3500);
+}
+
+function copyToClipboard(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('¡Enlace personalizado copiado al portapapeles!');
+    }).catch(() => {
+      prompt('Copia el enlace manualmente:', text);
+    });
+  } else {
+    prompt('Copia el enlace manualmente:', text);
+  }
+}
+
+/**
+ * ==========================================================================
+ * GESTIÓN DE INVITADOS (TABLA & LISTADO)
+ * ==========================================================================
+ */
 function renderInvitados() {
   const tbody = document.getElementById('tbodyInvitados');
   if (!tbody || !window.cumpleStore) return;
@@ -122,6 +430,8 @@ function renderInvitados() {
   if (searchVal) {
     invitados = invitados.filter(i =>
       (i.nombre || '').toLowerCase().includes(searchVal) ||
+      (i.familia || '').toLowerCase().includes(searchVal) ||
+      (i.nombresIntegrantes || '').toLowerCase().includes(searchVal) ||
       (i.disfraz || '').toLowerCase().includes(searchVal) ||
       (i.telefono || '').toLowerCase().includes(searchVal)
     );
@@ -129,19 +439,21 @@ function renderInvitados() {
 
   if (filterVal === 'si') {
     invitados = invitados.filter(i => i.asistira === true);
+  } else if (filterVal === 'pendiente') {
+    invitados = invitados.filter(i => i.asistira === null || i.asistira === undefined || i.asistira === 'pendiente');
   } else if (filterVal === 'no') {
     invitados = invitados.filter(i => i.asistira === false);
   } else if (filterVal === 'sin-mesa') {
-    invitados = invitados.filter(i => i.asistira === true && !i.mesaId);
+    invitados = invitados.filter(i => !i.mesaId);
   }
 
   tbody.innerHTML = '';
 
   if (invitados.length === 0) {
     if ((data.invitados || []).length === 0) {
-      tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--org-text-muted); padding: 2.5rem 1rem;"><div style="font-size: 2rem; margin-bottom: 0.5rem;">💌</div><strong style="color: var(--org-text-main); font-size: 1rem;">No hay invitados registrados todavía</strong><br><span style="font-size: 0.85rem;">Las confirmaciones de la invitación web aparecerán aquí automáticamente o puedes agregar invitados manualmente con el botón superior.</span></td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--org-text-muted); padding: 3rem 1rem;"><div style="font-size: 2.5rem; margin-bottom: 0.5rem;">💌</div><strong style="color: var(--org-text-main); font-size: 1.05rem;">No hay invitados registrados todavía</strong><br><span style="font-size: 0.88rem;">Usa el creador de arriba para generar la primera invitación personalizada para una persona, pareja o familia.</span></td></tr>`;
     } else {
-      tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--org-text-muted); padding: 2rem;">No se encontraron invitados con estos criterios de búsqueda.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--org-text-muted); padding: 2rem;">No se encontraron invitados con estos criterios de búsqueda.</td></tr>`;
     }
     return;
   }
@@ -149,9 +461,17 @@ function renderInvitados() {
   invitados.forEach(inv => {
     const tr = document.createElement('tr');
 
-    const statusBadge = inv.asistira
-      ? `<span class="badge-status badge-yes"><i class="ri-check-line"></i> Asiste</span>`
-      : `<span class="badge-status badge-no"><i class="ri-close-line"></i> No asiste</span>`;
+    let statusBadge = '';
+    if (inv.asistira === true) {
+      statusBadge = `<span class="badge-status badge-yes"><i class="ri-check-line"></i> Asiste</span>`;
+    } else if (inv.asistira === false) {
+      statusBadge = `<span class="badge-status badge-no"><i class="ri-close-line"></i> No asiste</span>`;
+    } else {
+      statusBadge = `<span class="badge-status badge-pending"><i class="ri-time-line"></i> Pendiente</span>`;
+    }
+
+    const typeLabel = inv.tipo === 'familia' ? '👨‍👩‍👧 Familia' : inv.tipo === 'pareja' ? '👥 Pareja' : '👤 Individual';
+    const typeClass = inv.tipo === 'familia' ? 'type-familia' : inv.tipo === 'pareja' ? 'type-pareja' : 'type-individual';
 
     // Dropdown inline de mesas
     let mesaOptions = `<option value="">-- Sin mesa --</option>`;
@@ -160,36 +480,51 @@ function renderInvitados() {
       mesaOptions += `<option value="${m.id}" ${selected}>Mesa ${m.numero}: ${escapeHtml(m.nombre)}</option>`;
     });
 
-    const phoneDigits = (inv.telefono || '').replace(/[^0-9]/g, '');
-    const phoneLink = phoneDigits
-      ? `<a href="https://wa.me/${phoneDigits}" target="_blank" class="btn-icon-action" title="Escribir por WhatsApp"><i class="ri-whatsapp-line" style="color: #25d366;"></i></a>`
-      : '';
+    const phoneDigits = (inv.telefono || '').replace(/\D/g, '');
+    const cleanPhone = phoneDigits.startsWith('9') && phoneDigits.length === 9 ? '56' + phoneDigits : phoneDigits;
+    const invUrl = generatePersonalizedUrl(inv);
+    const waMsg = buildWhatsAppMessage(inv, invUrl);
+    const waUrl = cleanPhone
+      ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMsg)}`
+      : `https://api.whatsapp.com/send?text=${encodeURIComponent(waMsg)}`;
+
+    const totalPases = (Number(inv.adultos) || 0) + (Number(inv.ninos) || 0);
 
     tr.innerHTML = `
       <td>
-        <strong>${escapeHtml(inv.nombre || '')}</strong>
-        ${inv.dedicatoria ? `<div style="font-size: 0.78rem; color: #8b5cf6; font-style: italic;">💌 "${escapeHtml(inv.dedicatoria)}"</div>` : ''}
+        <strong>${escapeHtml(inv.nombre || inv.familia || 'Invitado')}</strong>
+        ${inv.nombresIntegrantes ? `<div style="font-size: 0.78rem; color: #495057; margin-top: 0.2rem;"><i class="ri-group-line" style="color: var(--org-teal);"></i> ${escapeHtml(inv.nombresIntegrantes)}</div>` : ''}
+        <div><span class="badge-type ${typeClass}">${typeLabel}</span></div>
+        ${inv.dedicatoria ? `<div style="font-size: 0.76rem; color: #7048e8; font-style: italic; margin-top: 0.25rem;">💌 "${escapeHtml(inv.dedicatoria)}"</div>` : ''}
       </td>
       <td>
-        <div style="display: flex; align-items: center; gap: 0.35rem;">
-          <span>${escapeHtml(inv.telefono || '—')}</span>
-          ${phoneLink}
-        </div>
+        <strong style="color: var(--org-primary); font-size: 0.95rem;">${totalPases} pases</strong>
+        <div style="font-size: 0.78rem; color: var(--org-text-muted);">${inv.adultos || 0} ad. &bull; ${inv.ninos || 0} niñ.</div>
+      </td>
+      <td>
+        <span>${escapeHtml(inv.telefono || '—')}</span>
       </td>
       <td>${statusBadge}</td>
-      <td style="text-align: center;">${inv.asistira ? (inv.adultos || 0) : '0'}</td>
-      <td style="text-align: center;">${inv.asistira ? (inv.ninos || 0) : '0'}</td>
-      <td>${escapeHtml(inv.disfraz || '—')}</td>
-      <td>${escapeHtml(inv.alergias || '—')}</td>
       <td>
-        ${inv.asistira ? `
-          <select class="filter-select select-inline-mesa" data-invid="${inv.id}" style="font-size: 0.8rem; padding: 0.3rem 0.5rem;">
-            ${mesaOptions}
-          </select>
-        ` : '<span style="color: #adb5bd;">—</span>'}
+        <select class="filter-select select-inline-mesa" data-invid="${inv.id}" style="font-size: 0.8rem; padding: 0.3rem 0.5rem; max-width: 155px;">
+          ${mesaOptions}
+        </select>
+      </td>
+      <td>
+        <div style="font-size: 0.82rem;"><strong>🎭</strong> ${escapeHtml(inv.disfraz || 'Por definir')}</div>
+        ${inv.alergias ? `<div style="font-size: 0.76rem; color: #d6336c;">⚠️ ${escapeHtml(inv.alergias)}</div>` : ''}
       </td>
       <td style="text-align: right;">
-        <div class="row-actions" style="justify-content: flex-end;">
+        <div class="row-actions" style="justify-content: flex-end; gap: 0.35rem; flex-wrap: wrap;">
+          <a href="${escapeHtml(waUrl)}" target="_blank" rel="noopener" class="btn-row-whatsapp" title="Enviar invitación personalizada por WhatsApp">
+            <i class="ri-whatsapp-line"></i> <span>WhatsApp</span>
+          </a>
+          <button type="button" class="btn-row-link btn-copy-row-link" data-url="${escapeHtml(invUrl)}" title="Copiar enlace personalizado">
+            <i class="ri-file-copy-line"></i> <span>Copiar</span>
+          </button>
+          <a href="${escapeHtml(invUrl)}" target="_blank" rel="noopener" class="btn-row-view" title="Previsualizar invitación personalizada">
+            <i class="ri-external-link-line"></i>
+          </a>
           <button type="button" class="btn-icon-action btn-edit-inv" data-id="${inv.id}" title="Editar invitado">
             <i class="ri-pencil-line"></i>
           </button>
@@ -209,6 +544,14 @@ function renderInvitados() {
       const invId = e.target.getAttribute('data-invid');
       const newMesaId = e.target.value;
       window.cumpleStore.asignarInvitadoAMesa(invId, newMesaId);
+    });
+  });
+
+  // Listener copiar enlace en fila
+  tbody.querySelectorAll('.btn-copy-row-link').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const url = btn.getAttribute('data-url');
+      copyToClipboard(url);
     });
   });
 

@@ -1721,3 +1721,154 @@ body {
     padding: 0 1rem;
   }
 }
+
+/* ==========================================================================
+   Tarjeta VIP de Invitación Personalizada (Bajo el Mar & Halloween)
+   ========================================================================== */
+.personalized-vip-card {
+  max-width: 680px;
+  margin: 0 0 2rem 0;
+  background: rgba(22, 16, 46, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 24px;
+  border: 1.5px solid rgba(45, 212, 191, 0.45);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(45, 212, 191, 0.25);
+  padding: 1.85rem 2rem;
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+  animation: vipFloat 4s ease-in-out infinite alternate;
+}
+
+@keyframes vipFloat {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-5px); }
+}
+
+.vip-card-glow {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.18) 0%, rgba(45, 212, 191, 0.12) 40%, transparent 70%);
+  pointer-events: none;
+}
+
+.vip-header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--color-teal);
+  background: rgba(45, 212, 191, 0.12);
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(45, 212, 191, 0.3);
+  margin-bottom: 0.85rem;
+}
+
+.vip-guest-title {
+  font-family: var(--font-hero);
+  font-size: clamp(1.8rem, 4.5vw, 2.7rem);
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.18;
+  margin-bottom: 0.35rem;
+  text-shadow: 0 0 25px rgba(168, 85, 247, 0.45);
+}
+
+.vip-guest-subnames {
+  font-size: 1.05rem;
+  color: var(--color-purple-light);
+  font-weight: 600;
+  margin-bottom: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.vip-passes-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(244, 114, 182, 0.2));
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fef3c7;
+  padding: 0.45rem 1.15rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.92rem;
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.25);
+  margin-bottom: 0.75rem;
+}
+
+.vip-personal-msg {
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin: 0;
+}
+
+/* Banner de VIP en RSVP */
+.rsvp-vip-info-banner {
+  background: rgba(45, 212, 191, 0.1);
+  border: 1.5px solid rgba(45, 212, 191, 0.35);
+  border-radius: 16px;
+  padding: 1.15rem 1.35rem;
+  margin-bottom: 1.85rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 0 20px rgba(45, 212, 191, 0.15);
+}
+
+.rsvp-vip-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(45, 212, 191, 0.18);
+  border: 1px solid rgba(45, 212, 191, 0.4);
+  color: var(--color-teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.rsvp-vip-text h4 {
+  font-family: var(--font-title);
+  font-size: 1.15rem;
+  color: #fff;
+  margin: 0 0 0.25rem 0;
+}
+
+.rsvp-vip-text p {
+  font-size: 0.9rem;
+  color: #cbd5e1;
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .personalized-vip-card {
+    padding: 1.35rem 1.25rem;
+    border-radius: 18px;
+  }
+  .vip-guest-title {
+    font-size: 1.6rem;
+  }
+  .vip-passes-pill {
+    font-size: 0.84rem;
+    padding: 0.35rem 0.85rem;
+  }
+  .rsvp-vip-info-banner {
+    flex-direction: column;
+    text-align: center;
+    padding: 1rem;
+  }
+}

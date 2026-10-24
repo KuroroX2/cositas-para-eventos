@@ -133,7 +133,7 @@
         <div class="pane-header-actions">
           <div class="pane-title-group">
             <h3>Lista de Invitados &amp; Confirmaciones</h3>
-            <p>Monitorea quién asiste, acompañantes, disfraces, alergias y mesas asignadas</p>
+            <p>Crea invitaciones personalizadas con link de WhatsApp y monitorea confirmaciones, mesas y disfraces</p>
           </div>
 
           <div class="filter-bar">
@@ -141,13 +141,119 @@
             <select id="filterAsistencia" class="filter-select">
               <option value="all">Todos los Estados</option>
               <option value="si">Confirmados (Sí)</option>
+              <option value="pendiente">Pendientes de Confirmar</option>
               <option value="no">No Asisten (No)</option>
               <option value="sin-mesa">Sin Mesa Asignada</option>
             </select>
-            <button type="button" class="btn-org-action btn-org-primary" id="btnOpenModalAddInvitado">
-              <i class="ri-user-add-line"></i> Agregar Invitado
+            <button type="button" class="btn-org-action btn-org-primary" id="btnToggleGenFormTop">
+              <i class="ri-user-add-line"></i> Crear Invitación
             </button>
           </div>
+        </div>
+
+        <!-- Creador de Invitaciones Personalizadas (Estilo Matrimonios) -->
+        <div class="org-invite-generator-card" id="inviteGeneratorCard">
+          <div class="generator-header">
+            <div class="gen-title-box">
+              <span class="gen-tag"><i class="ri-magic-line"></i> Enlaces Personalizados</span>
+              <h4>Crear Invitación con Nombre(s) o Familia</h4>
+              <p>Genera un link único de WhatsApp para un invitado, pareja o familia completa con sus pases reservados</p>
+            </div>
+            <button type="button" class="btn-org-action btn-org-sm" id="btnToggleGenForm">
+              <i class="ri-arrow-up-s-line" id="iconToggleGen"></i> <span id="textToggleGen">Ocultar Creador</span>
+            </button>
+          </div>
+
+          <form id="formCreatePersonalizedInvite" class="gen-form-body">
+            <!-- Tipo de Invitación -->
+            <div class="gen-type-selector">
+              <label class="gen-type-option">
+                <input type="radio" name="inviteType" value="individual" checked>
+                <div class="gen-type-pill">
+                  <i class="ri-user-line"></i>
+                  <span>👤 Individual (1 Persona)</span>
+                </div>
+              </label>
+
+              <label class="gen-type-option">
+                <input type="radio" name="inviteType" value="pareja">
+                <div class="gen-type-pill">
+                  <i class="ri-team-line"></i>
+                  <span>👥 Pareja / Dúo (2 Personas)</span>
+                </div>
+              </label>
+
+              <label class="gen-type-option">
+                <input type="radio" name="inviteType" value="familia">
+                <div class="gen-type-pill">
+                  <i class="ri-home-heart-line"></i>
+                  <span>👨‍👩‍👧‍👦 Familia con Varias Personas</span>
+                </div>
+              </label>
+            </div>
+
+            <!-- Campos dinámicos según el tipo -->
+            <div class="gen-fields-grid">
+              <!-- Campo: Nombre individual -->
+              <div class="org-form-group field-group-type field-individual" id="grpIndividualName">
+                <label for="genIndivName"><i class="ri-user-smile-line" style="color: var(--org-primary);"></i> Nombre del Invitado *</label>
+                <input type="text" id="genIndivName" class="org-form-input" placeholder="Ej: Tía Marcela / Lucas">
+              </div>
+
+              <!-- Campos: Pareja -->
+              <div class="org-form-group field-group-type field-pareja" id="grpParejaName1" style="display: none;">
+                <label for="genParejaName1"><i class="ri-user-line" style="color: var(--org-primary);"></i> Nombre Primer Invitado *</label>
+                <input type="text" id="genParejaName1" class="org-form-input" placeholder="Ej: Carlos Gómez">
+              </div>
+              <div class="org-form-group field-group-type field-pareja" id="grpParejaName2" style="display: none;">
+                <label for="genParejaName2"><i class="ri-heart-line" style="color: var(--org-pink);"></i> Nombre Segundo Invitado / Pareja *</label>
+                <input type="text" id="genParejaName2" class="org-form-input" placeholder="Ej: Marcela Soto">
+              </div>
+
+              <!-- Campos: Familia -->
+              <div class="org-form-group field-group-type field-familia" id="grpFamiliaName" style="display: none;">
+                <label for="genFamName"><i class="ri-home-smile-line" style="color: var(--org-primary);"></i> Nombre de la Familia *</label>
+                <input type="text" id="genFamName" class="org-form-input" placeholder="Ej: Familia Morales Castro">
+              </div>
+              <div class="org-form-group field-group-type field-familia" id="grpFamiliaMembers" style="display: none;">
+                <label for="genFamMembers"><i class="ri-group-line" style="color: var(--org-teal);"></i> Nombres de los integrantes de la familia</label>
+                <input type="text" id="genFamMembers" class="org-form-input" placeholder="Ej: Carlos, Marcela, Mateo y Sofía">
+                <small style="color: var(--org-text-muted); font-size: 0.76rem; display: block; margin-top: 0.2rem;">Se mostrarán detallados con saludo personalizado en la invitación</small>
+              </div>
+
+              <!-- Teléfono / WhatsApp -->
+              <div class="org-form-group">
+                <label for="genPhone"><i class="ri-whatsapp-line" style="color: #25d366;"></i> Teléfono / WhatsApp (para envío directo)</label>
+                <input type="tel" id="genPhone" class="org-form-input" placeholder="Ej: +56 9 1234 5678">
+              </div>
+
+              <!-- Pases: Adultos y Niños -->
+              <div class="org-form-row">
+                <div class="org-form-group">
+                  <label for="genAdultos"><i class="ri-user-line"></i> Pases Adultos</label>
+                  <input type="number" id="genAdultos" class="org-form-input" min="0" max="20" value="1">
+                </div>
+                <div class="org-form-group">
+                  <label for="genNinos"><i class="ri-bear-smile-line"></i> Pases Niños</label>
+                  <input type="number" id="genNinos" class="org-form-input" min="0" max="20" value="0">
+                </div>
+              </div>
+
+              <!-- Asignar Mesa Temática (opcional) -->
+              <div class="org-form-group">
+                <label for="genMesa"><i class="ri-layout-masonry-line"></i> Asignar Mesa (opcional)</label>
+                <select id="genMesa" class="org-form-select">
+                  <option value="">-- Sin mesa asignada --</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="gen-form-actions">
+              <button type="submit" class="btn-org-action btn-org-primary" id="btnSubmitGenerateInvite">
+                <i class="ri-magic-line"></i> <span>Crear Invitación &amp; Generar Enlace</span>
+              </button>
+            </div>
+          </form>
         </div>
 
         <div class="table-responsive">
@@ -155,14 +261,12 @@
             <thead>
               <tr>
                 <th>Invitado / Familia</th>
+                <th>Pases Reservados</th>
                 <th>Teléfono</th>
-                <th>Asistencia</th>
-                <th>Adultos</th>
-                <th>Niños</th>
-                <th>Disfraz</th>
-                <th>Alergias / Dieta</th>
+                <th>Estado Asistencia</th>
                 <th>Mesa Asignada</th>
-                <th style="text-align: right;">Acciones</th>
+                <th>Disfraz / Dieta</th>
+                <th style="text-align: right;">Invitación Personalizada &amp; Acciones</th>
               </tr>
             </thead>
             <tbody id="tbodyInvitados">
@@ -639,6 +743,55 @@
         </div>
       </form>
     </div>
+  </div>
+
+  <!-- Modal Enlace Creado / Compartir -->
+  <div class="org-modal-overlay" id="modalShareInvite">
+    <div class="org-modal-card" style="max-width: 540px;">
+      <div class="org-modal-header">
+        <h4 style="display: flex; align-items: center; gap: 0.5rem; color: #2b8a3e;">
+          <i class="ri-checkbox-circle-fill"></i> ¡Invitación Lista para Enviar!
+        </h4>
+        <button type="button" class="btn-icon-action close-modal">&times;</button>
+      </div>
+      <div class="org-modal-body" style="padding: 1.25rem;">
+        <p style="font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--org-text);">
+          Se generó el enlace personalizado para: <strong id="shareGuestName" style="color: var(--org-primary);">...</strong>
+        </p>
+        <p style="font-size: 0.82rem; color: var(--org-text-muted); margin-bottom: 0.85rem;" id="shareGuestMembers">
+          <!-- Miembros de la familia -->
+        </p>
+        
+        <div style="background: #f8f9fa; border: 1px solid var(--org-border); border-radius: 10px; padding: 0.75rem 1rem; margin-bottom: 1.25rem; word-break: break-all; font-family: monospace; font-size: 0.82rem; color: #495057;" id="shareUrlDisplay">
+          https://...
+        </div>
+
+        <div style="display: flex; gap: 0.65rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
+          <a href="#" target="_blank" rel="noopener" class="btn-org-action" id="btnOpenShareWhatsApp" style="background: #25d366; color: #fff; flex: 1; text-decoration: none; justify-content: center; font-weight: 700;">
+            <i class="ri-whatsapp-line" style="font-size: 1.1rem;"></i> <span>Enviar por WhatsApp</span>
+          </a>
+          <button type="button" class="btn-org-action btn-org-primary" id="btnCopyShareUrl" style="flex: 1;">
+            <i class="ri-file-copy-line"></i> <span>Copiar Enlace</span>
+          </button>
+          <a href="#" target="_blank" rel="noopener" class="btn-org-action" id="btnPreviewShareUrl" style="text-decoration: none;">
+            <i class="ri-external-link-line"></i> <span>Ver</span>
+          </a>
+        </div>
+
+        <div style="background: #e7f5ff; border: 1px solid #a5d8ff; border-radius: 8px; padding: 0.75rem; font-size: 0.82rem; color: #1c7ed6; line-height: 1.4;">
+          <i class="ri-information-line"></i> Al abrir este enlace, la persona o familia verá la invitación de Dominique personalizada con sus nombres y pases reservados listos para confirmar en 1 clic.
+        </div>
+      </div>
+      <div class="org-modal-footer">
+        <button type="button" class="btn-org-action close-modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast de Notificaciones -->
+  <div class="org-toast" id="orgToast">
+    <i class="ri-checkbox-circle-line" style="color: #2dd4bf;"></i>
+    <span id="orgToastMsg">¡Enlace copiado al portapapeles!</span>
   </div>
 
   <!-- Scripts -->

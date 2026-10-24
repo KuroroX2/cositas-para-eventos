@@ -95,10 +95,21 @@ class CumpleStore {
 
   addInvitado(invitado) {
     const nuevo = {
-      id: 'inv-' + Date.now(),
+      id: 'inv-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 4),
       fechaRegistro: new Date().toISOString().slice(0, 16).replace('T', ' '),
+      tipo: 'individual',
+      nombre: '',
+      familia: '',
+      nombresIntegrantes: '',
+      name1: '',
+      name2: '',
+      telefono: '',
+      asistira: null, // null = pendiente, true = confirmado, false = no asiste
       adultos: 1,
       ninos: 0,
+      disfraz: '',
+      alergias: '',
+      dedicatoria: '',
       mesaId: null,
       ...invitado
     };
@@ -113,6 +124,22 @@ class CumpleStore {
       this.data.invitados[idx] = { ...this.data.invitados[idx], ...updates };
       this.save();
       return this.data.invitados[idx];
+    }
+    return null;
+  }
+
+  findInvitado(code, name) {
+    if (code) {
+      const found = this.data.invitados.find(i => i.id === code);
+      if (found) return found;
+    }
+    if (name) {
+      const clean = name.toLowerCase().trim();
+      return this.data.invitados.find(i => 
+        (i.nombre && i.nombre.toLowerCase().trim() === clean) ||
+        (i.familia && i.familia.toLowerCase().trim() === clean) ||
+        (i.name1 && i.name1.toLowerCase().trim() === clean)
+      );
     }
     return null;
   }

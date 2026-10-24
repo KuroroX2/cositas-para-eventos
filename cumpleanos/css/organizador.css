@@ -624,6 +624,217 @@ body.org-body {
 }
 
 /* ==========================================================================
+   Generador de Invitaciones Personalizadas (Estilo Matrimonios)
+   ========================================================================== */
+.org-invite-generator-card {
+  background: linear-gradient(180deg, #ffffff 0%, #faf8ff 100%);
+  border: 1.5px solid #d0bfff;
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 18px rgba(112, 72, 232, 0.08);
+  transition: all 0.3s ease;
+}
+
+.generator-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.gen-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--org-primary);
+  background: var(--org-primary-light);
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  margin-bottom: 0.35rem;
+}
+
+.gen-title-box h4 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--org-text);
+  margin: 0 0 0.2rem 0;
+}
+
+.gen-title-box p {
+  font-size: 0.85rem;
+  color: var(--org-text-muted);
+  margin: 0;
+}
+
+.gen-type-selector {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin: 1.2rem 0 1.25rem 0;
+}
+
+.gen-type-option {
+  cursor: pointer;
+}
+
+.gen-type-option input[type="radio"] {
+  display: none;
+}
+
+.gen-type-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1.15rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--org-border-dark);
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--org-text-muted);
+  background: #fff;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.gen-type-option input:checked + .gen-type-pill {
+  border-color: var(--org-primary);
+  background: var(--org-primary-light);
+  color: var(--org-primary);
+  box-shadow: 0 0 0 3px rgba(112, 72, 232, 0.15);
+}
+
+.gen-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.gen-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  border-top: 1px dashed #d0bfff;
+  padding-top: 1rem;
+  margin-top: 0.5rem;
+}
+
+/* Botones de acción en tabla de invitados */
+.btn-row-whatsapp {
+  background: #25d366;
+  color: #fff !important;
+  border: none;
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-row-whatsapp:hover {
+  background: #1ebe57;
+}
+
+.btn-row-link {
+  background: #e7f5ff;
+  color: #1c7ed6;
+  border: 1px solid #a5d8ff;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-row-link:hover {
+  background: #d0ebff;
+}
+
+.btn-row-view {
+  background: var(--org-primary-light);
+  color: var(--org-primary) !important;
+  border: 1px solid #d0bfff;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-row-view:hover {
+  background: #e5dbff;
+}
+
+.badge-pending {
+  background: #fff3bf;
+  color: #d9480f;
+  border: 1px solid #ffe066;
+}
+
+.badge-type {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  display: inline-block;
+  margin-top: 0.25rem;
+}
+
+.type-individual { background: #e7f5ff; color: #1c7ed6; }
+.type-pareja { background: #fff0f6; color: #d6336c; }
+.type-familia { background: #e6fcf5; color: #0ca678; }
+
+/* Toast de notificación rápida */
+.org-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #212529;
+  color: #fff;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  z-index: 9999;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.org-toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* ==========================================================================
    Modo Impresión (Print Styles)
    ========================================================================== */
 @media print {

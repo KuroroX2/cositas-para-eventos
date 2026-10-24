@@ -72,6 +72,24 @@
         <span>¡Mi Primera Vuelta al Sol! &bull; 31 de Octubre</span>
       </div>
 
+      <!-- Tarjeta VIP Invitación Personalizada (Aparece con enlace personalizado) -->
+      <div class="personalized-vip-card" id="vipPersonalizedCard" style="display: none;">
+        <div class="vip-card-glow"></div>
+        <div class="vip-header-badge">
+          <i class="ri-sparkling-fill" style="color: var(--color-amber);"></i>
+          <span>INVITACIÓN ESPECIAL PARA TI</span>
+          <i class="ri-sparkling-fill" style="color: var(--color-amber);"></i>
+        </div>
+        <h2 class="vip-guest-title" id="vipGuestTitle">Familia Morales</h2>
+        <div class="vip-guest-subnames" id="vipGuestSubnames" style="display: none;"></div>
+        <div class="vip-passes-pill" id="vipPassesPill">
+          <i class="ri-ticket-2-line"></i> <span id="vipPassesText">Pase Especial Reservado</span>
+        </div>
+        <p class="vip-personal-msg" id="vipPersonalMsg">
+          ¡Queremos compartir este día tan mágico e inolvidable junto a ustedes!
+        </p>
+      </div>
+
       <!-- Título Principal Despejado y Elegante -->
       <h1 class="hero-names" style="margin-bottom: 0.35rem; font-size: clamp(3rem, 6.5vw, 5.2rem);">Dominique</h1>
       <div class="hero-subtitle-theme" style="margin-bottom: 1.25rem; font-size: clamp(1.15rem, 2.2vw, 1.6rem);">Mi Cumpleaños N°1 &bull; Bajo el Mar</div>
@@ -366,11 +384,21 @@
         <div class="section-header-modern" style="margin-bottom: 2rem;">
           <span class="section-tag-modern">Confirmación de Asistencia</span>
           <h2 class="section-title-modern">¿Nos Acompañas?</h2>
-          <p class="section-subtitle-modern">Por favor confirma tu asistencia durante esta semana 💖</p>
+          <p class="section-subtitle-modern" id="rsvpSubtitleModern">Por favor confirma tu asistencia durante esta semana 💖</p>
+        </div>
+
+        <!-- Banner VIP en RSVP -->
+        <div id="rsvpVipBanner" class="rsvp-vip-info-banner" style="display: none;">
+          <div class="rsvp-vip-icon"><i class="ri-ticket-2-fill"></i></div>
+          <div class="rsvp-vip-text">
+            <h4 id="rsvpVipTitle">Invitación Reservada</h4>
+            <p id="rsvpVipDesc">Tienes pases reservados para celebrar junto a Dominique. Por favor confírmanos abajo:</p>
+          </div>
         </div>
 
         <!-- Formulario -->
         <form id="rsvpForm" class="rsvp-form-grid">
+          <input type="hidden" id="rsvpInviteCode" value="">
           <div class="input-row-2">
             <div class="input-group">
               <label for="rsvpNombre"><i class="ri-user-smile-line" style="color: var(--color-teal);"></i> Nombre y Apellido (o Familia) *</label>
