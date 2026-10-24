@@ -1478,3 +1478,246 @@ body {
     height: 260px !important;
   }
 }
+
+/* ==========================================================================
+   Sección: Itinerario del Gran Día (Timeline Encantador)
+   ========================================================================== */
+.itinerario-section {
+  margin-bottom: 5rem;
+  position: relative;
+}
+
+.itinerario-container {
+  position: relative;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.itinerario-timeline-rail {
+  position: absolute;
+  top: 32px;
+  bottom: 32px;
+  left: 32px;
+  width: 3px;
+  background: linear-gradient(180deg, var(--color-teal) 0%, var(--color-pink) 35%, var(--color-amber) 70%, var(--color-purple) 100%);
+  border-radius: 999px;
+  box-shadow: 0 0 14px rgba(168, 85, 247, 0.4);
+  opacity: 0.85;
+}
+
+.itinerario-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.75rem;
+  position: relative;
+}
+
+.itinerario-node {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.65rem;
+  z-index: 2;
+  position: relative;
+  flex-shrink: 0;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+}
+
+.step-teal .itinerario-node {
+  background: #0f0b24;
+  border: 2.5px solid var(--color-teal);
+  color: var(--color-teal);
+  box-shadow: 0 0 25px var(--color-teal-glow), inset 0 0 10px rgba(45, 212, 191, 0.2);
+}
+
+.step-pink .itinerario-node {
+  background: #0f0b24;
+  border: 2.5px solid var(--color-pink);
+  color: var(--color-pink);
+  box-shadow: 0 0 25px rgba(244, 114, 182, 0.45), inset 0 0 10px rgba(244, 114, 182, 0.2);
+}
+
+.step-amber .itinerario-node {
+  background: #0f0b24;
+  border: 2.5px solid var(--color-amber);
+  color: var(--color-amber);
+  box-shadow: 0 0 25px var(--color-amber-glow), inset 0 0 10px rgba(245, 158, 11, 0.2);
+}
+
+.step-purple .itinerario-node {
+  background: #0f0b24;
+  border: 2.5px solid var(--color-purple-light);
+  color: var(--color-purple-light);
+  box-shadow: 0 0 25px var(--color-purple-glow), inset 0 0 10px rgba(168, 85, 247, 0.2);
+}
+
+.itinerario-card {
+  flex: 1;
+  background: var(--color-bg-card);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-radius: 20px;
+  border: 1px solid var(--border-glass);
+  padding: 1.65rem 2rem;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.itinerario-step:hover .itinerario-card {
+  transform: translateX(6px);
+}
+
+.itinerario-step:hover .itinerario-node {
+  transform: scale(1.1);
+}
+
+.step-teal:hover .itinerario-card {
+  border-color: rgba(45, 212, 191, 0.5);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 25px rgba(45, 212, 191, 0.2);
+}
+
+.step-pink:hover .itinerario-card {
+  border-color: rgba(244, 114, 182, 0.5);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 25px rgba(244, 114, 182, 0.2);
+}
+
+.step-amber:hover .itinerario-card {
+  border-color: rgba(245, 158, 11, 0.5);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 25px rgba(245, 158, 11, 0.2);
+}
+
+.step-purple:hover .itinerario-card {
+  border-color: rgba(168, 85, 247, 0.5);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 25px rgba(168, 85, 247, 0.2);
+}
+
+.itinerario-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.itinerario-time-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  padding: 0.35rem 0.95rem;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+}
+
+.step-teal .itinerario-time-badge {
+  background: rgba(45, 212, 191, 0.15);
+  color: var(--color-teal);
+  border: 1px solid rgba(45, 212, 191, 0.35);
+}
+
+.step-pink .itinerario-time-badge {
+  background: rgba(244, 114, 182, 0.15);
+  color: var(--color-pink);
+  border: 1px solid rgba(244, 114, 182, 0.35);
+}
+
+.step-amber .itinerario-time-badge {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--color-amber);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.step-purple .itinerario-time-badge {
+  background: rgba(168, 85, 247, 0.15);
+  color: var(--color-purple-light);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+}
+
+.itinerario-tag-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-text-muted);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+}
+
+.itinerario-card-title {
+  font-family: var(--font-title);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.itinerario-card-desc {
+  font-size: 0.98rem;
+  color: #cbd5e1;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.itinerario-disclaimer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  margin-top: 2.25rem;
+  font-size: 0.75rem;
+  color: var(--color-text-dim);
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+.itinerario-disclaimer i {
+  color: var(--color-teal);
+  font-size: 0.95rem;
+}
+
+@media (max-width: 640px) {
+  .itinerario-step {
+    gap: 1rem;
+  }
+  .itinerario-node {
+    width: 48px;
+    height: 48px;
+    font-size: 1.25rem;
+  }
+  .itinerario-timeline-rail {
+    left: 24px;
+    top: 24px;
+    bottom: 24px;
+  }
+  .itinerario-card {
+    padding: 1.25rem 1.15rem;
+    border-radius: 16px;
+  }
+  .itinerario-card-title {
+    font-size: 1.12rem;
+  }
+  .itinerario-card-desc {
+    font-size: 0.9rem;
+  }
+  .itinerario-time-badge {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.75rem;
+  }
+  .itinerario-disclaimer {
+    font-size: 0.7rem;
+    padding: 0 1rem;
+  }
+}

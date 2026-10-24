@@ -138,7 +138,11 @@ function renderInvitados() {
   tbody.innerHTML = '';
 
   if (invitados.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--org-text-muted); padding: 2rem;">No se encontraron invitados con estos criterios.</td></tr>`;
+    if ((data.invitados || []).length === 0) {
+      tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--org-text-muted); padding: 2.5rem 1rem;"><div style="font-size: 2rem; margin-bottom: 0.5rem;">💌</div><strong style="color: var(--org-text-main); font-size: 1rem;">No hay invitados registrados todavía</strong><br><span style="font-size: 0.85rem;">Las confirmaciones de la invitación web aparecerán aquí automáticamente o puedes agregar invitados manualmente con el botón superior.</span></td></tr>`;
+    } else {
+      tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--org-text-muted); padding: 2rem;">No se encontraron invitados con estos criterios de búsqueda.</td></tr>`;
+    }
     return;
   }
 
@@ -243,7 +247,7 @@ function renderMesas() {
   container.innerHTML = '';
 
   if (mesas.length === 0) {
-    container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: var(--org-text-muted);">No has creado mesas aún. ¡Crea la primera para organizar a los invitados!</div>`;
+    container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 3rem 1.5rem; background: var(--org-surface); border-radius: var(--org-radius); border: 1px dashed var(--org-border); color: var(--org-text-muted);"><div style="font-size: 2.2rem; margin-bottom: 0.5rem;">🍽️</div><strong style="color: var(--org-text-main); font-size: 1.05rem;">No hay mesas creadas todavía</strong><br><span style="font-size: 0.88rem;">Presiona "+ Nueva Mesa" para organizar los asientos y la distribución del salón.</span></div>`;
     return;
   }
 
@@ -366,7 +370,7 @@ function renderComida() {
   tbody.innerHTML = '';
 
   if (comida.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--org-text-muted); padding: 2rem;">No hay ítems de comida registrados.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--org-text-muted); padding: 2.5rem 1rem;"><div style="font-size: 2rem; margin-bottom: 0.5rem;">🎂</div><strong style="color: var(--org-text-main); font-size: 1rem;">No hay ítems de comida registrados aún</strong><br><span style="font-size: 0.85rem;">Presiona "+ Agregar Ítem" para registrar la torta, cóctel o bebidas.</span></td></tr>`;
     return;
   }
 
@@ -435,7 +439,7 @@ function renderCotillon() {
   tbody.innerHTML = '';
 
   if (cotillon.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--org-text-muted); padding: 2rem;">No hay ítems de cotillón registrados.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--org-text-muted); padding: 2.5rem 1rem;"><div style="font-size: 2rem; margin-bottom: 0.5rem;">🎈</div><strong style="color: var(--org-text-main); font-size: 1rem;">No hay ítems de cotillón registrados aún</strong><br><span style="font-size: 0.85rem;">Presiona "+ Agregar Ítem" para registrar decoración, recuerdos o sorpresas.</span></td></tr>`;
     return;
   }
 
@@ -887,9 +891,9 @@ function initBackupsAndPrint() {
     reader.readAsText(file);
   });
 
-  // Restaurar datos de ejemplo
+  // Restablecer listas e itinerario oficial
   document.getElementById('btnResetDefaults')?.addEventListener('click', () => {
-    if (confirm('¿Deseas restaurar los datos iniciales de ejemplo? Esto reemplazará las listas actuales.')) {
+    if (confirm('¿Deseas restablecer el organizador? Esto dejará las listas limpias (sin invitados, mesas, comida ni cotillón de prueba) y cargará el itinerario oficial del día.')) {
       window.cumpleStore.resetToDefaults();
     }
   });

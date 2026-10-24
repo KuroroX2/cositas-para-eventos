@@ -59,9 +59,9 @@ function initCalendar() {
     title: "Primer Cumpleaños de Dominique 🧜‍♀️🎃",
     description: "¡Celebramos la primera vuelta al sol de Dominique! Temática: Bajo el mar con toque de Halloween. ¡Te espero con tu mejor disfraz!",
     location: "Club Valle del Sol, Senecio 4593, Puente Alto, Chile",
-    // 31 de Octubre 2026, 15:00 a 20:00 hora de Chile (UTC-3 -> 18:00Z a 23:00Z)
+    // 31 de Octubre 2026, 15:00 a 21:00 hora de Chile (UTC-3 -> 18:00Z a 00:00Z)
     startDate: "20261031T180000Z",
-    endDate: "20261031T230000Z"
+    endDate: "20261101T000000Z"
   };
 
   const googleUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventDetails.title)}&dates=${eventDetails.startDate}/${eventDetails.endDate}&details=${encodeURIComponent(eventDetails.description)}&location=${encodeURIComponent(eventDetails.location)}`;
