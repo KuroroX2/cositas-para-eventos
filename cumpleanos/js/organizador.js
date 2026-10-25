@@ -335,7 +335,21 @@ function generatePersonalizedUrl(inv) {
 }
 
 /**
- * Redacta el mensaje cariñoso de WhatsApp con link
+ * Genera la URL oficial de la API de WhatsApp para evitar corrupción de emojis en Windows y navegadores de escritorio
+ */
+function buildWhatsAppUrl(phone, message) {
+  const phoneDigits = (phone || '').replace(/\D/g, '');
+  const cleanPhone = phoneDigits.startsWith('9') && phoneDigits.length === 9 ? '56' + phoneDigits : phoneDigits;
+  const encodedText = encodeURIComponent(message);
+  
+  if (cleanPhone) {
+    return `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodedText}`;
+  }
+  return `https://api.whatsapp.com/send?text=${encodedText}`;
+}
+
+/**
+ * Redacta el mensaje cariñoso de WhatsApp con link y emojis estándar ultra-compatibles
  */
 function buildWhatsAppMessage(inv, url) {
   const isFamily = inv.tipo === 'familia' || !!inv.familia;
@@ -343,11 +357,11 @@ function buildWhatsAppMessage(inv, url) {
 
   let greeting = '';
   if (isFamily) {
-    greeting = `¡Hola ${inv.familia || inv.nombre}! 🧜‍♀️✨`;
+    greeting = `¡Hola ${inv.familia || inv.nombre}! 🧜✨`;
   } else if (isCouple) {
-    greeting = `¡Hola ${inv.name1} y ${inv.name2}! 🧜‍♀️✨`;
+    greeting = `¡Hola ${inv.name1} y ${inv.name2}! 🧜✨`;
   } else {
-    greeting = `¡Hola ${inv.nombre}! 🧜‍♀️✨`;
+    greeting = `¡Hola ${inv.nombre}! 🧜✨`;
   }
 
   let detallePersonas = '';
@@ -403,26 +417,29 @@ function showShareModal(inv, url) {
   if (urlDisplay) urlDisplay.textContent = url;
 
   // WhatsApp
-  const phoneDigits = (inv.telefono || '').replace(/\D/g, '');
-  const cleanPhone = phoneDigits.startsWith('9') && phoneDigits.length === 9 ? '56' + phoneDigits : phoneDigits;
   const waMsg = buildWhatsAppMessage(inv, url);
   const waBtn = document.getElementById('btnOpenShareWhatsApp');
   if (waBtn) {
-    const waUrl = cleanPhone
-      ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMsg)}`
-      : `https://api.whatsapp.com/send?text=${encodeURIComponent(waMsg)}`;
-    waBtn.href = waUrl;
+    waBtn.href = buildWhatsAppUrl(inv.telefono, waMsg);
   }
 
   // Previsualizar
   const prevBtn = document.getElementById('btnPreviewShareUrl');
   if (prevBtn) prevBtn.href = url;
 
-  // Copiar
+  // Copiar solo enlace
   const copyBtn = document.getElementById('btnCopyShareUrl');
   if (copyBtn) {
     copyBtn.onclick = () => {
-      copyToClipboard(url);
+      copyToClipboard(url, '¡Enlace personalizado copiado al portapapeles!');
+    };
+  }
+
+  // Copiar mensaje completo con emojis
+  const copyMsgBtn = document.getElementById('btnCopyShareMsg');
+  if (copyMsgBtn) {
+    copyMsgBtn.onclick = () => {
+      copyToClipboard(waMsg, '¡Mensaje completo con emojis copiado! Listo para pegar en WhatsApp');
     };
   }
 
@@ -443,15 +460,15 @@ function showToast(msg) {
   }, 3500);
 }
 
-function copyToClipboard(text) {
+function copyToClipboard(text, customToastMsg = '¡Enlace personalizado copiado al portapapeles!') {
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(() => {
-      showToast('¡Enlace personalizado copiado al portapapeles!');
+      showToast(customToastMsg);
     }).catch(() => {
-      prompt('Copia el enlace manualmente:', text);
+      prompt('Copia el texto manualmente:', text);
     });
   } else {
-    prompt('Copia el enlace manualmente:', text);
+    prompt('Copia el texto manualmente:', text);
   }
 }
 
@@ -552,13 +569,9 @@ function renderInvitados() {
     const typeLabel = inv.tipo === 'familia' ? '👨‍👩‍👧 Familia' : inv.tipo === 'pareja' ? '👥 Pareja' : '👤 Individual';
     const typeClass = inv.tipo === 'familia' ? 'type-familia' : inv.tipo === 'pareja' ? 'type-pareja' : 'type-individual';
 
-    const phoneDigits = (inv.telefono || '').replace(/\D/g, '');
-    const cleanPhone = phoneDigits.startsWith('9') && phoneDigits.length === 9 ? '56' + phoneDigits : phoneDigits;
     const invUrl = generatePersonalizedUrl(inv);
     const waMsg = buildWhatsAppMessage(inv, invUrl);
-    const waUrl = cleanPhone
-      ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMsg)}`
-      : `https://api.whatsapp.com/send?text=${encodeURIComponent(waMsg)}`;
+    const waUrl = buildWhatsAppUrl(inv.telefono, waMsg);
 
     const totalPersonas = (Number(inv.adultos) || 0) + (Number(inv.ninos) || 0);
     const isChecked = selectedGuestIds.has(inv.id);
@@ -583,11 +596,14 @@ function renderInvitados() {
       <td>${statusBadge}</td>
       <td style="text-align: right;">
         <div class="row-actions" style="justify-content: flex-end; gap: 0.35rem; flex-wrap: wrap;">
-          <a href="${escapeHtml(waUrl)}" target="_blank" rel="noopener" class="btn-row-whatsapp" title="Enviar invitación personalizada por WhatsApp">
+          <a href="${escapeHtml(waUrl)}" target="_blank" rel="noopener" class="btn-row-whatsapp" title="Abrir en WhatsApp">
             <i class="ri-whatsapp-line"></i> <span>WhatsApp</span>
           </a>
-          <button type="button" class="btn-row-link btn-copy-row-link" data-url="${escapeHtml(invUrl)}" title="Copiar enlace personalizado">
-            <i class="ri-file-copy-line"></i> <span>Copiar</span>
+          <button type="button" class="btn-row-link btn-copy-row-msg" data-msg="${escapeHtml(waMsg)}" title="Copiar mensaje con emojis para WhatsApp" style="background: #f1f5f9; border-color: #cbd5e1; color: #334155;">
+            <i class="ri-file-text-line"></i> <span>Mensaje</span>
+          </button>
+          <button type="button" class="btn-row-link btn-copy-row-link" data-url="${escapeHtml(invUrl)}" title="Copiar solo enlace">
+            <i class="ri-file-copy-line"></i> <span>Link</span>
           </button>
           <a href="${escapeHtml(invUrl)}" target="_blank" rel="noopener" class="btn-row-view" title="Previsualizar invitación personalizada">
             <i class="ri-external-link-line"></i>
@@ -622,11 +638,19 @@ function renderInvitados() {
     });
   });
 
-  // Listener copiar enlace en fila
+  // Listener copiar solo enlace en fila
   tbody.querySelectorAll('.btn-copy-row-link').forEach(btn => {
     btn.addEventListener('click', () => {
       const url = btn.getAttribute('data-url');
-      copyToClipboard(url);
+      copyToClipboard(url, '¡Enlace copiado al portapapeles!');
+    });
+  });
+
+  // Listener copiar mensaje completo con emojis en fila
+  tbody.querySelectorAll('.btn-copy-row-msg').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const msg = btn.getAttribute('data-msg');
+      copyToClipboard(msg, '¡Mensaje completo con emojis copiado! Listo para pegar en WhatsApp');
     });
   });
 
@@ -687,13 +711,9 @@ function initBulkSend() {
     listContainer.innerHTML = '';
 
     currentQueue.forEach((inv, idx) => {
-      const phoneDigits = (inv.telefono || '').replace(/\D/g, '');
-      const cleanPhone = phoneDigits.startsWith('9') && phoneDigits.length === 9 ? '56' + phoneDigits : phoneDigits;
       const invUrl = generatePersonalizedUrl(inv);
       const waMsg = buildWhatsAppMessage(inv, invUrl);
-      const waUrl = cleanPhone
-        ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMsg)}`
-        : `https://api.whatsapp.com/send?text=${encodeURIComponent(waMsg)}`;
+      const waUrl = buildWhatsAppUrl(inv.telefono, waMsg);
 
       const row = document.createElement('div');
       row.className = 'bulk-queue-row';
@@ -709,8 +729,11 @@ function initBulkSend() {
         </div>
         <div style="display: flex; gap: 0.4rem; align-items: center;">
           <span class="bulk-item-status" id="bulk-status-${idx}" style="font-size: 0.75rem; color: #94a3b8; font-weight: 600;">Pendiente</span>
+          <button type="button" class="btn-org-action btn-org-sm btn-copy-bulk-msg" data-idx="${idx}" data-msg="${escapeHtml(waMsg)}" style="background: #6366f1; color: white; border: none; font-size: 0.8rem; padding: 0.35rem 0.65rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.3rem;" title="Copiar mensaje con emojis para WhatsApp">
+            <i class="ri-file-text-line"></i> Copiar
+          </button>
           <a href="${escapeHtml(waUrl)}" target="_blank" rel="noopener" class="btn-org-action btn-org-sm btn-open-bulk-wa" data-idx="${idx}" style="background: #25d366; color: white; border: none; font-size: 0.8rem; text-decoration: none; padding: 0.35rem 0.65rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.3rem;">
-            <i class="ri-whatsapp-line"></i> Abrir WhatsApp
+            <i class="ri-whatsapp-line"></i> WhatsApp
           </a>
         </div>
       `;
@@ -724,12 +747,21 @@ function initBulkSend() {
         markSent(idx);
       });
     });
+
+    listContainer.querySelectorAll('.btn-copy-bulk-msg').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.getAttribute('data-idx'), 10);
+        const msg = btn.getAttribute('data-msg');
+        copyToClipboard(msg, '¡Mensaje con emojis copiado! Listo para pegar en WhatsApp');
+        markSent(idx);
+      });
+    });
   }
 
   function markSent(idx) {
     const statusEl = document.getElementById(`bulk-status-${idx}`);
     if (statusEl) {
-      statusEl.innerHTML = `<span style="color: #16a34a;"><i class="ri-check-line"></i> Abierto</span>`;
+      statusEl.innerHTML = `<span style="color: #16a34a;"><i class="ri-check-line"></i> Listo</span>`;
     }
     const rowEl = document.getElementById(`bulk-row-${idx}`);
     if (rowEl) {
@@ -744,13 +776,9 @@ function initBulkSend() {
     }
 
     const inv = currentQueue[currentIndex];
-    const phoneDigits = (inv.telefono || '').replace(/\D/g, '');
-    const cleanPhone = phoneDigits.startsWith('9') && phoneDigits.length === 9 ? '56' + phoneDigits : phoneDigits;
     const invUrl = generatePersonalizedUrl(inv);
     const waMsg = buildWhatsAppMessage(inv, invUrl);
-    const waUrl = cleanPhone
-      ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMsg)}`
-      : `https://api.whatsapp.com/send?text=${encodeURIComponent(waMsg)}`;
+    const waUrl = buildWhatsAppUrl(inv.telefono, waMsg);
 
     markSent(currentIndex);
     window.open(waUrl, '_blank', 'noopener');
