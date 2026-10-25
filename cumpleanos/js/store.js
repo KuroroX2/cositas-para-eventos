@@ -291,8 +291,11 @@ class CumpleStore {
     }
     this.isPushing = true;
     this.repushNeeded = false;
-    window.dispatchEvent(new CustomEvent('cumple_cloud_status', { detail: { status: 'syncing', message: 'Guardando en Supabase...' } }));
-    this.data._cloud_synced_at = new Date().toISOString();
+    const nowIso = this.data._cloud_synced_at || new Date().toISOString();
+    this.data._cloud_synced_at = nowIso;
+    try {
+      localStorage.setItem(this.storageKey, JSON.stringify(this.data));
+    } catch (e) {}
     try {
       const ok = await window.cumpleSupabase.uploadState(this.isDemo, this.data);
       if (ok) {

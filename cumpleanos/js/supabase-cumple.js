@@ -54,9 +54,10 @@ class CumpleSupabaseClient {
    */
   async uploadState(isDemo = false, data = {}) {
     const slug = this.getStoreSlug(isDemo);
+    const syncTime = data._cloud_synced_at || new Date().toISOString();
     const payload = {
       ...data,
-      _cloud_synced_at: new Date().toISOString()
+      _cloud_synced_at: syncTime
     };
 
     try {
