@@ -3,6 +3,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+  setupViewInvitationButton();
   initTabs();
   initModals();
   initInviteGenerator();
@@ -29,6 +30,28 @@ function renderAll() {
   renderCotillon();
   renderCronograma();
   loadSettingsFormData();
+}
+
+/**
+ * Configura el enlace del botón "Ver Invitación" para abrir la invitación en una nueva pestaña
+ */
+function setupViewInvitationButton() {
+  const btn = document.getElementById('btnViewInvite');
+  if (!btn) return;
+  btn.setAttribute('target', '_blank');
+  btn.setAttribute('rel', 'noopener');
+
+  if (window.location.protocol === 'file:') {
+    const isSubdir = window.location.pathname.includes('/organizador/');
+    btn.href = isSubdir ? '../index.html' : 'index.html';
+  } else {
+    const origin = (window.location.origin && window.location.origin !== 'null') ? window.location.origin : '';
+    if (window.location.pathname.includes('/cumpleanos')) {
+      btn.href = `${origin}/cumpleanos/`;
+    } else {
+      btn.href = `${origin}/`;
+    }
+  }
 }
 
 /**
@@ -245,21 +268,23 @@ function generatePersonalizedUrl(inv) {
       baseUrl = cleanHref.replace(/organizador.*$/, 'index.html');
     }
   } else {
-    let basePath = loc.pathname;
-    if (basePath.includes('/organizador/')) {
-      basePath = basePath.replace('/organizador/', '/');
-    } else if (basePath.includes('/organizador.html')) {
-      basePath = basePath.replace('/organizador.html', '/index.html');
-    } else {
-      basePath = basePath.replace(/organizador.*$/, 'index.html');
-    }
-    if (!basePath.endsWith('index.html') && !basePath.endsWith('/')) {
-      basePath += '/index.html';
-    } else if (basePath.endsWith('/')) {
-      basePath += 'index.html';
-    }
     const origin = (loc.origin && loc.origin !== 'null') ? loc.origin : '';
-    baseUrl = `${origin}${basePath}`;
+    if (loc.pathname.includes('/cumpleanos')) {
+      baseUrl = `${origin}/cumpleanos/`;
+    } else {
+      let basePath = loc.pathname;
+      if (basePath.includes('/organizador/')) {
+        basePath = basePath.replace('/organizador/', '/');
+      } else if (basePath.includes('/organizador.html')) {
+        basePath = basePath.replace('/organizador.html', '/');
+      } else {
+        basePath = basePath.replace(/organizador.*$/, '');
+      }
+      if (!basePath.endsWith('/')) {
+        basePath += '/';
+      }
+      baseUrl = `${origin}${basePath}`;
+    }
   }
 
   const params = new URLSearchParams();
