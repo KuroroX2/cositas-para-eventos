@@ -1058,13 +1058,46 @@ function renderCronograma() {
  * ==========================================================================
  */
 function initModals() {
-  // Cerrar modales al hacer clic en close o overlay
+  // Cerrar modales al hacer clic en close o overlay (protegido contra selección de texto)
   document.querySelectorAll('.org-modal-overlay').forEach(modal => {
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal || e.target.classList.contains('close-modal')) {
-        modal.style.display = 'none';
+    let isMouseDownDirectlyOnOverlay = false;
+
+    modal.addEventListener('mousedown', (e) => {
+      // Solo es verdadero si el clic inicial comenzó directamente sobre el fondo exterior
+      isMouseDownDirectlyOnOverlay = (e.target === modal);
+    });
+
+    modal.addEventListener('mouseup', (e) => {
+      // Si el usuario soltó el mouse fuera del fondo exterior, no cerrar
+      if (e.target !== modal) {
+        isMouseDownDirectlyOnOverlay = false;
       }
     });
+
+    modal.addEventListener('click', (e) => {
+      // Botón con clase close-modal (cruz o Cancelar)
+      if (e.target.classList.contains('close-modal') || e.target.closest('.close-modal')) {
+        modal.style.display = 'none';
+        isMouseDownDirectlyOnOverlay = false;
+        return;
+      }
+
+      // Solo cerrar si el clic empezó Y terminó directamente sobre el fondo gris exterior
+      // Evita que al arrastrar para seleccionar texto de derecha a izquierda se cierre el modal
+      if (e.target === modal && isMouseDownDirectlyOnOverlay) {
+        modal.style.display = 'none';
+      }
+      isMouseDownDirectlyOnOverlay = false;
+    });
+  });
+
+  // Tecla Escape para cerrar modales de forma opcional
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.org-modal-overlay').forEach(m => {
+        if (m.style.display === 'flex') m.style.display = 'none';
+      });
+    }
   });
 
   // Modal Invitado
