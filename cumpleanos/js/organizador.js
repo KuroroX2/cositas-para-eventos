@@ -208,21 +208,7 @@ function initInviteGenerator() {
   const grpMembers = document.getElementById('grpFamiliaMembers');
   const inputAdultos = document.getElementById('genAdultos');
   const inputNinos = document.getElementById('genNinos');
-  const btnToggle = document.getElementById('btnToggleGenForm');
-  const cardGen = document.getElementById('inviteGeneratorCard');
 
-  // Alternar vista del creador
-  function toggleGenerator() {
-    if (!cardGen) return;
-    const isHidden = cardGen.style.display === 'none';
-    cardGen.style.display = isHidden ? 'block' : 'none';
-    const textToggle = document.getElementById('textToggleGen');
-    const iconToggle = document.getElementById('iconToggleGen');
-    if (textToggle) textToggle.textContent = isHidden ? 'Ocultar Creador' : 'Mostrar Creador';
-    if (iconToggle) iconToggle.className = isHidden ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line';
-  }
-
-  btnToggle?.addEventListener('click', toggleGenerator);
 
   // Cambio de tipo de invitación (Individual / Pareja / Familia)
   typeRadios.forEach(radio => {
