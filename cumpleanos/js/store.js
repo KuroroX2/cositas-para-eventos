@@ -202,6 +202,30 @@ class CumpleStore {
         }
         return parsed;
       }
+
+      // Si no hay datos en la clave actual y no es el modo demo, buscar si quedaron guardados en claves previas
+      if (!isDemoContext()) {
+        const legacyKeys = [
+          'cumple_domi_data_v1',
+          'cumple_domi_data',
+          'cumple_data_v2',
+          'cumple_data_v1',
+          'cumple_data'
+        ];
+        for (const k of legacyKeys) {
+          const leg = localStorage.getItem(k);
+          if (leg) {
+            try {
+              const parsedLeg = JSON.parse(leg);
+              if (parsedLeg && ((parsedLeg.comida && parsedLeg.comida.length > 0) || (parsedLeg.invitados && parsedLeg.invitados.length > 0) || (parsedLeg.cotillon && parsedLeg.cotillon.length > 0))) {
+                console.log(`[CumpleStore] Migrando automáticamente datos desde clave previa '${k}' a '${this.storageKey}'`);
+                this.save(parsedLeg);
+                return parsedLeg;
+              }
+            } catch (err) {}
+          }
+        }
+      }
     } catch (e) {
       console.error('Error al cargar datos de localStorage:', e);
     }
@@ -442,15 +466,30 @@ class CumpleStore {
 
   importJSON(jsonString) {
     try {
-      const parsed = JSON.parse(jsonString);
-      if (parsed.evento && parsed.invitados) {
-        this.save(parsed);
-        return true;
+      const parsed = typeof jsonString === 'string' ? JSON.parse(jsonString) : jsonString;
+      if (parsed && typeof parsed === 'object') {
+        const current = this.data || {};
+        const sanitized = {
+          evento: (parsed.evento && typeof parsed.evento === 'object') ? parsed.evento : (current.evento || {}),
+          invitados: Array.isArray(parsed.invitados) ? parsed.invitados : (current.invitados || []),
+          mesas: Array.isArray(parsed.mesas) ? parsed.mesas : (current.mesas || []),
+          comida: Array.isArray(parsed.comida) ? parsed.comida : (current.comida || []),
+          cotillon: Array.isArray(parsed.cotillon) ? parsed.cotillon : (current.cotillon || []),
+          cronograma: Array.isArray(parsed.cronograma) ? parsed.cronograma : (current.cronograma || [])
+        };
+        this.save(sanitized);
+        return {
+          success: true,
+          countComida: sanitized.comida.length,
+          countInvitados: sanitized.invitados.length,
+          countMesas: sanitized.mesas.length,
+          countCotillon: sanitized.cotillon.length
+        };
       }
     } catch (e) {
       console.error('JSON inválido:', e);
     }
-    return false;
+    return { success: false };
   }
 }
 

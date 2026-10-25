@@ -43,6 +43,10 @@
         <button type="button" class="btn-org-action" id="btnPrintOrg" title="Imprimir reporte de prueba">
           <i class="ri-printer-line"></i> <span>Imprimir</span>
         </button>
+        <button type="button" class="btn-org-action" id="btnImportJsonTop" title="Subir y restaurar respaldo desde un archivo JSON">
+          <i class="ri-upload-2-line"></i> <span>Importar Respaldo</span>
+        </button>
+        <input type="file" id="inputImportJsonTop" accept=".json" style="display: none;">
         <button type="button" class="btn-org-action btn-org-primary" id="btnExportJsonTop" title="Descargar copia de respaldo">
           <i class="ri-download-2-line"></i> <span>Exportar Respaldo</span>
         </button>
@@ -327,9 +331,14 @@
             <h3>Planificación de Comida, Torta &amp; Bebidas</h3>
             <p>Control de cóctel, mesa dulce, torta temática y dispensadores de jugos</p>
           </div>
-          <button type="button" class="btn-org-action btn-org-primary" id="btnOpenModalAddComida">
-            <i class="ri-add-line"></i> Agregar Ítem de Comida
-          </button>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button type="button" class="btn-org-action" onclick="(document.getElementById('inputImportJsonTop') || document.getElementById('inputImportJson')).click();" title="Importar respaldo JSON descargado">
+              <i class="ri-upload-2-line"></i> <span>Importar Respaldo</span>
+            </button>
+            <button type="button" class="btn-org-action btn-org-primary" id="btnOpenModalAddComida">
+              <i class="ri-add-line"></i> Agregar Ítem de Comida
+            </button>
+          </div>
         </div>
 
         <div class="table-responsive">
@@ -481,14 +490,14 @@
         </div>
 
         <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-          <button type="button" class="btn-org-action" id="btnExportJson">
+          <button type="button" class="btn-org-action btn-org-primary" id="btnExportJson">
             <i class="ri-file-download-line"></i> Descargar Datos (JSON)
           </button>
 
-          <label class="btn-org-action" style="cursor: pointer;">
+          <button type="button" class="btn-org-action" id="btnImportJsonTab" style="cursor: pointer; background: #e7f5ff; border-color: #339af0; color: #1971c2;">
             <i class="ri-file-upload-line"></i> Cargar Respaldo (JSON)
-            <input type="file" id="inputImportJson" accept=".json" style="display: none;">
-          </label>
+          </button>
+          <input type="file" id="inputImportJson" accept=".json" style="display: none;">
 
           <button type="button" class="btn-org-action" id="btnResetDefaults" style="color: #fa5252;">
             <i class="ri-refresh-line"></i> Restablecer Listas e Itinerario

@@ -1421,19 +1421,53 @@ function initBackupsAndPrint() {
   document.getElementById('btnExportJson')?.addEventListener('click', handleExport);
 
   // Importar JSON
-  document.getElementById('inputImportJson')?.addEventListener('change', (e) => {
-    const file = e.target.files[0];
+  const handleImportFile = (file, inputEl) => {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (event) => {
-      const ok = window.cumpleStore.importJSON(event.target.result);
-      if (ok) {
-        alert('¡Respaldo cargado con éxito!');
-      } else {
-        alert('Error: El archivo no contiene un formato de respaldo válido.');
+      try {
+        const res = window.cumpleStore.importJSON(event.target.result);
+        const ok = (typeof res === 'object') ? res.success : !!res;
+        if (ok) {
+          const stats = (typeof res === 'object' && res.countComida !== undefined)
+            ? `\n\nResumen restaurado:\n• ${res.countComida} ítem(s) en Comidas y Torta\n• ${res.countInvitados} invitaciones\n• ${res.countMesas || 0} mesas\n• ${res.countCotillon || 0} cotillón`
+            : '';
+          alert(`¡Respaldo cargado con éxito! 🎉${stats}`);
+          renderAll();
+        } else {
+          alert('Error: El archivo no contiene un formato de respaldo válido de Cositas Para Eventos.');
+        }
+      } catch (err) {
+        alert('Error al leer el archivo JSON: ' + (err.message || err));
+      } finally {
+        if (inputEl) inputEl.value = '';
       }
     };
     reader.readAsText(file);
+  };
+
+  const bindFileInput = (id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      handleImportFile(file, e.target);
+    });
+  };
+
+  bindFileInput('inputImportJson');
+  bindFileInput('inputImportJsonTop');
+
+  // Botón Importar en la barra superior
+  document.getElementById('btnImportJsonTop')?.addEventListener('click', () => {
+    const topInput = document.getElementById('inputImportJsonTop') || document.getElementById('inputImportJson');
+    topInput?.click();
+  });
+
+  // Botón Importar en la pestaña de Ajustes
+  document.getElementById('btnImportJsonTab')?.addEventListener('click', () => {
+    const tabInput = document.getElementById('inputImportJson') || document.getElementById('inputImportJsonTop');
+    tabInput?.click();
   });
 
   // Restablecer listas e itinerario oficial
