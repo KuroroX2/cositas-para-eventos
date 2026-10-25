@@ -32,6 +32,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Clic en la insignia de la nube para forzar sincronización manual
+  const cloudBadgeEl = document.getElementById('orgCloudBadge');
+  if (cloudBadgeEl) {
+    cloudBadgeEl.style.cursor = 'pointer';
+    cloudBadgeEl.addEventListener('click', async () => {
+      const localCount = (window.cumpleStore.data?.comida?.length || 0) + (window.cumpleStore.data?.invitados?.length || 0);
+      const action = confirm(
+        `☁️ Sincronización con Supabase Cloud\n\n` +
+        `Tu equipo actual tiene: ${localCount} ítems guardados.\n\n` +
+        `• Haz clic en ACEPTAR para FORZAR SUBIDA de tus datos a la nube.\n` +
+        `• Haz clic en CANCELAR para FORZAR DESCARGA de lo que haya en la nube.`
+      );
+      if (action) {
+        cloudBadgeEl.innerHTML = `<i class="ri-refresh-line"></i> <span>Subiendo a Supabase...</span>`;
+        const ok = await window.cumpleStore.forcePushToCloud();
+        if (ok) {
+          alert('¡Tus datos locales fueron subidos a Supabase Cloud con éxito! 🎉 Ahora cualquier otro equipo los verá al instante.');
+        } else {
+          alert('No se pudo subir a Supabase. Revisa tu conexión a internet.');
+        }
+      } else {
+        cloudBadgeEl.innerHTML = `<i class="ri-refresh-line"></i> <span>Descargando de Supabase...</span>`;
+        await window.cumpleStore.pullFromCloud(false);
+      }
+    });
+  }
+
   // Render inicial
   renderAll();
 });

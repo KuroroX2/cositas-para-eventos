@@ -1,117 +1,106 @@
 /**
  * supabase-cumple.js - Sincronización en la Nube con Supabase para el Cumpleaños
- * Permite que los papás colaboren en tiempo real desde diferentes computadores y celulares.
+ * Utiliza la tabla de base de datos relacional de Supabase con permisos de lectura y actualización
  */
 
 const CUMPLE_SUPABASE_URL = 'https://igzxrpfghohdzcsqekir.supabase.co';
 const CUMPLE_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlnenhycGZnaG9oZHpjc3Fla2lyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwMTM2ODksImV4cCI6MjEwMzU4OTY4OX0.5iCkpu-usMMGeUfrPUpaWuJJmLEXALePauKKE-U2AgI';
-const STORAGE_BUCKET = 'wedding-photos';
 
 class CumpleSupabaseClient {
   constructor() {
     this.url = CUMPLE_SUPABASE_URL;
     this.key = CUMPLE_SUPABASE_ANON_KEY;
-    this.client = null;
-    this.initClient();
   }
 
-  initClient() {
-    if (window.supabase && typeof window.supabase.createClient === 'function') {
-      try {
-        this.client = window.supabase.createClient(this.url, this.key);
-      } catch (e) {
-        console.warn('Error inicializando Supabase SDK:', e);
-      }
-    }
-  }
-
-  getSlug(isDemo = false) {
-    return isDemo ? 'cumple-demo' : 'cumple-domi';
-  }
-
-  getStoragePath(slug) {
-    return `cumpleanos/${slug}/state.json`;
-  }
-
-  getPublicUrl(slug) {
-    return `${this.url}/storage/v1/object/public/${STORAGE_BUCKET}/${this.getStoragePath(slug)}?t=${Date.now()}`;
+  getStoreSlug(isDemo = false) {
+    return isDemo ? 'cumple-demo-store' : 'cumple-domi-store';
   }
 
   /**
-   * Descarga el estado más reciente desde Supabase Storage
+   * Descarga el estado guardado en Supabase (tabla photos / JSONB)
    */
   async downloadState(isDemo = false) {
-    const slug = this.getSlug(isDemo);
+    const slug = this.getStoreSlug(isDemo);
     try {
-      const res = await fetch(this.getPublicUrl(slug), {
+      const endpoint = `${this.url}/rest/v1/photos?event_slug=eq.${slug}&select=*&order=created_at.desc&limit=1`;
+      const res = await fetch(endpoint, {
         method: 'GET',
-        cache: 'no-store'
+        headers: {
+          'apikey': this.key,
+          'Authorization': `Bearer ${this.key}`,
+          'Accept': 'application/json',
+          'Cache-Control': 'no-cache'
+        }
       });
+
       if (res.ok) {
-        const json = await res.json();
-        return json;
+        const rows = await res.json();
+        if (Array.isArray(rows) && rows.length > 0 && rows[0].comments) {
+          const state = rows[0].comments;
+          // Validar si es un objeto con estado real
+          if (state && typeof state === 'object' && (Array.isArray(state.comida) || Array.isArray(state.invitados) || state.evento)) {
+            return state;
+          }
+        }
       }
     } catch (e) {
-      console.warn('[Supabase Cloud] No se pudo descargar estado desde la nube:', e);
+      console.warn('[Supabase Cloud] Error al descargar estado:', e);
     }
     return null;
   }
 
   /**
-   * Sube el estado completo a Supabase Storage con sobrescritura (upsert)
+   * Sube el estado a Supabase con actualización segura (UPSERT / PATCH)
    */
   async uploadState(isDemo = false, data = {}) {
-    const slug = this.getSlug(isDemo);
-    const path = this.getStoragePath(slug);
-    const payload = JSON.stringify({
+    const slug = this.getStoreSlug(isDemo);
+    const payload = {
       ...data,
       _cloud_synced_at: new Date().toISOString()
-    });
+    };
 
-    // Método 1: vía fetch directo a Storage API
     try {
-      const endpoint = `${this.url}/storage/v1/object/${STORAGE_BUCKET}/${path}`;
-      const res = await fetch(endpoint, {
-        method: 'POST',
+      // 1. Buscar si ya existe el registro del estado
+      const checkEndpoint = `${this.url}/rest/v1/photos?event_slug=eq.${slug}&select=id&limit=1`;
+      const checkRes = await fetch(checkEndpoint, {
+        method: 'GET',
         headers: {
           'apikey': this.key,
           'Authorization': `Bearer ${this.key}`,
-          'Content-Type': 'application/json',
-          'x-upsert': 'true'
-        },
-        body: payload
+          'Accept': 'application/json'
+        }
       });
 
-      if (res.ok) {
-        return true;
+      if (checkRes.ok) {
+        const existing = await checkRes.json();
+        if (Array.isArray(existing) && existing.length > 0 && existing[0].id) {
+          // 2. Actualizar registro existente con PATCH
+          const updateEndpoint = `${this.url}/rest/v1/photos?id=eq.${existing[0].id}`;
+          const patchRes = await fetch(updateEndpoint, {
+            method: 'PATCH',
+            headers: {
+              'apikey': this.key,
+              'Authorization': `Bearer ${this.key}`,
+              'Content-Type': 'application/json',
+              'Prefer': 'return=representation'
+            },
+            body: JSON.stringify({
+              comments: payload,
+              category: 'cloud_sync',
+              caption: `cumple_sync_${Date.now()}`
+            })
+          });
+
+          if (patchRes.ok) {
+            console.log('[Supabase Cloud] Estado actualizado exitosamente en la nube (PATCH).');
+            return true;
+          }
+        }
       }
-    } catch (e) {
-      console.warn('[Supabase Cloud] Error en uploadState fetch:', e);
-    }
 
-    // Método 2: vía SDK si está cargado
-    if (this.client && this.client.storage) {
-      try {
-        const blob = new Blob([payload], { type: 'application/json' });
-        const { error } = await this.client.storage
-          .from(STORAGE_BUCKET)
-          .upload(path, blob, { upsert: true });
-        if (!error) return true;
-      } catch (err) {
-        console.warn('[Supabase Cloud] Error en uploadState SDK:', err);
-      }
-    }
-
-    return false;
-  }
-
-  /**
-   * Guarda confirmaciones de invitados (RSVP) en la tabla relacional de Supabase
-   */
-  async recordRsvp(rsvpData) {
-    try {
-      const endpoint = `${this.url}/rest/v1/rsvps`;
-      await fetch(endpoint, {
+      // 3. Si no existe, crear con POST
+      const postEndpoint = `${this.url}/rest/v1/photos`;
+      const postRes = await fetch(postEndpoint, {
         method: 'POST',
         headers: {
           'apikey': this.key,
@@ -120,17 +109,24 @@ class CumpleSupabaseClient {
           'Prefer': 'return=representation'
         },
         body: JSON.stringify({
-          event_slug: 'cumple-domi',
-          name1: rsvpData.nombre || 'Invitado',
-          attendance1: !!rsvpData.asistira,
-          phone: rsvpData.telefono || '',
-          message: rsvpData.dedicatoria || '',
-          dietary1: `Adultos: ${rsvpData.adultos || 1}, Niños: ${rsvpData.ninos || 0}`
+          event_slug: slug,
+          author_name: 'CumpleStore',
+          category: 'cloud_sync',
+          caption: `cumple_init_${Date.now()}`,
+          photo_url: 'https://placeholder.test/organizador.json',
+          comments: payload
         })
       });
+
+      if (postRes.ok) {
+        console.log('[Supabase Cloud] Estado inicial creado exitosamente en la nube (POST).');
+        return true;
+      }
     } catch (e) {
-      console.warn('[Supabase Cloud] Error registrando RSVP en tabla:', e);
+      console.warn('[Supabase Cloud] Error al subir estado a Supabase:', e);
     }
+
+    return false;
   }
 }
 

@@ -214,56 +214,79 @@ class CumpleStore {
         window.dispatchEvent(new CustomEvent('cumple_cloud_status', { detail: { status: 'syncing', message: 'Conectando con Supabase...' } }));
       }
       const cloudData = await window.cumpleSupabase.downloadState(this.isDemo);
+      const localItems = (this.data.comida?.length || 0) + (this.data.invitados?.length || 0) + (this.data.mesas?.length || 0);
+
+      // Si no hay datos válidos en la nube:
       if (!cloudData) {
-        // Si no hay datos en la nube pero sí tenemos datos locales (ej. las 21 cosas de la mamá), subir a la nube
-        const localItems = (this.data.comida?.length || 0) + (this.data.invitados?.length || 0);
         if (localItems > 0) {
-          this.pushToCloud();
+          console.log('[CumpleStore] Local tiene datos pero la nube está vacía. Subiendo a Supabase...');
+          await this.forcePushToCloud();
+        } else {
+          window.dispatchEvent(new CustomEvent('cumple_cloud_status', { detail: { status: 'synced', message: 'Nube Supabase Conectada' } }));
         }
         return;
       }
 
+      const cloudItems = (cloudData.comida?.length || 0) + (cloudData.invitados?.length || 0) + (cloudData.mesas?.length || 0);
       const cloudTime = new Date(cloudData._cloud_synced_at || 0).getTime();
       const localTime = new Date(this.data._cloud_synced_at || 0).getTime();
-      const localItems = (this.data.comida?.length || 0) + (this.data.invitados?.length || 0);
-      const cloudItems = (cloudData.comida?.length || 0) + (cloudData.invitados?.length || 0);
 
-      // Si la nube es más reciente O si el equipo local no tiene datos y la nube sí:
-      if (cloudTime > localTime || (localItems === 0 && cloudItems > 0)) {
-        console.log('[CumpleStore] Datos más recientes encontrados en Supabase Cloud. Sincronizando...');
-        this.data = {
-          ...this.data,
-          ...cloudData
-        };
+      console.log(`[CumpleStore] Estado: Nube=${cloudItems} ítems, Local=${localItems} ítems.`);
+
+      // REGLA 1: Si local tiene más cosas (ej. la mamá con sus 21 comidas) que la nube
+      if (localItems > cloudItems) {
+        console.log(`[CumpleStore] Local tiene más datos (${localItems}) que la nube (${cloudItems}). Subiendo a Supabase...`);
+        await this.forcePushToCloud();
+        return;
+      }
+
+      // REGLA 2: Si la nube tiene más cosas que local (ej. el papá con 0 cosas y la mamá ya subió sus 21 comidas)
+      if (cloudItems > localItems) {
+        console.log(`[CumpleStore] Nube tiene más datos (${cloudItems}) que local (${localItems}). Descargando...`);
+        this.data = { ...this.data, ...cloudData };
         localStorage.setItem(this.storageKey, JSON.stringify(this.data));
         window.dispatchEvent(new CustomEvent('cumple_store_updated', { detail: this.data }));
-        window.dispatchEvent(new CustomEvent('cumple_cloud_status', { detail: { status: 'synced', message: 'Sincronizado con Supabase' } }));
-      } else if (localTime > cloudTime && localItems > 0) {
-        // El equipo local tiene cambios más recientes: subirlos a la nube
-        this.pushToCloud();
-      } else {
-        window.dispatchEvent(new CustomEvent('cumple_cloud_status', { detail: { status: 'synced', message: 'Sincronizado con Supabase' } }));
+        window.dispatchEvent(new CustomEvent('cumple_cloud_status', { detail: { status: 'synced', message: `Sincronizado (${cloudItems} ítems)` } }));
+        return;
       }
+
+      // REGLA 3: Misma cantidad de ítems, comparar fechas
+      if (cloudTime > localTime) {
+        this.data = { ...this.data, ...cloudData };
+        localStorage.setItem(this.storageKey, JSON.stringify(this.data));
+        window.dispatchEvent(new CustomEvent('cumple_store_updated', { detail: this.data }));
+      } else if (localTime > cloudTime) {
+        await this.forcePushToCloud();
+      }
+
+      window.dispatchEvent(new CustomEvent('cumple_cloud_status', { detail: { status: 'synced', message: 'Nube Supabase Sincronizada' } }));
     } catch (e) {
       console.warn('[CumpleStore] Error al sincronizar con la nube:', e);
       window.dispatchEvent(new CustomEvent('cumple_cloud_status', { detail: { status: 'error', message: 'Modo local' } }));
     }
   }
 
-  pushToCloud() {
-    if (!window.cumpleSupabase) return;
-    clearTimeout(this.cloudDebounceTimer);
-    this.cloudDebounceTimer = setTimeout(async () => {
-      window.dispatchEvent(new CustomEvent('cumple_cloud_status', { detail: { status: 'syncing', message: 'Guardando en Supabase...' } }));
-      this.data._cloud_synced_at = new Date().toISOString();
-      try {
-        const ok = await window.cumpleSupabase.uploadState(this.isDemo, this.data);
-        if (ok) {
-          window.dispatchEvent(new CustomEvent('cumple_cloud_status', { detail: { status: 'synced', message: 'Guardado en la nube' } }));
-        }
-      } catch (err) {
-        console.warn('[CumpleStore] Error al subir a Supabase:', err);
+  async forcePushToCloud() {
+    if (!window.cumpleSupabase) return false;
+    window.dispatchEvent(new CustomEvent('cumple_cloud_status', { detail: { status: 'syncing', message: 'Guardando en Supabase...' } }));
+    this.data._cloud_synced_at = new Date().toISOString();
+    try {
+      const ok = await window.cumpleSupabase.uploadState(this.isDemo, this.data);
+      if (ok) {
+        const count = (this.data.comida?.length || 0) + (this.data.invitados?.length || 0);
+        window.dispatchEvent(new CustomEvent('cumple_cloud_status', { detail: { status: 'synced', message: `Nube al día (${count} ítems)` } }));
+        return true;
       }
+    } catch (err) {
+      console.warn('[CumpleStore] Error al subir a Supabase:', err);
+    }
+    return false;
+  }
+
+  pushToCloud() {
+    clearTimeout(this.cloudDebounceTimer);
+    this.cloudDebounceTimer = setTimeout(() => {
+      this.forcePushToCloud();
     }, 1200);
   }
 
