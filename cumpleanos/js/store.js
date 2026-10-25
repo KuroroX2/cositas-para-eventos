@@ -182,7 +182,89 @@ const DEMO_INITIAL_DATA = {
 class CumpleStore {
   constructor() {
     this.storageKey = getActiveStorageKey();
+    this.isDemo = isDemoContext();
     this.data = this.load();
+    this.cloudDebounceTimer = null;
+    this.initCloudSync();
+  }
+
+  initCloudSync() {
+    // Sincronizar desde la nube al iniciar
+    setTimeout(() => {
+      this.pullFromCloud();
+    }, 150);
+
+    // Polling en segundo plano cada 25 segundos
+    setInterval(() => {
+      this.pullFromCloud(true);
+    }, 25000);
+
+    // Re-sincronizar automáticamente cada vez que el usuario vuelve a la pestaña
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', () => {
+        this.pullFromCloud(true);
+      });
+    }
+  }
+
+  async pullFromCloud(silent = false) {
+    if (!window.cumpleSupabase) return;
+    try {
+      if (!silent) {
+        window.dispatchEvent(new CustomEvent('cumple_cloud_status', { detail: { status: 'syncing', message: 'Conectando con Supabase...' } }));
+      }
+      const cloudData = await window.cumpleSupabase.downloadState(this.isDemo);
+      if (!cloudData) {
+        // Si no hay datos en la nube pero sí tenemos datos locales (ej. las 21 cosas de la mamá), subir a la nube
+        const localItems = (this.data.comida?.length || 0) + (this.data.invitados?.length || 0);
+        if (localItems > 0) {
+          this.pushToCloud();
+        }
+        return;
+      }
+
+      const cloudTime = new Date(cloudData._cloud_synced_at || 0).getTime();
+      const localTime = new Date(this.data._cloud_synced_at || 0).getTime();
+      const localItems = (this.data.comida?.length || 0) + (this.data.invitados?.length || 0);
+      const cloudItems = (cloudData.comida?.length || 0) + (cloudData.invitados?.length || 0);
+
+      // Si la nube es más reciente O si el equipo local no tiene datos y la nube sí:
+      if (cloudTime > localTime || (localItems === 0 && cloudItems > 0)) {
+        console.log('[CumpleStore] Datos más recientes encontrados en Supabase Cloud. Sincronizando...');
+        this.data = {
+          ...this.data,
+          ...cloudData
+        };
+        localStorage.setItem(this.storageKey, JSON.stringify(this.data));
+        window.dispatchEvent(new CustomEvent('cumple_store_updated', { detail: this.data }));
+        window.dispatchEvent(new CustomEvent('cumple_cloud_status', { detail: { status: 'synced', message: 'Sincronizado con Supabase' } }));
+      } else if (localTime > cloudTime && localItems > 0) {
+        // El equipo local tiene cambios más recientes: subirlos a la nube
+        this.pushToCloud();
+      } else {
+        window.dispatchEvent(new CustomEvent('cumple_cloud_status', { detail: { status: 'synced', message: 'Sincronizado con Supabase' } }));
+      }
+    } catch (e) {
+      console.warn('[CumpleStore] Error al sincronizar con la nube:', e);
+      window.dispatchEvent(new CustomEvent('cumple_cloud_status', { detail: { status: 'error', message: 'Modo local' } }));
+    }
+  }
+
+  pushToCloud() {
+    if (!window.cumpleSupabase) return;
+    clearTimeout(this.cloudDebounceTimer);
+    this.cloudDebounceTimer = setTimeout(async () => {
+      window.dispatchEvent(new CustomEvent('cumple_cloud_status', { detail: { status: 'syncing', message: 'Guardando en Supabase...' } }));
+      this.data._cloud_synced_at = new Date().toISOString();
+      try {
+        const ok = await window.cumpleSupabase.uploadState(this.isDemo, this.data);
+        if (ok) {
+          window.dispatchEvent(new CustomEvent('cumple_cloud_status', { detail: { status: 'synced', message: 'Guardado en la nube' } }));
+        }
+      } catch (err) {
+        console.warn('[CumpleStore] Error al subir a Supabase:', err);
+      }
+    }, 1200);
   }
 
   getInitialTemplate() {
@@ -198,7 +280,7 @@ class CumpleStore {
         const parsed = JSON.parse(stored);
         if (!parsed.cronograma || !Array.isArray(parsed.cronograma)) {
           parsed.cronograma = JSON.parse(JSON.stringify(this.getInitialTemplate().cronograma || []));
-          this.save(parsed);
+          this.save(parsed, false);
         }
         return parsed;
       }
@@ -230,15 +312,19 @@ class CumpleStore {
       console.error('Error al cargar datos de localStorage:', e);
     }
     const template = this.getInitialTemplate();
-    this.save(template);
+    this.save(template, false);
     return template;
   }
 
-  save(dataToSave = this.data) {
+  save(dataToSave = this.data, syncCloud = true) {
     try {
       this.data = dataToSave;
+      this.data._cloud_synced_at = new Date().toISOString();
       localStorage.setItem(this.storageKey, JSON.stringify(this.data));
       window.dispatchEvent(new CustomEvent('cumple_store_updated', { detail: this.data }));
+      if (syncCloud) {
+        this.pushToCloud();
+      }
     } catch (e) {
       console.error('Error al guardar en localStorage:', e);
     }

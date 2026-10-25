@@ -17,6 +17,21 @@ document.addEventListener('DOMContentLoaded', () => {
     renderAll();
   });
 
+  // Escuchar estado de sincronización en la nube con Supabase
+  window.addEventListener('cumple_cloud_status', (e) => {
+    const badge = document.getElementById('orgCloudBadge');
+    if (!badge) return;
+    const { status, message } = e.detail || {};
+    badge.className = 'org-cloud-badge ' + (status || '');
+    if (status === 'syncing') {
+      badge.innerHTML = `<i class="ri-refresh-line"></i> <span>${message || 'Guardando en Supabase...'}</span>`;
+    } else if (status === 'synced') {
+      badge.innerHTML = `<i class="ri-checkbox-circle-line"></i> <span>${message || 'Nube Supabase Sincronizada'}</span>`;
+    } else {
+      badge.innerHTML = `<i class="ri-cloud-line"></i> <span>${message || 'Nube Supabase'}</span>`;
+    }
+  });
+
   // Render inicial
   renderAll();
 });

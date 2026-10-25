@@ -100,6 +100,43 @@ body.org-body {
   flex-wrap: wrap;
 }
 
+.org-cloud-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  background: rgba(45, 212, 191, 0.12);
+  border: 1px solid rgba(45, 212, 191, 0.35);
+  color: #0d9488;
+  transition: all 0.25s ease;
+  user-select: none;
+}
+
+.org-cloud-badge.syncing {
+  background: rgba(234, 179, 8, 0.15);
+  border-color: rgba(234, 179, 8, 0.45);
+  color: #b45309;
+}
+
+.org-cloud-badge.syncing i {
+  display: inline-block;
+  animation: spinCloud 1s linear infinite;
+}
+
+.org-cloud-badge.synced {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.4);
+  color: #15803d;
+}
+
+@keyframes spinCloud {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 @media (max-width: 900px) {
   .org-header-inner {
     flex-direction: column;
@@ -113,6 +150,10 @@ body.org-body {
   .btn-org-action {
     padding: 0.45rem 0.75rem;
     font-size: 0.82rem;
+  }
+  .org-cloud-badge {
+    font-size: 0.76rem;
+    padding: 0.35rem 0.75rem;
   }
 }
 
