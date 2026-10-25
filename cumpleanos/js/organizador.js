@@ -128,9 +128,14 @@ function renderMetrics() {
 
   const invitados = data.invitados || [];
   const totalInvitaciones = invitados.length;
-  const totalPersonas = invitados.reduce((sum, i) => sum + (Number(i.adultos) || 0) + (Number(i.ninos) || 0), 0);
+  const totalAdultosInv = invitados.reduce((sum, i) => sum + (Number(i.adultos) || 0), 0);
+  const totalNinosInv = invitados.reduce((sum, i) => sum + (Number(i.ninos) || 0), 0);
+  const totalPersonas = totalAdultosInv + totalNinosInv;
+
   const confirmados = invitados.filter(i => i.asistira === true);
-  const totalAsistentes = confirmados.reduce((sum, i) => sum + (Number(i.adultos) || 0) + (Number(i.ninos) || 0), 0);
+  const totalAdultosConf = confirmados.reduce((sum, i) => sum + (Number(i.adultos) || 0), 0);
+  const totalNinosConf = confirmados.reduce((sum, i) => sum + (Number(i.ninos) || 0), 0);
+  const totalAsistentes = totalAdultosConf + totalNinosConf;
 
   // Comida
   const comida = data.comida || [];
@@ -145,14 +150,28 @@ function renderMetrics() {
   // Actualizar métricas visuales
   const elTotalInv = document.getElementById('metricTotalInvitaciones');
   const elTotalPer = document.getElementById('metricTotalPersonas');
+  const elTotalPerSub = document.getElementById('metricTotalPersonasSub');
   const elGuests = document.getElementById('metricGuests');
+  const elGuestsSub = document.getElementById('metricGuestsSub');
   const elFood = document.getElementById('metricFood');
   const elParty = document.getElementById('metricParty');
   const elBudget = document.getElementById('metricBudget');
 
   if (elTotalInv) elTotalInv.innerText = `${totalInvitaciones} invitación${totalInvitaciones === 1 ? '' : 'es'}`;
   if (elTotalPer) elTotalPer.innerText = `${totalPersonas} personas`;
+  if (elTotalPerSub) {
+    elTotalPerSub.innerHTML = `
+      <span class="tag-adultos" title="Adultos invitados"><i class="ri-user-line"></i> ${totalAdultosInv} adulto${totalAdultosInv === 1 ? '' : 's'}</span>
+      <span class="tag-ninos" title="Niños invitados"><i class="ri-bear-smile-line"></i> ${totalNinosInv} niño${totalNinosInv === 1 ? '' : 's'}</span>
+    `;
+  }
   if (elGuests) elGuests.innerText = `${totalAsistentes} personas`;
+  if (elGuestsSub) {
+    elGuestsSub.innerHTML = `
+      <span class="tag-adultos" title="Adultos confirmados"><i class="ri-user-line"></i> ${totalAdultosConf} adulto${totalAdultosConf === 1 ? '' : 's'}</span>
+      <span class="tag-ninos" title="Niños confirmados"><i class="ri-bear-smile-line"></i> ${totalNinosConf} niño${totalNinosConf === 1 ? '' : 's'}</span>
+    `;
+  }
   if (elFood) elFood.innerText = `${comidaLista} / ${comida.length}`;
   if (elParty) elParty.innerText = `${cotillonListo} / ${cotillon.length}`;
   if (elBudget) elBudget.innerText = `$${(costoComida + costoCotillon).toLocaleString('es-CL')}`;

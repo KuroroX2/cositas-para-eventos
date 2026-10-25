@@ -249,6 +249,38 @@ body.org-body {
   margin-top: 0.2rem;
 }
 
+.metric-sub {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  margin-top: 0.35rem;
+  font-size: 0.73rem;
+  font-weight: 600;
+}
+
+.metric-sub .tag-adultos {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: #eef2ff;
+  color: #4338ca;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  line-height: 1.2;
+}
+
+.metric-sub .tag-ninos {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: #fdf2f8;
+  color: #db2777;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  line-height: 1.2;
+}
+
 /* ==========================================================================
    Barra de Pestañas (Tabs)
    ========================================================================== */

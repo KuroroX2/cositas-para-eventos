@@ -17,8 +17,8 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css">
 
   <!-- Estilos -->
-  <link rel="stylesheet" href="../../css/organizador.css?v=20261025d">
-  <link rel="stylesheet" href="/cumpleanos/css/organizador.css?v=20261025d">
+  <link rel="stylesheet" href="../../css/organizador.css?v=20261025l">
+  <link rel="stylesheet" href="/cumpleanos/css/organizador.css?v=20261025l">
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
@@ -77,6 +77,7 @@
         <div class="metric-info">
           <div class="num" id="metricTotalPersonas">0</div>
           <div class="lbl">Total Personas Invitadas</div>
+          <div class="metric-sub" id="metricTotalPersonasSub"></div>
         </div>
       </div>
 
@@ -86,6 +87,7 @@
         <div class="metric-info">
           <div class="num" id="metricGuests">0</div>
           <div class="lbl">Asistentes Confirmados</div>
+          <div class="metric-sub" id="metricGuestsSub"></div>
         </div>
       </div>
 
@@ -850,9 +852,9 @@
 
   <!-- Scripts con Supabase Cloud Sync -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="../../js/supabase-cumple.js?v=20261025k"></script>
-  <script src="../../js/store.js?v=20261025k"></script>
-  <script src="../../js/organizador.js?v=20261025k"></script>
+  <script src="../../js/supabase-cumple.js?v=20261025l"></script>
+  <script src="../../js/store.js?v=20261025l"></script>
+  <script src="../../js/organizador.js?v=20261025l"></script>
   <script>
     if (typeof window.cumpleStore === 'undefined') {
       var sb = document.createElement('script'); sb.src = '/cumpleanos/js/supabase-cumple.js'; document.head.appendChild(sb);
