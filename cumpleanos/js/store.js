@@ -185,6 +185,9 @@ class CumpleStore {
     this.isDemo = isDemoContext();
     this.data = this.load();
     this.cloudDebounceTimer = null;
+    this.isPushing = false;
+    this.hasPendingPush = false;
+    this.repushNeeded = false;
     this.initCloudSync();
   }
 
@@ -209,16 +212,24 @@ class CumpleStore {
 
   async pullFromCloud(silent = false) {
     if (!window.cumpleSupabase) return;
+
+    // Si el usuario acaba de editar o eliminar algo localmente y aún se está guardando,
+    // NO sobreescribir con los datos antiguos de la nube
+    if (this.isPushing || this.hasPendingPush) {
+      console.log('[CumpleStore] Pull omitido: hay cambios locales pendientes de guardar en Supabase.');
+      return;
+    }
+
     try {
       if (!silent) {
         window.dispatchEvent(new CustomEvent('cumple_cloud_status', { detail: { status: 'syncing', message: 'Conectando con Supabase...' } }));
       }
       const cloudData = await window.cumpleSupabase.downloadState(this.isDemo);
-      const localItems = (this.data.comida?.length || 0) + (this.data.invitados?.length || 0) + (this.data.mesas?.length || 0);
 
-      // Si no hay datos válidos en la nube:
+      // Si no hay datos en la nube:
       if (!cloudData) {
-        if (localItems > 0) {
+        const localItems = (this.data.comida?.length || 0) + (this.data.invitados?.length || 0) + (this.data.mesas?.length || 0);
+        if (localItems > 0 && !this.data._is_default_template) {
           console.log('[CumpleStore] Local tiene datos pero la nube está vacía. Subiendo a Supabase...');
           await this.forcePushToCloud();
         } else {
@@ -227,38 +238,44 @@ class CumpleStore {
         return;
       }
 
-      const cloudItems = (cloudData.comida?.length || 0) + (cloudData.invitados?.length || 0) + (cloudData.mesas?.length || 0);
+      // Si este navegador sólo tiene la plantilla por defecto sin modificaciones del usuario,
+      // la nube SIEMPRE gana y se descarga inmediatamente
+      if (this.data._is_default_template || !this.data._cloud_synced_at) {
+        console.log('[CumpleStore] Local es plantilla inicial virgen. Descargando datos reales de la nube...');
+        this.data = { ...this.data, ...cloudData };
+        delete this.data._is_default_template;
+        this.hasPendingPush = false;
+        localStorage.setItem(this.storageKey, JSON.stringify(this.data));
+        window.dispatchEvent(new CustomEvent('cumple_store_updated', { detail: this.data }));
+        const count = (this.data.comida?.length || 0) + (this.data.invitados?.length || 0);
+        window.dispatchEvent(new CustomEvent('cumple_cloud_status', { detail: { status: 'synced', message: `Sincronizado (${count} ítems)` } }));
+        return;
+      }
+
       const cloudTime = new Date(cloudData._cloud_synced_at || 0).getTime();
       const localTime = new Date(this.data._cloud_synced_at || 0).getTime();
 
-      console.log(`[CumpleStore] Estado: Nube=${cloudItems} ítems, Local=${localItems} ítems.`);
+      // REGLA 1: Si la nube tiene cambios más recientes (otro dispositivo agregó, editó o borró después)
+      if (cloudTime > localTime + 1000) {
+        console.log(`[CumpleStore] Nube es más reciente (${cloudData._cloud_synced_at} vs local ${this.data._cloud_synced_at}). Actualizando local...`);
+        this.data = { ...this.data, ...cloudData };
+        delete this.data._is_default_template;
+        this.hasPendingPush = false;
+        localStorage.setItem(this.storageKey, JSON.stringify(this.data));
+        window.dispatchEvent(new CustomEvent('cumple_store_updated', { detail: this.data }));
+        const count = (this.data.comida?.length || 0) + (this.data.invitados?.length || 0);
+        window.dispatchEvent(new CustomEvent('cumple_cloud_status', { detail: { status: 'synced', message: `Sincronizado (${count} ítems)` } }));
+        return;
+      }
 
-      // REGLA 1: Si local tiene más cosas (ej. la mamá con sus 21 comidas) que la nube
-      if (localItems > cloudItems) {
-        console.log(`[CumpleStore] Local tiene más datos (${localItems}) que la nube (${cloudItems}). Subiendo a Supabase...`);
+      // REGLA 2: Si local tiene cambios más recientes que la nube
+      if (localTime > cloudTime + 1000) {
+        console.log(`[CumpleStore] Local es más reciente (${this.data._cloud_synced_at} vs nube ${cloudData._cloud_synced_at}). Subiendo a Supabase...`);
         await this.forcePushToCloud();
         return;
       }
 
-      // REGLA 2: Si la nube tiene más cosas que local (ej. el papá con 0 cosas y la mamá ya subió sus 21 comidas)
-      if (cloudItems > localItems) {
-        console.log(`[CumpleStore] Nube tiene más datos (${cloudItems}) que local (${localItems}). Descargando...`);
-        this.data = { ...this.data, ...cloudData };
-        localStorage.setItem(this.storageKey, JSON.stringify(this.data));
-        window.dispatchEvent(new CustomEvent('cumple_store_updated', { detail: this.data }));
-        window.dispatchEvent(new CustomEvent('cumple_cloud_status', { detail: { status: 'synced', message: `Sincronizado (${cloudItems} ítems)` } }));
-        return;
-      }
-
-      // REGLA 3: Misma cantidad de ítems, comparar fechas
-      if (cloudTime > localTime) {
-        this.data = { ...this.data, ...cloudData };
-        localStorage.setItem(this.storageKey, JSON.stringify(this.data));
-        window.dispatchEvent(new CustomEvent('cumple_store_updated', { detail: this.data }));
-      } else if (localTime > cloudTime) {
-        await this.forcePushToCloud();
-      }
-
+      // Están al día
       window.dispatchEvent(new CustomEvent('cumple_cloud_status', { detail: { status: 'synced', message: 'Nube Supabase Sincronizada' } }));
     } catch (e) {
       console.warn('[CumpleStore] Error al sincronizar con la nube:', e);
@@ -268,26 +285,43 @@ class CumpleStore {
 
   async forcePushToCloud() {
     if (!window.cumpleSupabase) return false;
+    if (this.isPushing) {
+      this.repushNeeded = true;
+      return false;
+    }
+    this.isPushing = true;
+    this.repushNeeded = false;
     window.dispatchEvent(new CustomEvent('cumple_cloud_status', { detail: { status: 'syncing', message: 'Guardando en Supabase...' } }));
     this.data._cloud_synced_at = new Date().toISOString();
     try {
       const ok = await window.cumpleSupabase.uploadState(this.isDemo, this.data);
       if (ok) {
+        this.hasPendingPush = false;
         const count = (this.data.comida?.length || 0) + (this.data.invitados?.length || 0);
         window.dispatchEvent(new CustomEvent('cumple_cloud_status', { detail: { status: 'synced', message: `Nube al día (${count} ítems)` } }));
+        if (this.repushNeeded) {
+          this.repushNeeded = false;
+          setTimeout(() => this.forcePushToCloud(), 100);
+        }
         return true;
       }
     } catch (err) {
       console.warn('[CumpleStore] Error al subir a Supabase:', err);
+    } finally {
+      this.isPushing = false;
     }
     return false;
   }
 
-  pushToCloud() {
+  pushToCloud(immediate = false) {
     clearTimeout(this.cloudDebounceTimer);
+    if (immediate) {
+      this.forcePushToCloud();
+      return;
+    }
     this.cloudDebounceTimer = setTimeout(() => {
       this.forcePushToCloud();
-    }, 1200);
+    }, 800);
   }
 
   getInitialTemplate() {
@@ -335,18 +369,24 @@ class CumpleStore {
       console.error('Error al cargar datos de localStorage:', e);
     }
     const template = this.getInitialTemplate();
-    this.save(template, false);
+    template._is_default_template = true;
+    template._cloud_synced_at = null;
+    try {
+      localStorage.setItem(this.storageKey, JSON.stringify(template));
+    } catch (e) {}
     return template;
   }
 
-  save(dataToSave = this.data, syncCloud = true) {
+  save(dataToSave = this.data, syncCloud = true, immediate = false) {
     try {
       this.data = dataToSave;
+      delete this.data._is_default_template;
       this.data._cloud_synced_at = new Date().toISOString();
+      this.hasPendingPush = true;
       localStorage.setItem(this.storageKey, JSON.stringify(this.data));
       window.dispatchEvent(new CustomEvent('cumple_store_updated', { detail: this.data }));
       if (syncCloud) {
-        this.pushToCloud();
+        this.pushToCloud(immediate);
       }
     } catch (e) {
       console.error('Error al guardar en localStorage:', e);
@@ -413,7 +453,7 @@ class CumpleStore {
 
   deleteInvitado(id) {
     this.data.invitados = this.data.invitados.filter(i => i.id !== id);
-    this.save();
+    this.save(this.data, true, true);
   }
 
   // --- MÉTODOS PARA MESAS ---
@@ -449,7 +489,7 @@ class CumpleStore {
       if (inv.mesaId === id) inv.mesaId = null;
     });
     this.data.mesas = this.data.mesas.filter(m => m.id !== id);
-    this.save();
+    this.save(this.data, true, true);
   }
 
   asignarInvitadoAMesa(invitadoId, mesaId) {
@@ -491,7 +531,7 @@ class CumpleStore {
 
   deleteItemComida(id) {
     this.data.comida = this.data.comida.filter(c => c.id !== id);
-    this.save();
+    this.save(this.data, true, true);
   }
 
   // --- MÉTODOS PARA COTILLÓN ---
@@ -523,7 +563,7 @@ class CumpleStore {
 
   deleteItemCotillon(id) {
     this.data.cotillon = this.data.cotillon.filter(c => c.id !== id);
-    this.save();
+    this.save(this.data, true, true);
   }
 
   // --- MÉTODOS PARA CRONOGRAMA ---
@@ -560,12 +600,12 @@ class CumpleStore {
 
   deleteItemCronograma(id) {
     this.data.cronograma = this.data.cronograma.filter(c => c.id !== id);
-    this.save();
+    this.save(this.data, true, true);
   }
 
   // --- REINICIAR / EXPORTAR / IMPORTAR ---
   resetToDefaults() {
-    this.save(this.getInitialTemplate());
+    this.save(this.getInitialTemplate(), true, true);
   }
 
   exportJSON() {
@@ -585,7 +625,7 @@ class CumpleStore {
           cotillon: Array.isArray(parsed.cotillon) ? parsed.cotillon : (current.cotillon || []),
           cronograma: Array.isArray(parsed.cronograma) ? parsed.cronograma : (current.cronograma || [])
         };
-        this.save(sanitized);
+        this.save(sanitized, true, true);
         return {
           success: true,
           countComida: sanitized.comida.length,
