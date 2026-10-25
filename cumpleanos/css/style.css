@@ -1201,45 +1201,31 @@ body {
   .nav-links {
     display: flex;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.5rem;
     flex-shrink: 0;
   }
 
-  /* Ocultar enlaces de texto para dejar sólo los dos botones principales */
+  /* Ocultar enlaces directos en móvil para dar paso al botón hamburguesa */
   .nav-btn-link {
     display: none !important;
   }
 
   .nav-btn {
-    padding: 0.38rem 0.62rem;
-    font-size: 0.78rem;
+    padding: 0.42rem 0.85rem;
+    font-size: 0.82rem;
     border-radius: 999px;
     white-space: nowrap;
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0.3rem;
   }
 
   .nav-btn i {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
   }
 
-  .nav-btn-rsvp {
-    padding: 0.38rem 0.65rem;
-    font-size: 0.78rem;
-  }
-
-  .nav-btn-admin {
-    padding: 0.38rem 0.58rem;
-    font-size: 0.78rem;
-  }
-
-  .nav-btn-admin .nav-btn-text-full {
+  .nav-btn-admin, .footer-admin-btn, .btn-to-organizador {
     display: none !important;
-  }
-
-  .nav-btn-admin .nav-btn-text-short {
-    display: inline !important;
   }
 
   /* Hero con espacio superior perfecto: 52px de barra + 20px de respiro limpio */
@@ -1872,3 +1858,192 @@ body {
     padding: 1rem;
   }
 }
+
+/* ==========================================================================
+   Menú Hamburguesa & Drawer Móvil (Navegación Fácil)
+   ========================================================================== */
+.mobile-nav-toggle {
+  display: none;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+}
+.mobile-nav-toggle:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: var(--color-teal);
+  color: var(--color-teal);
+}
+
+.mobile-nav-drawer {
+  position: fixed;
+  top: 56px;
+  left: 0;
+  right: 0;
+  background: rgba(12, 8, 30, 0.96);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1.5px solid rgba(168, 85, 247, 0.35);
+  padding: 1.15rem 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  z-index: 998;
+  transform: translateY(-120%);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+}
+.mobile-nav-drawer.open {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+}
+.mobile-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  color: #e2e8f0;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.2s ease;
+}
+.mobile-nav-link i {
+  color: var(--color-teal);
+  font-size: 1.15rem;
+}
+.mobile-nav-link:hover, .mobile-nav-link:active {
+  background: rgba(45, 212, 191, 0.14);
+  border-color: rgba(45, 212, 191, 0.4);
+  color: #fff;
+}
+
+@media (max-width: 900px) {
+  .mobile-nav-toggle {
+    display: inline-flex;
+  }
+}
+
+/* ==========================================================================
+   Badge Flotante de la Sirenita Bebé en Móvil (Foto Visible 100%)
+   ========================================================================== */
+.hero-baby-mermaid-mobile {
+  display: none;
+}
+@media (max-width: 900px) {
+  .hero-baby-mermaid-mobile {
+    display: flex;
+    position: relative;
+    width: 175px;
+    height: 175px;
+    margin: 0.5rem auto 1.35rem;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 35px rgba(45, 212, 191, 0.5), 0 0 60px rgba(168, 85, 247, 0.35);
+  }
+  .hero-baby-mermaid-halo {
+    position: absolute;
+    inset: -5px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-teal), var(--color-purple), var(--color-pink));
+    opacity: 0.9;
+    animation: rotateHalo 8s linear infinite;
+    z-index: 1;
+  }
+  .hero-baby-mermaid-img {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: 84% 45%;
+    z-index: 2;
+    border: 3.5px solid rgba(9, 6, 21, 0.95);
+  }
+  .hero-baby-mermaid-sparkle {
+    position: absolute;
+    bottom: -6px;
+    right: 4px;
+    z-index: 3;
+    font-size: 1.15rem;
+    background: rgba(18, 14, 36, 0.95);
+    border: 1px solid var(--color-teal);
+    border-radius: 999px;
+    padding: 0.25rem 0.6rem;
+    box-shadow: 0 0 15px var(--color-teal-glow);
+  }
+}
+
+@keyframes rotateHalo {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   Botón RSVP Cuando Declina Asistencia
+   ========================================================================== */
+.btn-submit-declined {
+  background: linear-gradient(135deg, #e11d48, #9f1239) !important;
+  box-shadow: 0 0 25px rgba(225, 29, 72, 0.45) !important;
+}
+.btn-submit-declined:hover {
+  background: linear-gradient(135deg, #f43f5e, #be123c) !important;
+  box-shadow: 0 0 35px rgba(225, 29, 72, 0.65) !important;
+}
+
+/* ==========================================================================
+   Nota Humorística del Itinerario (Hablar de Domi Obligatorio)
+   ========================================================================== */
+.itinerario-fun-note {
+  max-width: 760px;
+  margin: 2.75rem auto 0;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(168, 85, 247, 0.12));
+  border: 1.5px dashed rgba(245, 158, 11, 0.55);
+  border-radius: 20px;
+  padding: 1.35rem 1.65rem;
+  display: flex;
+  align-items: center;
+  gap: 1.35rem;
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.15);
+}
+.itinerario-fun-note .fun-note-icon {
+  font-size: 2.3rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.itinerario-fun-note h4 {
+  font-family: var(--font-title);
+  font-size: 1.1rem;
+  color: var(--color-amber);
+  margin-bottom: 0.35rem;
+}
+.itinerario-fun-note p {
+  font-size: 0.95rem;
+  color: #e2e8f0;
+  line-height: 1.55;
+  margin: 0;
+}
+@media (max-width: 640px) {
+  .itinerario-fun-note {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.85rem;
+    padding: 1.15rem 1.25rem;
+  }
+}
+

@@ -18,7 +18,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 
   <!-- Estilos -->
-  <link rel="stylesheet" href="css/style.css?v=2.0">
+  <link rel="stylesheet" href="../css/style.css?v=20261025e">
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎃🧜‍♀️</text></svg>">
@@ -38,7 +38,7 @@
   <!-- Barra de Navegación Translúcida -->
   <header class="main-header">
     <div class="header-container">
-      <a href="index.html" class="logo-badge">
+      <a href="#hero" class="logo-badge">
         <div class="logo-icon">🧜‍♀️</div>
         <div class="logo-text">
           <h1>Dominique N°1</h1>
@@ -50,25 +50,60 @@
         <a href="#cumpleanera" class="nav-btn nav-btn-link"><i class="ri-user-heart-line"></i> Cumpleañera</a>
         <a href="#video-invitacion" class="nav-btn nav-btn-link"><i class="ri-movie-line"></i> Video</a>
         <a href="#detalles" class="nav-btn nav-btn-link"><i class="ri-calendar-event-line"></i> Cuándo y Dónde</a>
+        <a href="#itinerario" class="nav-btn nav-btn-link"><i class="ri-time-line"></i> Itinerario</a>
         <a href="#confirmar" class="nav-btn nav-btn-rsvp"><i class="ri-check-line"></i> Confirmar</a>
-        <a href="organizador/" class="nav-btn nav-btn-admin btn-to-organizador" title="Panel de gestión para los papás">
-          <i class="ri-settings-4-line"></i> <span class="nav-btn-text-full">Organizador</span><span class="nav-btn-text-short">Org</span>
-        </a>
+        <button type="button" class="mobile-nav-toggle" id="btnMobileNavToggle" aria-label="Abrir menú" aria-expanded="false">
+          <i class="ri-menu-line"></i>
+        </button>
       </nav>
+    </div>
+
+    <!-- Drawer de navegación móvil -->
+    <div class="mobile-nav-drawer" id="mobileNavDrawer" aria-hidden="true">
+      <a href="#cumpleanera" class="mobile-nav-link"><i class="ri-user-heart-line"></i> La Cumpleañera</a>
+      <a href="#video-invitacion" class="mobile-nav-link"><i class="ri-movie-line"></i> Video &amp; Tarjeta</a>
+      <a href="#detalles" class="mobile-nav-link"><i class="ri-calendar-event-line"></i> Cuándo y Dónde</a>
+      <a href="#itinerario" class="mobile-nav-link"><i class="ri-time-line"></i> Itinerario</a>
+      <a href="#confirmar" class="mobile-nav-link" style="color: var(--color-teal); font-weight: 700;"><i class="ri-check-double-line"></i> Confirmar Asistencia</a>
     </div>
   </header>
 
   <!-- ====================================================================
-       HERO CINEMATOGRÁFICO DE ANCHO COMPLETO (BANNER SUPERIOR ESTILO MATRIMONIOS)
+       HERO CINEMATOGRÁFICO DE ANCHO COMPLETO
        ==================================================================== -->
   <header class="cumple-hero-cinematic" id="hero">
     <div class="cumple-hero-overlay"></div>
 
     <div class="cumple-hero-content">
-      <!-- Tag / Badge Superior -->
+      <!-- Badge de la Sirenita Bebé exclusivo para móvil (Foto 100% visible) -->
+      <div class="hero-baby-mermaid-mobile">
+        <div class="hero-baby-mermaid-halo"></div>
+        <img src="../assets/images/banner_domi_sirenita.jpg" alt="Dominique Sirenita Bebé" class="hero-baby-mermaid-img">
+        <div class="hero-baby-mermaid-sparkle">🧜‍♀️✨</div>
+      </div>
+
+      <!-- Tag Superior sin fecha repetida -->
       <div class="hero-tag" style="margin-bottom: 0.85rem;">
         <i class="ri-sparkling-fill" style="color: var(--color-amber);"></i>
-        <span>¡Mi Primera Vuelta al Sol! &bull; 31 de Octubre</span>
+        <span>¡Mi Primera Vuelta al Sol! 🧜‍♀️</span>
+      </div>
+
+      <!-- Tarjeta VIP Invitación Personalizada -->
+      <div class="personalized-vip-card" id="vipPersonalizedCard" style="display: none;">
+        <div class="vip-card-glow"></div>
+        <div class="vip-header-badge">
+          <i class="ri-sparkling-fill" style="color: var(--color-amber);"></i>
+          <span>INVITACIÓN ESPECIAL PARA TI</span>
+          <i class="ri-sparkling-fill" style="color: var(--color-amber);"></i>
+        </div>
+        <h2 class="vip-guest-title" id="vipGuestTitle">Familia Morales</h2>
+        <div class="vip-guest-subnames" id="vipGuestSubnames" style="display: none;"></div>
+        <div class="vip-passes-pill" id="vipPassesPill">
+          <i class="ri-ticket-2-line"></i> <span id="vipPassesText">Invitación Reservada</span>
+        </div>
+        <p class="vip-personal-msg" id="vipPersonalMsg">
+          ¡Queremos compartir este día tan mágico e inolvidable junto a ustedes!
+        </p>
       </div>
 
       <!-- Título Principal Despejado y Elegante -->
@@ -79,7 +114,7 @@
         <span>🎭 ¡Ven con tu mejor disfraz de Halloween o Marino! 🎃</span>
       </div>
 
-      <!-- Coordenadas Rápidas Limpias -->
+      <!-- Coordenadas Rápidas -->
       <div class="hero-meta-row" style="margin-bottom: 1.75rem; justify-content: flex-start;">
         <div class="hero-meta-item">
           <i class="ri-calendar-fill" style="color: var(--color-teal);"></i>
@@ -137,13 +172,13 @@
   <main class="site-content">
 
     <!-- ====================================================================
-         SECCIÓN: LA CUMPLEAÑERA (SHOWCASE ELEGANTE CON PORTAL MÁGICO)
+         SECCIÓN: LA CUMPLEAÑERA
          ==================================================================== -->
     <section class="birthday-girl-card" id="cumpleanera" style="scroll-margin-top: 6rem;">
       <div class="baby-portrait-frame">
         <div class="baby-portrait-halo"></div>
         <div class="baby-portrait-inner">
-          <img src="assets/images/foto_domi_primer_halloween.jpg" alt="Dominique, la cumpleañera" class="baby-portrait-img">
+          <img src="../assets/images/foto_domi_primer_halloween.jpg" alt="Dominique, la cumpleañera" class="baby-portrait-img">
         </div>
         <div class="baby-portrait-badge">
           ★ 1 Añito
@@ -159,14 +194,14 @@
         <div class="halloween-highlight-box">
           <i class="ri-magic-line" style="font-size: 1.4rem; color: var(--color-amber);"></i>
           <span>
-            <strong>Temática Especial:</strong> Disfrázate de sirenita, criatura marina, pirata o con tu disfraz favorito de Halloween. ¡Habrá música, juegos y premios al mejor disfraz!
+            <strong>Temática Especial:</strong> Disfrázate de sirenita, criatura marina, pirata o con tu disfraz favorito de Halloween. ¡Te esperamos para compartir este momento mágico!
           </span>
         </div>
       </div>
     </section>
 
     <!-- ====================================================================
-         SECCIÓN: VIDEO INVITACIÓN & AFICHE (CINEMA LOUNGE)
+         SECCIÓN: VIDEO INVITACIÓN & TARJETA DIGITAL
          ==================================================================== -->
     <section id="video-invitacion" style="scroll-margin-top: 6rem;">
       <div class="section-header-modern">
@@ -180,23 +215,22 @@
         <div class="cinema-card">
           <div class="cinema-card-header">
             <h4><i class="ri-film-line" style="color: var(--color-teal);"></i> Video Invitación Oficial</h4>
-            <span style="font-size: 0.8rem; color: var(--color-teal);"><i class="ri-volume-up-line"></i> Con audio activado</span>
           </div>
           <div class="video-cinema-viewport">
-            <video id="invitationVideo" controls playsinline webkit-playsinline preload="metadata" poster="assets/images/afiche_invitacion.png" style="width: 100%; height: 100%; object-fit: contain; background: #000;">
-              <source src="invitacion-cumple-domi.mp4" type="video/mp4">
+            <video id="invitationVideo" controls playsinline webkit-playsinline preload="metadata" poster="../assets/images/tarjeta_dominique_hormazabal.png" style="width: 100%; height: 100%; object-fit: contain; background: #000;">
+              <source src="../invitacion-cumple-domi.mp4" type="video/mp4">
               Tu navegador no soporta la reproducción de video.
             </video>
           </div>
         </div>
 
-        <!-- Tarjeta del Afiche -->
+        <!-- Tarjeta Digital de Ilustración Oficial -->
         <div class="poster-lounge-card">
           <div class="poster-lounge-header">
             <h4><i class="ri-image-2-line" style="color: var(--color-purple-light);"></i> Tarjeta Digital</h4>
           </div>
           <div class="poster-lounge-body">
-            <img src="assets/images/afiche_invitacion.png" alt="Afiche Invitación Sirenita" class="poster-lounge-img" id="btnOpenPosterModal">
+            <img src="../assets/images/tarjeta_dominique_hormazabal.png" alt="Tarjeta Oficial de Invitación Sirenita" class="poster-lounge-img" id="btnOpenPosterModal">
             <button type="button" class="btn-open-zoom" id="btnZoomPoster">
               <i class="ri-zoom-in-line"></i> Toca para ver en grande
             </button>
@@ -269,6 +303,121 @@
     </section>
 
     <!-- ====================================================================
+         SECCIÓN: ITINERARIO DEL DÍA
+         ==================================================================== -->
+    <section id="itinerario" class="itinerario-section" style="scroll-margin-top: 6rem;">
+      <div class="section-header-modern">
+        <span class="section-tag-modern"><i class="ri-compass-3-line"></i> Cronograma de Actividades</span>
+        <h2 class="section-title-modern">Itinerario del Gran Día</h2>
+        <p class="section-subtitle-modern">Acompáñanos a vivir cada momento especial preparado con mucho amor para Dominique</p>
+      </div>
+
+      <div class="itinerario-container">
+        <div class="itinerario-timeline-rail" aria-hidden="true"></div>
+
+        <!-- Hito 1: 15:00 a 16:00 -->
+        <div class="itinerario-step step-teal">
+          <div class="itinerario-node">
+            <i class="ri-cup-line"></i>
+          </div>
+          <div class="itinerario-card">
+            <div class="itinerario-card-header">
+              <span class="itinerario-time-badge"><i class="ri-time-line"></i> 15:00 — 16:00 hrs</span>
+              <span class="itinerario-tag-badge">Inicio &amp; Bienvenida</span>
+            </div>
+            <h3 class="itinerario-card-title">Conversar sobre Domi y Comer Cositas Ricas</h3>
+            <p class="itinerario-card-desc">
+              Damos inicio a la celebración con una cálida bienvenida, disfrutando de ricas cositas para picar y un espacio ameno para compartir, hablar de lo bella, inteligente, risueña y adorable que es Domi, celebrando juntos su primer añito de vida.
+            </p>
+          </div>
+        </div>
+
+        <!-- Hito 2: 16:00 -->
+        <div class="itinerario-step step-pink">
+          <div class="itinerario-node">
+            <i class="ri-cake-3-line"></i>
+          </div>
+          <div class="itinerario-card">
+            <div class="itinerario-card-header">
+              <span class="itinerario-time-badge"><i class="ri-time-line"></i> 16:00 hrs</span>
+              <span class="itinerario-tag-badge">Torta &amp; Regalos</span>
+            </div>
+            <h3 class="itinerario-card-title">Cantar Cumpleaños Feliz y Apertura de Regalos</h3>
+            <p class="itinerario-card-desc">
+              ¡El momento más dulce y esperado! Nos reunimos todos en torno a la torta para cantarle con emoción a Domi, apagar su velita N°1 y abrir sus regalitos con mucho amor.
+            </p>
+          </div>
+        </div>
+
+        <!-- Hito 3: 18:00 (Banquete Pomposo) -->
+        <div class="itinerario-step step-amber">
+          <div class="itinerario-node">
+            <i class="ri-restaurant-2-line"></i>
+          </div>
+          <div class="itinerario-card">
+            <div class="itinerario-card-header">
+              <span class="itinerario-time-badge"><i class="ri-time-line"></i> 18:00 hrs</span>
+              <span class="itinerario-tag-badge">Banquete Pomposo</span>
+            </div>
+            <h3 class="itinerario-card-title">Gran Banquete de Completos de Etiqueta</h3>
+            <p class="itinerario-card-desc">
+              Un distinguido y solemne momento gastronómico donde nos deleitaremos con la más selecta preparación de tradicionales completos servidos al más puro estilo de etiqueta, con gran pompa y sabor para el deleite de todos nuestros invitados.
+            </p>
+          </div>
+        </div>
+
+        <!-- Hito 4: 19:00 a 20:00 -->
+        <div class="itinerario-step step-purple">
+          <div class="itinerario-node">
+            <i class="ri-ghost-line"></i>
+          </div>
+          <div class="itinerario-card">
+            <div class="itinerario-card-header">
+              <span class="itinerario-time-badge"><i class="ri-time-line"></i> 19:00 — 20:00 hrs</span>
+              <span class="itinerario-tag-badge">Halloween &amp; Disfraces</span>
+            </div>
+            <h3 class="itinerario-card-title">Salir a Pedir Dulces</h3>
+            <p class="itinerario-card-desc">
+              ¡Dulce o truco! Nos preparamos con nuestros disfraces para salir a recorrer y pedir dulces con los niños entre las 19:00 y las 20:00 hrs, compartiendo risas y ricas golosinas.
+            </p>
+          </div>
+        </div>
+
+        <!-- Hito 5: 20:00 -->
+        <div class="itinerario-step step-teal">
+          <div class="itinerario-node">
+            <i class="ri-home-heart-line"></i>
+          </div>
+          <div class="itinerario-card">
+            <div class="itinerario-card-header">
+              <span class="itinerario-time-badge"><i class="ri-time-line"></i> 20:00 hrs</span>
+              <span class="itinerario-tag-badge">Cierre del Evento</span>
+            </div>
+            <h3 class="itinerario-card-title">Regreso al Club &amp; Despedida</h3>
+            <p class="itinerario-card-desc">
+              Luego de pedir dulces, están todos cordialmente invitados a volver al club para descansar un momento, recoger sus cosas con toda tranquilidad, abrigarse y despedirnos con un gran abrazo y el corazón lleno de gratitud.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nota Humorística: Hablar de Domi es obligatorio -->
+      <div class="itinerario-fun-note">
+        <div class="fun-note-icon">🧜‍♀️🤫</div>
+        <div class="fun-note-content">
+          <h4>¡Regla de Oro de la Fiesta!</h4>
+          <p>Hablar sobre lo hermosa, inteligente, risueña y adorable que es la Domi es <strong>100% obligatorio</strong>. ¡Cualquier otro tema de conversación está estrictamente prohibido durante toda la celebración! 😉🎉</p>
+        </div>
+      </div>
+
+      <!-- Nota de referencia -->
+      <div class="itinerario-disclaimer">
+        <i class="ri-information-line"></i>
+        <span>* Este horario es de referencia y puede presentar ligeras variaciones durante la celebración.</span>
+      </div>
+    </section>
+
+    <!-- ====================================================================
          SECCIÓN: CONFIRMACIÓN DE ASISTENCIA (RSVP)
          ==================================================================== -->
     <section id="confirmar" style="scroll-margin-top: 6rem;">
@@ -276,11 +425,15 @@
         <div class="section-header-modern" style="margin-bottom: 2rem;">
           <span class="section-tag-modern">Confirmación de Asistencia</span>
           <h2 class="section-title-modern">¿Nos Acompañas?</h2>
-          <p class="section-subtitle-modern">Por favor confirma tu asistencia durante esta semana 💖</p>
+          <p class="section-subtitle-modern" id="rsvpSubtitleModern">Por favor confirma tu asistencia lo antes posible 💖</p>
         </div>
+
+        <!-- Banner VIP Oculto para no duplicar textos -->
+        <div id="rsvpVipBanner" class="rsvp-vip-info-banner" style="display: none;"></div>
 
         <!-- Formulario -->
         <form id="rsvpForm" class="rsvp-form-grid">
+          <input type="hidden" id="rsvpInviteCode" value="">
           <div class="input-row-2">
             <div class="input-group">
               <label for="rsvpNombre"><i class="ri-user-smile-line" style="color: var(--color-teal);"></i> Nombre y Apellido (o Familia) *</label>
@@ -338,8 +491,6 @@
                 </select>
               </div>
             </div>
-
-
           </div>
 
           <div class="input-group">
@@ -378,32 +529,29 @@
 
   </main>
 
-  <!-- Modal para ver el afiche en grande -->
+  <!-- Modal para ver la tarjeta en grande -->
   <div class="modal-overlay" id="posterModal">
     <div class="modal-content-glass">
       <button class="modal-close-btn" id="btnClosePosterModal">&times;</button>
       <h4 style="font-family: var(--font-hero); color: #fff; margin-bottom: 1rem; font-size: 1.35rem;">
         Tarjeta Oficial de Invitación
       </h4>
-      <img src="assets/images/afiche_invitacion.png" alt="Afiche Completo" style="width: 100%; height: auto; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">
+      <img src="../assets/images/tarjeta_dominique_hormazabal.png" alt="Tarjeta Completa" style="width: 100%; height: auto; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">
     </div>
   </div>
 
-  <!-- Pie de Página Elegante -->
+  <!-- Pie de Página -->
   <footer class="main-footer">
     <div class="footer-content">
       <div class="footer-logo">DOMINIQUE &bull; N°1</div>
       <p class="footer-text">
         Celebrando con amor y magia bajo el mar &bull; 31 de Octubre, Club Valle del Sol
       </p>
-      <a href="organizador/" class="footer-admin-btn btn-to-organizador">
-        <i class="ri-lock-password-line"></i> Acceso al Panel del Organizador
-      </a>
     </div>
   </footer>
 
   <!-- Scripts -->
-  <script src="js/store.js"></script>
-  <script src="js/app.js"></script>
+  <script src="../js/store.js?v=20261025e"></script>
+  <script src="../js/app.js?v=20261025e"></script>
 </body>
 </html>

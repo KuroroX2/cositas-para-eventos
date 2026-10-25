@@ -43,13 +43,13 @@ function setupViewInvitationButton() {
 
   if (window.location.protocol === 'file:') {
     const isSubdir = window.location.pathname.includes('/organizador/');
-    btn.href = isSubdir ? '../index.html' : 'index.html';
+    btn.href = isSubdir ? '../DominiqueHormazabal/index.html' : 'DominiqueHormazabal/index.html';
   } else {
     const origin = (window.location.origin && window.location.origin !== 'null') ? window.location.origin : '';
     if (window.location.pathname.includes('/cumpleanos')) {
-      btn.href = `${origin}/cumpleanos/`;
+      btn.href = `${origin}/cumpleanos/DominiqueHormazabal/`;
     } else {
-      btn.href = `${origin}/`;
+      btn.href = `${origin}/DominiqueHormazabal/`;
     }
   }
 }
@@ -261,24 +261,24 @@ function generatePersonalizedUrl(inv) {
   if (loc.protocol === 'file:') {
     let cleanHref = loc.href.split('?')[0].split('#')[0];
     if (cleanHref.includes('/organizador/')) {
-      baseUrl = cleanHref.replace('/organizador/', '/');
+      baseUrl = cleanHref.replace('/organizador/', '/DominiqueHormazabal/index.html');
     } else if (cleanHref.includes('/organizador.html')) {
-      baseUrl = cleanHref.replace('/organizador.html', '/index.html');
+      baseUrl = cleanHref.replace('/organizador.html', '/DominiqueHormazabal/index.html');
     } else {
-      baseUrl = cleanHref.replace(/organizador.*$/, 'index.html');
+      baseUrl = cleanHref.replace(/organizador.*$/, 'DominiqueHormazabal/index.html');
     }
   } else {
     const origin = (loc.origin && loc.origin !== 'null') ? loc.origin : '';
     if (loc.pathname.includes('/cumpleanos')) {
-      baseUrl = `${origin}/cumpleanos/`;
+      baseUrl = `${origin}/cumpleanos/DominiqueHormazabal/`;
     } else {
       let basePath = loc.pathname;
       if (basePath.includes('/organizador/')) {
-        basePath = basePath.replace('/organizador/', '/');
+        basePath = basePath.replace('/organizador/', '/DominiqueHormazabal/');
       } else if (basePath.includes('/organizador.html')) {
-        basePath = basePath.replace('/organizador.html', '/');
+        basePath = basePath.replace('/organizador.html', '/DominiqueHormazabal/');
       } else {
-        basePath = basePath.replace(/organizador.*$/, '');
+        basePath = basePath.replace(/organizador.*$/, 'DominiqueHormazabal/');
       }
       if (!basePath.endsWith('/')) {
         basePath += '/';

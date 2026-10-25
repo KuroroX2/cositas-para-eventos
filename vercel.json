@@ -1,7 +1,31 @@
-{
+﻿{
   "trailingSlash": true,
   "cleanUrls": true,
   "rewrites": [
+    {
+      "source": "/cumpleanos/DominiqueHormazabal/css/:path*",
+      "destination": "/cumpleanos/css/:path*"
+    },
+    {
+      "source": "/cumpleanos/DominiqueHormazabal/js/:path*",
+      "destination": "/cumpleanos/js/:path*"
+    },
+    {
+      "source": "/cumpleanos/DominiqueHormazabal/assets/:path*",
+      "destination": "/cumpleanos/assets/:path*"
+    },
+    {
+      "source": "/cumpleanos/demo/css/:path*",
+      "destination": "/cumpleanos/css/:path*"
+    },
+    {
+      "source": "/cumpleanos/demo/js/:path*",
+      "destination": "/cumpleanos/js/:path*"
+    },
+    {
+      "source": "/cumpleanos/demo/assets/:path*",
+      "destination": "/cumpleanos/assets/:path*"
+    },
     {
       "source": "/cumpleanos/organizador/css/:path*",
       "destination": "/cumpleanos/css/:path*"
@@ -37,6 +61,22 @@
     {
       "source": "/fotos/:path*",
       "destination": "/matrimonio/yimmy-eve/fotos/:path*"
+    },
+    {
+      "source": "/cumpleanos/DominiqueHormazabal",
+      "destination": "/cumpleanos/DominiqueHormazabal/index.html"
+    },
+    {
+      "source": "/cumpleanos/DominiqueHormazabal/",
+      "destination": "/cumpleanos/DominiqueHormazabal/index.html"
+    },
+    {
+      "source": "/cumpleanos/demo",
+      "destination": "/cumpleanos/demo/index.html"
+    },
+    {
+      "source": "/cumpleanos/demo/",
+      "destination": "/cumpleanos/demo/index.html"
     },
     {
       "source": "/cumpleanos",

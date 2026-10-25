@@ -3,6 +3,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+  initMobileNavigation();
   initCountdown();
   initCalendar();
   initPersonalizedInvitation();
@@ -96,24 +97,19 @@ function initPersonalizedInvitation() {
     vipCard.style.display = 'block';
   }
 
-  // 2. Mostrar y configurar el banner VIP en la sección de confirmación (RSVP)
+  // 2. Personalizar el subtítulo de la sección de confirmación (RSVP)
   const rsvpVipBanner = document.getElementById('rsvpVipBanner');
-  const rsvpVipTitle = document.getElementById('rsvpVipTitle');
-  const rsvpVipDesc = document.getElementById('rsvpVipDesc');
+  const rsvpSubtitleModern = document.getElementById('rsvpSubtitleModern');
   const rsvpCodeInput = document.getElementById('rsvpInviteCode');
 
   const isPersonalized = Boolean(code || fam || n || n1 || params.get('inv') || params.get('p') || params.get('a') || params.get('adultos'));
 
+  // Ocultar banner redundante de invitación reservada para no repetir textos
   if (rsvpVipBanner) {
-    rsvpVipBanner.style.display = 'block';
-    if (rsvpVipTitle) rsvpVipTitle.textContent = `¡Hola, ${displayTitle}!`;
-    if (rsvpVipDesc) {
-      if (totalPases === 1) {
-        rsvpVipDesc.textContent = 'Hemos reservado 1 invitación para celebrar el 1er añito de Dominique. Por favor indícanos si podrás asistir.';
-      } else {
-        rsvpVipDesc.textContent = `Hemos reservado ${totalPases} invitaciones para celebrar el 1er añito de Dominique. Por favor indícanos si podrán asistir.`;
-      }
-    }
+    rsvpVipBanner.style.display = 'none';
+  }
+  if (rsvpSubtitleModern && isPersonalized) {
+    rsvpSubtitleModern.textContent = `¡Hola, ${displayTitle}! Por favor indícanos si podrás asistir lo antes posible 💖`;
   }
 
   // Pre-llenar campos del formulario
@@ -127,40 +123,51 @@ function initPersonalizedInvitation() {
   if (rsvpCodeInput) {
     rsvpCodeInput.value = code;
   }
-  if (rsvpAdultosSelect && !isNaN(adultosParam)) {
-    const val = Math.min(Math.max(adultosParam, 1), 6);
-    rsvpAdultosSelect.value = String(val);
-  }
-  if (rsvpNinosSelect && !isNaN(ninosParam)) {
-    const val = Math.min(Math.max(ninosParam, 0), 6);
-    rsvpNinosSelect.value = String(val);
-  }
 
-  // En la invitación personalizada no se puede cambiar la cantidad de invitados
+  // En la invitación personalizada los combo box son modificables a la baja
   if (isPersonalized) {
     if (rsvpAdultosSelect) {
-      rsvpAdultosSelect.disabled = true;
-      rsvpAdultosSelect.style.cursor = 'not-allowed';
-      rsvpAdultosSelect.style.opacity = '0.9';
-      rsvpAdultosSelect.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
-      rsvpAdultosSelect.title = 'Cantidad de invitados asignada para tu invitación';
+      rsvpAdultosSelect.disabled = false;
+      rsvpAdultosSelect.style.cursor = 'pointer';
+      rsvpAdultosSelect.style.opacity = '1';
+      rsvpAdultosSelect.style.backgroundColor = '';
+
+      const maxA = (!isNaN(adultosParam) && adultosParam > 0) ? Math.min(adultosParam, 12) : 1;
+      rsvpAdultosSelect.innerHTML = '';
+      for (let i = 1; i <= maxA; i++) {
+        const opt = document.createElement('option');
+        opt.value = String(i);
+        opt.textContent = i === 1 ? '1 Adulto' : `${i} Adultos`;
+        if (i === maxA) opt.selected = true;
+        rsvpAdultosSelect.appendChild(opt);
+      }
     }
+
     if (rsvpNinosSelect) {
-      rsvpNinosSelect.disabled = true;
-      rsvpNinosSelect.style.cursor = 'not-allowed';
-      rsvpNinosSelect.style.opacity = '0.9';
-      rsvpNinosSelect.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
-      rsvpNinosSelect.title = 'Cantidad de invitados asignada para tu invitación';
+      rsvpNinosSelect.disabled = false;
+      rsvpNinosSelect.style.cursor = 'pointer';
+      rsvpNinosSelect.style.opacity = '1';
+      rsvpNinosSelect.style.backgroundColor = '';
+
+      const maxN = (!isNaN(ninosParam) && ninosParam >= 0) ? Math.min(ninosParam, 12) : 0;
+      rsvpNinosSelect.innerHTML = '';
+      for (let i = 0; i <= maxN; i++) {
+        const opt = document.createElement('option');
+        opt.value = String(i);
+        opt.textContent = i === 0 ? '0 Niños' : (i === 1 ? '1 Niño' : `${i} Niños`);
+        if (i === maxN) opt.selected = true;
+        rsvpNinosSelect.appendChild(opt);
+      }
     }
 
     const attendeesSection = document.getElementById('attendeesSection');
-    let fixedNote = document.getElementById('rsvpGuestsFixedNote');
-    if (!fixedNote && attendeesSection) {
-      fixedNote = document.createElement('div');
-      fixedNote.id = 'rsvpGuestsFixedNote';
-      fixedNote.style.cssText = 'font-size: 0.82rem; color: var(--color-teal); margin-top: -0.3rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.4rem;';
-      fixedNote.innerHTML = '<i class="ri-lock-line"></i> <span>Cantidad de invitados asignada a tu invitación</span>';
-      attendeesSection.appendChild(fixedNote);
+    let limitNote = document.getElementById('rsvpGuestsLimitNote');
+    if (!limitNote && attendeesSection) {
+      limitNote = document.createElement('div');
+      limitNote.id = 'rsvpGuestsLimitNote';
+      limitNote.style.cssText = 'font-size: 0.82rem; color: var(--color-teal); margin-top: -0.3rem; margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.4rem;';
+      limitNote.innerHTML = '<i class="ri-information-line"></i> <span>Puedes confirmar hasta el número máximo asignado a tu invitación.</span>';
+      attendeesSection.appendChild(limitNote);
     }
   }
 
@@ -299,16 +306,27 @@ function initRsvpForm() {
 
   if (!form) return;
 
-  // Alternar visualización si dice que no podrá asistir
-  radioButtons.forEach(radio => {
-    radio.addEventListener('change', () => {
-      if (radio.value === 'no' && radio.checked) {
-        if (attendeesSection) attendeesSection.style.display = 'none';
+  const btnSubmitRsvp = document.getElementById('btnSubmitRsvp');
+
+  // Alternar visualización y texto de botón si dice que no podrá asistir
+  function updateAttendanceState() {
+    const isNo = document.querySelector('input[name="asistencia"]:checked')?.value === 'no';
+    if (attendeesSection) attendeesSection.style.display = isNo ? 'none' : 'block';
+    if (btnSubmitRsvp) {
+      if (isNo) {
+        btnSubmitRsvp.innerHTML = '<i class="ri-close-circle-line"></i> Enviar que no podré asistir';
+        btnSubmitRsvp.classList.add('btn-submit-declined');
       } else {
-        if (attendeesSection) attendeesSection.style.display = 'block';
+        btnSubmitRsvp.innerHTML = '<i class="ri-send-plane-fill"></i> Confirmar mi Asistencia';
+        btnSubmitRsvp.classList.remove('btn-submit-declined');
       }
-    });
+    }
+  }
+
+  radioButtons.forEach(radio => {
+    radio.addEventListener('change', updateAttendanceState);
   });
+  updateAttendanceState();
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -490,3 +508,46 @@ function initOrganizadorNavLinks() {
     });
   });
 }
+
+/**
+ * Menú de Navegación Móvil (Botón Hamburguesa / Sándwich)
+ */
+function initMobileNavigation() {
+  const toggleBtn = document.getElementById('btnMobileNavToggle');
+  const drawer = document.getElementById('mobileNavDrawer');
+  if (!toggleBtn || !drawer) return;
+
+  function toggleMenu(open) {
+    const shouldOpen = (open !== undefined) ? open : !drawer.classList.contains('open');
+    if (shouldOpen) {
+      drawer.classList.add('open');
+      toggleBtn.innerHTML = '<i class="ri-close-line"></i>';
+      toggleBtn.setAttribute('aria-expanded', 'true');
+    } else {
+      drawer.classList.remove('open');
+      toggleBtn.innerHTML = '<i class="ri-menu-line"></i>';
+      toggleBtn.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  toggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleMenu();
+  });
+
+  // Cerrar al pulsar un link dentro del drawer
+  const drawerLinks = drawer.querySelectorAll('.mobile-nav-link');
+  drawerLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      toggleMenu(false);
+    });
+  });
+
+  // Cerrar al pulsar fuera del menú
+  document.addEventListener('click', (e) => {
+    if (drawer.classList.contains('open') && !drawer.contains(e.target) && !toggleBtn.contains(e.target)) {
+      toggleMenu(false);
+    }
+  });
+}
+
