@@ -3,6 +3,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+  initOrganizadorSecurity();
   setupViewInvitationButton();
   initTabs();
   initModals();
@@ -32,6 +33,11 @@ function renderAll() {
   loadSettingsFormData();
 }
 
+function isDemoOrg() {
+  const p = (typeof window !== 'undefined' && window.location && window.location.pathname ? window.location.pathname : '').toLowerCase();
+  return p.includes('/demo/') || p.includes('/demo');
+}
+
 /**
  * Configura el enlace del botón "Ver Invitación" para abrir la invitación en una nueva pestaña
  */
@@ -42,14 +48,13 @@ function setupViewInvitationButton() {
   btn.setAttribute('rel', 'noopener');
 
   if (window.location.protocol === 'file:') {
-    const isSubdir = window.location.pathname.includes('/organizador/');
-    btn.href = isSubdir ? '../DominiqueHormazabal/index.html' : 'DominiqueHormazabal/index.html';
+    btn.href = '../index.html';
   } else {
     const origin = (window.location.origin && window.location.origin !== 'null') ? window.location.origin : '';
-    if (window.location.pathname.includes('/cumpleanos')) {
-      btn.href = `${origin}/cumpleanos/DominiqueHormazabal/`;
+    if (isDemoOrg()) {
+      btn.href = `${origin}/cumpleanos/demo/`;
     } else {
-      btn.href = `${origin}/DominiqueHormazabal/`;
+      btn.href = `${origin}/cumpleanos/DominiqueHormazabal/`;
     }
   }
 }
@@ -259,31 +264,13 @@ function generatePersonalizedUrl(inv) {
   let baseUrl = '';
 
   if (loc.protocol === 'file:') {
-    let cleanHref = loc.href.split('?')[0].split('#')[0];
-    if (cleanHref.includes('/organizador/')) {
-      baseUrl = cleanHref.replace('/organizador/', '/DominiqueHormazabal/index.html');
-    } else if (cleanHref.includes('/organizador.html')) {
-      baseUrl = cleanHref.replace('/organizador.html', '/DominiqueHormazabal/index.html');
-    } else {
-      baseUrl = cleanHref.replace(/organizador.*$/, 'DominiqueHormazabal/index.html');
-    }
+    baseUrl = '../index.html';
   } else {
     const origin = (loc.origin && loc.origin !== 'null') ? loc.origin : '';
-    if (loc.pathname.includes('/cumpleanos')) {
-      baseUrl = `${origin}/cumpleanos/DominiqueHormazabal/`;
+    if (isDemoOrg()) {
+      baseUrl = `${origin}/cumpleanos/demo/`;
     } else {
-      let basePath = loc.pathname;
-      if (basePath.includes('/organizador/')) {
-        basePath = basePath.replace('/organizador/', '/DominiqueHormazabal/');
-      } else if (basePath.includes('/organizador.html')) {
-        basePath = basePath.replace('/organizador.html', '/DominiqueHormazabal/');
-      } else {
-        basePath = basePath.replace(/organizador.*$/, 'DominiqueHormazabal/');
-      }
-      if (!basePath.endsWith('/')) {
-        basePath += '/';
-      }
-      baseUrl = `${origin}${basePath}`;
+      baseUrl = `${origin}/cumpleanos/DominiqueHormazabal/`;
     }
   }
 
@@ -1466,3 +1453,124 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
+
+/**
+ * Seguridad y Bloqueo con Clave para el Panel Organizador (Clave: Domi.2026)
+ */
+function getInvitationTargetUrl() {
+  if (window.location.protocol === 'file:') {
+    return '../index.html';
+  } else {
+    const origin = (window.location.origin && window.location.origin !== 'null') ? window.location.origin : '';
+    if (isDemoOrg()) {
+      return `${origin}/cumpleanos/demo/`;
+    } else {
+      return `${origin}/cumpleanos/DominiqueHormazabal/`;
+    }
+  }
+}
+
+function initOrganizadorSecurity() {
+  // En modo demo, mostrar aviso informativo pero NO bloquear con clave
+  if (isDemoOrg()) {
+    const lockBtn = document.getElementById('btnLogoutOrg');
+    if (lockBtn) {
+      lockBtn.innerHTML = '<i class="ri-sparkling-fill"></i> <span>Modo Demo</span>';
+      lockBtn.style.borderColor = 'rgba(45, 212, 191, 0.4)';
+      lockBtn.style.color = '#5eead4';
+      lockBtn.title = 'Este es el organizador de demostración con datos de prueba';
+    }
+    return;
+  }
+
+  // En el organizador de Dominique, sí requiere autenticación
+  const isAuth = sessionStorage.getItem('cumple_admin_auth') === 'true';
+  if (!isAuth) {
+    showOrganizadorLockScreen();
+  }
+
+  const logoutBtn = document.getElementById('btnLogoutOrg');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      if (confirm('¿Deseas bloquear el panel organizador?')) {
+        sessionStorage.removeItem('cumple_admin_auth');
+        showOrganizadorLockScreen();
+      }
+    });
+  }
+}
+
+function showOrganizadorLockScreen() {
+  let overlay = document.getElementById('orgSecurityLockOverlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'orgSecurityLockOverlay';
+    overlay.className = 'org-lock-overlay';
+    overlay.innerHTML = `
+      <div class="org-lock-modal">
+        <div class="org-lock-badge">🧜‍♀️🔐</div>
+        <h2>Panel Organizador Protegido</h2>
+        <p>Este espacio es exclusivo para los papás de Dominique. Ingresa la clave de acceso para ver y editar el evento.</p>
+        <form id="orgLockForm" class="org-lock-form" autocomplete="off">
+          <div class="org-lock-input-wrap">
+            <input type="password" id="orgLockPin" placeholder="Ingresa la clave..." required autofocus>
+            <button type="button" id="btnToggleOrgPin" class="org-eye-btn" aria-label="Ver clave"><i class="ri-eye-line"></i></button>
+          </div>
+          <div id="orgLockError" class="org-lock-error" style="display: none;">
+            <i class="ri-error-warning-line"></i> <span>Clave incorrecta. Inténtalo nuevamente.</span>
+          </div>
+          <button type="submit" class="btn-org-unlock">
+            <i class="ri-lock-unlock-line"></i> Desbloquear Organizador
+          </button>
+        </form>
+        <div style="margin-top: 1.25rem;">
+          <a href="${getInvitationTargetUrl()}" class="org-lock-back-link">
+            <i class="ri-arrow-left-line"></i> Volver a la Invitación de Dominique
+          </a>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    const form = overlay.querySelector('#orgLockForm');
+    const input = overlay.querySelector('#orgLockPin');
+    const errorMsg = overlay.querySelector('#orgLockError');
+    const toggleEye = overlay.querySelector('#btnToggleOrgPin');
+
+    if (toggleEye && input) {
+      toggleEye.addEventListener('click', () => {
+        const isPass = input.type === 'password';
+        input.type = isPass ? 'text' : 'password';
+        toggleEye.innerHTML = isPass ? '<i class="ri-eye-off-line"></i>' : '<i class="ri-eye-line"></i>';
+      });
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const entered = input.value.trim();
+      if (entered === 'Domi.2026') {
+        sessionStorage.setItem('cumple_admin_auth', 'true');
+        overlay.style.display = 'none';
+        document.body.style.overflow = '';
+      } else {
+        errorMsg.style.display = 'flex';
+        const wrap = input.closest('.org-lock-input-wrap');
+        if (wrap) {
+          wrap.classList.remove('org-shake');
+          void wrap.offsetWidth;
+          wrap.classList.add('org-shake');
+        }
+        input.select();
+      }
+    });
+  }
+
+  overlay.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  const input = overlay.querySelector('#orgLockPin');
+  if (input) {
+    input.value = '';
+    setTimeout(() => input.focus(), 100);
+  }
+}
+

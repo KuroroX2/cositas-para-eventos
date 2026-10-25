@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initCountdown();
   initCalendar();
   initPersonalizedInvitation();
+  initAdminAuthModal();
   initRsvpForm();
   initPosterModal();
   initSmoothScroll();
@@ -36,8 +37,20 @@ function initPersonalizedInvitation() {
   const code = params.get('code')?.trim() || '';
   const tipo = params.get('tipo')?.trim() || (fam ? 'familia' : (n2 ? 'pareja' : 'individual'));
 
-  // Si no hay ningún parámetro de personalización, salir
-  if (!fam && !n && !n1 && !code && !nombres) return;
+  // Si no hay ningún parámetro de personalización:
+  if (!fam && !n && !n1 && !code && !nombres) {
+    // Mostrar la tarjeta VIP con datos de invitado de ejemplo para que la invitación se vea completa
+    const vipCard = document.getElementById('vipPersonalizedCard');
+    if (vipCard) {
+      vipCard.style.display = 'block';
+    }
+    return;
+  }
+
+  // Si ES una invitación personalizada para un invitado real: OCULTAR botones de administración
+  document.querySelectorAll('.btn-admin-auth').forEach(btn => {
+    btn.style.setProperty('display', 'none', 'important');
+  });
 
   // Determinar título principal a mostrar
   let displayTitle = '';
@@ -550,4 +563,121 @@ function initMobileNavigation() {
     }
   });
 }
+
+/**
+ * Autenticación y Acceso al Organizador (Clave de los Papás: Domi.2026)
+ */
+function initAdminAuthModal() {
+  const ADMIN_PASS = 'Domi.2026';
+  const authBtns = document.querySelectorAll('.btn-admin-auth');
+  const modal = document.getElementById('adminAuthModal');
+  const closeBtn = document.getElementById('btnCloseAuthModal');
+  const form = document.getElementById('adminAuthForm');
+  const pinInput = document.getElementById('adminAuthPin');
+  const errorMsg = document.getElementById('adminAuthError');
+  const toggleEye = document.getElementById('btnToggleAuthPin');
+
+  function getOrganizadorUrl() {
+    const loc = window.location;
+    if (loc.protocol === 'file:') {
+      const cleanPath = loc.pathname;
+      if (cleanPath.includes('/DominiqueHormazabal/')) {
+        return cleanPath.replace('/DominiqueHormazabal/index.html', '/DominiqueHormazabal/organizador/index.html').replace('/DominiqueHormazabal/', '/DominiqueHormazabal/organizador/index.html');
+      } else if (cleanPath.includes('/demo/')) {
+        return cleanPath.replace('/demo/index.html', '/demo/organizador/index.html').replace('/demo/', '/demo/organizador/index.html');
+      } else {
+        return 'organizador/index.html';
+      }
+    } else {
+      const origin = (loc.origin && loc.origin !== 'null') ? loc.origin : '';
+      if (loc.pathname.includes('/demo')) {
+        return `${origin}/cumpleanos/demo/organizador/`;
+      } else {
+        return `${origin}/cumpleanos/DominiqueHormazabal/organizador/`;
+      }
+    }
+  }
+
+  function openOrgOrModal(e) {
+    if (e) e.preventDefault();
+    const drawer = document.getElementById('mobileNavDrawer');
+    if (drawer && drawer.classList.contains('open')) {
+      drawer.classList.remove('open');
+      const toggleBtn = document.getElementById('btnMobileNavToggle');
+      if (toggleBtn) toggleBtn.innerHTML = '<i class="ri-menu-line"></i>';
+    }
+
+    // Si estamos en la DEMO: abrir directamente su propio organizador demo sin pedir clave
+    if (window.location.pathname.includes('/demo')) {
+      window.location.href = getOrganizadorUrl();
+      return;
+    }
+
+    // Si ya está autenticado en la sesión, ingresar directamente al organizador de Dominique
+    if (sessionStorage.getItem('cumple_admin_auth') === 'true') {
+      window.location.href = getOrganizadorUrl();
+      return;
+    }
+
+    if (modal) {
+      modal.style.display = 'flex';
+      if (pinInput) {
+        pinInput.value = '';
+        setTimeout(() => pinInput.focus(), 100);
+      }
+      if (errorMsg) errorMsg.style.display = 'none';
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  authBtns.forEach(btn => {
+    btn.addEventListener('click', openOrgOrModal);
+  });
+
+  if (closeBtn && modal) {
+    closeBtn.addEventListener('click', () => {
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+    });
+  }
+
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    });
+  }
+
+  if (toggleEye && pinInput) {
+    toggleEye.addEventListener('click', () => {
+      const isPass = pinInput.getAttribute('type') === 'password';
+      pinInput.setAttribute('type', isPass ? 'text' : 'password');
+      toggleEye.innerHTML = isPass ? '<i class="ri-eye-off-line"></i>' : '<i class="ri-eye-line"></i>';
+    });
+  }
+
+  if (form && pinInput) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const entered = pinInput.value.trim();
+      if (entered === ADMIN_PASS) {
+        sessionStorage.setItem('cumple_admin_auth', 'true');
+        if (errorMsg) errorMsg.style.display = 'none';
+        window.location.href = getOrganizadorUrl();
+      } else {
+        if (errorMsg) errorMsg.style.display = 'flex';
+        const wrapper = pinInput.closest('.auth-input-wrapper');
+        if (wrapper) {
+          wrapper.classList.remove('auth-shake');
+          void wrapper.offsetWidth;
+          wrapper.classList.add('auth-shake');
+        }
+        pinInput.select();
+      }
+    });
+  }
+}
+
 

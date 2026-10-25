@@ -3,6 +3,30 @@
   "cleanUrls": true,
   "rewrites": [
     {
+      "source": "/cumpleanos/DominiqueHormazabal/organizador/css/:path*",
+      "destination": "/cumpleanos/css/:path*"
+    },
+    {
+      "source": "/cumpleanos/DominiqueHormazabal/organizador/js/:path*",
+      "destination": "/cumpleanos/js/:path*"
+    },
+    {
+      "source": "/cumpleanos/DominiqueHormazabal/organizador/assets/:path*",
+      "destination": "/cumpleanos/assets/:path*"
+    },
+    {
+      "source": "/cumpleanos/demo/organizador/css/:path*",
+      "destination": "/cumpleanos/css/:path*"
+    },
+    {
+      "source": "/cumpleanos/demo/organizador/js/:path*",
+      "destination": "/cumpleanos/js/:path*"
+    },
+    {
+      "source": "/cumpleanos/demo/organizador/assets/:path*",
+      "destination": "/cumpleanos/assets/:path*"
+    },
+    {
       "source": "/cumpleanos/DominiqueHormazabal/css/:path*",
       "destination": "/cumpleanos/css/:path*"
     },
@@ -63,6 +87,22 @@
       "destination": "/matrimonio/yimmy-eve/fotos/:path*"
     },
     {
+      "source": "/cumpleanos/DominiqueHormazabal/organizador",
+      "destination": "/cumpleanos/DominiqueHormazabal/organizador/index.html"
+    },
+    {
+      "source": "/cumpleanos/DominiqueHormazabal/organizador/",
+      "destination": "/cumpleanos/DominiqueHormazabal/organizador/index.html"
+    },
+    {
+      "source": "/cumpleanos/demo/organizador",
+      "destination": "/cumpleanos/demo/organizador/index.html"
+    },
+    {
+      "source": "/cumpleanos/demo/organizador/",
+      "destination": "/cumpleanos/demo/organizador/index.html"
+    },
+    {
       "source": "/cumpleanos/DominiqueHormazabal",
       "destination": "/cumpleanos/DominiqueHormazabal/index.html"
     },
@@ -88,27 +128,27 @@
     },
     {
       "source": "/cumpleanos/organizador",
-      "destination": "/cumpleanos/organizador/index.html"
+      "destination": "/cumpleanos/DominiqueHormazabal/organizador/index.html"
     },
     {
       "source": "/cumpleanos/organizador/",
-      "destination": "/cumpleanos/organizador/index.html"
+      "destination": "/cumpleanos/DominiqueHormazabal/organizador/index.html"
     },
     {
       "source": "/cumpleanos/organizador.html",
-      "destination": "/cumpleanos/organizador/index.html"
+      "destination": "/cumpleanos/DominiqueHormazabal/organizador/index.html"
     },
     {
       "source": "/organizador",
-      "destination": "/cumpleanos/organizador/index.html"
+      "destination": "/cumpleanos/DominiqueHormazabal/organizador/index.html"
     },
     {
       "source": "/organizador/",
-      "destination": "/cumpleanos/organizador/index.html"
+      "destination": "/cumpleanos/DominiqueHormazabal/organizador/index.html"
     },
     {
       "source": "/organizador.html",
-      "destination": "/cumpleanos/organizador/index.html"
+      "destination": "/cumpleanos/DominiqueHormazabal/organizador/index.html"
     }
   ]
 }

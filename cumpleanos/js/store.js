@@ -3,7 +3,14 @@
  * Conecta la invitación (index.html) y el panel del organizador (organizador.html)
  */
 
-const STORAGE_KEY = 'cumple_domi_data_v2';
+function isDemoContext() {
+  const p = (typeof window !== 'undefined' && window.location && window.location.pathname ? window.location.pathname : '').toLowerCase();
+  return p.includes('/demo/') || p.endsWith('/demo');
+}
+
+function getActiveStorageKey() {
+  return isDemoContext() ? 'cumple_demo_data_v2' : 'cumple_domi_data_v2';
+}
 
 const INITIAL_DATA = {
   evento: {
@@ -57,21 +64,138 @@ const INITIAL_DATA = {
   ]
 };
 
+const DEMO_INITIAL_DATA = {
+  evento: {
+    nombreCumpleanera: "Dominique (Demo)",
+    edad: "1 añito",
+    titulo: "Mi Cumpleaños N°1 — Modo Demostración",
+    fecha: "2026-10-31",
+    hora: "15:00",
+    lugar: "Club Valle del Sol",
+    direccion: "Senecio 4593, Puente Alto",
+    mapaUrl: "https://maps.google.com/?q=Senecio+4593,+Puente+Alto",
+    tematica: "Sirenita & Bajo el Mar Pastel con Halloween",
+    dressCode: "¡Con Disfraz! (Bajo el mar o Halloween)",
+    whatsappOrganizador: "+56912345678"
+  },
+  invitados: [
+    {
+      id: "inv-demo-1",
+      fechaRegistro: "2026-10-25 10:30",
+      tipo: "familia",
+      nombre: "Familia Morales",
+      familia: "Familia Morales",
+      nombresIntegrantes: "Carlos, Carolina y Mateo",
+      asistira: true,
+      adultos: 2,
+      ninos: 1,
+      dedicatoria: "¡Muchísimas felicidades Domi hermosa en tu primer añito!",
+      mesaId: "mesa-1"
+    },
+    {
+      id: "inv-demo-2",
+      fechaRegistro: "2026-10-25 11:15",
+      tipo: "pareja",
+      name1: "Gonzalo",
+      name2: "Valentina",
+      nombre: "Gonzalo & Valentina",
+      asistira: true,
+      adultos: 2,
+      ninos: 0,
+      dedicatoria: "¡Ahí estaremos con nuestros disfraces marinos!",
+      mesaId: "mesa-2"
+    },
+    {
+      id: "inv-demo-3",
+      fechaRegistro: "2026-10-25 12:00",
+      tipo: "individual",
+      nombre: "Tía Claudia",
+      asistira: true,
+      adultos: 1,
+      ninos: 0,
+      dedicatoria: "Un besote enorme a la sirenita más tierna de todas.",
+      mesaId: "mesa-1"
+    },
+    {
+      id: "inv-demo-4",
+      fechaRegistro: "2026-10-25 13:45",
+      tipo: "familia",
+      nombre: "Familia Henríquez",
+      familia: "Familia Henríquez",
+      nombresIntegrantes: "Felipe, Marcela, Sofía y Lucas",
+      asistira: null,
+      adultos: 2,
+      ninos: 2,
+      mesaId: null
+    }
+  ],
+  mesas: [
+    { id: "mesa-1", nombre: "Mesa 1: Océano Mágico", capacidad: 8, notas: "Familia cercana" },
+    { id: "mesa-2", nombre: "Mesa 2: Sirenitas & Piratas", capacidad: 8, notas: "Amigos y peques" }
+  ],
+  comida: [
+    { id: "com-1", item: "Vienesas de Primera Calidad", cantidad: "80 un.", comprado: true, notas: "Para los completos de etiqueta" },
+    { id: "com-2", item: "Panes de Completo Especial", cantidad: "80 un.", comprado: true, notas: "Panadería local" },
+    { id: "com-3", item: "Paltas y Tomates frescos", cantidad: "8 kg", comprado: false, notas: "Comprar el día anterior" },
+    { id: "com-4", item: "Torta Temática Sirenita N°1", cantidad: "1 grande (40 porciones)", comprado: true, notas: "Pastelería fina" }
+  ],
+  cotillon: [
+    { id: "cot-1", item: "Piñata Artesanal Sirenita Bebé", cantidad: "1 un.", comprado: true, notas: "Con dulces y sorpresas" },
+    { id: "cot-2", item: "Banderines Holográficos Bajo el Mar", cantidad: "3 tiras", comprado: true, notas: "Para el fondo de fotos" },
+    { id: "cot-3", item: "Vasos y Platos Biodegradables Marinos", cantidad: "100 un.", comprado: false, notas: "Diseño pastel" },
+    { id: "cot-4", item: "Bolsitas de Dulces para Salir a Pedir", cantidad: "30 un.", comprado: true, notas: "Con temática Halloween/Mar" }
+  ],
+  cronograma: [
+    {
+      id: "cr-1",
+      hora: "15:00",
+      titulo: "Conversar sobre Domi y Comer Cositas Ricas",
+      descripcion: "De 15:00 a 16:00 hrs. Bienvenida, ricas cositas para picar y un hermoso momento para compartir, hablar de lo bella, inteligente, risueña y adorable que es Domi en su primer añito."
+    },
+    {
+      id: "cr-2",
+      hora: "16:00",
+      titulo: "Cantar Cumpleaños Feliz & Apertura de Regalos",
+      descripcion: "A las 16:00 hrs. Canto del cumpleaños feliz junto a la torta, apagar la velita N°1 y apertura de regalos con mucho amor."
+    },
+    {
+      id: "cr-completos",
+      hora: "18:00",
+      titulo: "Gran Banquete de Completos de Etiqueta",
+      descripcion: "A las 18:00 hrs. Solemne y distinguido momento gastronómico donde nos deleitaremos con la más selecta preparación de completos al estilo de etiqueta, servidos con gran pompa y sabor."
+    },
+    {
+      id: "cr-3",
+      hora: "19:00",
+      titulo: "Salir a Pedir Dulces",
+      descripcion: "De 19:00 a 20:00 hrs. ¡Momento de dulces y diversión! Salir a pedir dulces con los niños y sus disfraces compartiendo risas y ricas golosinas."
+    },
+    {
+      id: "cr-4",
+      hora: "20:00",
+      titulo: "Regreso al Club & Despedida",
+      descripcion: "A las 20:00 hrs. Tras salir a pedir dulces, pueden volver con toda tranquilidad al club a descansar, recoger sus pertenencias, abrigarse y despedirnos con un gran abrazo."
+    }
+  ]
+};
+
 class CumpleStore {
   constructor() {
+    this.storageKey = getActiveStorageKey();
     this.data = this.load();
+  }
+
+  getInitialTemplate() {
+    return isDemoContext() 
+      ? JSON.parse(JSON.stringify(DEMO_INITIAL_DATA))
+      : JSON.parse(JSON.stringify(INITIAL_DATA));
   }
 
   load() {
     try {
-      // Limpiar versiones anteriores que contenían datos de ejemplo
-      if (localStorage.getItem('cumple_domi_data_v1')) {
-        localStorage.removeItem('cumple_domi_data_v1');
-      }
-      const stored = localStorage.getItem(STORAGE_KEY);
+      const stored = localStorage.getItem(this.storageKey);
       if (stored) {
         const parsed = JSON.parse(stored);
-        // Sincronizar cronograma actualizado si tiene hitos anteriores, conservando intactos todos los invitados
         if (parsed.cronograma && (!parsed.cronograma.some(c => c.id === 'cr-completos') || parsed.cronograma.some(c => c.descripcion && c.descripcion.includes('cóctel')))) {
           parsed.cronograma = JSON.parse(JSON.stringify(INITIAL_DATA.cronograma));
           this.save(parsed);
@@ -81,15 +205,15 @@ class CumpleStore {
     } catch (e) {
       console.error('Error al cargar datos de localStorage:', e);
     }
-    // Si no hay datos, inicializamos con los valores por defecto
-    this.save(INITIAL_DATA);
-    return JSON.parse(JSON.stringify(INITIAL_DATA));
+    const template = this.getInitialTemplate();
+    this.save(template);
+    return template;
   }
 
   save(dataToSave = this.data) {
     try {
       this.data = dataToSave;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data));
+      localStorage.setItem(this.storageKey, JSON.stringify(this.data));
       window.dispatchEvent(new CustomEvent('cumple_store_updated', { detail: this.data }));
     } catch (e) {
       console.error('Error al guardar en localStorage:', e);
@@ -309,7 +433,7 @@ class CumpleStore {
 
   // --- REINICIAR / EXPORTAR / IMPORTAR ---
   resetToDefaults() {
-    this.save(JSON.parse(JSON.stringify(INITIAL_DATA)));
+    this.save(this.getInitialTemplate());
   }
 
   exportJSON() {

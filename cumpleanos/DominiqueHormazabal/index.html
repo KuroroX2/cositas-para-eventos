@@ -18,7 +18,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 
   <!-- Estilos -->
-  <link rel="stylesheet" href="../css/style.css?v=20261025e">
+  <link rel="stylesheet" href="../css/style.css?v=20261025f">
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎃🧜‍♀️</text></svg>">
@@ -52,6 +52,9 @@
         <a href="#detalles" class="nav-btn nav-btn-link"><i class="ri-calendar-event-line"></i> Cuándo y Dónde</a>
         <a href="#itinerario" class="nav-btn nav-btn-link"><i class="ri-time-line"></i> Itinerario</a>
         <a href="#confirmar" class="nav-btn nav-btn-rsvp"><i class="ri-check-line"></i> Confirmar</a>
+        <button type="button" class="nav-btn nav-btn-admin btn-admin-auth" id="btnAdminAuth" title="Panel Organizador para los Papás">
+          <i class="ri-settings-4-line"></i> <span class="nav-btn-text-full">Organizador</span><span class="nav-btn-text-short">Org</span>
+        </button>
         <button type="button" class="mobile-nav-toggle" id="btnMobileNavToggle" aria-label="Abrir menú" aria-expanded="false">
           <i class="ri-menu-line"></i>
         </button>
@@ -65,6 +68,9 @@
       <a href="#detalles" class="mobile-nav-link"><i class="ri-calendar-event-line"></i> Cuándo y Dónde</a>
       <a href="#itinerario" class="mobile-nav-link"><i class="ri-time-line"></i> Itinerario</a>
       <a href="#confirmar" class="mobile-nav-link" style="color: var(--color-teal); font-weight: 700;"><i class="ri-check-double-line"></i> Confirmar Asistencia</a>
+      <button type="button" class="mobile-nav-link btn-admin-auth" id="btnMobileAdminAuth" style="color: var(--color-purple-light); background: rgba(168, 85, 247, 0.12); border-color: rgba(168, 85, 247, 0.3); text-align: left; width: 100%; cursor: pointer;">
+        <i class="ri-lock-line" style="color: var(--color-purple-light);"></i> Organizador (Papás)
+      </button>
     </div>
   </header>
 
@@ -88,18 +94,18 @@
         <span>¡Mi Primera Vuelta al Sol! 🧜‍♀️</span>
       </div>
 
-      <!-- Tarjeta VIP Invitación Personalizada -->
-      <div class="personalized-vip-card" id="vipPersonalizedCard" style="display: none;">
+      <!-- Tarjeta VIP Invitación Personalizada (Por defecto de ejemplo; se reemplaza si hay datos reales) -->
+      <div class="personalized-vip-card" id="vipPersonalizedCard" style="display: block;">
         <div class="vip-card-glow"></div>
         <div class="vip-header-badge">
           <i class="ri-sparkling-fill" style="color: var(--color-amber);"></i>
           <span>INVITACIÓN ESPECIAL PARA TI</span>
           <i class="ri-sparkling-fill" style="color: var(--color-amber);"></i>
         </div>
-        <h2 class="vip-guest-title" id="vipGuestTitle">Familia Morales</h2>
-        <div class="vip-guest-subnames" id="vipGuestSubnames" style="display: none;"></div>
+        <h2 class="vip-guest-title" id="vipGuestTitle">Familia Morales (Invitado de Ejemplo)</h2>
+        <div class="vip-guest-subnames" id="vipGuestSubnames" style="display: block;">Carlos, Carolina y Mateo</div>
         <div class="vip-passes-pill" id="vipPassesPill">
-          <i class="ri-ticket-2-line"></i> <span id="vipPassesText">Invitación Reservada</span>
+          <i class="ri-ticket-2-line"></i> <span id="vipPassesText">3 Invitaciones Reservadas (2 Adultos + 1 Niño)</span>
         </div>
         <p class="vip-personal-msg" id="vipPersonalMsg">
           ¡Queremos compartir este día tan mágico e inolvidable junto a ustedes!
@@ -547,11 +553,38 @@
       <p class="footer-text">
         Celebrando con amor y magia bajo el mar &bull; 31 de Octubre, Club Valle del Sol
       </p>
+      <div style="margin-top: 1rem;">
+        <button type="button" class="footer-admin-btn btn-admin-auth" id="btnFooterAdminAuth" style="background: none; border: 1px dashed rgba(168, 85, 247, 0.4); border-radius: 999px; padding: 0.45rem 1.1rem; color: #a855f7; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.25s ease;">
+          <i class="ri-lock-line"></i> Acceso Papás al Organizador
+        </button>
+      </div>
     </div>
   </footer>
 
+  <!-- Modal de Autenticación para los Papás (Clave: Domi.2026) -->
+  <div class="modal-overlay" id="adminAuthModal" style="display: none;">
+    <div class="modal-content-glass auth-modal-box">
+      <button type="button" class="modal-close-btn" id="btnCloseAuthModal">&times;</button>
+      <div class="auth-icon-badge">🧜‍♀️🔐</div>
+      <h3 class="auth-title">Panel Organizador de Domi</h3>
+      <p class="auth-subtitle">Ingresa la clave de acceso de los papás para administrar invitados, mesas y detalles del evento.</p>
+      <form id="adminAuthForm" class="auth-form" autocomplete="off">
+        <div class="auth-input-wrapper">
+          <input type="password" id="adminAuthPin" class="auth-input" placeholder="Ingresa la clave..." required autofocus>
+          <button type="button" id="btnToggleAuthPin" class="auth-eye-btn" aria-label="Mostrar contraseña"><i class="ri-eye-line"></i></button>
+        </div>
+        <div id="adminAuthError" class="auth-error-msg" style="display: none;">
+          <i class="ri-error-warning-line"></i> <span>Clave incorrecta. Inténtalo nuevamente.</span>
+        </div>
+        <button type="submit" class="auth-submit-btn">
+          <i class="ri-login-box-line"></i> Ingresar al Organizador
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- Scripts -->
-  <script src="../js/store.js?v=20261025e"></script>
-  <script src="../js/app.js?v=20261025e"></script>
+  <script src="../js/store.js?v=20261025f"></script>
+  <script src="../js/app.js?v=20261025f"></script>
 </body>
 </html>
