@@ -16,7 +16,7 @@ const INITIAL_DATA = {
     direccion: "Senecio 4593, Puente Alto",
     mapaUrl: "https://maps.google.com/?q=Senecio+4593,+Puente+Alto",
     tematica: "Sirenita & Bajo el Mar Pastel",
-    dressCode: "¡Te espero con tu mejor disfraz!",
+    dressCode: "Vestimenta cómoda / Casual",
     whatsappOrganizador: "+56912345678"
   },
   invitados: [],
@@ -27,26 +27,32 @@ const INITIAL_DATA = {
     {
       id: "cr-1",
       hora: "15:00",
-      titulo: "Conversar sobre la Domi y Comer Cositas Ricas",
-      descripcion: "Inicio a las 15:00 hasta las 17:00 hrs. Bienvenida, cóctel y un lindo momento para compartir anécdotas y celebrar el primer añito de Dominique."
+      titulo: "Conversar sobre Domi y Comer Cositas Ricas",
+      descripcion: "De 15:00 a 16:00 hrs. Bienvenida, ricas cositas para picar y un hermoso momento para compartir, hablar de lo bella, inteligente, risueña y adorable que es Domi en su primer añito."
     },
     {
       id: "cr-2",
-      hora: "17:00",
+      hora: "16:00",
       titulo: "Cantar Cumpleaños Feliz & Apertura de Regalos",
-      descripcion: "A las 17:00 hrs. Canto del cumpleaños feliz junto a la torta, apagar la velita N°1 y apertura de regalos."
+      descripcion: "A las 16:00 hrs. Canto del cumpleaños feliz junto a la torta, apagar la velita N°1 y apertura de regalos con mucho amor."
+    },
+    {
+      id: "cr-completos",
+      hora: "18:00",
+      titulo: "Gran Banquete de Completos de Gala",
+      descripcion: "A las 18:00 hrs. Solemne y distinguido momento gastronómico donde nos deleitaremos con la más selecta preparación de completos al estilo de gala, servidos con gran pompa y sabor."
     },
     {
       id: "cr-3",
-      hora: "18:00",
+      hora: "19:00",
       titulo: "Salir a Pedir Dulces",
-      descripcion: "A las 18:00 hasta las 20:00 hrs. ¡Momento de disfraces y dulces de Halloween! Salir a pedir dulces con los niños."
+      descripcion: "De 19:00 a 20:00 hrs. ¡Momento de dulces y diversión! Salir a pedir dulces con los niños y sus disfraces compartiendo risas y ricas golosinas."
     },
     {
       id: "cr-4",
-      hora: "21:00",
-      titulo: "Fin del Cumpleaños",
-      descripcion: "21:00 hrs. Cierre del cumpleaños, fotos de despedida y agradecimientos."
+      hora: "20:00",
+      titulo: "Regreso al Club & Despedida",
+      descripcion: "A las 20:00 hrs. Tras salir a pedir dulces, pueden volver con toda tranquilidad al club a descansar, recoger sus pertenencias, abrigarse y despedirnos con un gran abrazo."
     }
   ]
 };
@@ -64,7 +70,13 @@ class CumpleStore {
       }
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        return JSON.parse(stored);
+        const parsed = JSON.parse(stored);
+        // Sincronizar cronograma actualizado si tiene hitos anteriores, conservando intactos todos los invitados
+        if (parsed.cronograma && (!parsed.cronograma.some(c => c.id === 'cr-completos') || parsed.cronograma.some(c => c.descripcion && c.descripcion.includes('cóctel')))) {
+          parsed.cronograma = JSON.parse(JSON.stringify(INITIAL_DATA.cronograma));
+          this.save(parsed);
+        }
+        return parsed;
       }
     } catch (e) {
       console.error('Error al cargar datos de localStorage:', e);
@@ -107,8 +119,6 @@ class CumpleStore {
       asistira: null, // null = pendiente, true = confirmado, false = no asiste
       adultos: 1,
       ninos: 0,
-      disfraz: '',
-      alergias: '',
       dedicatoria: '',
       mesaId: null,
       ...invitado
@@ -261,6 +271,11 @@ class CumpleStore {
 
   // --- MÉTODOS PARA CRONOGRAMA ---
   getCronograma() {
+    // Sincronizar automáticamente con el itinerario oficial si tiene la versión antigua o falta el banquete de completos
+    if (!this.data.cronograma || !this.data.cronograma.some(c => c.id === 'cr-completos') || this.data.cronograma.some(c => c.titulo && c.titulo.includes('la Domi')) || this.data.cronograma.some(c => c.hora === '17:00' && c.id === 'cr-2')) {
+      this.data.cronograma = JSON.parse(JSON.stringify(INITIAL_DATA.cronograma));
+      this.save(this.data);
+    }
     return this.data.cronograma || [];
   }
 

@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initTabs();
   initModals();
   initInviteGenerator();
+  initBulkSend();
   initSettingsForm();
   initBackupsAndPrint();
 
@@ -24,8 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
 function renderAll() {
   renderMetrics();
   renderInvitados();
-  updateGeneratorMesas();
-  renderMesas();
   renderComida();
   renderCotillon();
   renderCronograma();
@@ -58,14 +57,10 @@ function renderMetrics() {
   const data = window.cumpleStore.getData();
 
   const invitados = data.invitados || [];
+  const totalInvitaciones = invitados.length;
+  const totalPersonas = invitados.reduce((sum, i) => sum + (Number(i.adultos) || 0) + (Number(i.ninos) || 0), 0);
   const confirmados = invitados.filter(i => i.asistira === true);
   const totalAsistentes = confirmados.reduce((sum, i) => sum + (Number(i.adultos) || 0) + (Number(i.ninos) || 0), 0);
-
-  // Mesas y capacidad
-  const mesas = data.mesas || [];
-  const capacidadTotal = mesas.reduce((sum, m) => sum + (Number(m.capacidad) || 0), 0);
-  const sentados = confirmados.filter(i => i.mesaId);
-  const totalSentados = sentados.reduce((sum, i) => sum + (Number(i.adultos) || 0) + (Number(i.ninos) || 0), 0);
 
   // Comida
   const comida = data.comida || [];
@@ -78,27 +73,25 @@ function renderMetrics() {
   const costoCotillon = cotillon.reduce((sum, c) => sum + (Number(c.costo) || 0), 0);
 
   // Actualizar métricas visuales
+  const elTotalInv = document.getElementById('metricTotalInvitaciones');
+  const elTotalPer = document.getElementById('metricTotalPersonas');
   const elGuests = document.getElementById('metricGuests');
-  const elSeats = document.getElementById('metricSeats');
   const elFood = document.getElementById('metricFood');
-  const elParty = document.getElementById('metricParty');
   const elBudget = document.getElementById('metricBudget');
 
+  if (elTotalInv) elTotalInv.innerText = `${totalInvitaciones} invitación${totalInvitaciones === 1 ? '' : 'es'}`;
+  if (elTotalPer) elTotalPer.innerText = `${totalPersonas} personas`;
   if (elGuests) elGuests.innerText = `${totalAsistentes} personas`;
-  if (elSeats) elSeats.innerText = `${totalSentados} / ${capacidadTotal}`;
   if (elFood) elFood.innerText = `${comidaLista} / ${comida.length}`;
-  if (elParty) elParty.innerText = `${cotillonListo} / ${cotillon.length}`;
   if (elBudget) elBudget.innerText = `$${(costoComida + costoCotillon).toLocaleString('es-CL')}`;
 
   // Actualizar badges en pestañas
   const bInv = document.getElementById('badgeCountInvitados');
-  const bMes = document.getElementById('badgeCountMesas');
   const bCom = document.getElementById('badgeCountComida');
   const bCot = document.getElementById('badgeCountCotillon');
   const bCro = document.getElementById('badgeCountCronograma');
 
   if (bInv) bInv.innerText = invitados.length;
-  if (bMes) bMes.innerText = mesas.length;
   if (bCom) bCom.innerText = comida.length;
   if (bCot) bCot.innerText = cotillon.length;
   if (bCro) bCro.innerText = (data.cronograma || []).length;
@@ -124,9 +117,7 @@ function initInviteGenerator() {
   const grpMembers = document.getElementById('grpFamiliaMembers');
   const inputAdultos = document.getElementById('genAdultos');
   const inputNinos = document.getElementById('genNinos');
-  const selectMesa = document.getElementById('genMesa');
   const btnToggle = document.getElementById('btnToggleGenForm');
-  const btnToggleTop = document.getElementById('btnToggleGenFormTop');
   const cardGen = document.getElementById('inviteGeneratorCard');
 
   // Alternar vista del creador
@@ -141,14 +132,6 @@ function initInviteGenerator() {
   }
 
   btnToggle?.addEventListener('click', toggleGenerator);
-  btnToggleTop?.addEventListener('click', () => {
-    if (cardGen && cardGen.style.display === 'none') {
-      toggleGenerator();
-    }
-    cardGen?.scrollIntoView({ behavior: 'smooth' });
-    const firstInput = document.getElementById('genIndivName') || document.getElementById('genFamName');
-    firstInput?.focus();
-  });
 
   // Cambio de tipo de invitación (Individual / Pareja / Familia)
   typeRadios.forEach(radio => {
@@ -211,7 +194,6 @@ function initInviteGenerator() {
     const phone = document.getElementById('genPhone')?.value.trim() || '';
     const adultos = parseInt(inputAdultos?.value, 10) || 1;
     const ninos = parseInt(inputNinos?.value, 10) || 0;
-    const mesaId = selectMesa?.value || null;
 
     const newInv = window.cumpleStore.addInvitado({
       tipo: type,
@@ -223,30 +205,27 @@ function initInviteGenerator() {
       telefono: phone,
       asistira: null, // Pendiente de confirmación
       adultos: adultos,
-      ninos: ninos,
-      mesaId: mesaId
+      ninos: ninos
     });
-
-    const url = generatePersonalizedUrl(newInv);
-
-    // Mostrar modal con los enlaces y opciones
-    showShareModal(newInv, url);
 
     form.reset();
     document.querySelector('input[name="inviteType"][value="individual"]').click();
+
+    renderMetrics();
+    renderInvitados();
+
+    const toast = document.getElementById('orgToast');
+    const toastMsg = document.getElementById('orgToastMsg');
+    if (toast && toastMsg) {
+      toastMsg.innerText = `¡Invitación para "${nombreFinal}" creada! El enlace está disponible en el listado.`;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3500);
+    }
   });
 }
 
 function updateGeneratorMesas() {
-  const selectMesa = document.getElementById('genMesa');
-  if (!selectMesa || !window.cumpleStore) return;
-  const currentVal = selectMesa.value;
-  const mesas = window.cumpleStore.getMesas();
-  let html = '<option value="">-- Sin mesa asignada --</option>';
-  mesas.forEach(m => {
-    html += `<option value="${m.id}" ${m.id === currentVal ? 'selected' : ''}>Mesa ${m.numero}: ${escapeHtml(m.nombre)}</option>`;
-  });
-  selectMesa.innerHTML = html;
+  // Sin asignación de mesas
 }
 
 /**
@@ -254,24 +233,36 @@ function updateGeneratorMesas() {
  */
 function generatePersonalizedUrl(inv) {
   const loc = window.location;
-  let basePath = loc.pathname;
+  let baseUrl = '';
 
-  if (basePath.includes('/organizador/')) {
-    basePath = basePath.replace('/organizador/', '/');
-  } else if (basePath.includes('/organizador.html')) {
-    basePath = basePath.replace('/organizador.html', '/index.html');
+  if (loc.protocol === 'file:') {
+    let cleanHref = loc.href.split('?')[0].split('#')[0];
+    if (cleanHref.includes('/organizador/')) {
+      baseUrl = cleanHref.replace('/organizador/', '/');
+    } else if (cleanHref.includes('/organizador.html')) {
+      baseUrl = cleanHref.replace('/organizador.html', '/index.html');
+    } else {
+      baseUrl = cleanHref.replace(/organizador.*$/, 'index.html');
+    }
   } else {
-    basePath = basePath.replace(/organizador.*$/, 'index.html');
-  }
-  if (!basePath.endsWith('index.html') && !basePath.endsWith('/')) {
-    basePath += '/index.html';
-  } else if (basePath.endsWith('/')) {
-    basePath += 'index.html';
+    let basePath = loc.pathname;
+    if (basePath.includes('/organizador/')) {
+      basePath = basePath.replace('/organizador/', '/');
+    } else if (basePath.includes('/organizador.html')) {
+      basePath = basePath.replace('/organizador.html', '/index.html');
+    } else {
+      basePath = basePath.replace(/organizador.*$/, 'index.html');
+    }
+    if (!basePath.endsWith('index.html') && !basePath.endsWith('/')) {
+      basePath += '/index.html';
+    } else if (basePath.endsWith('/')) {
+      basePath += 'index.html';
+    }
+    const origin = (loc.origin && loc.origin !== 'null') ? loc.origin : '';
+    baseUrl = `${origin}${basePath}`;
   }
 
-  const origin = loc.origin;
   const params = new URLSearchParams();
-
   if (inv.tipo) params.set('tipo', inv.tipo);
   if (inv.familia) params.set('fam', inv.familia);
   if (inv.nombre) params.set('n', inv.nombre);
@@ -284,7 +275,7 @@ function generatePersonalizedUrl(inv) {
   params.set('p', total || 1);
   if (inv.id) params.set('code', inv.id);
 
-  return `${origin}${basePath}?${params.toString()}`;
+  return `${baseUrl}?${params.toString()}`;
 }
 
 /**
@@ -295,41 +286,39 @@ function buildWhatsAppMessage(inv, url) {
   const isCouple = inv.tipo === 'pareja' || (inv.name1 && inv.name2);
 
   let greeting = '';
-  let pluralWait = '¡Te espero con tu mejor disfraz!';
   if (isFamily) {
-    greeting = `¡Hola ${inv.familia || inv.nombre}! 🧜‍♀️🎃`;
-    pluralWait = '¡Los esperamos con sus mejores disfraces para compartir este día mágico!';
+    greeting = `¡Hola ${inv.familia || inv.nombre}! 🧜‍♀️✨`;
   } else if (isCouple) {
-    greeting = `¡Hola ${inv.name1} y ${inv.name2}! 🧜‍♀️🎃`;
-    pluralWait = '¡Los esperamos con sus mejores disfraces!';
+    greeting = `¡Hola ${inv.name1} y ${inv.name2}! 🧜‍♀️✨`;
   } else {
-    greeting = `¡Hola ${inv.nombre}! 🧜‍♀️🎃`;
-    pluralWait = '¡Te espero con tu mejor disfraz!';
+    greeting = `¡Hola ${inv.nombre}! 🧜‍♀️✨`;
   }
 
-  let pasesText = '';
+  let detallePersonas = '';
   const ads = Number(inv.adultos) || 0;
   const chs = Number(inv.ninos) || 0;
   if (ads > 0 && chs > 0) {
-    pasesText = `Pase reservado para: ${ads} Adulto(s) y ${chs} Niño(s)`;
+    detallePersonas = `Invitación para: ${ads} Adulto(s) y ${chs} Niño(s)`;
   } else if (ads > 1) {
-    pasesText = `Pase reservado para: ${ads} Personas`;
+    detallePersonas = `Invitación para: ${ads} Personas`;
   } else {
-    pasesText = `Pase individual reservado`;
+    detallePersonas = `Invitación individual`;
   }
 
   return `${greeting}
-Con muchísima emoción queremos invitarlos a celebrar el Primer Cumpleaños de Dominique ("Bajo el Mar & Halloween").
+Con muchísimo cariño queremos invitarte a celebrar el Primer Cumpleaños de Dominique ("Bajo el Mar").
 
 📅 Sábado 31 de Octubre, 15:00 hrs
 📍 Club Valle del Sol (Senecio 4593, Puente Alto)
-🎟️ ${pasesText}
+💌 ${detallePersonas}
 
-Aquí tienen su invitación personalizada lista con sus pases reservados:
+Te compartimos el enlace con tu invitación interactiva:
 👉 ${url}
 
-Por favor confírmennos su asistencia a través del link. ${pluralWait} 💖✨
-— Dominique & sus Papás`;
+Por favor, ¿podrías ingresar al link y confirmarnos con toda confianza si podrás acompañarnos o no? Nos hace mucha ilusión compartir este momento contigo y nos ayuda mucho a organizar todo con amor 💖🌊
+
+¡Te esperamos!
+— Dominique & sus Papás 💕`;
 }
 
 /**
@@ -415,12 +404,31 @@ function copyToClipboard(text) {
  * GESTIÓN DE INVITADOS (TABLA & LISTADO)
  * ==========================================================================
  */
+// Selección de invitados en memoria
+const selectedGuestIds = new Set();
+
+function updateSelectedCount() {
+  const countEl = document.getElementById('countSelectedGuests');
+  const summaryEl = document.getElementById('selectedCountSummary');
+  if (countEl) countEl.innerText = selectedGuestIds.size;
+  if (summaryEl) summaryEl.innerText = `${selectedGuestIds.size} seleccionados`;
+
+  const btnSelected = document.getElementById('btnSendSelectedInvites');
+  if (btnSelected) {
+    btnSelected.style.opacity = selectedGuestIds.size > 0 ? '1' : '0.65';
+  }
+}
+
+/**
+ * ==========================================================================
+ * GESTIÓN DE INVITADOS (TABLA & LISTADO)
+ * ==========================================================================
+ */
 function renderInvitados() {
   const tbody = document.getElementById('tbodyInvitados');
   if (!tbody || !window.cumpleStore) return;
 
   const data = window.cumpleStore.getData();
-  const mesas = data.mesas || [];
   let invitados = data.invitados || [];
 
   const searchVal = document.getElementById('searchInvitados')?.value.toLowerCase().trim() || '';
@@ -432,7 +440,6 @@ function renderInvitados() {
       (i.nombre || '').toLowerCase().includes(searchVal) ||
       (i.familia || '').toLowerCase().includes(searchVal) ||
       (i.nombresIntegrantes || '').toLowerCase().includes(searchVal) ||
-      (i.disfraz || '').toLowerCase().includes(searchVal) ||
       (i.telefono || '').toLowerCase().includes(searchVal)
     );
   }
@@ -443,18 +450,34 @@ function renderInvitados() {
     invitados = invitados.filter(i => i.asistira === null || i.asistira === undefined || i.asistira === 'pendiente');
   } else if (filterVal === 'no') {
     invitados = invitados.filter(i => i.asistira === false);
-  } else if (filterVal === 'sin-mesa') {
-    invitados = invitados.filter(i => !i.mesaId);
   }
 
   tbody.innerHTML = '';
 
+  const checkAllEl = document.getElementById('checkAllGuests');
+  if (checkAllEl) {
+    checkAllEl.checked = invitados.length > 0 && invitados.every(i => selectedGuestIds.has(i.id));
+    checkAllEl.onclick = () => {
+      const checked = checkAllEl.checked;
+      invitados.forEach(i => {
+        if (checked) {
+          selectedGuestIds.add(i.id);
+        } else {
+          selectedGuestIds.delete(i.id);
+        }
+      });
+      tbody.querySelectorAll('.chk-invitado').forEach(c => c.checked = checked);
+      updateSelectedCount();
+    };
+  }
+
   if (invitados.length === 0) {
     if ((data.invitados || []).length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--org-text-muted); padding: 3rem 1rem;"><div style="font-size: 2.5rem; margin-bottom: 0.5rem;">💌</div><strong style="color: var(--org-text-main); font-size: 1.05rem;">No hay invitados registrados todavía</strong><br><span style="font-size: 0.88rem;">Usa el creador de arriba para generar la primera invitación personalizada para una persona, pareja o familia.</span></td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--org-text-muted); padding: 3rem 1rem;"><div style="font-size: 2.5rem; margin-bottom: 0.5rem;">💌</div><strong style="color: var(--org-text-main); font-size: 1.05rem;">No hay invitados registrados todavía</strong><br><span style="font-size: 0.88rem;">Usa el creador de arriba para generar la primera invitación personalizada para una persona, pareja o familia.</span></td></tr>`;
     } else {
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--org-text-muted); padding: 2rem;">No se encontraron invitados con estos criterios de búsqueda.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--org-text-muted); padding: 2rem;">No se encontraron invitados con estos criterios de búsqueda.</td></tr>`;
     }
+    updateSelectedCount();
     return;
   }
 
@@ -473,13 +496,6 @@ function renderInvitados() {
     const typeLabel = inv.tipo === 'familia' ? '👨‍👩‍👧 Familia' : inv.tipo === 'pareja' ? '👥 Pareja' : '👤 Individual';
     const typeClass = inv.tipo === 'familia' ? 'type-familia' : inv.tipo === 'pareja' ? 'type-pareja' : 'type-individual';
 
-    // Dropdown inline de mesas
-    let mesaOptions = `<option value="">-- Sin mesa --</option>`;
-    mesas.forEach(m => {
-      const selected = (inv.mesaId === m.id) ? 'selected' : '';
-      mesaOptions += `<option value="${m.id}" ${selected}>Mesa ${m.numero}: ${escapeHtml(m.nombre)}</option>`;
-    });
-
     const phoneDigits = (inv.telefono || '').replace(/\D/g, '');
     const cleanPhone = phoneDigits.startsWith('9') && phoneDigits.length === 9 ? '56' + phoneDigits : phoneDigits;
     const invUrl = generatePersonalizedUrl(inv);
@@ -488,9 +504,13 @@ function renderInvitados() {
       ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMsg)}`
       : `https://api.whatsapp.com/send?text=${encodeURIComponent(waMsg)}`;
 
-    const totalPases = (Number(inv.adultos) || 0) + (Number(inv.ninos) || 0);
+    const totalPersonas = (Number(inv.adultos) || 0) + (Number(inv.ninos) || 0);
+    const isChecked = selectedGuestIds.has(inv.id);
 
     tr.innerHTML = `
+      <td style="text-align: center;">
+        <input type="checkbox" class="chk-invitado" data-id="${inv.id}" ${isChecked ? 'checked' : ''} style="cursor: pointer; width: 16px; height: 16px;">
+      </td>
       <td>
         <strong>${escapeHtml(inv.nombre || inv.familia || 'Invitado')}</strong>
         ${inv.nombresIntegrantes ? `<div style="font-size: 0.78rem; color: #495057; margin-top: 0.2rem;"><i class="ri-group-line" style="color: var(--org-teal);"></i> ${escapeHtml(inv.nombresIntegrantes)}</div>` : ''}
@@ -498,22 +518,13 @@ function renderInvitados() {
         ${inv.dedicatoria ? `<div style="font-size: 0.76rem; color: #7048e8; font-style: italic; margin-top: 0.25rem;">💌 "${escapeHtml(inv.dedicatoria)}"</div>` : ''}
       </td>
       <td>
-        <strong style="color: var(--org-primary); font-size: 0.95rem;">${totalPases} pases</strong>
+        <strong style="color: var(--org-primary); font-size: 0.95rem;">${totalPersonas} persona${totalPersonas > 1 ? 's' : ''}</strong>
         <div style="font-size: 0.78rem; color: var(--org-text-muted);">${inv.adultos || 0} ad. &bull; ${inv.ninos || 0} niñ.</div>
       </td>
       <td>
         <span>${escapeHtml(inv.telefono || '—')}</span>
       </td>
       <td>${statusBadge}</td>
-      <td>
-        <select class="filter-select select-inline-mesa" data-invid="${inv.id}" style="font-size: 0.8rem; padding: 0.3rem 0.5rem; max-width: 155px;">
-          ${mesaOptions}
-        </select>
-      </td>
-      <td>
-        <div style="font-size: 0.82rem;"><strong>🎭</strong> ${escapeHtml(inv.disfraz || 'Por definir')}</div>
-        ${inv.alergias ? `<div style="font-size: 0.76rem; color: #d6336c;">⚠️ ${escapeHtml(inv.alergias)}</div>` : ''}
-      </td>
       <td style="text-align: right;">
         <div class="row-actions" style="justify-content: flex-end; gap: 0.35rem; flex-wrap: wrap;">
           <a href="${escapeHtml(waUrl)}" target="_blank" rel="noopener" class="btn-row-whatsapp" title="Enviar invitación personalizada por WhatsApp">
@@ -538,12 +549,20 @@ function renderInvitados() {
     tbody.appendChild(tr);
   });
 
-  // Listener para cambio directo de mesa
-  tbody.querySelectorAll('.select-inline-mesa').forEach(select => {
-    select.addEventListener('change', (e) => {
-      const invId = e.target.getAttribute('data-invid');
-      const newMesaId = e.target.value;
-      window.cumpleStore.asignarInvitadoAMesa(invId, newMesaId);
+  // Listeners de checkboxes de fila
+  tbody.querySelectorAll('.chk-invitado').forEach(chk => {
+    chk.addEventListener('change', (e) => {
+      const id = e.target.getAttribute('data-id');
+      if (e.target.checked) {
+        selectedGuestIds.add(id);
+      } else {
+        selectedGuestIds.delete(id);
+      }
+      updateSelectedCount();
+      const checkAll = document.getElementById('checkAllGuests');
+      if (checkAll) {
+        checkAll.checked = invitados.length > 0 && invitados.every(i => selectedGuestIds.has(i.id));
+      }
     });
   });
 
@@ -564,9 +583,147 @@ function renderInvitados() {
     btn.addEventListener('click', () => {
       const id = btn.getAttribute('data-id');
       if (confirm('¿Seguro que deseas eliminar este invitado?')) {
+        selectedGuestIds.delete(id);
         window.cumpleStore.deleteInvitado(id);
       }
     });
+  });
+
+  updateSelectedCount();
+}
+
+// Filtros de búsqueda en tiempo real
+document.getElementById('searchInvitados')?.addEventListener('input', renderInvitados);
+document.getElementById('filterAsistencia')?.addEventListener('change', renderInvitados);
+
+/**
+ * ==========================================================================
+ * ENVÍO MASIVO DE INVITACIONES POR WHATSAPP
+ * ==========================================================================
+ */
+function initBulkSend() {
+  const btnSelected = document.getElementById('btnSendSelectedInvites');
+  const btnAll = document.getElementById('btnSendAllBottom');
+  const modal = document.getElementById('modalBulkSend');
+  const listContainer = document.getElementById('bulkSendListContainer');
+  const totalCountEl = document.getElementById('bulkModalTotalCount');
+  const btnNext = document.getElementById('btnNextBulkSend');
+
+  let currentQueue = [];
+  let currentIndex = 0;
+
+  function openBulkModal(targetGuests) {
+    if (!targetGuests || targetGuests.length === 0) {
+      alert('No hay invitados para enviar.');
+      return;
+    }
+
+    currentQueue = targetGuests;
+    currentIndex = 0;
+    if (totalCountEl) totalCountEl.innerText = currentQueue.length;
+
+    renderQueueList();
+    if (modal) modal.style.display = 'flex';
+  }
+
+  function renderQueueList() {
+    if (!listContainer) return;
+    listContainer.innerHTML = '';
+
+    currentQueue.forEach((inv, idx) => {
+      const phoneDigits = (inv.telefono || '').replace(/\D/g, '');
+      const cleanPhone = phoneDigits.startsWith('9') && phoneDigits.length === 9 ? '56' + phoneDigits : phoneDigits;
+      const invUrl = generatePersonalizedUrl(inv);
+      const waMsg = buildWhatsAppMessage(inv, invUrl);
+      const waUrl = cleanPhone
+        ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMsg)}`
+        : `https://api.whatsapp.com/send?text=${encodeURIComponent(waMsg)}`;
+
+      const row = document.createElement('div');
+      row.className = 'bulk-queue-row';
+      row.id = `bulk-row-${idx}`;
+      row.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0.85rem; border-bottom: 1px solid #f1f5f9; gap: 0.5rem;';
+      
+      const totalPersonas = (Number(inv.adultos) || 0) + (Number(inv.ninos) || 0);
+
+      row.innerHTML = `
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-weight: 700; color: var(--org-text-main); font-size: 0.88rem;">${escapeHtml(inv.nombre || inv.familia)}</div>
+          <div style="font-size: 0.78rem; color: #64748b;">${inv.telefono ? `📞 ${escapeHtml(inv.telefono)}` : '⚠️ Sin teléfono'} &bull; ${totalPersonas} pers.</div>
+        </div>
+        <div style="display: flex; gap: 0.4rem; align-items: center;">
+          <span class="bulk-item-status" id="bulk-status-${idx}" style="font-size: 0.75rem; color: #94a3b8; font-weight: 600;">Pendiente</span>
+          <a href="${escapeHtml(waUrl)}" target="_blank" rel="noopener" class="btn-org-action btn-org-sm btn-open-bulk-wa" data-idx="${idx}" style="background: #25d366; color: white; border: none; font-size: 0.8rem; text-decoration: none; padding: 0.35rem 0.65rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 0.3rem;">
+            <i class="ri-whatsapp-line"></i> Abrir WhatsApp
+          </a>
+        </div>
+      `;
+
+      listContainer.appendChild(row);
+    });
+
+    listContainer.querySelectorAll('.btn-open-bulk-wa').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.getAttribute('data-idx'), 10);
+        markSent(idx);
+      });
+    });
+  }
+
+  function markSent(idx) {
+    const statusEl = document.getElementById(`bulk-status-${idx}`);
+    if (statusEl) {
+      statusEl.innerHTML = `<span style="color: #16a34a;"><i class="ri-check-line"></i> Abierto</span>`;
+    }
+    const rowEl = document.getElementById(`bulk-row-${idx}`);
+    if (rowEl) {
+      rowEl.style.background = '#f0fdf4';
+    }
+  }
+
+  btnNext?.addEventListener('click', () => {
+    if (currentIndex >= currentQueue.length) {
+      alert('¡Has completado el envío a todos los invitados de la lista!');
+      return;
+    }
+
+    const inv = currentQueue[currentIndex];
+    const phoneDigits = (inv.telefono || '').replace(/\D/g, '');
+    const cleanPhone = phoneDigits.startsWith('9') && phoneDigits.length === 9 ? '56' + phoneDigits : phoneDigits;
+    const invUrl = generatePersonalizedUrl(inv);
+    const waMsg = buildWhatsAppMessage(inv, invUrl);
+    const waUrl = cleanPhone
+      ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMsg)}`
+      : `https://api.whatsapp.com/send?text=${encodeURIComponent(waMsg)}`;
+
+    markSent(currentIndex);
+    window.open(waUrl, '_blank', 'noopener');
+
+    currentIndex++;
+    if (currentIndex < currentQueue.length) {
+      const nextRow = document.getElementById(`bulk-row-${currentIndex}`);
+      nextRow?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  });
+
+  btnSelected?.addEventListener('click', () => {
+    if (selectedGuestIds.size === 0) {
+      alert('Por favor selecciona al menos un invitado marcando su casilla en la lista.');
+      return;
+    }
+    const data = window.cumpleStore.getData();
+    const guests = (data.invitados || []).filter(i => selectedGuestIds.has(i.id));
+    openBulkModal(guests);
+  });
+
+  btnAll?.addEventListener('click', () => {
+    const data = window.cumpleStore.getData();
+    const guests = data.invitados || [];
+    if (guests.length === 0) {
+      alert('No hay invitados registrados todavía.');
+      return;
+    }
+    openBulkModal(guests);
   });
 }
 
@@ -918,18 +1075,15 @@ function initModals() {
     const data = {
       nombre: document.getElementById('mInvNombre').value.trim(),
       telefono: document.getElementById('mInvTelefono').value.trim(),
-      asistira: document.getElementById('mInvAsistencia').value === 'true',
       adultos: parseInt(document.getElementById('mInvAdultos').value, 10) || 0,
       ninos: parseInt(document.getElementById('mInvNinos').value, 10) || 0,
-      disfraz: document.getElementById('mInvDisfraz').value.trim(),
-      alergias: document.getElementById('mInvAlergias').value.trim(),
-      dedicatoria: document.getElementById('mInvDedicatoria').value.trim(),
-      mesaId: document.getElementById('mInvMesa').value || null
+      dedicatoria: document.getElementById('mInvDedicatoria').value.trim()
     };
 
     if (editId) {
       window.cumpleStore.updateInvitado(editId, data);
     } else {
+      data.asistira = null; // Pendiente de confirmación hasta que el invitado confirme o decline
       window.cumpleStore.addInvitado(data);
     }
     document.getElementById('modalInvitado').style.display = 'none';
@@ -1024,13 +1178,8 @@ function openModalInvitado(id = null) {
   form.reset();
   document.getElementById('invitadoEditId').value = id || '';
 
-  // Rellenar mesas en select
-  const selectMesa = document.getElementById('mInvMesa');
-  selectMesa.innerHTML = `<option value="">-- Sin mesa asignada --</option>`;
-  const mesas = window.cumpleStore.getMesas();
-  mesas.forEach(m => {
-    selectMesa.innerHTML += `<option value="${m.id}">Mesa ${m.numero}: ${escapeHtml(m.nombre)}</option>`;
-  });
+  const estadoRow = document.getElementById('mInvEstadoRow');
+  const estadoDisplay = document.getElementById('mInvEstadoDisplay');
 
   if (id) {
     document.getElementById('modalInvitadoTitle').innerText = 'Editar Invitado';
@@ -1038,18 +1187,26 @@ function openModalInvitado(id = null) {
     if (inv) {
       document.getElementById('mInvNombre').value = inv.nombre || '';
       document.getElementById('mInvTelefono').value = inv.telefono || '';
-      document.getElementById('mInvAsistencia').value = inv.asistira ? 'true' : 'false';
       document.getElementById('mInvAdultos').value = inv.adultos || 1;
       document.getElementById('mInvNinos').value = inv.ninos || 0;
-      document.getElementById('mInvDisfraz').value = inv.disfraz || '';
-      document.getElementById('mInvAlergias').value = inv.alergias || '';
       document.getElementById('mInvDedicatoria').value = inv.dedicatoria || '';
-      selectMesa.value = inv.mesaId || '';
+
+      if (estadoRow && estadoDisplay) {
+        estadoRow.style.display = 'block';
+        if (inv.asistira === true) {
+          estadoDisplay.innerHTML = `<span class="badge-status badge-yes"><i class="ri-check-line"></i> Asiste (Confirmado)</span>`;
+        } else if (inv.asistira === false) {
+          estadoDisplay.innerHTML = `<span class="badge-status badge-no"><i class="ri-close-line"></i> No asiste</span>`;
+        } else {
+          estadoDisplay.innerHTML = `<span class="badge-status badge-pending"><i class="ri-time-line"></i> Pendiente de confirmación</span>`;
+        }
+      }
     }
   } else {
     document.getElementById('modalInvitadoTitle').innerText = 'Agregar Nuevo Invitado';
     document.getElementById('mInvAdultos').value = 1;
     document.getElementById('mInvNinos').value = 0;
+    if (estadoRow) estadoRow.style.display = 'none';
   }
 
   modal.style.display = 'flex';

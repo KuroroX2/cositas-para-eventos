@@ -63,11 +63,11 @@ function initPersonalizedInvitation() {
   }
 
   const pasesText = totalPases === 1 
-    ? '1 Pase Reservado' 
-    : `${totalPases} Pases Reservados (${adultosParam} Adulto${adultosParam > 1 ? 's' : ''}${ninosParam > 0 ? ` + ${ninosParam} Niño${ninosParam > 1 ? 's' : ''}` : ''})`;
+    ? 'Invitación para 1 Persona' 
+    : `Invitación para ${totalPases} Personas (${adultosParam} Adulto${adultosParam > 1 ? 's' : ''}${ninosParam > 0 ? ` + ${ninosParam} Niño${ninosParam > 1 ? 's' : ''}` : ''})`;
 
   // Mensaje personalizado
-  let personalMsg = '¡Tu presencia hará este día aún más mágico e inolvidable para Dominique!';
+  let personalMsg = '¡Tu presencia hará este día aún más mágico e inolvidable para mí!';
   if (tipo === 'familia' || fam) {
     personalMsg = '¡Familia, su presencia y cariño harán que esta primera vuelta al sol sea mágica e inolvidable!';
   } else if (tipo === 'pareja' || (n1 && n2)) {
@@ -102,11 +102,17 @@ function initPersonalizedInvitation() {
   const rsvpVipDesc = document.getElementById('rsvpVipDesc');
   const rsvpCodeInput = document.getElementById('rsvpInviteCode');
 
+  const isPersonalized = Boolean(code || fam || n || n1 || params.get('inv') || params.get('p') || params.get('a') || params.get('adultos'));
+
   if (rsvpVipBanner) {
     rsvpVipBanner.style.display = 'block';
     if (rsvpVipTitle) rsvpVipTitle.textContent = `¡Hola, ${displayTitle}!`;
     if (rsvpVipDesc) {
-      rsvpVipDesc.textContent = `Hemos reservado ${pasesText.toLowerCase()} para celebrar el 1er añito de Dominique. Por favor indícanos cuántos nos acompañarán.`;
+      if (totalPases === 1) {
+        rsvpVipDesc.textContent = 'Hemos reservado 1 invitacion  para celebrar el 1er añito de Dominique. Por favor indícanos si podras asistir.';
+      } else {
+        rsvpVipDesc.textContent = `Hemos reservado ${totalPases} invitaciones para celebrar el 1er añito de Dominique. Por favor indícanos si podras asistir.`;
+      }
     }
   }
 
@@ -128,6 +134,34 @@ function initPersonalizedInvitation() {
   if (rsvpNinosSelect && !isNaN(ninosParam)) {
     const val = Math.min(Math.max(ninosParam, 0), 6);
     rsvpNinosSelect.value = String(val);
+  }
+
+  // En la invitación personalizada no se puede cambiar la cantidad de invitados
+  if (isPersonalized) {
+    if (rsvpAdultosSelect) {
+      rsvpAdultosSelect.disabled = true;
+      rsvpAdultosSelect.style.cursor = 'not-allowed';
+      rsvpAdultosSelect.style.opacity = '0.9';
+      rsvpAdultosSelect.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+      rsvpAdultosSelect.title = 'Cantidad de invitados asignada para tu invitación';
+    }
+    if (rsvpNinosSelect) {
+      rsvpNinosSelect.disabled = true;
+      rsvpNinosSelect.style.cursor = 'not-allowed';
+      rsvpNinosSelect.style.opacity = '0.9';
+      rsvpNinosSelect.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+      rsvpNinosSelect.title = 'Cantidad de invitados asignada para tu invitación';
+    }
+
+    const attendeesSection = document.getElementById('attendeesSection');
+    let fixedNote = document.getElementById('rsvpGuestsFixedNote');
+    if (!fixedNote && attendeesSection) {
+      fixedNote = document.createElement('div');
+      fixedNote.id = 'rsvpGuestsFixedNote';
+      fixedNote.style.cssText = 'font-size: 0.82rem; color: var(--color-teal); margin-top: -0.3rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.4rem;';
+      fixedNote.innerHTML = '<i class="ri-lock-line"></i> <span>Cantidad de invitados asignada a tu invitación</span>';
+      attendeesSection.appendChild(fixedNote);
+    }
   }
 
   // Si existe en el store local, intentar rellenar teléfono si ya lo teníamos
@@ -185,8 +219,8 @@ function initCountdown() {
  */
 function initCalendar() {
   const eventDetails = {
-    title: "Primer Cumpleaños de Dominique 🧜‍♀️🎃",
-    description: "¡Celebramos la primera vuelta al sol de Dominique! Temática: Bajo el mar con toque de Halloween. ¡Te espero con tu mejor disfraz!",
+    title: "Primer Cumpleaños de Dominique 🧜‍♀️✨",
+    description: "¡Celebramos la primera vuelta al sol de Dominique! Temática: Bajo el mar. ¡Te esperamos para celebrar juntos!",
     location: "Club Valle del Sol, Senecio 4593, Puente Alto, Chile",
     // 31 de Octubre 2026, 15:00 a 21:00 hora de Chile (UTC-3 -> 18:00Z a 00:00Z)
     startDate: "20261031T180000Z",
@@ -314,8 +348,6 @@ function initRsvpForm() {
           asistira,
           adultos,
           ninos,
-          disfraz: '',
-          alergias: '',
           dedicatoria,
           codigo: code
         });
@@ -382,6 +414,7 @@ function initRsvpForm() {
       if (attendeesSection) attendeesSection.style.display = 'block';
       form.style.display = 'flex';
       if (successCard) successCard.style.display = 'none';
+      parsePersonalizedInvite();
     });
   }
 }

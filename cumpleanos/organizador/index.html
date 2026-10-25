@@ -57,21 +57,30 @@
 
     <!-- Fila de Tarjetas de Métricas -->
     <section class="org-metrics-grid">
-      <!-- Métrica Invitados -->
+      <!-- Métrica 1: Total Invitaciones -->
       <div class="metric-card m-guests">
+        <div class="metric-icon"><i class="ri-mail-star-line"></i></div>
+        <div class="metric-info">
+          <div class="num" id="metricTotalInvitaciones">0</div>
+          <div class="lbl">Invitaciones Creadas</div>
+        </div>
+      </div>
+
+      <!-- Métrica 2: Total Personas Invitadas -->
+      <div class="metric-card m-party">
+        <div class="metric-icon"><i class="ri-team-line"></i></div>
+        <div class="metric-info">
+          <div class="num" id="metricTotalPersonas">0</div>
+          <div class="lbl">Total Personas Invitadas</div>
+        </div>
+      </div>
+
+      <!-- Métrica 3: Asistentes Confirmados -->
+      <div class="metric-card m-tables">
         <div class="metric-icon"><i class="ri-user-heart-line"></i></div>
         <div class="metric-info">
           <div class="num" id="metricGuests">0</div>
           <div class="lbl">Asistentes Confirmados</div>
-        </div>
-      </div>
-
-      <!-- Métrica Mesas & Asientos -->
-      <div class="metric-card m-tables">
-        <div class="metric-icon"><i class="ri-layout-masonry-line"></i></div>
-        <div class="metric-info">
-          <div class="num" id="metricSeats">0 / 0</div>
-          <div class="lbl">Asientos Asignados</div>
         </div>
       </div>
 
@@ -130,34 +139,20 @@
          ==================================================================== -->
     <section class="org-pane active" id="pane-invitados">
       <div class="pane-card">
-        <div class="pane-header-actions">
+        <div class="pane-header-actions" style="margin-bottom: 1.25rem;">
           <div class="pane-title-group">
             <h3>Lista de Invitados &amp; Confirmaciones</h3>
-            <p>Crea invitaciones personalizadas con link de WhatsApp y monitorea confirmaciones, mesas y disfraces</p>
-          </div>
-
-          <div class="filter-bar">
-            <input type="text" id="searchInvitados" class="search-input" placeholder="🔍 Buscar por nombre o disfraz...">
-            <select id="filterAsistencia" class="filter-select">
-              <option value="all">Todos los Estados</option>
-              <option value="si">Confirmados (Sí)</option>
-              <option value="pendiente">Pendientes de Confirmar</option>
-              <option value="no">No Asisten (No)</option>
-              <option value="sin-mesa">Sin Mesa Asignada</option>
-            </select>
-            <button type="button" class="btn-org-action btn-org-primary" id="btnToggleGenFormTop">
-              <i class="ri-user-add-line"></i> Crear Invitación
-            </button>
+            <p>Monitorea y gestiona las invitaciones del cumpleaños de Dominique</p>
           </div>
         </div>
 
-        <!-- Creador de Invitaciones Personalizadas (Estilo Matrimonios) -->
+        <!-- Creador de Invitaciones Personalizadas -->
         <div class="org-invite-generator-card" id="inviteGeneratorCard">
           <div class="generator-header">
             <div class="gen-title-box">
-              <span class="gen-tag"><i class="ri-magic-line"></i> Enlaces Personalizados</span>
+              <span class="gen-tag"><i class="ri-magic-line"></i> Nueva Invitación</span>
               <h4>Crear Invitación con Nombre(s) o Familia</h4>
-              <p>Genera un link único de WhatsApp para un invitado, pareja o familia completa con sus pases reservados</p>
+              <p>Genera la invitación para una persona, pareja o familia con su saludo personalizado</p>
             </div>
             <button type="button" class="btn-org-action btn-org-sm" id="btnToggleGenForm">
               <i class="ri-arrow-up-s-line" id="iconToggleGen"></i> <span id="textToggleGen">Ocultar Creador</span>
@@ -227,52 +222,74 @@
                 <input type="tel" id="genPhone" class="org-form-input" placeholder="Ej: +56 9 1234 5678">
               </div>
 
-              <!-- Pases: Adultos y Niños -->
+              <!-- Personas: Adultos y Niños -->
               <div class="org-form-row">
                 <div class="org-form-group">
-                  <label for="genAdultos"><i class="ri-user-line"></i> Pases Adultos</label>
+                  <label for="genAdultos"><i class="ri-user-line"></i> Adultos Invitados</label>
                   <input type="number" id="genAdultos" class="org-form-input" min="0" max="20" value="1">
                 </div>
                 <div class="org-form-group">
-                  <label for="genNinos"><i class="ri-bear-smile-line"></i> Pases Niños</label>
+                  <label for="genNinos"><i class="ri-bear-smile-line"></i> Niños Invitados</label>
                   <input type="number" id="genNinos" class="org-form-input" min="0" max="20" value="0">
                 </div>
-              </div>
-
-              <!-- Asignar Mesa Temática (opcional) -->
-              <div class="org-form-group">
-                <label for="genMesa"><i class="ri-layout-masonry-line"></i> Asignar Mesa (opcional)</label>
-                <select id="genMesa" class="org-form-select">
-                  <option value="">-- Sin mesa asignada --</option>
-                </select>
               </div>
             </div>
 
             <div class="gen-form-actions">
               <button type="submit" class="btn-org-action btn-org-primary" id="btnSubmitGenerateInvite">
-                <i class="ri-magic-line"></i> <span>Crear Invitación &amp; Generar Enlace</span>
+                <i class="ri-user-add-line"></i> <span>Crear Invitación</span>
               </button>
             </div>
           </form>
+        </div>
+
+        <!-- Barra de Búsqueda, Filtro y Acciones Masivas justo encima de la tabla -->
+        <div class="table-controls-bar" style="display: flex; gap: 0.75rem; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 1rem; margin-top: 1.5rem; background: #f8fafc; padding: 0.85rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--org-border);">
+          <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; flex: 1; max-width: 580px;">
+            <input type="text" id="searchInvitados" class="search-input" placeholder="🔍 Buscar por nombre o teléfono..." style="flex: 1; min-width: 200px;">
+            <select id="filterAsistencia" class="filter-select" style="min-width: 170px;">
+              <option value="all">Todos los Estados</option>
+              <option value="si">Confirmados (Sí)</option>
+              <option value="pendiente">Pendientes de Confirmar</option>
+              <option value="no">No Asisten (No)</option>
+            </select>
+          </div>
+
+          <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+            <button type="button" class="btn-org-action" id="btnSendSelectedInvites" style="background: linear-gradient(135deg, #25d366, #128c7e); color: white; border-color: #25d366; font-weight: 600;">
+              <i class="ri-whatsapp-line"></i> <span>Enviar a seleccionados (<span id="countSelectedGuests">0</span>)</span>
+            </button>
+          </div>
         </div>
 
         <div class="table-responsive">
           <table class="data-table" id="tableInvitados">
             <thead>
               <tr>
+                <th style="width: 44px; text-align: center;">
+                  <input type="checkbox" id="checkAllGuests" title="Seleccionar todos" style="cursor: pointer; width: 16px; height: 16px;">
+                </th>
                 <th>Invitado / Familia</th>
-                <th>Pases Reservados</th>
+                <th>Personas Invitadas</th>
                 <th>Teléfono</th>
                 <th>Estado Asistencia</th>
-                <th>Mesa Asignada</th>
-                <th>Disfraz / Dieta</th>
-                <th style="text-align: right;">Invitación Personalizada &amp; Acciones</th>
+                <th style="text-align: right;">Invitación &amp; Acciones</th>
               </tr>
             </thead>
             <tbody id="tbodyInvitados">
               <!-- Renderizado dinámico -->
             </tbody>
           </table>
+        </div>
+
+        <!-- Botón al final del listado -->
+        <div class="table-bottom-bar" style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+          <div style="font-size: 0.88rem; color: var(--org-text-muted);">
+            <span id="selectedCountSummary">0 seleccionados</span>
+          </div>
+          <button type="button" class="btn-org-action" id="btnSendAllBottom" style="background: linear-gradient(135deg, #25d366, #128c7e); border-color: #25d366; color: #fff; font-weight: 600; padding: 0.7rem 1.4rem; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25); border-radius: var(--radius-sm);">
+            <i class="ri-whatsapp-fill" style="font-size: 1.1rem;"></i> <span>Enviar enlace a todos</span>
+          </button>
         </div>
       </div>
     </section>
@@ -438,7 +455,7 @@
 
           <div class="org-form-row">
             <div class="org-form-group">
-              <label for="setDressCode">Código de Vestimenta / Disfraz</label>
+              <label for="setDressCode">Código de Vestimenta</label>
               <input type="text" id="setDressCode" class="org-form-input" required>
             </div>
             <div class="org-form-group">
@@ -505,20 +522,14 @@
           <input type="text" id="mInvTelefono" class="org-form-input" placeholder="+56 9 ...">
         </div>
 
-        <div class="org-form-row">
-          <div class="org-form-group">
-            <label for="mInvAsistencia">¿Asiste? *</label>
-            <select id="mInvAsistencia" class="org-form-select">
-              <option value="true">Sí, confirmado</option>
-              <option value="false">No asistirá</option>
-            </select>
-          </div>
-          <div class="org-form-group">
-            <label for="mInvMesa">Asignar a Mesa</label>
-            <select id="mInvMesa" class="org-form-select">
-              <option value="">-- Sin mesa asignada --</option>
-            </select>
-          </div>
+
+
+        <div class="org-form-group" id="mInvEstadoRow" style="display: none;">
+          <label>Estado de Asistencia</label>
+          <div id="mInvEstadoDisplay" style="padding: 0.35rem 0;"></div>
+          <small style="color: var(--org-text-muted); font-size: 0.78rem; display: block; margin-top: 0.25rem;">
+            <i class="ri-information-line"></i> Se actualiza automáticamente cuando el invitado confirma o rechaza en la invitación.
+          </small>
         </div>
 
         <div class="org-form-row">
@@ -530,16 +541,6 @@
             <label for="mInvNinos">Niños</label>
             <input type="number" id="mInvNinos" class="org-form-input" min="0" value="0">
           </div>
-        </div>
-
-        <div class="org-form-group">
-          <label for="mInvDisfraz">Disfraz planeado</label>
-          <input type="text" id="mInvDisfraz" class="org-form-input" placeholder="Ej: Ariel, Pez, Batman...">
-        </div>
-
-        <div class="org-form-group">
-          <label for="mInvAlergias">Restricciones o alergias</label>
-          <input type="text" id="mInvAlergias" class="org-form-input" placeholder="Ej: Celíaco, sin lactosa...">
         </div>
 
         <div class="org-form-group">
@@ -779,7 +780,47 @@
         </div>
 
         <div style="background: #e7f5ff; border: 1px solid #a5d8ff; border-radius: 8px; padding: 0.75rem; font-size: 0.82rem; color: #1c7ed6; line-height: 1.4;">
-          <i class="ri-information-line"></i> Al abrir este enlace, la persona o familia verá la invitación de Dominique personalizada con sus nombres y pases reservados listos para confirmar en 1 clic.
+          <i class="ri-information-line"></i> Al abrir este enlace, la persona o familia verá la invitación personalizada de Dominique lista para confirmar en 1 clic.
+        </div>
+      </div>
+      <div class="org-modal-footer">
+        <button type="button" class="btn-org-action close-modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Enviar Invitaciones Masivas -->
+  <div class="org-modal-overlay" id="modalBulkSend">
+    <div class="org-modal-card" style="max-width: 640px;">
+      <div class="org-modal-header">
+        <h4 style="display: flex; align-items: center; gap: 0.5rem; color: #128c7e;">
+          <i class="ri-whatsapp-line" style="color: #25d366; font-size: 1.3rem;"></i> Enviar Invitaciones por WhatsApp
+        </h4>
+        <button type="button" class="btn-icon-action close-modal">&times;</button>
+      </div>
+      <div class="org-modal-body" style="padding: 1.25rem;">
+        <p style="font-size: 0.88rem; color: var(--org-text-muted); margin-bottom: 0.85rem; line-height: 1.45;">
+          Por seguridad del navegador, los enlaces de WhatsApp se abren de forma individual. Puedes abrir el chat de cada invitado o hacer clic en <strong>"Enviar siguiente"</strong> para avanzar automáticamente:
+        </p>
+        
+        <div style="background: #f8fafc; border: 1px solid var(--org-border); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 1rem; font-size: 0.82rem;">
+          <span style="font-weight: 700; color: var(--org-text-main);">Mensaje amigable que se enviará:</span>
+          <div style="font-style: italic; margin-top: 0.35rem; color: #475569; line-height: 1.4;">
+            "¡Hola [Nombre]! Te invitamos con mucho cariño al 1er Añito de Dominique... Por favor, ¿podrías ingresar al link y confirmarnos con toda confianza si podrás acompañarnos o no? Nos encantaría verte allí 💖🌊"
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <span style="font-weight: 700; font-size: 0.9rem; color: var(--org-text-main);">
+            Destinatarios (<span id="bulkModalTotalCount">0</span>):
+          </span>
+          <button type="button" class="btn-org-action btn-org-sm" id="btnNextBulkSend" style="background: #25d366; color: white; border: none; font-weight: 700;">
+            <i class="ri-play-fill"></i> Enviar siguiente
+          </button>
+        </div>
+
+        <div id="bulkSendListContainer" style="max-height: 290px; overflow-y: auto; border: 1px solid var(--org-border); border-radius: 8px; background: #fff;">
+          <!-- Items generados dinámicamente -->
         </div>
       </div>
       <div class="org-modal-footer">
@@ -795,8 +836,8 @@
   </div>
 
   <!-- Scripts -->
-    <script src="../js/store.js"></script>
-  <script src="../js/organizador.js"></script>
+  <script src="../js/store.js?v=20261024c"></script>
+  <script src="../js/organizador.js?v=20261024c"></script>
   <script>
     if (typeof window.cumpleStore === 'undefined') {
       var s1 = document.createElement('script'); s1.src = '/cumpleanos/js/store.js'; document.head.appendChild(s1);
