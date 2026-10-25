@@ -196,8 +196,8 @@ class CumpleStore {
       const stored = localStorage.getItem(this.storageKey);
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (parsed.cronograma && (!parsed.cronograma.some(c => c.id === 'cr-completos') || parsed.cronograma.some(c => c.descripcion && c.descripcion.includes('cóctel')))) {
-          parsed.cronograma = JSON.parse(JSON.stringify(INITIAL_DATA.cronograma));
+        if (!parsed.cronograma || !Array.isArray(parsed.cronograma)) {
+          parsed.cronograma = JSON.parse(JSON.stringify(this.getInitialTemplate().cronograma || []));
           this.save(parsed);
         }
         return parsed;
@@ -419,9 +419,8 @@ class CumpleStore {
 
   // --- MÉTODOS PARA CRONOGRAMA ---
   getCronograma() {
-    // Sincronizar automáticamente con el itinerario oficial si tiene la versión antigua o falta el banquete de completos
-    if (!this.data.cronograma || !this.data.cronograma.some(c => c.id === 'cr-completos') || this.data.cronograma.some(c => c.titulo && c.titulo.includes('la Domi')) || this.data.cronograma.some(c => c.hora === '17:00' && c.id === 'cr-2')) {
-      this.data.cronograma = JSON.parse(JSON.stringify(INITIAL_DATA.cronograma));
+    if (!this.data.cronograma || !Array.isArray(this.data.cronograma)) {
+      this.data.cronograma = JSON.parse(JSON.stringify(this.getInitialTemplate().cronograma || []));
       this.save(this.data);
     }
     return this.data.cronograma || [];

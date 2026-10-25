@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initPosterModal();
   initSmoothScroll();
   initOrganizadorNavLinks();
+  initDynamicItinerario();
 });
 
 /**
@@ -678,6 +679,85 @@ function initAdminAuthModal() {
       }
     });
   }
+}
+
+/**
+ * Renderizado dinámico del Itinerario del Evento desde CumpleStore
+ * Conecta en tiempo real los cambios del panel organizador con la invitación
+ */
+function initDynamicItinerario() {
+  const container = document.querySelector('.itinerario-container');
+  if (!container || !window.cumpleStore) return;
+
+  function renderItinerario() {
+    const cronograma = window.cumpleStore.getCronograma();
+    if (!cronograma || cronograma.length === 0) return;
+
+    const stepStyles = ['step-teal', 'step-pink', 'step-amber', 'step-purple'];
+    const getStepIcon = (titulo = '') => {
+      const t = titulo.toLowerCase();
+      if (t.includes('torta') || t.includes('feliz') || t.includes('vela')) return 'ri-cake-3-line';
+      if (t.includes('completo') || t.includes('banquete') || t.includes('comida') || t.includes('comer') || t.includes('cenar')) return 'ri-restaurant-2-line';
+      if (t.includes('dulce') || t.includes('disfraz') || t.includes('halloween')) return 'ri-ghost-line';
+      if (t.includes('despedida') || t.includes('regreso') || t.includes('cierre') || t.includes('final') || t.includes('adios')) return 'ri-home-heart-line';
+      if (t.includes('bienvenida') || t.includes('llegada') || t.includes('inicio') || t.includes('picar') || t.includes('conversar')) return 'ri-cup-line';
+      if (t.includes('juego') || t.includes('show') || t.includes('magia') || t.includes('animac') || t.includes('piñata')) return 'ri-magic-line';
+      if (t.includes('foto') || t.includes('sesion') || t.includes('recuerdo')) return 'ri-camera-lens-line';
+      if (t.includes('baile') || t.includes('musica') || t.includes('cancion')) return 'ri-music-2-line';
+      return 'ri-time-line';
+    };
+
+    let stepsHtml = `<div class="itinerario-timeline-rail" aria-hidden="true"></div>`;
+
+    cronograma.forEach((item, index) => {
+      const styleClass = stepStyles[index % stepStyles.length];
+      const iconClass = getStepIcon(item.titulo || '');
+      const horaText = item.hora ? `${escapeAppHtml(item.hora)} hrs` : '';
+      const titulo = escapeAppHtml(item.titulo || 'Momento Especial');
+      const desc = escapeAppHtml(item.descripcion || '');
+
+      stepsHtml += `
+        <div class="itinerario-step ${styleClass}">
+          <div class="itinerario-node">
+            <i class="${iconClass}"></i>
+          </div>
+          <div class="itinerario-card">
+            <div class="itinerario-card-header">
+              <span class="itinerario-time-badge"><i class="ri-time-line"></i> ${horaText}</span>
+            </div>
+            <h3 class="itinerario-card-title">${titulo}</h3>
+            ${desc ? `<p class="itinerario-card-desc">${desc}</p>` : ''}
+          </div>
+        </div>
+      `;
+    });
+
+    container.innerHTML = stepsHtml;
+  }
+
+  // Render inicial al cargar
+  renderItinerario();
+
+  // Escuchar evento personalizado dentro de la misma pestaña
+  window.addEventListener('cumple_store_updated', renderItinerario);
+
+  // Escuchar cambios de localStorage entre diferentes pestañas o ventanas
+  window.addEventListener('storage', (e) => {
+    if (e.key === window.cumpleStore.storageKey) {
+      window.cumpleStore.data = window.cumpleStore.load();
+      renderItinerario();
+    }
+  });
+}
+
+function escapeAppHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 
