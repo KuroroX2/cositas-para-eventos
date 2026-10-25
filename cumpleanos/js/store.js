@@ -39,8 +39,8 @@ const INITIAL_DATA = {
     {
       id: "cr-completos",
       hora: "18:00",
-      titulo: "Gran Banquete de Completos de Gala",
-      descripcion: "A las 18:00 hrs. Solemne y distinguido momento gastronómico donde nos deleitaremos con la más selecta preparación de completos al estilo de gala, servidos con gran pompa y sabor."
+      titulo: "Gran Banquete de Completos de Etiqueta",
+      descripcion: "A las 18:00 hrs. Solemne y distinguido momento gastronómico donde nos deleitaremos con la más selecta preparación de completos al estilo de etiqueta, servidos con gran pompa y sabor."
     },
     {
       id: "cr-3",

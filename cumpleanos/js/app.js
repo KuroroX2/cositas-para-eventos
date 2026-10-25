@@ -109,9 +109,9 @@ function initPersonalizedInvitation() {
     if (rsvpVipTitle) rsvpVipTitle.textContent = `¡Hola, ${displayTitle}!`;
     if (rsvpVipDesc) {
       if (totalPases === 1) {
-        rsvpVipDesc.textContent = 'Hemos reservado 1 invitacion  para celebrar el 1er añito de Dominique. Por favor indícanos si podras asistir.';
+        rsvpVipDesc.textContent = 'Hemos reservado 1 invitación para celebrar el 1er añito de Dominique. Por favor indícanos si podrás asistir.';
       } else {
-        rsvpVipDesc.textContent = `Hemos reservado ${totalPases} invitaciones para celebrar el 1er añito de Dominique. Por favor indícanos si podras asistir.`;
+        rsvpVipDesc.textContent = `Hemos reservado ${totalPases} invitaciones para celebrar el 1er añito de Dominique. Por favor indícanos si podrán asistir.`;
       }
     }
   }
