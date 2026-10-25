@@ -20,10 +20,48 @@
   <!-- Estilos -->
   <link rel="stylesheet" href="../css/style.css?v=20261025f">
 
+  <style>
+    .demo-bar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: linear-gradient(90deg, #9333ea, #0d9488);
+      color: #fff;
+      padding: 0.55rem 1rem;
+      text-align: center;
+      font-size: 0.86rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
+      line-height: 1.35;
+    }
+    .demo-bar strong {
+      color: #fef08a;
+      font-weight: 800;
+    }
+    @media (max-width: 768px) {
+      .demo-bar {
+        font-size: 0.78rem;
+        padding: 0.45rem 0.65rem;
+      }
+      .main-header {
+        top: 48px !important;
+      }
+    }
+  </style>
+
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨🧜‍♀️</text></svg>">
 </head>
 <body>
+
+  <!-- Barra Superior de Demostración (Informativa, sin botón al organizador) -->
+  <div class="demo-bar">
+    <span>🌟 <strong>MODO DEMOSTRACIÓN</strong> — Esta es una vista previa de ejemplo: cada invitado real recibe su invitación con su propio nombre, pases asignados y dedicatoria personalizada.</span>
+  </div>
 
   <!-- Fondo de Burbujas Mágicas -->
   <div class="bubbles-bg" aria-hidden="true">
@@ -36,7 +74,7 @@
   </div>
 
   <!-- Barra de Navegación Translúcida -->
-  <header class="main-header">
+  <header class="main-header" style="top: 36px;">
     <div class="header-container">
       <a href="../" class="logo-badge">
         <div class="logo-icon">🧜‍♀️</div>
