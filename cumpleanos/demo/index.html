@@ -20,42 +20,10 @@
   <!-- Estilos -->
   <link rel="stylesheet" href="../css/style.css?v=20261025f">
 
-  <style>
-    .demo-bar {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      background: linear-gradient(90deg, #9333ea, #0d9488);
-      color: #fff;
-      padding: 0.6rem 1rem;
-      text-align: center;
-      font-size: 0.88rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-    }
-    .demo-bar a {
-      color: #fef08a;
-      text-decoration: underline;
-      font-weight: 800;
-    }
-  </style>
-
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨🧜‍♀️</text></svg>">
 </head>
 <body>
-
-  <!-- Barra Superior de Demostración -->
-  <div class="demo-bar">
-    <span>🌟 <strong>MODO DEMOSTRACIÓN</strong> — Así reciben y viven tus invitados una invitación digital personalizada.</span>
-    <a href="organizador/" class="demo-bar-org-link" style="color: #67e8f9; background: rgba(13, 148, 136, 0.35); padding: 0.2rem 0.75rem; border-radius: 999px; text-decoration: none; border: 1px solid rgba(45, 212, 191, 0.4);"><i class="ri-settings-4-line"></i> Probar Panel Organizador</a>
-    <a href="../#catalogo">Ver todos los productos</a>
-  </div>
 
   <!-- Fondo de Burbujas Mágicas -->
   <div class="bubbles-bg" aria-hidden="true">
@@ -68,7 +36,7 @@
   </div>
 
   <!-- Barra de Navegación Translúcida -->
-  <header class="main-header" style="top: 38px;">
+  <header class="main-header">
     <div class="header-container">
       <a href="../" class="logo-badge">
         <div class="logo-icon">🧜‍♀️</div>
@@ -390,6 +358,25 @@
             <i class="ri-arrow-left-line"></i> Volver a Productos de Cumpleaños
           </a>
         </div>
+      </div>
+    </section>
+
+    <!-- Sección Inferior: Modo Demostración & Acceso al Organizador -->
+    <section class="demo-bottom-section" style="max-width: 960px; margin: 3.5rem auto 2.5rem; padding: 2.2rem 1.8rem; background: linear-gradient(135deg, rgba(147, 51, 234, 0.18), rgba(13, 148, 136, 0.2)); border: 1.5px solid rgba(45, 212, 191, 0.45); border-radius: 24px; text-align: center; box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);">
+      <div style="font-size: 2rem; margin-bottom: 0.4rem;">🌟</div>
+      <h3 style="font-family: var(--font-hero); color: #fff; font-size: clamp(1.3rem, 2.5vw, 1.7rem); margin-bottom: 0.65rem;">
+        Modo Demostración Interactivo
+      </h3>
+      <p style="color: #cbd5e1; font-size: 0.96rem; line-height: 1.6; max-width: 620px; margin: 0 auto 1.5rem;">
+        Así reciben tus invitados su invitación personalizada con dedicatoria, video y confirmación en tiempo real. ¡Prueba el panel del organizador para ver cómo se gestionan los invitados, compras y mesas!
+      </p>
+      <div style="display: flex; gap: 0.85rem; justify-content: center; flex-wrap: wrap;">
+        <a href="organizador/" class="btn-hero btn-hero-primary" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1.5rem;">
+          <i class="ri-settings-4-line"></i> Probar Panel Organizador (Demo)
+        </a>
+        <a href="../" class="btn-hero btn-hero-secondary" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1.5rem;">
+          <i class="ri-store-2-line"></i> Ver Vitrina de Cumpleaños
+        </a>
       </div>
     </section>
 
