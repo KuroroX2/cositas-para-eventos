@@ -15,8 +15,8 @@ const INITIAL_DATA = {
     lugar: "Club Valle del Sol",
     direccion: "Senecio 4593, Puente Alto",
     mapaUrl: "https://maps.google.com/?q=Senecio+4593,+Puente+Alto",
-    tematica: "Sirenita & Bajo el Mar Pastel",
-    dressCode: "Vestimenta cómoda / Casual",
+    tematica: "Sirenita & Bajo el Mar Pastel con Halloween",
+    dressCode: "¡Con Disfraz! (Bajo el mar o Halloween)",
     whatsappOrganizador: "+56912345678"
   },
   invitados: [],

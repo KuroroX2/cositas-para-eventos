@@ -219,8 +219,8 @@ function initCountdown() {
  */
 function initCalendar() {
   const eventDetails = {
-    title: "Primer Cumpleaños de Dominique 🧜‍♀️✨",
-    description: "¡Celebramos la primera vuelta al sol de Dominique! Temática: Bajo el mar. ¡Te esperamos para celebrar juntos!",
+    title: "Primer Cumpleaños de Dominique 🧜‍♀️🎃",
+    description: "¡Celebramos la primera vuelta al sol de Dominique! Temática: Bajo el mar con toque de Halloween. ¡Te esperamos con tu mejor disfraz!",
     location: "Club Valle del Sol, Senecio 4593, Puente Alto, Chile",
     // 31 de Octubre 2026, 15:00 a 21:00 hora de Chile (UTC-3 -> 18:00Z a 00:00Z)
     startDate: "20261031T180000Z",
