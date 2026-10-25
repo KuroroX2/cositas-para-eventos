@@ -147,12 +147,14 @@ function renderMetrics() {
   const elTotalPer = document.getElementById('metricTotalPersonas');
   const elGuests = document.getElementById('metricGuests');
   const elFood = document.getElementById('metricFood');
+  const elParty = document.getElementById('metricParty');
   const elBudget = document.getElementById('metricBudget');
 
   if (elTotalInv) elTotalInv.innerText = `${totalInvitaciones} invitación${totalInvitaciones === 1 ? '' : 'es'}`;
   if (elTotalPer) elTotalPer.innerText = `${totalPersonas} personas`;
   if (elGuests) elGuests.innerText = `${totalAsistentes} personas`;
   if (elFood) elFood.innerText = `${comidaLista} / ${comida.length}`;
+  if (elParty) elParty.innerText = `${cotillonListo} / ${cotillon.length}`;
   if (elBudget) elBudget.innerText = `$${(costoComida + costoCotillon).toLocaleString('es-CL')}`;
 
   // Actualizar badges en pestañas
