@@ -19,8 +19,8 @@
   
 
   <!-- Estilos -->
-  <link rel="stylesheet" href="../../css/organizador.css?v=20261025m">
-  <link rel="stylesheet" href="/cumpleanos/css/organizador.css?v=20261025m">
+  <link rel="stylesheet" href="../../css/organizador.css?v=20261025o">
+  <link rel="stylesheet" href="/cumpleanos/css/organizador.css?v=20261025o">
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
@@ -62,76 +62,146 @@
   <!-- Contenedor Principal -->
   <main class="org-container">
 
-    <!-- Fila de Tarjetas de Métricas -->
-    <section class="org-metrics-grid">
-      <!-- Métrica 1: Total Invitaciones -->
-      <div class="metric-card m-guests">
-        <div class="metric-icon"><i class="ri-mail-star-line"></i></div>
-        <div class="metric-info">
-          <div class="num" id="metricTotalInvitaciones">0</div>
-          <div class="lbl">Invitaciones Creadas</div>
+    <!-- Paneles de Control Agrupados: Asistencia y Compras -->
+    <section class="org-dashboard-panels">
+      
+      <!-- Panel 1: Invitaciones & Asistencia (RSVP) -->
+      <div class="dashboard-group-panel panel-rsvp">
+        <div class="group-panel-header">
+          <div class="group-panel-title">
+            <div class="panel-icon-wrap icon-rsvp"><i class="ri-mail-check-line"></i></div>
+            <div>
+              <h3>Invitaciones &amp; Asistencia</h3>
+              <p>Seguimiento de confirmaciones y cálculo de asistencia en tiempo real</p>
+            </div>
+          </div>
+          <div class="group-panel-badges">
+            <div class="badge-group-stat stat-invites">
+              <i class="ri-mail-star-line"></i>
+              <span id="metricTotalInvitaciones">0 invitaciones</span>
+            </div>
+            <div class="badge-group-stat stat-people">
+              <i class="ri-team-line"></i>
+              <span id="metricTotalPersonas">0 personas</span>
+              <div class="metric-sub" id="metricTotalPersonasSub"></div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <!-- Métrica 2: Total Personas Invitadas -->
-      <div class="metric-card m-party">
-        <div class="metric-icon"><i class="ri-team-line"></i></div>
-        <div class="metric-info">
-          <div class="num" id="metricTotalPersonas">0</div>
-          <div class="lbl">Total Personas Invitadas</div>
-          <div class="metric-sub" id="metricTotalPersonasSub"></div>
+        <div class="rsvp-cards-grid">
+          <!-- Card Confirmados -->
+          <div class="rsvp-metric-card card-confirmed">
+            <div class="rsvp-card-icon"><i class="ri-user-heart-line"></i></div>
+            <div class="rsvp-card-body">
+              <div class="rsvp-card-num" id="metricGuests">0 personas</div>
+              <div class="rsvp-card-lbl">Asistirán Confirmados</div>
+              <div class="metric-sub" id="metricGuestsSub">
+                <span class="tag-adultos"><i class="ri-user-line"></i> 0 adultos</span>
+                <span class="tag-ninos"><i class="ri-bear-smile-line"></i> 0 niños</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Pendientes -->
+          <div class="rsvp-metric-card card-pending">
+            <div class="rsvp-card-icon"><i class="ri-time-line"></i></div>
+            <div class="rsvp-card-body">
+              <div class="rsvp-card-num" id="metricPending">0 personas</div>
+              <div class="rsvp-card-lbl">Faltan por Confirmar</div>
+              <div class="metric-sub" id="metricPendingSub">
+                <span class="tag-pending-adultos"><i class="ri-user-line"></i> 0 adultos</span>
+                <span class="tag-pending-ninos"><i class="ri-bear-smile-line"></i> 0 niños</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Rechazados -->
+          <div class="rsvp-metric-card card-declined">
+            <div class="rsvp-card-icon"><i class="ri-user-unfollow-line"></i></div>
+            <div class="rsvp-card-body">
+              <div class="rsvp-card-num" id="metricDeclined">0 personas</div>
+              <div class="rsvp-card-lbl">No Asistirán / Rechazos</div>
+              <div class="metric-sub" id="metricDeclinedSub">
+                <span class="tag-declined-adultos"><i class="ri-user-line"></i> 0 adultos</span>
+                <span class="tag-declined-ninos"><i class="ri-bear-smile-line"></i> 0 niños</span>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <!-- Métrica 3: Asistentes Confirmados -->
-      <div class="metric-card m-tables">
-        <div class="metric-icon"><i class="ri-user-heart-line"></i></div>
-        <div class="metric-info">
-          <div class="num" id="metricGuests">0</div>
-          <div class="lbl">Asistentes Confirmados</div>
-          <div class="metric-sub" id="metricGuestsSub"></div>
-        </div>
-      </div>
-
-      <!-- Métrica 4: No Asistirán / Rechazados -->
-      <div class="metric-card m-declined">
-        <div class="metric-icon"><i class="ri-user-unfollow-line"></i></div>
-        <div class="metric-info">
-          <div class="num" id="metricDeclined">0 personas</div>
-          <div class="lbl">No Asistirán / Rechazos</div>
-          <div class="metric-sub" id="metricDeclinedSub">
-            <span class="tag-declined-adultos"><i class="ri-user-line"></i> 0 adultos</span>
-            <span class="tag-declined-ninos"><i class="ri-bear-smile-line"></i> 0 niños</span>
+        <!-- Barra Tricolor y Leyenda -->
+        <div class="rsvp-progress-section">
+          <div class="rsvp-progress-bar">
+            <div class="bar-fill fill-yes" id="barFillConfirmed" style="width: 0%"></div>
+            <div class="bar-fill fill-pending" id="barFillPending" style="width: 0%"></div>
+            <div class="bar-fill fill-no" id="barFillDeclined" style="width: 0%"></div>
+          </div>
+          <div class="rsvp-progress-legend" id="rsvpProgressLegend">
+            <!-- Rellenado por JS -->
           </div>
         </div>
       </div>
 
-      <!-- Métrica Comida -->
-      <div class="metric-card m-food">
-        <div class="metric-icon"><i class="ri-cake-3-line"></i></div>
-        <div class="metric-info">
-          <div class="num" id="metricFood">0 / 0</div>
-          <div class="lbl">Comida &amp; Torta Lista</div>
+      <!-- Panel 2: Compras, Logística & Presupuesto -->
+      <div class="dashboard-group-panel panel-logistics">
+        <div class="group-panel-header">
+          <div class="group-panel-title">
+            <div class="panel-icon-wrap icon-logistics"><i class="ri-shopping-bag-3-line"></i></div>
+            <div>
+              <h3>Compras, Logística &amp; Presupuesto</h3>
+              <p>Control de ítems de comida, cotillón y gastos estimados</p>
+            </div>
+          </div>
+          <div class="group-panel-badges">
+            <div class="badge-compras-progress" id="badgeComprasProgress">
+              <i class="ri-checkbox-circle-line"></i> Avance: 0% completado
+            </div>
+          </div>
+        </div>
+
+        <div class="logistics-cards-grid">
+          <!-- Card Comida -->
+          <div class="log-item-card card-food">
+            <div class="log-card-icon"><i class="ri-cake-3-line"></i></div>
+            <div class="log-card-body">
+              <div class="log-card-num" id="metricFood">0 / 0</div>
+              <div class="log-card-lbl">Comida &amp; Torta Lista</div>
+              <div class="log-card-sub" id="metricFoodSub">0 por comprar</div>
+            </div>
+          </div>
+
+          <!-- Card Cotillón -->
+          <div class="log-item-card card-party">
+            <div class="log-card-icon"><i class="ri-magic-line"></i></div>
+            <div class="log-card-body">
+              <div class="log-card-num" id="metricParty">0 / 0</div>
+              <div class="log-card-lbl">Cotillón &amp; Decoración</div>
+              <div class="log-card-sub" id="metricPartySub">0 por comprar</div>
+            </div>
+          </div>
+
+          <!-- Card Presupuesto -->
+          <div class="log-item-card card-budget">
+            <div class="log-card-icon"><i class="ri-money-dollar-circle-line"></i></div>
+            <div class="log-card-body">
+              <div class="log-card-num" id="metricBudget">$0</div>
+              <div class="log-card-lbl">Presupuesto Estimado</div>
+              <div class="log-card-sub" id="metricBudgetSub">Total estimado</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Barra de Avance de Compras -->
+        <div class="logistics-progress-section">
+          <div class="purchases-progress-bar">
+            <div class="bar-fill fill-purchases" id="barFillPurchases" style="width: 0%"></div>
+          </div>
+          <div class="purchases-progress-meta">
+            <span id="lblPurchasesPercent">0 de 0 ítems comprados (0%)</span>
+          </div>
         </div>
       </div>
 
-      <!-- Métrica Cotillón -->
-      <div class="metric-card m-party">
-        <div class="metric-icon"><i class="ri-magic-line"></i></div>
-        <div class="metric-info">
-          <div class="num" id="metricParty">0 / 0</div>
-          <div class="lbl">Cotillón &amp; Decoración</div>
-        </div>
-      </div>
-
-      <!-- Métrica Presupuesto -->
-      <div class="metric-card m-budget">
-        <div class="metric-icon"><i class="ri-money-dollar-circle-line"></i></div>
-        <div class="metric-info">
-          <div class="num" id="metricBudget">$0</div>
-          <div class="lbl">Presupuesto Estimado</div>
-        </div>
-      </div>
     </section>
 
     <!-- Navegación de Pestañas -->
@@ -949,9 +1019,9 @@
 
   <!-- Scripts con Supabase Cloud Sync -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="../../js/supabase-cumple.js?v=20261025n"></script>
-  <script src="../../js/store.js?v=20261025n"></script>
-  <script src="../../js/organizador.js?v=20261025n"></script>
+  <script src="../../js/supabase-cumple.js?v=20261025o"></script>
+  <script src="../../js/store.js?v=20261025o"></script>
+  <script src="../../js/organizador.js?v=20261025o"></script>
   <script>
     if (typeof window.cumpleStore === 'undefined') {
       var sb = document.createElement('script'); sb.src = '/cumpleanos/js/supabase-cumple.js'; document.head.appendChild(sb);

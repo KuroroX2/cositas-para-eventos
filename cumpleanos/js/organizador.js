@@ -138,6 +138,8 @@ function getGuestCounts(inv) {
   let ninosConf = 0;
   let adultosRech = 0;
   let ninosRech = 0;
+  let adultosPend = 0;
+  let ninosPend = 0;
 
   if (inv.asistira === true) {
     adultosConf = inv.adultosConfirmados !== undefined ? (Number(inv.adultosConfirmados) || 0) : adultosInv;
@@ -160,6 +162,8 @@ function getGuestCounts(inv) {
     ninosConf = 0;
     adultosRech = 0;
     ninosRech = 0;
+    adultosPend = adultosInv;
+    ninosPend = ninosInv;
   }
 
   return {
@@ -171,7 +175,10 @@ function getGuestCounts(inv) {
     totalConf: adultosConf + ninosConf,
     adultosRech,
     ninosRech,
-    totalRech: adultosRech + ninosRech
+    totalRech: adultosRech + ninosRech,
+    adultosPend,
+    ninosPend,
+    totalPend: adultosPend + ninosPend
   };
 }
 
@@ -189,6 +196,8 @@ function renderMetrics() {
   let totalNinosInv = 0;
   let totalAdultosConf = 0;
   let totalNinosConf = 0;
+  let totalAdultosPend = 0;
+  let totalNinosPend = 0;
   let totalAdultosRech = 0;
   let totalNinosRech = 0;
 
@@ -198,12 +207,15 @@ function renderMetrics() {
     totalNinosInv += c.ninosInv;
     totalAdultosConf += c.adultosConf;
     totalNinosConf += c.ninosConf;
+    totalAdultosPend += c.adultosPend;
+    totalNinosPend += c.ninosPend;
     totalAdultosRech += c.adultosRech;
     totalNinosRech += c.ninosRech;
   });
 
   const totalPersonas = totalAdultosInv + totalNinosInv;
   const totalAsistentes = totalAdultosConf + totalNinosConf;
+  const totalPendientes = totalAdultosPend + totalNinosPend;
   const totalRechazados = totalAdultosRech + totalNinosRech;
 
   // Comida
@@ -222,11 +234,10 @@ function renderMetrics() {
   const elTotalPerSub = document.getElementById('metricTotalPersonasSub');
   const elGuests = document.getElementById('metricGuests');
   const elGuestsSub = document.getElementById('metricGuestsSub');
+  const elPending = document.getElementById('metricPending');
+  const elPendingSub = document.getElementById('metricPendingSub');
   const elDeclined = document.getElementById('metricDeclined');
   const elDeclinedSub = document.getElementById('metricDeclinedSub');
-  const elFood = document.getElementById('metricFood');
-  const elParty = document.getElementById('metricParty');
-  const elBudget = document.getElementById('metricBudget');
 
   if (elTotalInv) elTotalInv.innerText = `${totalInvitaciones} invitación${totalInvitaciones === 1 ? '' : 'es'}`;
   if (elTotalPer) elTotalPer.innerText = `${totalPersonas} personas`;
@@ -236,23 +247,93 @@ function renderMetrics() {
       <span class="tag-ninos" title="Niños invitados"><i class="ri-bear-smile-line"></i> ${totalNinosInv} niño${totalNinosInv === 1 ? '' : 's'}</span>
     `;
   }
-  if (elGuests) elGuests.innerText = `${totalAsistentes} personas`;
+  if (elGuests) elGuests.innerText = `${totalAsistentes} persona${totalAsistentes === 1 ? '' : 's'}`;
   if (elGuestsSub) {
     elGuestsSub.innerHTML = `
       <span class="tag-adultos" title="Adultos confirmados"><i class="ri-user-line"></i> ${totalAdultosConf} adulto${totalAdultosConf === 1 ? '' : 's'}</span>
       <span class="tag-ninos" title="Niños confirmados"><i class="ri-bear-smile-line"></i> ${totalNinosConf} niño${totalNinosConf === 1 ? '' : 's'}</span>
     `;
   }
-  if (elDeclined) elDeclined.innerText = `${totalRechazados} personas`;
+  if (elPending) elPending.innerText = `${totalPendientes} persona${totalPendientes === 1 ? '' : 's'}`;
+  if (elPendingSub) {
+    elPendingSub.innerHTML = `
+      <span class="tag-pending-adultos" title="Adultos pendientes"><i class="ri-user-line"></i> ${totalAdultosPend} adulto${totalAdultosPend === 1 ? '' : 's'}</span>
+      <span class="tag-pending-ninos" title="Niños pendientes"><i class="ri-bear-smile-line"></i> ${totalNinosPend} niño${totalNinosPend === 1 ? '' : 's'}</span>
+    `;
+  }
+  if (elDeclined) elDeclined.innerText = `${totalRechazados} persona${totalRechazados === 1 ? '' : 's'}`;
   if (elDeclinedSub) {
     elDeclinedSub.innerHTML = `
       <span class="tag-declined-adultos" title="Adultos que no asistirán"><i class="ri-user-line"></i> ${totalAdultosRech} adulto${totalAdultosRech === 1 ? '' : 's'}</span>
       <span class="tag-declined-ninos" title="Niños que no asistirán"><i class="ri-bear-smile-line"></i> ${totalNinosRech} niño${totalNinosRech === 1 ? '' : 's'}</span>
     `;
   }
+
+  // Barra de progreso y leyenda RSVP
+  const barConf = document.getElementById('barFillConfirmed');
+  const barPend = document.getElementById('barFillPending');
+  const barDecl = document.getElementById('barFillDeclined');
+  const legendRsvp = document.getElementById('rsvpProgressLegend');
+
+  let pctConf = 0;
+  let pctRech = 0;
+  let pctPend = 0;
+  if (totalPersonas > 0) {
+    pctConf = Math.round((totalAsistentes / totalPersonas) * 100);
+    pctRech = Math.round((totalRechazados / totalPersonas) * 100);
+    pctPend = Math.max(0, 100 - pctConf - pctRech);
+  }
+
+  if (barConf) barConf.style.width = `${pctConf}%`;
+  if (barPend) barPend.style.width = `${pctPend}%`;
+  if (barDecl) barDecl.style.width = `${pctRech}%`;
+
+  if (legendRsvp) {
+    legendRsvp.innerHTML = `
+      <span class="legend-item"><span class="legend-dot dot-conf"></span> <strong>${pctConf}%</strong> Asistirán (${totalAsistentes})</span>
+      <span class="legend-item"><span class="legend-dot dot-pend"></span> <strong>${pctPend}%</strong> Pendientes (${totalPendientes})</span>
+      <span class="legend-item"><span class="legend-dot dot-rech"></span> <strong>${pctRech}%</strong> No asistirán (${totalRechazados})</span>
+    `;
+  }
+
+  // Panel Logística & Compras
+  const elFood = document.getElementById('metricFood');
+  const elFoodSub = document.getElementById('metricFoodSub');
+  const elParty = document.getElementById('metricParty');
+  const elPartySub = document.getElementById('metricPartySub');
+  const elBudget = document.getElementById('metricBudget');
+  const elBudgetSub = document.getElementById('metricBudgetSub');
+  const badgeCompras = document.getElementById('badgeComprasProgress');
+  const barPurchases = document.getElementById('barFillPurchases');
+  const lblPurchases = document.getElementById('lblPurchasesPercent');
+
+  const totalItems = comida.length + cotillon.length;
+  const totalListos = comidaLista + cotillonListo;
+  const pctCompras = totalItems > 0 ? Math.round((totalListos / totalItems) * 100) : 0;
+
   if (elFood) elFood.innerText = `${comidaLista} / ${comida.length}`;
+  if (elFoodSub) {
+    const pendFood = comida.length - comidaLista;
+    elFoodSub.innerText = pendFood === 0 && comida.length > 0 ? '¡Todo comprado!' : `${pendFood} pendientes`;
+  }
+
   if (elParty) elParty.innerText = `${cotillonListo} / ${cotillon.length}`;
+  if (elPartySub) {
+    const pendParty = cotillon.length - cotillonListo;
+    elPartySub.innerText = pendParty === 0 && cotillon.length > 0 ? '¡Todo comprado!' : `${pendParty} pendientes`;
+  }
+
   if (elBudget) elBudget.innerText = `$${(costoComida + costoCotillon).toLocaleString('es-CL')}`;
+  if (elBudgetSub) elBudgetSub.innerText = `Total estimado invertido`;
+
+  if (badgeCompras) {
+    badgeCompras.innerHTML = `<i class="ri-checkbox-circle-line"></i> Avance: ${pctCompras}% completado`;
+  }
+
+  if (barPurchases) barPurchases.style.width = `${pctCompras}%`;
+  if (lblPurchases) {
+    lblPurchases.innerText = `${totalListos} de ${totalItems} ítems listos o encargados (${pctCompras}%)`;
+  }
 
   // Actualizar badges en pestañas
   const bInv = document.getElementById('badgeCountInvitados');

@@ -304,6 +304,338 @@ body.org-body {
   line-height: 1.2;
 }
 
+.metric-sub .tag-pending-adultos {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: #fef3c7;
+  color: #b45309;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  line-height: 1.2;
+}
+
+.metric-sub .tag-pending-ninos {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: #fffbeb;
+  color: #92400e;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  line-height: 1.2;
+}
+
+/* ==========================================================================
+   Paneles Agrupados de Dashboard (RSVP y Compras)
+   ========================================================================== */
+.org-dashboard-panels {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.dashboard-group-panel {
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+  padding: 1.5rem;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.dashboard-group-panel:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 6px 24px rgba(15, 23, 42, 0.06);
+}
+
+.group-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.group-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.panel-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.icon-rsvp {
+  background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+}
+
+.icon-logistics {
+  background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+}
+
+.group-panel-title h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.group-panel-title p {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0.15rem 0 0;
+}
+
+.group-panel-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.badge-group-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+}
+
+.badge-group-stat.stat-invites {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #166534;
+}
+
+.badge-group-stat.stat-people {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #1e293b;
+  flex-wrap: wrap;
+}
+
+.badge-compras-progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  background: rgba(14, 165, 233, 0.12);
+  border: 1px solid rgba(14, 165, 233, 0.35);
+  color: #0284c7;
+}
+
+/* Grillas de Tarjetas Internas */
+.rsvp-cards-grid,
+.logistics-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 860px) {
+  .rsvp-cards-grid,
+  .logistics-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rsvp-metric-card,
+.log-item-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1.1rem 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.rsvp-metric-card:hover,
+.log-item-card:hover {
+  transform: translateY(-2px);
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+.rsvp-metric-card.card-confirmed {
+  border-left: 4px solid #10b981;
+}
+
+.rsvp-metric-card.card-pending {
+  border-left: 4px solid #f59e0b;
+}
+
+.rsvp-metric-card.card-declined {
+  border-left: 4px solid #ef4444;
+}
+
+.log-item-card.card-food {
+  border-left: 4px solid #ec4899;
+}
+
+.log-item-card.card-party {
+  border-left: 4px solid #f59e0b;
+}
+
+.log-item-card.card-budget {
+  border-left: 4px solid #0284c7;
+}
+
+.rsvp-card-icon,
+.log-card-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.card-confirmed .rsvp-card-icon { background: #d1fae5; color: #059669; }
+.card-pending .rsvp-card-icon { background: #fef3c7; color: #d97706; }
+.card-declined .rsvp-card-icon { background: #fee2e2; color: #dc2626; }
+
+.card-food .log-card-icon { background: #fce7f3; color: #db2777; }
+.card-party .log-card-icon { background: #fef3c7; color: #d97706; }
+.card-budget .log-card-icon { background: #e0f2fe; color: #0284c7; }
+
+.rsvp-card-num,
+.log-card-num {
+  font-size: 1.45rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #0f172a;
+}
+
+.rsvp-card-lbl,
+.log-card-lbl {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 600;
+  margin-top: 0.2rem;
+}
+
+.log-card-sub {
+  font-size: 0.74rem;
+  color: #94a3b8;
+  font-weight: 500;
+  margin-top: 0.25rem;
+}
+
+/* Barras de Progreso */
+.rsvp-progress-section,
+.logistics-progress-section {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0.9rem 1.2rem;
+}
+
+.rsvp-progress-bar {
+  display: flex;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #e2e8f0;
+  margin-bottom: 0.65rem;
+}
+
+.rsvp-progress-bar .bar-fill {
+  height: 100%;
+  transition: width 0.45s ease;
+}
+
+.rsvp-progress-bar .fill-yes {
+  background: linear-gradient(90deg, #10b981, #059669);
+}
+
+.rsvp-progress-bar .fill-pending {
+  background: linear-gradient(90deg, #fbbf24, #d97706);
+}
+
+.rsvp-progress-bar .fill-no {
+  background: linear-gradient(90deg, #f87171, #dc2626);
+}
+
+.rsvp-progress-legend {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.78rem;
+  color: #475569;
+}
+
+.rsvp-progress-legend .legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.rsvp-progress-legend .legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legend-dot.dot-conf { background: #10b981; }
+.legend-dot.dot-pend { background: #f59e0b; }
+.legend-dot.dot-rech { background: #ef4444; }
+
+.purchases-progress-bar {
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #e2e8f0;
+  margin-bottom: 0.5rem;
+}
+
+.purchases-progress-bar .fill-purchases {
+  background: linear-gradient(90deg, #06b6d4, #3b82f6);
+  height: 100%;
+  transition: width 0.45s ease;
+}
+
+.purchases-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+  color: #475569;
+  font-weight: 600;
+}
+
 .select-row-status {
   padding: 0.28rem 0.55rem;
   border-radius: 8px;
