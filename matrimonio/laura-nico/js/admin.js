@@ -150,7 +150,7 @@
           showDashboard();
         } else {
           if (errEl) {
-            errEl.textContent = 'Clave incorrecta. Recuerda que la clave de los novios es "sakura" (o "pastox").';
+            errEl.textContent = 'Clave incorrecta. Inténtalo nuevamente.';
             errEl.style.display = 'block';
           }
         }
