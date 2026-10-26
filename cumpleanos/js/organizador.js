@@ -124,8 +124,15 @@ function initTabs() {
  * Considera pases originales, confirmados reales y rechazos totales o parciales
  */
 function getGuestCounts(inv) {
-  const adultosInv = inv.adultosInvitados !== undefined ? (Number(inv.adultosInvitados) || 0) : (Number(inv.adultos) || 0);
-  const ninosInv = inv.ninosInvitados !== undefined ? (Number(inv.ninosInvitados) || 0) : (Number(inv.ninos) || 0);
+  let adultosInv = inv.adultosInvitados !== undefined ? (Number(inv.adultosInvitados) || 0) : (Number(inv.adultos) || 0);
+  let ninosInv = inv.ninosInvitados !== undefined ? (Number(inv.ninosInvitados) || 0) : (Number(inv.ninos) || 0);
+
+  // Si un invitado rechazó en el pasado y el viejo formulario guardó 0, recuperar el cupo mínimo según su tipo
+  if (adultosInv === 0 && ninosInv === 0) {
+    if (inv.tipo === 'pareja') adultosInv = 2;
+    else if (inv.tipo === 'familia') adultosInv = 2;
+    else adultosInv = 1;
+  }
 
   let adultosConf = 0;
   let ninosConf = 0;
@@ -135,6 +142,11 @@ function getGuestCounts(inv) {
   if (inv.asistira === true) {
     adultosConf = inv.adultosConfirmados !== undefined ? (Number(inv.adultosConfirmados) || 0) : adultosInv;
     ninosConf = inv.ninosConfirmados !== undefined ? (Number(inv.ninosConfirmados) || 0) : ninosInv;
+
+    // Si los confirmados superan a los invitados originales, ajustar los invitados originales
+    if (adultosInv < adultosConf) adultosInv = adultosConf;
+    if (ninosInv < ninosConf) ninosInv = ninosConf;
+
     adultosRech = Math.max(0, adultosInv - adultosConf);
     ninosRech = Math.max(0, ninosInv - ninosConf);
   } else if (inv.asistira === false) {
