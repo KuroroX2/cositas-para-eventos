@@ -692,7 +692,7 @@ function renderInvitados() {
         <span>${escapeHtml(inv.telefono || '—')}</span>
       </td>
       <td>
-        <select class="select-row-status ${statusClass}" data-id="${inv.id}" title="Modificar estado de asistencia">
+        <select class="select-row-status ${statusClass}" data-id="${inv.id}" data-current="${statusVal}" title="Modificar estado de asistencia">
           <option value="pendiente" ${statusVal === 'pendiente' ? 'selected' : ''}>⏳ Pendiente</option>
           <option value="si" ${statusVal === 'si' ? 'selected' : ''}>✅ Asiste</option>
           <option value="no" ${statusVal === 'no' ? 'selected' : ''}>❌ No asiste</option>
@@ -763,33 +763,28 @@ function renderInvitados() {
     sel.addEventListener('change', (e) => {
       const id = e.target.getAttribute('data-id');
       const val = e.target.value;
+      const currentVal = e.target.getAttribute('data-current') || 'pendiente';
       const inv = (window.cumpleStore?.getInvitados() || []).find(i => i.id === id);
       if (!inv) return;
-      const counts = getGuestCounts(inv);
-
-      let asistira = null;
-      let adConf = 0;
-      let niConf = 0;
 
       if (val === 'si') {
-        asistira = true;
-        adConf = inv.adultosConfirmados !== undefined ? Number(inv.adultosConfirmados) : counts.adultosInv;
-        niConf = inv.ninosConfirmados !== undefined ? Number(inv.ninosConfirmados) : counts.ninosInv;
-      } else if (val === 'no') {
-        asistira = false;
-        adConf = 0;
-        niConf = 0;
-      } else {
-        asistira = null;
-        adConf = 0;
-        niConf = 0;
+        openConfirmAttendanceModal(inv, currentVal);
+        return;
       }
 
-      window.cumpleStore.updateInvitado(id, {
-        asistira: asistira,
-        adultosConfirmados: adConf,
-        ninosConfirmados: niConf
-      });
+      if (val === 'no') {
+        window.cumpleStore.updateInvitado(id, {
+          asistira: false,
+          adultosConfirmados: 0,
+          ninosConfirmados: 0
+        });
+      } else {
+        window.cumpleStore.updateInvitado(id, {
+          asistira: null,
+          adultosConfirmados: 0,
+          ninosConfirmados: 0
+        });
+      }
 
       renderMetrics();
       renderInvitados();
@@ -797,7 +792,7 @@ function renderInvitados() {
       const toast = document.getElementById('orgToast');
       const toastMsg = document.getElementById('orgToastMsg');
       if (toast && toastMsg) {
-        toastMsg.innerText = val === 'si' ? '¡Invitado marcado como Asiste!' : (val === 'no' ? 'Invitado marcado como No asiste' : 'Invitado marcado como Pendiente');
+        toastMsg.innerText = val === 'no' ? 'Invitado marcado como No asiste' : 'Invitado marcado como Pendiente';
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), 2800);
       }
@@ -1334,7 +1329,60 @@ function initModals() {
     }
   });
 
-  // Modal Invitado
+  // Modal Confirmar Asistencia Manual (Popup para decidir Todos o Parcial)
+  document.getElementById('btnCancelConfirmAttendance')?.addEventListener('click', () => {
+    closeConfirmAttendanceModal(true);
+  });
+  document.getElementById('modalConfirmAttendance')?.querySelector('.close-modal')?.addEventListener('click', () => {
+    closeConfirmAttendanceModal(true);
+  });
+
+  document.getElementById('formConfirmAttendance')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const guestId = document.getElementById('confModalGuestId')?.value;
+    const inv = (window.cumpleStore?.getInvitados() || []).find(i => i.id === guestId);
+    if (!inv) return;
+    const counts = getGuestCounts(inv);
+
+    const mode = document.querySelector('input[name="confAttendanceMode"]:checked')?.value || 'todos';
+    let adConf = counts.adultosInv;
+    let niConf = counts.ninosInv;
+
+    if (mode === 'parcial') {
+      const parsedA = parseInt(document.getElementById('confInputAdultos')?.value, 10);
+      const parsedN = parseInt(document.getElementById('confInputNinos')?.value, 10);
+      adConf = isNaN(parsedA) ? 0 : Math.max(0, Math.min(parsedA, counts.adultosInv));
+      niConf = isNaN(parsedN) ? 0 : Math.max(0, Math.min(parsedN, counts.ninosInv));
+    }
+
+    window.cumpleStore.updateInvitado(guestId, {
+      asistira: true,
+      adultos: counts.adultosInv,
+      ninos: counts.ninosInv,
+      adultosInvitados: counts.adultosInv,
+      ninosInvitados: counts.ninosInv,
+      adultosConfirmados: adConf,
+      ninosConfirmados: niConf
+    });
+
+    closeConfirmAttendanceModal(false);
+    renderMetrics();
+    renderInvitados();
+
+    const toast = document.getElementById('orgToast');
+    const toastMsg = document.getElementById('orgToastMsg');
+    if (toast && toastMsg) {
+      const totalConf = adConf + niConf;
+      const totalRech = (counts.adultosInv + counts.ninosInv) - totalConf;
+      toastMsg.innerText = totalRech > 0
+        ? `¡Asistencia confirmada para ${totalConf} personas (${totalRech} rechazo${totalRech > 1 ? 's' : ''})!`
+        : `¡Asistencia confirmada para ${totalConf} personas (grupo completo)!`;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+  });
+
+  // Modal Invitado General
   document.getElementById('btnOpenModalAddInvitado')?.addEventListener('click', () => openModalInvitado());
   document.getElementById('formModalInvitado')?.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -1344,8 +1392,22 @@ function initModals() {
 
     const adInv = parseInt(document.getElementById('mInvAdultos').value, 10) || 0;
     const niInv = parseInt(document.getElementById('mInvNinos').value, 10) || 0;
-    const adConf = asistira === true ? (parseInt(document.getElementById('mInvAdultosConfirmados')?.value, 10) || 0) : 0;
-    const niConf = asistira === true ? (parseInt(document.getElementById('mInvNinosConfirmados')?.value, 10) || 0) : 0;
+    
+    let adConf = 0;
+    let niConf = 0;
+    if (asistira === true) {
+      const box = document.getElementById('mInvConfirmadosBox');
+      const boxVisible = box && box.style.display !== 'none';
+      if (boxVisible) {
+        const pA = parseInt(document.getElementById('mInvAdultosConfirmados')?.value, 10);
+        const pN = parseInt(document.getElementById('mInvNinosConfirmados')?.value, 10);
+        adConf = isNaN(pA) ? adInv : Math.max(0, Math.min(pA, adInv));
+        niConf = isNaN(pN) ? niInv : Math.max(0, Math.min(pN, niInv));
+      } else {
+        adConf = adInv;
+        niConf = niInv;
+      }
+    }
 
     const data = {
       nombre: document.getElementById('mInvNombre').value.trim(),
@@ -1461,6 +1523,80 @@ function initModals() {
     }
     document.getElementById('modalCronograma').style.display = 'none';
   });
+}
+
+let pendingAttendanceModalData = null;
+
+function openConfirmAttendanceModal(inv, previousStatus) {
+  const modal = document.getElementById('modalConfirmAttendance');
+  const form = document.getElementById('formConfirmAttendance');
+  if (!modal || !form) return;
+
+  pendingAttendanceModalData = {
+    guestId: inv.id,
+    previousStatus: previousStatus
+  };
+
+  const counts = getGuestCounts(inv);
+  document.getElementById('confModalGuestId').value = inv.id;
+  document.getElementById('confModalGuestName').innerText = inv.nombre || inv.familia || 'Invitado';
+  
+  const pasesInfo = document.getElementById('confModalPasesInfo');
+  if (pasesInfo) {
+    pasesInfo.innerHTML = `<strong>Pases Asignados:</strong> ${counts.adultosInv} adulto${counts.adultosInv === 1 ? '' : 's'} y ${counts.ninosInv} niño${counts.ninosInv === 1 ? '' : 's'} (${counts.totalInv} en total).`;
+  }
+  const labelTodos = document.getElementById('confLabelTotalTodos');
+  if (labelTodos) {
+    labelTodos.innerText = `${counts.totalInv} personas: ${counts.adultosInv} ad. · ${counts.ninosInv} niñ.`;
+  }
+
+  const inputAdultos = document.getElementById('confInputAdultos');
+  const inputNinos = document.getElementById('confInputNinos');
+  const boxParcial = document.getElementById('confParcialInputsBox');
+  const radioTodos = form.querySelector('input[name="confAttendanceMode"][value="todos"]');
+  const radioParcial = form.querySelector('input[name="confAttendanceMode"][value="parcial"]');
+
+  // Si ya tenía confirmación parcial previa, sugerir esos números
+  const alreadyPartial = inv.asistira === true && counts.totalRech > 0 && counts.totalConf > 0;
+  if (alreadyPartial) {
+    if (radioParcial) radioParcial.checked = true;
+    if (boxParcial) boxParcial.style.display = 'block';
+  } else {
+    if (radioTodos) radioTodos.checked = true;
+    if (boxParcial) boxParcial.style.display = 'none';
+  }
+
+  if (inputAdultos) {
+    inputAdultos.max = counts.adultosInv;
+    inputAdultos.value = alreadyPartial ? counts.adultosConf : counts.adultosInv;
+  }
+  if (inputNinos) {
+    inputNinos.max = counts.ninosInv;
+    inputNinos.value = alreadyPartial ? counts.ninosConf : counts.ninosInv;
+  }
+
+  form.querySelectorAll('input[name="confAttendanceMode"]').forEach(r => {
+    r.onchange = () => {
+      if (boxParcial) {
+        boxParcial.style.display = (r.value === 'parcial') ? 'block' : 'none';
+      }
+      if (r.value === 'todos') {
+        if (inputAdultos) inputAdultos.value = counts.adultosInv;
+        if (inputNinos) inputNinos.value = counts.ninosInv;
+      }
+    };
+  });
+
+  modal.style.display = 'flex';
+}
+
+function closeConfirmAttendanceModal(revert = false) {
+  const modal = document.getElementById('modalConfirmAttendance');
+  if (modal) modal.style.display = 'none';
+  if (revert && pendingAttendanceModalData) {
+    renderInvitados();
+  }
+  pendingAttendanceModalData = null;
 }
 
 function openModalInvitado(id = null) {
