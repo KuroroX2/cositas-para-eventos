@@ -19,8 +19,8 @@
   
 
   <!-- Estilos -->
-  <link rel="stylesheet" href="../../css/organizador.css?v=20261025l">
-  <link rel="stylesheet" href="/cumpleanos/css/organizador.css?v=20261025l">
+  <link rel="stylesheet" href="../../css/organizador.css?v=20261025m">
+  <link rel="stylesheet" href="/cumpleanos/css/organizador.css?v=20261025m">
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
@@ -90,6 +90,19 @@
           <div class="num" id="metricGuests">0</div>
           <div class="lbl">Asistentes Confirmados</div>
           <div class="metric-sub" id="metricGuestsSub"></div>
+        </div>
+      </div>
+
+      <!-- Métrica 4: No Asistirán / Rechazados -->
+      <div class="metric-card m-declined">
+        <div class="metric-icon"><i class="ri-user-unfollow-line"></i></div>
+        <div class="metric-info">
+          <div class="num" id="metricDeclined">0 personas</div>
+          <div class="lbl">No Asistirán / Rechazos</div>
+          <div class="metric-sub" id="metricDeclinedSub">
+            <span class="tag-declined-adultos"><i class="ri-user-line"></i> 0 adultos</span>
+            <span class="tag-declined-ninos"><i class="ri-bear-smile-line"></i> 0 niños</span>
+          </div>
         </div>
       </div>
 
@@ -535,22 +548,43 @@
 
 
 
-        <div class="org-form-group" id="mInvEstadoRow" style="display: none;">
-          <label>Estado de Asistencia</label>
-          <div id="mInvEstadoDisplay" style="padding: 0.35rem 0;"></div>
-          <small style="color: var(--org-text-muted); font-size: 0.78rem; display: block; margin-top: 0.25rem;">
-            <i class="ri-information-line"></i> Se actualiza automáticamente cuando el invitado confirma o rechaza en la invitación.
-          </small>
+        <div class="org-form-group" id="mInvEstadoRow">
+          <label for="mInvEstadoSelect" style="font-weight: 700;">Estado de Asistencia</label>
+          <select id="mInvEstadoSelect" class="org-form-input" style="font-weight: 600;">
+            <option value="pendiente">⏳ Pendiente de confirmación</option>
+            <option value="si">✅ Confirmado / Asistirá</option>
+            <option value="no">❌ Rechazado / No asistirá</option>
+          </select>
         </div>
 
         <div class="org-form-row">
           <div class="org-form-group">
-            <label for="mInvAdultos">Adultos</label>
+            <label for="mInvAdultos">Adultos Invitados (Pases)</label>
             <input type="number" id="mInvAdultos" class="org-form-input" min="0" value="1">
           </div>
           <div class="org-form-group">
-            <label for="mInvNinos">Niños</label>
+            <label for="mInvNinos">Niños Invitados (Pases)</label>
             <input type="number" id="mInvNinos" class="org-form-input" min="0" value="0">
+          </div>
+        </div>
+
+        <!-- Personas que Asistirán Realmente (cuando el estado es 'si') -->
+        <div id="mInvConfirmadosBox" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.85rem; margin-bottom: 1rem; display: none;">
+          <div style="font-size: 0.82rem; font-weight: 700; color: #1e293b; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.35rem;">
+            <i class="ri-user-heart-line" style="color: #0ca678;"></i> Asistentes Reales Confirmados
+          </div>
+          <p style="font-size: 0.74rem; color: #64748b; margin-bottom: 0.65rem; line-height: 1.35;">
+            Si asistirán menos de los invitados originalmente (ej. un hijo adolescente no asiste), ajusta los números aquí. La diferencia se computará automáticamente como rechazo.
+          </p>
+          <div class="org-form-row" style="margin-bottom: 0;">
+            <div class="org-form-group" style="margin-bottom: 0;">
+              <label for="mInvAdultosConfirmados" style="font-size: 0.76rem;">Adultos que Asistirán</label>
+              <input type="number" id="mInvAdultosConfirmados" class="org-form-input" min="0" value="1">
+            </div>
+            <div class="org-form-group" style="margin-bottom: 0;">
+              <label for="mInvNinosConfirmados" style="font-size: 0.76rem;">Niños que Asistirán</label>
+              <input type="number" id="mInvNinosConfirmados" class="org-form-input" min="0" value="0">
+            </div>
           </div>
         </div>
 
@@ -851,9 +885,9 @@
 
   <!-- Scripts con Supabase Cloud Sync -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="../../js/supabase-cumple.js?v=20261025l"></script>
-  <script src="../../js/store.js?v=20261025l"></script>
-  <script src="../../js/organizador.js?v=20261025l"></script>
+  <script src="../../js/supabase-cumple.js?v=20261025m"></script>
+  <script src="../../js/store.js?v=20261025m"></script>
+  <script src="../../js/organizador.js?v=20261025m"></script>
   <script>
     if (typeof window.cumpleStore === 'undefined') {
       var sb = document.createElement('script'); sb.src = '/cumpleanos/js/supabase-cumple.js'; document.head.appendChild(sb);

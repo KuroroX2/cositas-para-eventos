@@ -231,6 +231,7 @@ body.org-body {
 
 .metric-card.m-guests .metric-icon { background: var(--org-teal-light); color: var(--org-teal); }
 .metric-card.m-tables .metric-icon { background: var(--org-primary-light); color: var(--org-primary); }
+.metric-card.m-declined .metric-icon { background: #ffe3e3; color: #e03131; }
 .metric-card.m-food .metric-icon { background: var(--org-pink-light); color: var(--org-pink); }
 .metric-card.m-party .metric-icon { background: var(--org-amber-light); color: var(--org-amber); }
 .metric-card.m-budget .metric-icon { background: #e7f5ff; color: #1c7ed6; }
@@ -279,6 +280,59 @@ body.org-body {
   padding: 0.15rem 0.45rem;
   border-radius: 6px;
   line-height: 1.2;
+}
+
+.metric-sub .tag-declined-adultos {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: #fff5f5;
+  color: #c92a2a;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  line-height: 1.2;
+}
+
+.metric-sub .tag-declined-ninos {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: #fff0f6;
+  color: #a61e4d;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  line-height: 1.2;
+}
+
+.select-row-status {
+  padding: 0.28rem 0.55rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid #ced4da;
+  outline: none;
+  transition: all 0.2s ease;
+  background-color: #fff;
+  font-family: inherit;
+}
+
+.select-row-status.status-yes {
+  background-color: #e6fcf5;
+  color: #0ca678;
+  border-color: #96f2d7;
+}
+
+.select-row-status.status-no {
+  background-color: #fff5f5;
+  color: #e03131;
+  border-color: #ffc9c9;
+}
+
+.select-row-status.status-pending {
+  background-color: #fff9db;
+  color: #f59f00;
+  border-color: #ffe066;
 }
 
 /* ==========================================================================

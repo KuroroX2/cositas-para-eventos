@@ -364,12 +364,19 @@ function initRsvpForm() {
     if (window.cumpleStore) {
       existingGuest = window.cumpleStore.findInvitado(code, nombre);
       if (existingGuest) {
+        const origAdultos = existingGuest.adultosInvitados !== undefined ? Number(existingGuest.adultosInvitados) : (Number(existingGuest.adultos) || 0);
+        const origNinos = existingGuest.ninosInvitados !== undefined ? Number(existingGuest.ninosInvitados) : (Number(existingGuest.ninos) || 0);
+
         window.cumpleStore.updateInvitado(existingGuest.id, {
           nombre: nombre,
           telefono: telefono || existingGuest.telefono,
           asistira: asistira,
-          adultos: adultos,
-          ninos: ninos,
+          adultos: origAdultos,
+          ninos: origNinos,
+          adultosInvitados: origAdultos,
+          ninosInvitados: origNinos,
+          adultosConfirmados: asistira ? adultos : 0,
+          ninosConfirmados: asistira ? ninos : 0,
           dedicatoria: dedicatoria || existingGuest.dedicatoria,
           fechaConfirmacion: new Date().toISOString()
         });
@@ -380,6 +387,10 @@ function initRsvpForm() {
           asistira,
           adultos,
           ninos,
+          adultosInvitados: adultos,
+          ninosInvitados: ninos,
+          adultosConfirmados: asistira ? adultos : 0,
+          ninosConfirmados: asistira ? ninos : 0,
           dedicatoria,
           codigo: code
         });

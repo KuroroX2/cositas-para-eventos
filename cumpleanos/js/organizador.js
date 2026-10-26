@@ -120,6 +120,50 @@ function initTabs() {
 }
 
 /**
+ * Helper para calcular de forma unificada las métricas de un invitado
+ * Considera pases originales, confirmados reales y rechazos totales o parciales
+ */
+function getGuestCounts(inv) {
+  const adultosInv = inv.adultosInvitados !== undefined ? (Number(inv.adultosInvitados) || 0) : (Number(inv.adultos) || 0);
+  const ninosInv = inv.ninosInvitados !== undefined ? (Number(inv.ninosInvitados) || 0) : (Number(inv.ninos) || 0);
+
+  let adultosConf = 0;
+  let ninosConf = 0;
+  let adultosRech = 0;
+  let ninosRech = 0;
+
+  if (inv.asistira === true) {
+    adultosConf = inv.adultosConfirmados !== undefined ? (Number(inv.adultosConfirmados) || 0) : adultosInv;
+    ninosConf = inv.ninosConfirmados !== undefined ? (Number(inv.ninosConfirmados) || 0) : ninosInv;
+    adultosRech = Math.max(0, adultosInv - adultosConf);
+    ninosRech = Math.max(0, ninosInv - ninosConf);
+  } else if (inv.asistira === false) {
+    adultosConf = 0;
+    ninosConf = 0;
+    adultosRech = adultosInv;
+    ninosRech = ninosInv;
+  } else {
+    // Pendiente de confirmación
+    adultosConf = 0;
+    ninosConf = 0;
+    adultosRech = 0;
+    ninosRech = 0;
+  }
+
+  return {
+    adultosInv,
+    ninosInv,
+    totalInv: adultosInv + ninosInv,
+    adultosConf,
+    ninosConf,
+    totalConf: adultosConf + ninosConf,
+    adultosRech,
+    ninosRech,
+    totalRech: adultosRech + ninosRech
+  };
+}
+
+/**
  * Cálculo y renderizado de métricas superiores
  */
 function renderMetrics() {
@@ -128,14 +172,27 @@ function renderMetrics() {
 
   const invitados = data.invitados || [];
   const totalInvitaciones = invitados.length;
-  const totalAdultosInv = invitados.reduce((sum, i) => sum + (Number(i.adultos) || 0), 0);
-  const totalNinosInv = invitados.reduce((sum, i) => sum + (Number(i.ninos) || 0), 0);
-  const totalPersonas = totalAdultosInv + totalNinosInv;
 
-  const confirmados = invitados.filter(i => i.asistira === true);
-  const totalAdultosConf = confirmados.reduce((sum, i) => sum + (Number(i.adultos) || 0), 0);
-  const totalNinosConf = confirmados.reduce((sum, i) => sum + (Number(i.ninos) || 0), 0);
+  let totalAdultosInv = 0;
+  let totalNinosInv = 0;
+  let totalAdultosConf = 0;
+  let totalNinosConf = 0;
+  let totalAdultosRech = 0;
+  let totalNinosRech = 0;
+
+  invitados.forEach(inv => {
+    const c = getGuestCounts(inv);
+    totalAdultosInv += c.adultosInv;
+    totalNinosInv += c.ninosInv;
+    totalAdultosConf += c.adultosConf;
+    totalNinosConf += c.ninosConf;
+    totalAdultosRech += c.adultosRech;
+    totalNinosRech += c.ninosRech;
+  });
+
+  const totalPersonas = totalAdultosInv + totalNinosInv;
   const totalAsistentes = totalAdultosConf + totalNinosConf;
+  const totalRechazados = totalAdultosRech + totalNinosRech;
 
   // Comida
   const comida = data.comida || [];
@@ -153,6 +210,8 @@ function renderMetrics() {
   const elTotalPerSub = document.getElementById('metricTotalPersonasSub');
   const elGuests = document.getElementById('metricGuests');
   const elGuestsSub = document.getElementById('metricGuestsSub');
+  const elDeclined = document.getElementById('metricDeclined');
+  const elDeclinedSub = document.getElementById('metricDeclinedSub');
   const elFood = document.getElementById('metricFood');
   const elParty = document.getElementById('metricParty');
   const elBudget = document.getElementById('metricBudget');
@@ -170,6 +229,13 @@ function renderMetrics() {
     elGuestsSub.innerHTML = `
       <span class="tag-adultos" title="Adultos confirmados"><i class="ri-user-line"></i> ${totalAdultosConf} adulto${totalAdultosConf === 1 ? '' : 's'}</span>
       <span class="tag-ninos" title="Niños confirmados"><i class="ri-bear-smile-line"></i> ${totalNinosConf} niño${totalNinosConf === 1 ? '' : 's'}</span>
+    `;
+  }
+  if (elDeclined) elDeclined.innerText = `${totalRechazados} personas`;
+  if (elDeclinedSub) {
+    elDeclinedSub.innerHTML = `
+      <span class="tag-declined-adultos" title="Adultos que no asistirán"><i class="ri-user-line"></i> ${totalAdultosRech} adulto${totalAdultosRech === 1 ? '' : 's'}</span>
+      <span class="tag-declined-ninos" title="Niños que no asistirán"><i class="ri-bear-smile-line"></i> ${totalNinosRech} niño${totalNinosRech === 1 ? '' : 's'}</span>
     `;
   }
   if (elFood) elFood.innerText = `${comidaLista} / ${comida.length}`;
@@ -282,7 +348,11 @@ function initInviteGenerator() {
       telefono: phone,
       asistira: null, // Pendiente de confirmación
       adultos: adultos,
-      ninos: ninos
+      ninos: ninos,
+      adultosInvitados: adultos,
+      ninosInvitados: ninos,
+      adultosConfirmados: 0,
+      ninosConfirmados: 0
     });
 
     form.reset();
@@ -562,13 +632,24 @@ function renderInvitados() {
   invitados.forEach(inv => {
     const tr = document.createElement('tr');
 
-    let statusBadge = '';
+    const counts = getGuestCounts(inv);
+    const statusVal = inv.asistira === true ? 'si' : (inv.asistira === false ? 'no' : 'pendiente');
+    const statusClass = statusVal === 'si' ? 'status-yes' : (statusVal === 'no' ? 'status-no' : 'status-pending');
+
+    let personasDetail = '';
     if (inv.asistira === true) {
-      statusBadge = `<span class="badge-status badge-yes"><i class="ri-check-line"></i> Asiste</span>`;
+      if (counts.totalRech > 0) {
+        personasDetail = `
+          <div style="font-size: 0.78rem; font-weight: 700; color: #0ca678; margin-top: 0.2rem;"><i class="ri-user-heart-line"></i> Asisten: ${counts.totalConf} (${counts.adultosConf} ad. · ${counts.ninosConf} niñ.)</div>
+          <div style="font-size: 0.72rem; color: #e03131; font-weight: 600;"><i class="ri-user-unfollow-line"></i> No asiste: ${counts.totalRech} (${counts.adultosRech > 0 ? `${counts.adultosRech} ad.` : ''}${counts.adultosRech > 0 && counts.ninosRech > 0 ? ' · ' : ''}${counts.ninosRech > 0 ? `${counts.ninosRech} niñ.` : ''})</div>
+        `;
+      } else {
+        personasDetail = `<div style="font-size: 0.76rem; color: #0ca678; font-weight: 600; margin-top: 0.2rem;"><i class="ri-check-line"></i> Asisten todos (${counts.totalConf})</div>`;
+      }
     } else if (inv.asistira === false) {
-      statusBadge = `<span class="badge-status badge-no"><i class="ri-close-line"></i> No asiste</span>`;
+      personasDetail = `<div style="font-size: 0.76rem; color: #e03131; font-weight: 600; margin-top: 0.2rem;"><i class="ri-close-line"></i> Ninguno asiste</div>`;
     } else {
-      statusBadge = `<span class="badge-status badge-pending"><i class="ri-time-line"></i> Pendiente</span>`;
+      personasDetail = `<div style="font-size: 0.76rem; color: #868e96; margin-top: 0.2rem;"><i class="ri-time-line"></i> Pendiente respuesta</div>`;
     }
 
     const typeLabel = inv.tipo === 'familia' ? '👨‍👩‍👧 Familia' : inv.tipo === 'pareja' ? '👥 Pareja' : '👤 Individual';
@@ -578,7 +659,6 @@ function renderInvitados() {
     const waMsg = buildWhatsAppMessage(inv, invUrl);
     const waUrl = buildWhatsAppUrl(inv.telefono, waMsg);
 
-    const totalPersonas = (Number(inv.adultos) || 0) + (Number(inv.ninos) || 0);
     const isChecked = selectedGuestIds.has(inv.id);
 
     tr.innerHTML = `
@@ -592,13 +672,20 @@ function renderInvitados() {
         ${inv.dedicatoria ? `<div style="font-size: 0.76rem; color: #7048e8; font-style: italic; margin-top: 0.25rem;">💌 "${escapeHtml(inv.dedicatoria)}"</div>` : ''}
       </td>
       <td>
-        <strong style="color: var(--org-primary); font-size: 0.95rem;">${totalPersonas} persona${totalPersonas > 1 ? 's' : ''}</strong>
-        <div style="font-size: 0.78rem; color: var(--org-text-muted);">${inv.adultos || 0} ad. &bull; ${inv.ninos || 0} niñ.</div>
+        <strong style="color: var(--org-primary); font-size: 0.95rem;">${counts.totalInv} pases</strong>
+        <div style="font-size: 0.78rem; color: var(--org-text-muted);">${counts.adultosInv} ad. &bull; ${counts.ninosInv} niñ.</div>
+        ${personasDetail}
       </td>
       <td>
         <span>${escapeHtml(inv.telefono || '—')}</span>
       </td>
-      <td>${statusBadge}</td>
+      <td>
+        <select class="select-row-status ${statusClass}" data-id="${inv.id}" title="Modificar estado de asistencia">
+          <option value="pendiente" ${statusVal === 'pendiente' ? 'selected' : ''}>⏳ Pendiente</option>
+          <option value="si" ${statusVal === 'si' ? 'selected' : ''}>✅ Asiste</option>
+          <option value="no" ${statusVal === 'no' ? 'selected' : ''}>❌ No asiste</option>
+        </select>
+      </td>
       <td style="text-align: right;">
         <div class="row-actions" style="justify-content: flex-end; gap: 0.35rem; flex-wrap: wrap;">
           <a href="${escapeHtml(waUrl)}" target="_blank" rel="noopener" class="btn-row-whatsapp" title="Abrir en WhatsApp">
@@ -613,7 +700,7 @@ function renderInvitados() {
           <a href="${escapeHtml(invUrl)}" target="_blank" rel="noopener" class="btn-row-view" title="Previsualizar invitación personalizada">
             <i class="ri-external-link-line"></i>
           </a>
-          <button type="button" class="btn-icon-action btn-edit-inv" data-id="${inv.id}" title="Editar invitado">
+          <button type="button" class="btn-icon-action btn-edit-inv" data-id="${inv.id}" title="Editar invitado y asistencia detallada">
             <i class="ri-pencil-line"></i>
           </button>
           <button type="button" class="btn-icon-action btn-del btn-del-inv" data-id="${inv.id}" title="Eliminar invitado">
@@ -656,6 +743,52 @@ function renderInvitados() {
     btn.addEventListener('click', () => {
       const msg = btn.getAttribute('data-msg');
       copyToClipboard(msg, '¡Mensaje completo con emojis copiado! Listo para pegar en WhatsApp');
+    });
+  });
+
+  // Listeners de cambio de estado de asistencia directamente en la fila
+  tbody.querySelectorAll('.select-row-status').forEach(sel => {
+    sel.addEventListener('change', (e) => {
+      const id = e.target.getAttribute('data-id');
+      const val = e.target.value;
+      const inv = (window.cumpleStore?.getInvitados() || []).find(i => i.id === id);
+      if (!inv) return;
+      const counts = getGuestCounts(inv);
+
+      let asistira = null;
+      let adConf = 0;
+      let niConf = 0;
+
+      if (val === 'si') {
+        asistira = true;
+        adConf = inv.adultosConfirmados !== undefined ? Number(inv.adultosConfirmados) : counts.adultosInv;
+        niConf = inv.ninosConfirmados !== undefined ? Number(inv.ninosConfirmados) : counts.ninosInv;
+      } else if (val === 'no') {
+        asistira = false;
+        adConf = 0;
+        niConf = 0;
+      } else {
+        asistira = null;
+        adConf = 0;
+        niConf = 0;
+      }
+
+      window.cumpleStore.updateInvitado(id, {
+        asistira: asistira,
+        adultosConfirmados: adConf,
+        ninosConfirmados: niConf
+      });
+
+      renderMetrics();
+      renderInvitados();
+
+      const toast = document.getElementById('orgToast');
+      const toastMsg = document.getElementById('orgToastMsg');
+      if (toast && toastMsg) {
+        toastMsg.innerText = val === 'si' ? '¡Invitado marcado como Asiste!' : (val === 'no' ? 'Invitado marcado como No asiste' : 'Invitado marcado como Pendiente');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2800);
+      }
     });
   });
 
@@ -1194,21 +1327,45 @@ function initModals() {
   document.getElementById('formModalInvitado')?.addEventListener('submit', (e) => {
     e.preventDefault();
     const editId = document.getElementById('invitadoEditId').value;
+    const estadoVal = document.getElementById('mInvEstadoSelect')?.value || 'pendiente';
+    const asistira = estadoVal === 'si' ? true : (estadoVal === 'no' ? false : null);
+
+    const adInv = parseInt(document.getElementById('mInvAdultos').value, 10) || 0;
+    const niInv = parseInt(document.getElementById('mInvNinos').value, 10) || 0;
+    const adConf = asistira === true ? (parseInt(document.getElementById('mInvAdultosConfirmados')?.value, 10) || 0) : 0;
+    const niConf = asistira === true ? (parseInt(document.getElementById('mInvNinosConfirmados')?.value, 10) || 0) : 0;
+
     const data = {
       nombre: document.getElementById('mInvNombre').value.trim(),
       telefono: document.getElementById('mInvTelefono').value.trim(),
-      adultos: parseInt(document.getElementById('mInvAdultos').value, 10) || 0,
-      ninos: parseInt(document.getElementById('mInvNinos').value, 10) || 0,
+      adultos: adInv,
+      ninos: niInv,
+      adultosInvitados: adInv,
+      ninosInvitados: niInv,
+      asistira: asistira,
+      adultosConfirmados: adConf,
+      ninosConfirmados: niConf,
       dedicatoria: document.getElementById('mInvDedicatoria').value.trim()
     };
 
     if (editId) {
       window.cumpleStore.updateInvitado(editId, data);
     } else {
-      data.asistira = null; // Pendiente de confirmación hasta que el invitado confirme o decline
       window.cumpleStore.addInvitado(data);
     }
+
+    renderMetrics();
+    renderInvitados();
+
     document.getElementById('modalInvitado').style.display = 'none';
+
+    const toast = document.getElementById('orgToast');
+    const toastMsg = document.getElementById('orgToastMsg');
+    if (toast && toastMsg) {
+      toastMsg.innerText = editId ? '¡Invitado actualizado correctamente!' : '¡Invitado agregado con éxito!';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2800);
+    }
   });
 
   // Modal Mesa
@@ -1300,35 +1457,56 @@ function openModalInvitado(id = null) {
   form.reset();
   document.getElementById('invitadoEditId').value = id || '';
 
-  const estadoRow = document.getElementById('mInvEstadoRow');
-  const estadoDisplay = document.getElementById('mInvEstadoDisplay');
+  const estadoSelect = document.getElementById('mInvEstadoSelect');
+  const confirmadosBox = document.getElementById('mInvConfirmadosBox');
+  const adConfInput = document.getElementById('mInvAdultosConfirmados');
+  const niConfInput = document.getElementById('mInvNinosConfirmados');
+
+  function updateConfirmadosBox() {
+    if (!confirmadosBox) return;
+    const isYes = estadoSelect?.value === 'si';
+    confirmadosBox.style.display = isYes ? 'block' : 'none';
+  }
+
+  if (estadoSelect) {
+    estadoSelect.onchange = () => {
+      updateConfirmadosBox();
+      if (estadoSelect.value === 'si') {
+        const adInv = parseInt(document.getElementById('mInvAdultos')?.value, 10) || 1;
+        const niInv = parseInt(document.getElementById('mInvNinos')?.value, 10) || 0;
+        if (adConfInput && (!adConfInput.value || adConfInput.value == 0)) adConfInput.value = adInv;
+        if (niConfInput && !niConfInput.value) niConfInput.value = niInv;
+      }
+    };
+  }
 
   if (id) {
     document.getElementById('modalInvitadoTitle').innerText = 'Editar Invitado';
     const inv = window.cumpleStore.getInvitados().find(i => i.id === id);
     if (inv) {
+      const counts = getGuestCounts(inv);
       document.getElementById('mInvNombre').value = inv.nombre || '';
       document.getElementById('mInvTelefono').value = inv.telefono || '';
-      document.getElementById('mInvAdultos').value = inv.adultos || 1;
-      document.getElementById('mInvNinos').value = inv.ninos || 0;
+      document.getElementById('mInvAdultos').value = counts.adultosInv;
+      document.getElementById('mInvNinos').value = counts.ninosInv;
       document.getElementById('mInvDedicatoria').value = inv.dedicatoria || '';
 
-      if (estadoRow && estadoDisplay) {
-        estadoRow.style.display = 'block';
-        if (inv.asistira === true) {
-          estadoDisplay.innerHTML = `<span class="badge-status badge-yes"><i class="ri-check-line"></i> Asiste (Confirmado)</span>`;
-        } else if (inv.asistira === false) {
-          estadoDisplay.innerHTML = `<span class="badge-status badge-no"><i class="ri-close-line"></i> No asiste</span>`;
-        } else {
-          estadoDisplay.innerHTML = `<span class="badge-status badge-pending"><i class="ri-time-line"></i> Pendiente de confirmación</span>`;
-        }
+      if (estadoSelect) {
+        estadoSelect.value = inv.asistira === true ? 'si' : (inv.asistira === false ? 'no' : 'pendiente');
       }
+      if (adConfInput) adConfInput.value = counts.adultosConf;
+      if (niConfInput) niConfInput.value = counts.ninosConf;
+
+      updateConfirmadosBox();
     }
   } else {
     document.getElementById('modalInvitadoTitle').innerText = 'Agregar Nuevo Invitado';
     document.getElementById('mInvAdultos').value = 1;
     document.getElementById('mInvNinos').value = 0;
-    if (estadoRow) estadoRow.style.display = 'none';
+    if (adConfInput) adConfInput.value = 1;
+    if (niConfInput) niConfInput.value = 0;
+    if (estadoSelect) estadoSelect.value = 'pendiente';
+    updateConfirmadosBox();
   }
 
   modal.style.display = 'flex';
