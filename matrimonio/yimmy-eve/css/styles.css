@@ -3859,6 +3859,7 @@ body.theme-florido .ch-num {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  align-items: stretch;
   box-shadow: 0 4px 15px rgba(82, 122, 80, 0.05);
   transition: all 0.25s ease;
   position: relative;
@@ -4741,6 +4742,7 @@ body.theme-florido .ch-num {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  align-items: stretch;
   align-items: center;
   gap: 1rem;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);

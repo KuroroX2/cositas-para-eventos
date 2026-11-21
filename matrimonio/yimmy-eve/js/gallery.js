@@ -142,7 +142,7 @@ function renderChallengeGridThumbnails() {
 
     let thumbsHtml = topPhotos.map(photo => `
       <div class="ch-thumb-item" onclick="openLightboxForPhoto('${photo.id}')" title="Foto por ${escapeHtml(photo.author || 'Invitado')} (${photo.likes || 0} ❤️)">
-        <img src="${escapeHtml(photo.url || photo.photo_url || '')}" alt="Reto ${ch.num}" loading="lazy">
+        <img src="${escapeHtml(photo.url || photo.photo_url || '')}" alt="Reto ${ch.num}">
         <span class="ch-thumb-likes">❤️ ${photo.likes || 0}</span>
       </div>
     `).join('');
@@ -751,11 +751,22 @@ function initUploadModal() {
   }
 }
 
-function compressImageFile(file, maxWidth = 800, quality = 0.72) {
+async function compressImageFile(file, maxWidth = 800, quality = 0.72) {
+  let sourceBlob = file;
+  const isHeic = /\.(heic|heif)$/i.test(file.name || '') || /image\/hei[cf]/i.test(file.type || '');
+  if (isHeic && typeof window.heic2any === 'function') {
+    try {
+      const converted = await window.heic2any({ blob: file, toType: 'image/jpeg', quality: 0.85 });
+      sourceBlob = Array.isArray(converted) ? converted[0] : converted;
+    } catch (heicErr) {
+      console.warn('heic2any conversion fallback:', heicErr);
+    }
+  }
+
   return new Promise((resolve) => {
     let objectUrl = '';
     try {
-      objectUrl = URL.createObjectURL(file);
+      objectUrl = URL.createObjectURL(sourceBlob);
     } catch (e) {}
 
     const img = new Image();
@@ -775,13 +786,13 @@ function compressImageFile(file, maxWidth = 800, quality = 0.72) {
 
       const dataUrl = canvas.toDataURL('image/jpeg', quality);
       canvas.toBlob((blob) => {
-        resolve({ blob: blob || file, dataUrl });
+        resolve({ blob: blob || sourceBlob, dataUrl });
       }, 'image/jpeg', quality);
     };
 
     img.onerror = () => {
       if (objectUrl) URL.revokeObjectURL(objectUrl);
-      resolve({ blob: file, dataUrl: '' });
+      resolve({ blob: sourceBlob, dataUrl: '' });
     };
 
     if (objectUrl) {
@@ -789,8 +800,8 @@ function compressImageFile(file, maxWidth = 800, quality = 0.72) {
     } else {
       const reader = new FileReader();
       reader.onload = (e) => { img.src = e.target.result; };
-      reader.onerror = () => resolve({ blob: file, dataUrl: '' });
-      reader.readAsDataURL(file);
+      reader.onerror = () => resolve({ blob: sourceBlob, dataUrl: '' });
+      reader.readAsDataURL(sourceBlob);
     }
   });
 }
