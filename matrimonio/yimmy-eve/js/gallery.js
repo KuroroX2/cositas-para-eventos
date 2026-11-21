@@ -4,8 +4,8 @@
  * Desafíos con miniaturas ordenadas por Likes, Álbum con orden Cronológico/Popular y Sincronización Global
  */
 
-const CLOUD_STORAGE_KEY = 'eve_yimmy_wedding_album_cache_v9';
-const LIKED_PHOTOS_KEY = 'eve_yimmy_liked_photos_v9';
+const CLOUD_STORAGE_KEY = 'eve_yimmy_wedding_album_cache_v10';
+const LIKED_PHOTOS_KEY = 'eve_yimmy_liked_photos_v10';
 
 const CHALLENGES_LIST = [
   { id: 'desafio_01', num: '01', title: 'Foto con los lentes de la novia 🕶️' },
@@ -27,6 +27,7 @@ let activeSortOrder = 'recent';   // 'recent' (cronológico), 'popular' (más me
 let currentUploadMode = 'album';   // 'album', 'desafios'
 let weddingPhotos = [];
 let activePhotoForLightbox = null;
+let isUploadingPhoto = false;
 
 // Expose to window
 window.weddingPhotos = weddingPhotos;
@@ -689,6 +690,7 @@ function initUploadModal() {
       if (submitBtn) submitBtn.style.display = 'none';
       if (progressBox) progressBox.style.display = 'flex';
 
+      isUploadingPhoto = true;
       try {
         // 1. Comprimir imagen a tamaño ligero (~70KB)
         const { blob, dataUrl } = await compressImageFile(selectedFile, 800, 0.72);
@@ -710,20 +712,18 @@ function initUploadModal() {
         saveLocalCache();
         renderGallery();
 
-        // 3. Sincronizar en Supabase Cloud
-        if (window.dbSupabase) {
-          try {
-            const record = await window.dbSupabase.uploadPhoto(blob, author, category, caption, dataUrl);
-            if (record && record.id) {
-              newPhoto.id = record.id;
-              if (record.photo_url) newPhoto.url = record.photo_url;
-              saveLocalCache();
-              renderGallery();
-            }
-          } catch (cloudErr) {
-            console.warn('Cloud sync note:', cloudErr);
-          }
+        // 3. Sincronizar en Supabase Cloud (obligatorio para que otros dispositivos la vean)
+        if (!window.dbSupabase) {
+          throw new Error('Conexión con la nube no disponible');
         }
+        const record = await window.dbSupabase.uploadPhoto(blob, author, category, caption, dataUrl);
+        if (!record || !record.id) {
+          throw new Error('No se recibió confirmación del servidor');
+        }
+        newPhoto.id = record.id;
+        if (record.photo_url) newPhoto.url = record.photo_url;
+        saveLocalCache();
+        renderGallery();
 
         closeModal();
         alert('¡Foto publicada con éxito! Ya está disponible para todos en vivo.');
@@ -737,8 +737,13 @@ function initUploadModal() {
 
       } catch (error) {
         console.error('Upload error:', error);
-        alert('Foto subida con éxito.');
+        // Revertir la foto temporal si falló la subida a la nube
+        weddingPhotos = weddingPhotos.filter(p => !String(p.id).startsWith('photo_'));
+        saveLocalCache();
+        renderGallery();
+        alert('No se pudo subir la foto a la nube. Verifica tu conexión a internet e intenta nuevamente.');
       } finally {
+        isUploadingPhoto = false;
         if (submitBtn) submitBtn.style.display = 'inline-flex';
         if (progressBox) progressBox.style.display = 'none';
       }
@@ -794,10 +799,10 @@ function compressImageFile(file, maxWidth = 800, quality = 0.72) {
    7. REALTIME SUPABASE SYNC (Fetch & Polling)
    ========================================================================== */
 async function fetchCloudPhotos() {
-  if (!window.dbSupabase) return;
+  if (!window.dbSupabase || isUploadingPhoto) return;
   try {
     const rawPhotos = await window.dbSupabase.getPhotos();
-    if (rawPhotos && rawPhotos.length > 0) {
+    if (Array.isArray(rawPhotos)) {
       weddingPhotos = rawPhotos.map(p => ({
         id: p.id,
         url: p.photo_url,
@@ -812,6 +817,7 @@ async function fetchCloudPhotos() {
       renderGallery();
       if (activePhotoForLightbox) {
         updateLightboxLikeUI();
+        renderLightboxComments();
       }
     }
   } catch (e) {

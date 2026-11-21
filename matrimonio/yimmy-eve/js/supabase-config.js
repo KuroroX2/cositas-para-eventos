@@ -251,17 +251,18 @@ window.dbSupabase = {
   // ==========================================
   async getPhotos() {
     const client = getSupabaseClient();
-    if (!client) return [];
+    if (!client) return null;
     try {
       const { data, error } = await client
         .from('photos')
         .select('*')
+        .eq('event_slug', 'eve-y-yimmy')
         .order('created_at', { ascending: false });
       if (error) throw error;
       return data || [];
     } catch (e) {
       console.warn('Error al obtener fotos:', e);
-      return [];
+      return null;
     }
   },
 
